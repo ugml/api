@@ -63,7 +63,6 @@ export class BuildingsRouter {
      */
     init() {
         this.router.get('/get/:planetID', this.getAllBuildingsOnPlanet);
-        // this.router.get('/get/:planetID/:buildingID', this.getBuildingById);
     }
 
 }

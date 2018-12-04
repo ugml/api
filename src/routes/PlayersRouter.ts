@@ -2,6 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import { DB } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import { PlanetsRouter } from "./PlanetsRouter";
 
 
 
@@ -19,6 +20,32 @@ export class PlayersRouter {
         this.init();
     }
 
+    public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        let playerId = parseInt(request.userID);
+        let query = "SELECT `userID`, `username`, `onlinetime`, `currentplanet` FROM `users` WHERE `userID` = '" + playerId + "'";
+
+        // execute the query
+        db.getConnection().query(query, function (err, result, fields) {
+            let data;
+
+            if(!validator.isSet(result)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: data
+            });
+        });
+
+    }
+
     /**
      * GET player by ID
      */
@@ -27,14 +54,7 @@ export class PlayersRouter {
         // validate parameters
         if(validator.isSet(request.params.playerID) && validator.isValidInt(request.params.playerID)) {
 
-            let query : string = "";
-
-            // check, if user wants data from himself
-            if(parseInt(request.params.playerID) === parseInt(request.userID)) {
-                query = "SELECT DISTINCT `userID`, `username`, `onlinetime`, `currentplanet` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
-            } else {
-                query = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
-            }
+            let query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
 
             // execute the query
             db.getConnection().query(query, function (err, result, fields) {
@@ -88,8 +108,17 @@ export class PlayersRouter {
      * endpoints.
      */
     init() {
-        this.router.post('/create/', this.createPlayer);
-        this.router.get('/get/:playerID', this.getPlayerByID);
+        // /user
+        this.router.get('/', this.getPlayerSelf);
+
+        // /users/:playerID
+        this.router.get('/:playerID', this.getPlayerByID);
+
+        // /user/planets/:planetID
+        this.router.get('/planets/:planetID', new PlanetsRouter().getOwnPlanet);
+
+        // /user/create/
+        this.router.post('/create', this.createPlayer);
     }
 
 }

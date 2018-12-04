@@ -18,6 +18,7 @@ import BuildingRouter from "./routes/BuildingsRouter";
 import TechsRouter from "./routes/TechsRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import DefenseRouter from "./routes/DefenseRouter";
+import {Router} from "express";
 
 
 // Creates and configures an ExpressJS web server.
@@ -43,8 +44,8 @@ class App {
 
     // Configure API endpoints.
     private routes(): void {
-
         let self = this;
+
 
         // check, if request contains valid jwt-token
         this.express.use('/*', (request, response, next) => {
@@ -74,39 +75,31 @@ class App {
 
         });
 
+        this.register('/v1/auth', AuthRouter);
 
-        // this.express.use('/', router);
-        this.express.use('/v1/auth', AuthRouter);
+        this.register('/v1/user', PlayerRouter);
 
-        this.express.use('/v1/players', function (req : IAuthorizedRequest, res, next) {
+        this.register('/v1/users', PlayerRouter);
+
+        this.register('/v1/planets', PlanetRouter);
+
+        this.register('/v1/buildings', BuildingRouter);
+
+        this.register('/v1/techs', TechsRouter);
+
+        this.register('/v1/ships', ShipsRouter);
+
+        this.register('/v1/defense', DefenseRouter);
+    }
+
+    private register(route : string, router : Router) {
+
+        let self = this;
+
+        this.express.use(route, function (req : IAuthorizedRequest, res, next) {
             req.userID = self.userID;
             next();
-        }, PlayerRouter);
-
-        this.express.use('/v1/planets', function (req : IAuthorizedRequest, res, next) {
-            req.userID = self.userID;
-            next();
-        }, PlanetRouter);
-
-        this.express.use('/v1/buildings', function (req : IAuthorizedRequest, res, next) {
-            req.userID = self.userID;
-            next();
-        }, BuildingRouter);
-
-        this.express.use('/v1/techs', function (req : IAuthorizedRequest, res, next) {
-            req.userID = self.userID;
-            next();
-        }, TechsRouter);
-
-        this.express.use('/v1/ships', function (req : IAuthorizedRequest, res, next) {
-            req.userID = self.userID;
-            next();
-        }, ShipsRouter);
-
-        this.express.use('/v1/defense', function (req : IAuthorizedRequest, res, next) {
-            req.userID = self.userID;
-            next();
-        }, DefenseRouter);
+        }, router);
     }
 
 }

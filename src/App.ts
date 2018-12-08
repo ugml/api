@@ -52,7 +52,7 @@ class App {
 
             // if the user tries to authenticate, we don't have a token yet
             if(!request.originalUrl.toString().includes("\/auth\/") &&
-                !request.originalUrl.toString().includes("\/players\/create\/")) {
+                !request.originalUrl.toString().includes("\/users\/create\/")) {
 
                 const authString = request.header("authorization");
 

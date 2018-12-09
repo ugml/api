@@ -17,52 +17,51 @@ export class BuildingsRouter {
         this.init();
     }
 
-
+    /**
+     * Returns all buildings on a given planet
+     * @param request
+     * @param response
+     * @param next
+     */
     public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(validator.isSet(request.params.planetID) &&
-            validator.isValidInt(request.params.planetID)) {
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = '" + request.params.planetID + "';";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-
-
-            });
-
-
-
-        } else {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
+
         }
+
+        let query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = :planetID;";
+
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    planetID: request.params.planetID
+                },
+                type: db.getConnection().QueryTypes.SELECT
+            }
+        ).then(buildings => {
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: buildings
+            });
+
+        });
     }
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+    /***
+     * Initializes the routes
      */
     init() {
-        this.router.get('/get/:planetID', this.getAllBuildingsOnPlanet);
+        this.router.get('/:planetID', this.getAllBuildingsOnPlanet);
     }
 
 }

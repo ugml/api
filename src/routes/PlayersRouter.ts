@@ -20,95 +20,107 @@ export class PlayersRouter {
         this.init();
     }
 
+    /***
+     * Returns the data of the currently logged in player
+     * @param request
+     * @param response
+     * @param next
+     */
     public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        // validate parameters
-        let playerId = parseInt(request.userID);
-        let query = "SELECT `userID`, `username`, `onlinetime`, `currentplanet` FROM `users` WHERE `userID` = '" + playerId + "'";
+        let query = "SELECT DISTINCT `userID`, `username`, `onlinetime`, `currentplanet` FROM `users` WHERE `userID` = :userID;";
 
-        // execute the query
-        db.getConnection().query(query, function (err, result, fields) {
-            let data;
-
-            if(!validator.isSet(result)) {
-                data = {};
-            } else {
-                data = result[0];
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    userID: request.userID
+                },
+                type: db.getConnection().QueryTypes.SELECT
             }
+        ).then(user => {
 
             // return the result
             response.json({
                 status: 200,
                 message: "Success",
-                data: data
+                data: user
             });
         });
 
     }
 
-    /**
-     * GET player by ID
+    /***
+     * Returns the data of any player given his userID
+     * @param request
+     * @param response
+     * @param next
      */
     public getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(validator.isSet(request.params.playerID) && validator.isValidInt(request.params.playerID)) {
-
-            let query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-            });
-
-
-        } else {
+        if(!validator.isSet(request.params.playerID) || !validator.isValidInt(request.params.playerID)) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
         }
-    }
 
-    public createPlayer(request: Request, response: Response, next: NextFunction) {
+        let query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = :userID;";
 
-        if(validator.isSet(request.query.username) && validator.isSet(request.query.password) && validator.isSet(request.query.email)) {
-            // TODO: send user-create event to kafka
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    userID: request.params.playerID
+                },
+                type: db.getConnection().QueryTypes.SELECT
+            }
+        ).then(user => {
+
+            // return the result
             response.json({
                 status: 200,
                 message: "Success",
-                data: {}
+                data: user
             });
-        } else {
+
+        });
+    }
+
+    /***
+     * Passes a request to create a new user to kafka
+     * @param request
+     * @param response
+     * @param next
+     */
+    public createPlayer(request: Request, response: Response, next: NextFunction) {
+
+        if(!validator.isSet(request.query.username) ||
+            !validator.isSet(request.query.password) ||
+            !validator.isSet(request.query.email)) {
+
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
+
         }
+
+        // TODO: send user-create event to kafka
+        response.json({
+            status: 200,
+            message: "Success",
+            data: {}
+        });
+
     }
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+    /***
+     * Initializes the routes
      */
     init() {
-        // /user
+        // /user/
         this.router.get('/', this.getPlayerSelf);
 
         // /users/:playerID
@@ -118,7 +130,7 @@ export class PlayersRouter {
         this.router.get('/planets/:planetID', new PlanetsRouter().getOwnPlanet);
 
         // /user/create/
-        this.router.post('/create', this.createPlayer);
+        this.router.post('/create/', this.createPlayer);
     }
 
 }

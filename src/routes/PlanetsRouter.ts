@@ -17,80 +17,95 @@ export class PlanetsRouter {
         this.init();
     }
 
+    /***
+     * Returns the data of any planet the player owns given the planetID
+     * @param request
+     * @param response
+     * @param next
+     */
     public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(validator.isSet(request.params.planetID) && validator.isValidInt(request.params.planetID)) {
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT * FROM `planets` WHERE `planetID` = '" + request.params.planetID + "' AND `ownerID` = '" + request.userID + "';";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-            });
-        }
-
-    }
-
-    /**
-     * GET planet by ID
-     */
-    public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-
-        // validate parameters
-        if(validator.isSet(request.params.planetID) && validator.isValidInt(request.params.planetID)) {
-
-            let query : string = "SELECT `planetID`, `ownerID`, `name`, `galaxy`, `system`, `planet`, `last_update`, `planet_type`, `image`, `destroyed` FROM `planets` WHERE `planetID` = '" + request.params.planetID + "'";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-
-            });
-
-
-        } else {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
         }
+
+        let query : string = "SELECT * FROM `planets` WHERE `planetID` = :planetID AND `ownerID` = :ownerID;";
+
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    ownerID: request.userID,
+                    planetID: request.params.planetID
+                },
+                type: db.getConnection().QueryTypes.SELECT
+            }
+        ).then(planet => {
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: planet
+            });
+
+        });
+
     }
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+    /***
+     * Returns the data of any planet given the planetID
+     * @param request
+     * @param response
+     * @param next
+     */
+    public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
+
+            response.json({
+                status: 400,
+                message: "Invalid parameter",
+                data: {}
+            });
+        }
+
+        let query : string = "SELECT `planetID`, `ownerID`, `name`, `galaxy`, `system`, `planet`, `last_update`, `planet_type`, `image`, `destroyed` FROM `planets` WHERE `planetID` = :planetID;";
+
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    planetID: request.params.planetID
+                },
+                type: db.getConnection().QueryTypes.SELECT
+            }
+        ).then(planet => {
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: planet
+            });
+
+        });
+    }
+
+    /***
+     * Initializes the routes
      */
     init() {
+
+        // /user/planets/:planetID (getOwnPlanet)
+        // is handled in the PlayersRouter.ts file
 
         // /planets/:planetID
         this.router.get('/:planetID', this.getPlanetByID);

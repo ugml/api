@@ -18,53 +18,49 @@ export class DefenseRouter {
         this.init();
     }
 
+    /**
+     * Returns all defenses on a given planet
+     * @param request
+     * @param response
+     * @param next
+     */
+    public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-    public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-
-        if(validator.isSet(request.params.planetID) &&
-            validator.isValidInt(request.params.planetID)) {
-
-            let query : string = "SELECT p.ownerID, d.* FROM defense d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = '" + request.params.planetID + "';";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-
-
-            });
-
-
-
-        } else {
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
         }
+
+        let query : string = "SELECT p.ownerID, d.* FROM defenses d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = :planetID;";
+
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    planetID: request.params.planetID
+                },
+                type: db.getConnection().QueryTypes.SELECT
+            }
+        ).then(defense => {
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: defense
+            });
+
+        });
     }
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+    /***
+     * Initializes the routes
      */
     init() {
-        this.router.get('/get/:planetID', this.getAllBuildingsOnPlanet);
-        // this.router.get('/get/:planetID/:buildingID', this.getBuildingById);
+        this.router.get('/:planetID', this.getAllDefensesOnPlanet);
     }
 
 }

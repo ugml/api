@@ -34,6 +34,8 @@ export class PlanetsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let query : string = "SELECT * FROM `planets` WHERE `planetID` = :planetID AND `ownerID` = :ownerID;";
@@ -76,6 +78,8 @@ export class PlanetsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let query : string = "SELECT `planetID`, `ownerID`, `name`, `galaxy`, `system`, `planet`, `last_update`, `planet_type`, `image`, `destroyed` FROM `planets` WHERE `planetID` = :planetID;";

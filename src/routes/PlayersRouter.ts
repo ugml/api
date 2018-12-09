@@ -64,6 +64,8 @@ export class PlayersRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = :userID;";
@@ -104,6 +106,8 @@ export class PlayersRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
 
         }
 

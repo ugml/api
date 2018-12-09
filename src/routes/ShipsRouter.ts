@@ -34,6 +34,8 @@ export class ShipsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let query : string = "SELECT p.ownerID, f.* FROM fleet f LEFT JOIN planets p ON f.planetID = p.planetID WHERE f.planetID = :planetID;";

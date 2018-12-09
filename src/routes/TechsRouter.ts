@@ -35,6 +35,8 @@ export class TechsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let query : string = "SELECT * FROM techs WHERE userID =  :userID;";

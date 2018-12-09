@@ -33,6 +33,8 @@ export class DefenseRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let query : string = "SELECT p.ownerID, d.* FROM defenses d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = :planetID;";

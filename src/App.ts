@@ -68,6 +68,8 @@ class App {
                         message: "Authentication failed",
                         data: {}
                     });
+
+                    return;
                 }
             } else {
                 next();

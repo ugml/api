@@ -40,6 +40,8 @@ export class AuthRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
         }
 
         let email = validator.sanitizeString(req.query['email']);

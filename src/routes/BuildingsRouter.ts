@@ -34,6 +34,8 @@ export class BuildingsRouter {
                 data: {}
             });
 
+            return;
+
         }
 
         let query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = :planetID;";

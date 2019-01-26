@@ -22,49 +22,66 @@ export class AuthRouter {
         this.init();
     }
 
+    /***
+     * Validates the passed login-data. If the data is valid,
+     * a new JWT-token is returned.
+     * @param req
+     * @param response
+     * @param next
+     */
     public authenticate(req: Request, response: Response, next: NextFunction) {
 
+        if(!validator.isSet(req.query['email'])) {
 
-        if(validator.isSet(req.query['email'])) {
-            let email = validator.sanitizeString(req.query['email']);
+            console.log("AuthRouter.ts: 400");
 
-            let query : string = "SELECT DISTINCT `userID`, `email`, `password` FROM `users` WHERE `email` = '" + email + "'";
+            response.json({
+                status: 400,
+                message: "Invalid parameter",
+                data: {}
+            });
 
+            return;
+        }
 
-            db.getConnection().query(query, function (err, result, fields) {
+        let email = validator.sanitizeString(req.query['email']);
 
-                bcrypt.compare(req.query['password'], result[0].password).then(function(isValidPassword) {
+        let query : string = "SELECT `userID`, `email`, `password` FROM `users` WHERE `email` = :email;";
 
-                    if(validator.isSet(result) && isValidPassword) {
-                        // create new jwt-token
+        db.getConnection().query(query,
+            {
+                replacements: {
+                    email: email
+                },
+                type: db.getConnection().QueryTypes.SELECT
+            }
+        ).then(user => {
 
-                        return response.json({
-                            status: 200,
-                            message: "Success",
-                            data: {
-                                token: jwt.generateToken(result[0].userID)
-                            }
-                        });
+            bcrypt.compare(req.query['password'], user[0].password).then(function(isValidPassword) {
 
+                if(!validator.isSet(user) || !isValidPassword) {
+                    response.json({
+                        status: 401,
+                        message: "Authentication failed",
+                        data: {}
+                    });
+                }
 
-                    } else {
-                        // send fail-response
-
-                        return response.json({
-                            status: 401,
-                            message: "Authentication failed",
-                            data: {}
-                        });
+                // create new jwt-token
+                return response.json({
+                    status: 200,
+                    message: "Success",
+                    data: {
+                        token: jwt.generateToken(user[0].userID)
                     }
                 });
 
             });
-        }
+        });
     }
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+    /***
+     * Initializes the routes
      */
     init() {
         this.router.post('/login', this.authenticate);

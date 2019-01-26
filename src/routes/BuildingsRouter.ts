@@ -21,7 +21,12 @@ export class BuildingsRouter {
         this.init();
     }
 
-
+    /**
+     * Returns all buildings on a given planet
+     * @param request
+     * @param response
+     * @param next
+     */
     public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         if(validator.isSet(request.params.planetID) &&

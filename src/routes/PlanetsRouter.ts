@@ -17,6 +17,30 @@ export class PlanetsRouter {
         this.init();
     }
 
+    public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        let query : string = "SELECT * FROM `planets` WHERE `ownerID` = '" + request.userID + "';";
+
+        // execute the query
+        db.getConnection().query(query, function (err, result, fields) {
+
+            let data;
+
+            if(!validator.isSet(result)) {
+                data = {};
+            } else {
+                data = result;
+            }
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: data
+            });
+        });
+    }
+
     public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters

@@ -63,7 +63,7 @@ export class TechsRouter {
      * endpoints.
      */
     init() {
-        this.router.get('/get/:playerID', this.getTechs);
+        this.router.get('/:playerID', this.getTechs);
     }
 
 }

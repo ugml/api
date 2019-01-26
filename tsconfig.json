@@ -5,7 +5,8 @@
     "outDir": "dist"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/config/*.json"
   ],
   "exclude": [
     "node_modules"

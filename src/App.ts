@@ -11,6 +11,7 @@ require('dotenv-safe').config();
 
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest"
 
+import ConfigRouter from './routes/ConfigRouter';
 import AuthRouter from './routes/AuthRouter';
 import PlayerRouter from "./routes/PlayersRouter";
 import PlanetRouter from "./routes/PlanetsRouter";
@@ -52,7 +53,8 @@ class App {
 
             // if the user tries to authenticate, we don't have a token yet
             if(!request.originalUrl.toString().includes("\/auth\/") &&
-                !request.originalUrl.toString().includes("\/users\/create\/")) {
+                !request.originalUrl.toString().includes("\/users\/create\/") &&
+                !request.originalUrl.toString().includes("\/config\/")) {
 
                 const authString = request.header("authorization");
 
@@ -75,6 +77,8 @@ class App {
 
         });
 
+        this.register('/v1/config', ConfigRouter);
+
         this.register('/v1/auth', AuthRouter);
 
         this.register('/v1/user', PlayerRouter);
@@ -89,7 +93,7 @@ class App {
 
         this.register('/v1/ships', ShipsRouter);
 
-        this.register('/v1/defense', DefenseRouter);
+        this.register('/v1/defenses', DefenseRouter);
     }
 
     private register(route : string, router : Router) {

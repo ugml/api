@@ -79,7 +79,7 @@ export class PlayersRouter {
         } else {
             response.json({
                 status: 400,
-                message: "Invalid parameter",
+                message: "Invalid parameter3",
                 data: {}
             });
         }
@@ -103,22 +103,35 @@ export class PlayersRouter {
         }
     }
 
+    public test(request: Request, response: Response, next: NextFunction) {
+
+        response.json({
+            status: 200,
+            message: "test",
+            data: {}
+        });
+    }
+
     /**
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
      */
     init() {
+
+        // /user/planets/:planetID
+        this.router.get('/planets/:planetID', new PlanetsRouter().getOwnPlanet);
+
+        // /user/planets/
+        this.router.get('/planetlist/', new PlanetsRouter().getAllPlanetsOfPlayer);
+
+        // /user/create/
+        this.router.post('/create', this.createPlayer);
+
         // /user
         this.router.get('/', this.getPlayerSelf);
 
         // /users/:playerID
         this.router.get('/:playerID', this.getPlayerByID);
-
-        // /user/planets/:planetID
-        this.router.get('/planets/:planetID', new PlanetsRouter().getOwnPlanet);
-
-        // /user/create/
-        this.router.post('/create', this.createPlayer);
     }
 
 }

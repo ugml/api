@@ -1,0 +1,749 @@
+{
+    "units": {
+        "buildings": {
+            "1": {
+                "metal": 60,
+                "crystal": 15,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1.5
+            },
+            "2": {
+                "metal": 48,
+                "crystal": 24,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1.6
+            },
+            "3": {
+                "metal": 225,
+                "crystal": 75,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1.5
+            },
+            "4": {
+                "metal": 75,
+                "crystal": 30,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1.5
+            },
+            "5": {
+                "metal": 900,
+                "crystal": 360,
+                "deuterium": 180,
+                "energy": 0,
+                "factor": 1.8
+            },
+            "6": {
+                "metal": 400,
+                "crystal": 120,
+                "deuterium": 200,
+                "energy": 0,
+                "factor": 2
+            },
+            "7": {
+                "metal": 1000000,
+                "crystal": 500000,
+                "deuterium": 100000,
+                "energy": 0,
+                "factor": 2
+            },
+            "8": {
+                "metal": 400,
+                "crystal": 200,
+                "deuterium": 100,
+                "energy": 0,
+                "factor": 2
+            },
+            "9": {
+                "metal": 1000,
+                "crystal": 0,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "10": {
+                "metal": 1000,
+                "crystal": 500,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "11": {
+                "metal": 1000,
+                "crystal": 1000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "12": {
+                "metal": 200,
+                "crystal": 400,
+                "deuterium": 200,
+                "energy": 0,
+                "factor": 2
+            },
+            "13": {
+                "metal": 0,
+                "crystal": 50000,
+                "deuterium": 100000,
+                "energy": 1000,
+                "factor": 2
+            },
+            "14": {
+                "metal": 20000,
+                "crystal": 40000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "15": {
+                "metal": 20000,
+                "crystal": 20000,
+                "deuterium": 1000,
+                "energy": 0,
+                "factor": 2
+            }
+        },
+        "ships": {
+            "201": {
+                "metal": 2000,
+                "crystal": 2000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 20,
+                "speed": 28000,
+                "capacity": 5000,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "202": {
+                "metal": 6000,
+                "crystal": 6000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 50,
+                "speed": 17250,
+                "capacity": 25000,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "203": {
+                "metal": 3000,
+                "crystal": 1000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 20,
+                "speed": 28750,
+                "capacity": 50,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "204": {
+                "metal": 6000,
+                "crystal": 4000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 75,
+                "speed": 28000,
+                "capacity": 100,
+                "rapidfire": {
+                    "201": 3,
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "205": {
+                "metal": 20000,
+                "crystal": 7000,
+                "deuterium": 2000,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 300,
+                "speed": 42000,
+                "capacity": 800,
+                "rapidfire": {
+                    "203": 6,
+                    "209": 5,
+                    "211": 5,
+                    "301": 10
+                }
+            },
+            "206": {
+                "metal": 45000,
+                "crystal": 15000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 500,
+                "speed": 31000,
+                "capacity": 1500,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "207": {
+                "metal": 10000,
+                "crystal": 20000,
+                "deuterium": 10000,
+                "energy": 0,
+                "factor": 1,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "208": {
+                "metal": 10000,
+                "crystal": 6000,
+                "deuterium": 2000,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 300,
+                "speed": 4600,
+                "capacity": 20000,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "209": {
+                "metal": 0,
+                "crystal": 1000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 1,
+                "speed": 230000000,
+                "capacity": 5,
+                "rapidfire": {}
+            },
+            "210": {
+                "metal": 50000,
+                "crystal": 25000,
+                "deuterium": 15000,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 1000,
+                "speed": 11200,
+                "capacity": 500,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5,
+                    "301": 20,
+                    "302": 20,
+                    "303": 10,
+                    "305": 10
+                }
+            },
+            "211": {
+                "metal": 0,
+                "crystal": 2000,
+                "deuterium": 500,
+                "energy": 0,
+                "factor": 1,
+                "rapidfire": {}
+            },
+            "212": {
+                "metal": 60000,
+                "crystal": 50000,
+                "deuterium": 15000,
+                "energy": 0,
+                "factor": 1,
+                "consumption": 1000,
+                "speed": 15500,
+                "capacity": 2000,
+                "rapidfire": {
+                    "209": 5,
+                    "211": 5,
+                    "215": 2,
+                    "302": 10
+                }
+            },
+            "213": {
+                "metal": 30000,
+                "crystal": 40000,
+                "deuterium": 15000,
+                "energy": 0,
+                "factor": 1,
+                "rapidfire": {
+                    "201": 3,
+                    "202": 3,
+                    "204": 4,
+                    "205": 4,
+                    "206": 7,
+                    "209": 5,
+                    "211": 5
+                }
+            },
+            "214": {
+                "metal": 5000000,
+                "crystal": 4000000,
+                "deuterium": 1000000,
+                "energy": 0,
+                "factor": 1,
+                "rapidfire": {
+                    "201": 250,
+                    "202": 250,
+                    "203": 200,
+                    "204": 100,
+                    "205": 33,
+                    "206": 30,
+                    "207": 250,
+                    "208": 250,
+                    "209": 1250,
+                    "211": 1250,
+                    "215": 15,
+                    "301": 200,
+                    "302": 200,
+                    "303": 100,
+                    "304": 50,
+                    "305": 100
+                }
+            }
+        },
+        "defenses": {
+            "301": {
+                "metal": 2000,
+                "crystal": 0,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "302": {
+                "metal": 1500,
+                "crystal": 500,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "303": {
+                "metal": 6000,
+                "crystal": 2000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "304": {
+                "metal": 20000,
+                "crystal": 15000,
+                "deuterium": 2000,
+                "energy": 0,
+                "factor": 1
+            },
+            "305": {
+                "metal": 2000,
+                "crystal": 6000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "306": {
+                "metal": 50000,
+                "crystal": 50000,
+                "deuterium": 30000,
+                "energy": 0,
+                "factor": 1
+            },
+            "307": {
+                "metal": 10000,
+                "crystal": 10000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "308": {
+                "metal": 50000,
+                "crystal": 50000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "309": {
+                "metal": 8000,
+                "crystal": 2000,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 1
+            },
+            "310": {
+                "metal": 12500,
+                "crystal": 2500,
+                "deuterium": 10000,
+                "energy": 0,
+                "factor": 1
+            }
+        },
+        "technologies": {
+            "101": {
+                "metal": 200,
+                "crystal": 1000,
+                "deuterium": 200,
+                "energy": 0,
+                "factor": 2
+            },
+            "102": {
+                "metal": 0,
+                "crystal": 400,
+                "deuterium": 600,
+                "energy": 0,
+                "factor": 2
+            },
+            "103": {
+                "metal": 800,
+                "crystal": 200,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "104": {
+                "metal": 200,
+                "crystal": 600,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "105": {
+                "metal": 1000,
+                "crystal": 0,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "106": {
+                "metal": 0,
+                "crystal": 800,
+                "deuterium": 400,
+                "energy": 0,
+                "factor": 2
+            },
+            "107": {
+                "metal": 0,
+                "crystal": 4000,
+                "deuterium": 2000,
+                "energy": 0,
+                "factor": 2
+            },
+            "108": {
+                "metal": 400,
+                "crystal": 0,
+                "deuterium": 600,
+                "energy": 0,
+                "factor": 2
+            },
+            "109": {
+                "metal": 2000,
+                "crystal": 4000,
+                "deuterium": 600,
+                "energy": 0,
+                "factor": 2
+            },
+            "110": {
+                "metal": 10000,
+                "crystal": 20000,
+                "deuterium": 6000,
+                "energy": 0,
+                "factor": 2
+            },
+            "111": {
+                "metal": 200,
+                "crystal": 100,
+                "deuterium": 0,
+                "energy": 0,
+                "factor": 2
+            },
+            "112": {
+                "metal": 1000,
+                "crystal": 300,
+                "deuterium": 100,
+                "energy": 0,
+                "factor": 2
+            },
+            "113": {
+                "metal": 2000,
+                "crystal": 4000,
+                "deuterium": 1000,
+                "energy": 0,
+                "factor": 2
+            },
+            "114": {
+                "metal": 240000,
+                "crystal": 400000,
+                "deuterium": 160000,
+                "energy": 0,
+                "factor": 2
+            },
+            "115": {
+                "metal": 0,
+                "crystal": 0,
+                "deuterium": 0,
+                "energy": 300000,
+                "factor": 3
+            }
+        }
+    },
+    "requirements": {
+        "5": {
+            "3": 5,
+            "106": 3
+        },
+        "7": {
+            "6": 10,
+            "102": 10
+        },
+        "8": {
+            "6": 2
+        },
+        "13": {
+            "7": 1,
+            "106": 12
+        },
+        "101": {
+            "12": 3
+        },
+        "102": {
+            "12": 1
+        },
+        "103": {
+            "12": 4
+        },
+        "104": {
+            "12": 2
+        },
+        "105": {
+            "12": 6,
+            "106": 3
+        },
+        "106": {
+            "12": 1
+        },
+        "107": {
+            "12": 7,
+            "105": 5,
+            "106": 5
+        },
+        "108": {
+            "12": 1,
+            "106": 1
+        },
+        "109": {
+            "12": 2,
+            "106": 1
+        },
+        "110": {
+            "12": 7,
+            "107": 3
+        },
+        "111": {
+            "12": 1,
+            "106": 2
+        },
+        "112": {
+            "12": 4,
+            "106": 4,
+            "111": 5
+        },
+        "113": {
+            "12": 4,
+            "106": 8,
+            "111": 10,
+            "112": 5
+        },
+        "114": {
+            "12": 10,
+            "102": 8,
+            "107": 8
+        },
+        "115": {
+            "12": 12
+        },
+        "201": {
+            "8": 2,
+            "108": 2
+        },
+        "202": {
+            "8": 4,
+            "108": 6
+        },
+        "203": {
+            "8": 1,
+            "108": 1
+        },
+        "204": {
+            "8": 3,
+            "104": 2,
+            "109": 2
+        },
+        "205": {
+            "8": 5,
+            "109": 4,
+            "112": 2
+        },
+        "206": {
+            "8": 7,
+            "110": 4
+        },
+        "207": {
+            "8": 4,
+            "109": 3
+        },
+        "208": {
+            "8": 4,
+            "105": 2,
+            "108": 6
+        },
+        "209": {
+            "8": 3,
+            "101": 2,
+            "108": 3
+        },
+        "210": {
+            "8": 8,
+            "109": 6,
+            "113": 5
+        },
+        "211": {
+            "8": 1
+        },
+        "212": {
+            "8": 9,
+            "107": 5,
+            "110": 6
+        },
+        "213": {
+            "8": 8,
+            "107": 5,
+            "110": 5,
+            "111": 12
+        },
+        "214": {
+            "8": 12,
+            "107": 6,
+            "110": 7,
+            "115": 1
+        }
+    },
+    "mappings": {
+        "1": "metal_mine",
+        "2": "crystal_mine",
+        "3": "deuterium_synthesizer",
+        "4": "solar_plant",
+        "5": "fusion_reactor",
+        "6": "robotic_factory",
+        "7": "nanite_factory",
+        "8": "shipyard",
+        "9": "metal_storage",
+        "10": "crystal_storage",
+        "11": "deuterium_storage",
+        "12": "research_lab",
+        "13": "terraformer",
+        "14": "alliance_depot",
+        "15": "missile_silo",
+        "101": "espionage_tech",
+        "102": "computer_tech",
+        "103": "weapon_tech",
+        "104": "armour_tech",
+        "105": "shielding_tech",
+        "106": "energy_tech",
+        "107": "hyperspace_tech",
+        "108": "combustion_drive_tech",
+        "109": "impulse_drive_tech",
+        "110": "hyperspace_drive_tech",
+        "111": "laser_tech",
+        "112": "ion_tech",
+        "113": "plasma_tech",
+        "114": "intergalactic_research_tech",
+        "115": "graviton_tech",
+        "201": "small_cargo_ship",
+        "202": "large_cargo_ship",
+        "203": "light_fighter",
+        "204": "heavy_fighter",
+        "205": "cruiser",
+        "206": "battleship",
+        "207": "colony_ship",
+        "208": "recycler",
+        "209": "espionage_probe",
+        "210": "bomber",
+        "211": "solar_satellite",
+        "212": "destroyer",
+        "213": "battlecruiser",
+        "214": "deathstar",
+        "301": "rocket_launcher",
+        "302": "light_laser",
+        "303": "heavy_laser",
+        "304": "gauss_cannon",
+        "305": "ion_cannon",
+        "306": "plasma_turret",
+        "307": "small_shield_dome",
+        "308": "large_shield_dome",
+        "309": "anti_ballistic_missile",
+        "310": "interplanetary_missile",
+        "metal_mine": "1",
+        "crystal_mine": "2",
+        "deuterium_synthesizer": "3",
+        "solar_plant": "4",
+        "fusion_reactor": "5",
+        "robotic_factory": "6",
+        "nanite_factory": "7",
+        "shipyard": "8",
+        "metal_storage": "9",
+        "crystal_storage": "10",
+        "deuterium_storage": "11",
+        "research_lab": "12",
+        "terraformer": "13",
+        "alliance_depot": "14",
+        "missile_silo": "15",
+        "espionage_tech": "101",
+        "computer_tech": "102",
+        "weapon_tech": "103",
+        "armour_tech": "104",
+        "shielding_tech": "105",
+        "energy_tech": "106",
+        "hyperspace_tech": "107",
+        "combustion_drive_tech": "108",
+        "impulse_drive_tech": "109",
+        "hyperspace_drive_tech": "110",
+        "laser_tech": "111",
+        "ion_tech": "112",
+        "plasma_tech": "113",
+        "intergalactic_research_tech": "114",
+        "graviton_tech": "115",
+        "small_cargo_ship": "201",
+        "large_cargo_ship": "202",
+        "light_fighter": "203",
+        "heavy_fighter": "204",
+        "cruiser": "205",
+        "battleship": "206",
+        "colony_ship": "207",
+        "recycler": "208",
+        "espionage_probe": "209",
+        "bomber": "210",
+        "solar_satellite": "211",
+        "destroyer": "212",
+        "battlecruiser": "213",
+        "deathstar": "214",
+        "rocket_launcher": "301",
+        "light_laser": "302",
+        "heavy_laser": "303",
+        "gauss_cannon": "304",
+        "ion_cannon": "305",
+        "plasma_turret": "306",
+        "small_shield_dome": "307",
+        "large_shield_dome": "308",
+        "anti_ballistic_missile": "309",
+        "interplanetary_missile": "310"
+    }
+}

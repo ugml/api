@@ -19,12 +19,12 @@ export class DefenseRouter {
     }
 
 
-    public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         if(validator.isSet(request.params.planetID) &&
             validator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT p.ownerID, d.* FROM defense d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = '" + request.params.planetID + "';";
+            let query : string = "SELECT p.ownerID AS ownerID, d.* FROM defenses d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = '" + request.params.planetID + "';";
 
             // execute the query
             db.getConnection().query(query, function (err, result, fields) {
@@ -63,7 +63,7 @@ export class DefenseRouter {
      * endpoints.
      */
     init() {
-        this.router.get('/get/:planetID', this.getAllBuildingsOnPlanet);
+        this.router.get('/:planetID', this.getAllDefensesOnPlanet);
         // this.router.get('/get/:planetID/:buildingID', this.getBuildingById);
     }
 

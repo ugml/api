@@ -18,7 +18,7 @@ export class ShipsRouter {
     }
 
 
-    public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         if(validator.isSet(request.params.planetID) &&
             validator.isValidInt(request.params.planetID)) {
@@ -61,7 +61,7 @@ export class ShipsRouter {
      * endpoints.
      */
     init() {
-        this.router.get('/get/:planetID', this.getAllBuildingsOnPlanet);
+        this.router.get('/:planetID', this.getAllShipsOnPlanet);
         // this.router.get('/get/:planetID/:buildingID', this.getBuildingById);
     }
 

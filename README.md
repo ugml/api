@@ -6,7 +6,7 @@
 # ugamela API
 
 This repository contains the official API which can be usedto create a client for the browsergame ugamela.
-The official API can be found at https://api.ugamela.org/
+The official API can be found at https://api.ugamela.org/v1/
 
 # Disclaimer
 
@@ -34,6 +34,123 @@ gulp scripts
 ```
 npm start
 ```
+
+# Routes
+
+### Authentication
+
+#### Login
+
+```
+/v1/auth/login
+```
+
+**Request-Type:** POST
+
+| Parameter | Description              |
+|-----------|--------------------------|
+| email     | The email of the user    |
+| password  | The password of the user |
+
+**Returns:** a JWT-Token for authentications.
+
+**Example:**
+```
+{
+    "status": 200,
+    "message": "Success",
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImlhdCI6MTU1MzA3NDk2MSwiZXhwIjoxNTUzMDc2NzYxfQ.sT3tsVg7rHoPtk0iTYFau5Wd9KeCLJY6qFxM1yIJ3rU"
+    }
+}
+```
+
+
+### Buildings
+
+#### Get all buildings on a planet
+```
+/v1/buildings/:planetID
+```
+**Request-Type:** GET
+
+| Parameter | Description              |
+|-----------|--------------------------|
+| planetID  | The ID of the planet     |
+
+**Returns:** a list of all buildings on the given planet.
+
+**Example:**
+
+```
+
+```
+
+
+#### Get a specific buildings on a planet
+```
+/build/:planetID/:buildingID
+```
+**Request-Type:** GET
+
+| Parameter | Description              |
+|-----------|--------------------------|
+| planetID  | The ID of the planet     |
+| buildingID| The ID of the building   |
+
+
+### Configurations
+
+#### Get a specific buildings on a planet
+
+```
+/v1/config/game
+```
+**Request-Type:** GET
+
+#### Get a specific buildings on a planet
+
+```
+/v1/config/units
+```
+
+**Request-Type:** GET
+
+
+### Defenses
+```
+/v1/defenses
+```
+
+### Planets
+
+```
+/v1/planets
+```
+
+### Ships on a planet
+
+```
+/v1/ships
+```
+
+
+### Technologies
+```
+/v1/techs
+```
+
+
+### Users
+```
+/v1/user
+```
+
+```
+/v1/users
+```
+
+
 
 # Support / Questions
 

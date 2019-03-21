@@ -19,6 +19,7 @@ import BuildingRouter from "./routes/BuildingsRouter";
 import TechsRouter from "./routes/TechsRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import DefenseRouter from "./routes/DefenseRouter";
+import EventRouter from "./routes/EventRouter";
 import {Router} from "express";
 
 
@@ -96,6 +97,8 @@ class App {
         this.register('/v1/ships', ShipsRouter);
 
         this.register('/v1/defenses', DefenseRouter);
+
+        this.register('/v1/events', EventRouter);
     }
 
     private register(route : string, router : Router) {

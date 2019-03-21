@@ -57,9 +57,17 @@ export class AuthRouter {
             }
         ).then(user => {
 
+            if(!validator.isSet(user)) {
+                response.json({
+                    status: 401,
+                    message: "Authentication failed",
+                    data: {}
+                });
+            }
+
             bcrypt.compare(req.query['password'], user[0].password).then(function(isValidPassword) {
 
-                if(!validator.isSet(user) || !isValidPassword) {
+                if(!isValidPassword) {
                     response.json({
                         status: 401,
                         message: "Authentication failed",

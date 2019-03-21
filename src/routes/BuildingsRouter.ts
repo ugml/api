@@ -32,7 +32,7 @@ export class BuildingsRouter {
         if(validator.isSet(request.params.planetID) &&
             validator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = '" + request.params.planetID + "';";
+            let query : string = `SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = '${request.params.planetID}';`;
 
             // execute the query
             db.getConnection().query(query, function (err, result, fields) {
@@ -64,6 +64,12 @@ export class BuildingsRouter {
                 data: {}
             });
         }
+
+        response.json({
+            status: 500,
+            message: "Server error",
+            data: {}
+        });
     }
 
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -100,7 +106,7 @@ export class BuildingsRouter {
         }
 
         // get the planet, on which the building should be built
-        let query: string = "SELECT * FROM planets p JOIN buildings b on p.planetID = b.planetID WHERE p.planetID = '" + request.params.planetID + "' AND p.ownerID = '" + request.userID + "';";
+        let query: string = `SELECT * FROM planets p JOIN buildings b on p.planetID = b.planetID WHERE p.planetID = '${request.params.planetID}' AND p.ownerID = '${request.userID}';`;
 
         db.getConnection().query(query, function (err, result, fields) {
 
@@ -239,7 +245,7 @@ export class BuildingsRouter {
             planet.b_building_endtime = endTime;
 
 
-            let query: string = "UPDATE planets SET metal = " + (planet.metal) + ", crystal = " + (planet.crystal) + ", deuterium = " + (planet.deuterium) + ", b_building_id = " + planet.b_building_id + ", b_building_endtime = " + planet.b_building_endtime + " WHERE planetID = " + request.params.planetID + ";";
+            let query: string = `UPDATE planets SET metal = ${planet.metal}, crystal = ${planet.crystal}, deuterium = ${planet.deuterium}, b_building_id = ${planet.b_building_id}, b_building_endtime = ${planet.b_building_endtime} WHERE planetID = ${request.params.planetID};`;
 
             db.getConnection().query(query, function (err, result, fields) {
 

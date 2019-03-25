@@ -1,12 +1,12 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { PlanetsRouter } from "./PlanetsRouter";
 
 
 
-const db = new DB();
+
 const validator = new Validator();
 
 export class PlayersRouter {
@@ -27,7 +27,7 @@ export class PlayersRouter {
         let query = "SELECT `userID`, `username`, `onlinetime`, `currentplanet` FROM `users` WHERE `userID` = '" + playerId + "'";
 
         // execute the query
-        db.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (err, result, fields) {
             let data;
 
             if(!validator.isSet(result)) {
@@ -57,7 +57,7 @@ export class PlayersRouter {
             let query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
 
             // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 let data;
 

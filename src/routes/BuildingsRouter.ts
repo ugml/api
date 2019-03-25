@@ -1,11 +1,11 @@
 import {Router, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import {Units} from "../common/Units";
 import {Config} from "../common/Config";
 
-const db = new DB();
+
 const validator = new Validator();
 
 const units = new Units();
@@ -32,10 +32,10 @@ export class BuildingsRouter {
         if(validator.isSet(request.params.planetID) &&
             validator.isValidInt(request.params.planetID)) {
 
-            let query : string = `SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = '${request.params.planetID}';`;
+            const query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = '${request.params.planetID}';";
 
             // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 let data;
 
@@ -108,7 +108,7 @@ export class BuildingsRouter {
         // get the planet, on which the building should be built
         let query: string = `SELECT * FROM planets p JOIN buildings b on p.planetID = b.planetID WHERE p.planetID = '${request.params.planetID}' AND p.ownerID = '${request.userID}';`;
 
-        db.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (err, result, fields) {
 
             if(!validator.isSet(result)) {
                 response.json({
@@ -247,7 +247,7 @@ export class BuildingsRouter {
 
             let query: string = `UPDATE planets SET metal = ${planet.metal}, crystal = ${planet.crystal}, deuterium = ${planet.deuterium}, b_building_id = ${planet.b_building_id}, b_building_endtime = ${planet.b_building_endtime} WHERE planetID = ${request.params.planetID};`;
 
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 if (err) throw err;
 

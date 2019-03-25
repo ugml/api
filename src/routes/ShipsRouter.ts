@@ -1,9 +1,9 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
-const db = new DB();
+
 const validator = new Validator();
 
 export class ShipsRouter {
@@ -26,7 +26,7 @@ export class ShipsRouter {
             let query : string = "SELECT p.ownerID, f.* FROM fleet f LEFT JOIN planets p ON f.planetID = p.planetID WHERE f.planetID = '" + request.params.planetID + "';";
 
             // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 let data;
 

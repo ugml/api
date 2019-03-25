@@ -1,10 +1,10 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 
-const db = new DB();
+
 const validator = new Validator();
 
 export class TechsRouter {
@@ -41,12 +41,12 @@ export class TechsRouter {
 
         let query : string = "SELECT * FROM techs WHERE userID =  :userID;";
 
-        db.getConnection().query(query,
+        Database.getConnection().query(query,
             {
                 replacements: {
                     userID: request.params.playerID
                 },
-                type: db.getConnection().QueryTypes.SELECT
+                type: Database.getConnection().QueryTypes.SELECT
             }
         ).then(techs => {
 

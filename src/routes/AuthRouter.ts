@@ -1,22 +1,18 @@
 import {Router, Request, Response, NextFunction} from 'express';
 
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { JwtHelper } from "../common/JwtHelper";
 
 const jwt = new JwtHelper();
-const db = new DB();
 const validator = new Validator();
-
 const bcrypt = require('bcrypt');
 
 
 export class AuthRouter {
-    router: Router
+    router: Router;
 
-    /**
-     * Initialize the Router
-     */
+
     constructor() {
         this.router = Router();
         this.init();
@@ -44,16 +40,16 @@ export class AuthRouter {
             return;
         }
 
-        let email = validator.sanitizeString(req.query['email']);
+        const email : string = validator.sanitizeString(req.query['email']);
 
-        let query : string = "SELECT `userID`, `email`, `password` FROM `users` WHERE `email` = :email;";
+        const query : string = "SELECT `userID`, `email`, `password` FROM `users` WHERE `email` = :email;";
 
-        db.getConnection().query(query,
+        Database.getConnection().query(query,
             {
                 replacements: {
                     email: email
                 },
-                type: db.getConnection().QueryTypes.SELECT
+                type: Database.getConnection().QueryTypes.SELECT
             }
         ).then(user => {
 
@@ -75,7 +71,7 @@ export class AuthRouter {
                     });
                 }
 
-                // create new jwt-token
+
                 return response.json({
                     status: 200,
                     message: "Success",

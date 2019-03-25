@@ -1,10 +1,10 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 
-const db = new DB();
+
 const validator = new Validator();
 
 export class DefenseRouter {
@@ -27,7 +27,7 @@ export class DefenseRouter {
             let query : string = "SELECT p.ownerID AS ownerID, d.* FROM defenses d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = '" + request.params.planetID + "';";
 
             // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 let data;
 

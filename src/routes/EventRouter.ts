@@ -1,10 +1,10 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 
-const db = new DB();
+
 const validator = new Validator();
 
 export class EventRouter {

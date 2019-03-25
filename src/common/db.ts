@@ -3,6 +3,13 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     host: process.env.DB_HOST,
     dialect: 'mysql',
     operatorsAliases: false,
+    // logging: false,
+
+    logging: function (str : string) {
+        // TODO: logging through a logger-object and store in logfiles
+        if(!str.includes("password"))
+            console.log(str);
+    },
 
     pool: {
         max: 5,
@@ -12,13 +19,12 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     }
 });
 
-class DB {
+class Database {
 
-    getConnection() {
+    static getConnection() {
         return sequelize;
     }
 
-
 }
 
-export { DB };
+export { Database };

@@ -1,9 +1,9 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
+import { Database } from '../common/db';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
-const db = new DB();
+
 const validator = new Validator();
 
 export class PlanetsRouter {
@@ -22,7 +22,7 @@ export class PlanetsRouter {
         let query : string = "SELECT * FROM `planets` WHERE `ownerID` = '" + request.userID + "';";
 
         // execute the query
-        db.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (err, result, fields) {
 
             let data;
 
@@ -49,7 +49,7 @@ export class PlanetsRouter {
             let query : string = "SELECT * FROM `planets` WHERE `planetID` = '" + request.params.planetID + "' AND `ownerID` = '" + request.userID + "';";
 
             // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 let data;
 
@@ -81,7 +81,7 @@ export class PlanetsRouter {
             let query : string = "SELECT `planetID`, `ownerID`, `name`, `galaxy`, `system`, `planet`, `last_update`, `planet_type`, `image`, `destroyed` FROM `planets` WHERE `planetID` = '" + request.params.planetID + "'";
 
             // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result, fields) {
 
                 let data;
 

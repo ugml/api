@@ -5,6 +5,7 @@ import * as bodyParser from 'body-parser';
 import { JwtHelper } from "./common/JwtHelper";
 
 const jwt = new JwtHelper();
+const expressip = require('express-ip');
 
 require('dotenv-safe').config();
 
@@ -42,15 +43,17 @@ class App {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.express.use(expressip().getIpInfoMiddleware);
     }
 
     // Configure API endpoints.
     private routes(): void {
         let self = this;
 
-
         // check, if request contains valid jwt-token
         this.express.use('/*', (request, response, next) => {
+
+            console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
 
             // if the user tries to authenticate, we don't have a token yet
             if(!request.originalUrl.toString().includes("\/auth\/") &&

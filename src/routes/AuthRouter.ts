@@ -29,8 +29,6 @@ export class AuthRouter {
 
         if(!validator.isSet(req.query['email'])) {
 
-            console.log("AuthRouter.ts: 400");
-
             response.json({
                 status: 400,
                 message: "Invalid parameter",

@@ -1,6 +1,6 @@
 import {Router, Request, Response, NextFunction} from 'express';
 
-import { Database } from '../common/db';
+import { Database } from '../common/Database';
 import { Validator } from "../common/ValidationTools";
 import { JwtHelper } from "../common/JwtHelper";
 

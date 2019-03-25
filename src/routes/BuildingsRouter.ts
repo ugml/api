@@ -1,5 +1,5 @@
 import {Router, Response, NextFunction} from 'express';
-import { Database } from '../common/db';
+import { Database } from '../common/Database';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import {Units} from "../common/Units";

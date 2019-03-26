@@ -110,9 +110,14 @@ export class BuildingsRouter {
         }
 
         // get the planet, on which the building should be built
-        let query: string = `SELECT * FROM planets p JOIN buildings b on p.planetID = b.planetID WHERE p.planetID = '${request.params.planetID}' AND p.ownerID = '${request.userID}';`;
+        let query: string = squel.select()
+                            .from("planets", "p")
+                            .join("buildings", "b", "p.planetID = b.planetID")
+                            .where("p.planetID = ?", request.params.planetID)
+                            .toString();
 
-        Database.getConnection().query(query, function (err, result, fields) {
+
+        Database.getConnection().query(query, function (err, result) {
 
             if(!validator.isSet(result)) {
                 response.json({
@@ -249,9 +254,17 @@ export class BuildingsRouter {
             planet.b_building_endtime = endTime;
 
 
-            let query: string = `UPDATE planets SET metal = ${planet.metal}, crystal = ${planet.crystal}, deuterium = ${planet.deuterium}, b_building_id = ${planet.b_building_id}, b_building_endtime = ${planet.b_building_endtime} WHERE planetID = ${request.params.planetID};`;
+            let query : string = squel.update()
+                                .table("planets")
+                                .set("metal", planet.metal)
+                                .set("crystal", planet.crystal)
+                                .set("deuterium", planet.deuterium)
+                                .set("b_building_id", planet.b_building_id)
+                                .set("b_building_endtime", planet.b_building_endtime)
+                                .where("planetID = ?", request.params.planetID)
+                                .toString();
 
-            Database.getConnection().query(query, function (err, result, fields) {
+            Database.getConnection().query(query, function (err, result) {
 
                 if (err) throw err;
 
@@ -260,6 +273,7 @@ export class BuildingsRouter {
                     message: "Job started",
                     data: {planet}
                 });
+
                 return;
 
             });

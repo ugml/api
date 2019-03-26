@@ -3,11 +3,11 @@ import { Database } from '../common/Database';
 import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
-
+const squel = require("squel");
 const validator = new Validator();
 
 export class PlanetsRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -19,10 +19,13 @@ export class PlanetsRouter {
 
     public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        let query : string = "SELECT * FROM `planets` WHERE `ownerID` = '" + request.userID + "';";
+        let query : string = squel.select()
+            .from("planets")
+            .where("ownerID", request.userID)
+            .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (err, result) {
 
             let data;
 
@@ -45,30 +48,43 @@ export class PlanetsRouter {
     public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(validator.isSet(request.params.planetID) && validator.isValidInt(request.params.planetID)) {
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT * FROM `planets` WHERE `planetID` = '" + request.params.planetID + "' AND `ownerID` = '" + request.userID + "';";
-
-            // execute the query
-            Database.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-                return;
+            response.json({
+                status: 400,
+                message: "Invalid parameter",
+                data: {}
             });
+
+            return;
         }
+
+        let query : string = squel.select()
+                                .from("planets")
+                                .where("planetID + ?", request.params.planetID)
+                                .where("ownerID = ?", request.userID)
+                                .toString();
+
+        // execute the query
+        Database.getConnection().query(query, function (err, result) {
+
+            let data;
+
+            if(!validator.isSet(result)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: data
+            });
+            return;
+        });
 
     }
 
@@ -78,40 +94,54 @@ export class PlanetsRouter {
     public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(validator.isSet(request.params.planetID) && validator.isValidInt(request.params.planetID)) {
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT `planetID`, `ownerID`, `name`, `galaxy`, `system`, `planet`, `last_update`, `planet_type`, `image`, `destroyed` FROM `planets` WHERE `planetID` = '" + request.params.planetID + "'";
-
-            // execute the query
-            Database.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-                return;
-
-            });
-
-
-        } else {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
+
             return;
+
         }
+
+        let query : string = squel.select()
+                                .field("planetID")
+                                .field("ownerID")
+                                .field("name")
+                                .field("galaxy")
+                                .field("system")
+                                .field("planet")
+                                .field("last_update")
+                                .field("planet_type")
+                                .field("image")
+                                .field("destroyed")
+                                .from("planets")
+                                .where("planetID", request.params.planetID)
+                                .toString();
+
+        // execute the query
+        Database.getConnection().query(query, function (err, result) {
+
+            let data;
+
+            if(!validator.isSet(result)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: data
+            });
+            return;
+
+        });
     }
 
     /**

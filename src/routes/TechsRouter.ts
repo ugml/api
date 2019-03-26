@@ -4,11 +4,11 @@ import { Validator } from "../common/ValidationTools";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 
-
+const squel = require("squel");
 const validator = new Validator();
 
 export class TechsRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -39,7 +39,10 @@ export class TechsRouter {
             return;
         }
 
-        let query : string = "SELECT * FROM techs WHERE userID =  " + request.params.playerID + ";";
+        let query : string = squel.select()
+                                .from("techs")
+                                .where("userID = ?", request.params.playerID)
+                                .toString();
 
         Database.getConnection().query(query, function(err, result) {
 

@@ -90,15 +90,9 @@ export class PlayersRouter {
 
     public createPlayer(request: Request, response: Response, next: NextFunction) {
 
-        if(validator.isSet(request.query.username) && validator.isSet(request.query.password) && validator.isSet(request.query.email)) {
-            // TODO: send user-create event to kafka
-            response.json({
-                status: 200,
-                message: "Success",
-                data: {}
-            });
-            return;
-        } else {
+        if(!validator.isSet(request.query.username) ||
+            !validator.isSet(request.query.password) ||
+            !validator.isSet(request.query.email)) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
@@ -106,16 +100,15 @@ export class PlayersRouter {
             });
             return;
         }
-    }
 
-    public test(request: Request, response: Response, next: NextFunction) {
 
         response.json({
             status: 200,
-            message: "test",
+            message: "Success",
             data: {}
         });
         return;
+
     }
 
     /**
@@ -124,8 +117,8 @@ export class PlayersRouter {
      */
     init() {
 
-        // /user/planets/:planetID
-        this.router.get('/planets/:planetID', new PlanetsRouter().getOwnPlanet);
+        // /user/planet/:planetID
+        this.router.get('/planet/:planetID', new PlanetsRouter().getOwnPlanet);
 
         // /user/planets/
         this.router.get('/planetlist/', new PlanetsRouter().getAllPlanetsOfPlayer);

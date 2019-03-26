@@ -32,7 +32,7 @@ export class BuildingsRouter {
         if(validator.isSet(request.params.planetID) &&
             validator.isValidInt(request.params.planetID)) {
 
-            const query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = '${request.params.planetID}';";
+            const query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = "+request.params.planetID+";";
 
             // execute the query
             Database.getConnection().query(query, function (err, result, fields) {
@@ -53,7 +53,6 @@ export class BuildingsRouter {
                 });
                 return;
 
-
             });
 
 
@@ -66,13 +65,6 @@ export class BuildingsRouter {
             });
             return;
         }
-
-        response.json({
-            status: 500,
-            message: "Server error",
-            data: {}
-        });
-        return;
     }
 
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {

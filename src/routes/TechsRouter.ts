@@ -39,22 +39,15 @@ export class TechsRouter {
             return;
         }
 
-        let query : string = "SELECT * FROM techs WHERE userID =  :userID;";
+        let query : string = "SELECT * FROM techs WHERE userID =  " + request.params.playerID + ";";
 
-        Database.getConnection().query(query,
-            {
-                replacements: {
-                    userID: request.params.playerID
-                },
-                type: Database.getConnection().QueryTypes.SELECT
-            }
-        ).then(techs => {
+        Database.getConnection().query(query, function(err, result) {
 
             // return the result
             response.json({
                 status: 200,
                 message: "Success",
-                data: techs
+                data: result
             });
             return;
 

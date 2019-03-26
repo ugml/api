@@ -91,6 +91,8 @@ class App {
 
         this.register('/v1/users', PlayerRouter);
 
+        this.register('/v1/planet', PlanetRouter);
+
         this.register('/v1/planets', PlanetRouter);
 
         this.register('/v1/buildings', BuildingRouter);

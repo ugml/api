@@ -1,11 +1,16 @@
 import {Router, Request, Response, NextFunction} from "express";
 import { Database } from "../common/Database";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import { Validator } from "../common/ValidationTools";
 import { Redis } from "../common/Redis";
+import {start} from "repl";
 
 
-const Validator = require('jsonschema').Validator;
-const JSONValidator = new Validator();
+const JSONValidator = require('jsonschema').Validator;
+const jsonValidator = new JSONValidator();
+const inputValidator = new Validator();
+
+const eventSchema = require("../../event.schema.json");
 
 export class EventRouter {
     router: Router
@@ -21,10 +26,10 @@ export class EventRouter {
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        console.log(JSON.parse(request.query.event))
+        let jsonObj = JSON.parse(request.query.event);
 
         // validate JSON against schema
-        if(!JSONValidator.validate(JSON.parse(request.query.event), {"type": "number"}).valid) {
+        if(!jsonValidator.validate(jsonObj, eventSchema).valid) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
@@ -32,11 +37,62 @@ export class EventRouter {
             });
             return;
         }
-        response.json({
-            status: 200,
-            message: "Valid schema",
-            data: {}
-        });
+
+        // client -> createEvent -> api
+        // api -> check json -> send to redis
+        // eventQueue -> eventhandler process -> write result into eventqueue
+
+        if(request.userID !== jsonObj.ownerID) {
+            response.json({
+                status: 401,
+                message: "Event-creator is not currently authenticated user",
+                data: {}
+            });
+            return;
+        }
+
+
+        // check if owner exists and sender of event = owner
+        const query : string = "SELECT * FROM `planets` WHERE `ownerID` = "+request.userID+" AND `galaxy` = "+jsonObj.data.origin.galaxy+" AND `system` = "+jsonObj.data.origin.system+" AND `planet` = "+jsonObj.data.origin.planet+";";
+
+        let startPlanet = Database.getConnection().query(query).then( result => {
+
+                if(!inputValidator.isSet(result[0].planetID)) {
+                    response.json({
+                        status: 400,
+                        message: "Invalid startplanet",
+                        data: {}
+                    });
+                    return;
+                }
+
+                return result[0];
+
+            });
+
+
+        console.log(startPlanet);
+
+
+        // if returning = false, check if eventOwner = owner of origin
+        // check if destination exists
+        //      if not, check if mission is colonize
+        // check, if any ships are sent
+
+
+
+
+        // set starttime
+        // calculate endtime
+
+
+
+
+        // response.json({
+        //     status: 200,
+        //     message: "Valid schema",
+        //     data: {}
+        // });
 
 
 

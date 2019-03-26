@@ -54,7 +54,7 @@ export class PlayersRouter {
         // validate parameters
         if(validator.isSet(request.params.playerID) && validator.isValidInt(request.params.playerID)) {
 
-            let query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
+            const query : string = "SELECT DISTINCT `userID`, `username` FROM `users` WHERE `userID` = '" + request.params.playerID + "'";
 
             // execute the query
             Database.getConnection().query(query, function (err, result, fields) {

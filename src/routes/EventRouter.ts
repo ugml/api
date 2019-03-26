@@ -1,5 +1,4 @@
 import {Router, Request, Response, NextFunction} from "express";
-import { BaseRouter } from "./BaseRouter";
 import { Database } from "../common/Database";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { Validator } from "../common/ValidationTools";
@@ -7,132 +6,136 @@ import { Redis } from "../common/Redis";
 import {start} from "repl";
 
 
-
+const JSONValidator = require('jsonschema').Validator;
+const jsonValidator = new JSONValidator();
+const inputValidator = new Validator();
+const squel = require("squel");
 
 const eventSchema = require("../../event.schema.json");
 
-export class EventRouter extends BaseRouter {
-    router: Router
+
+export class EventRouter {
+    router: Router;
 
     /**
      * Initialize the Router
      */
     constructor() {
-        super();
         this.router = Router();
         this.init();
     }
 
-
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        let jsonObj = JSON.parse(request.query.event);
+        let eventData = JSON.parse(request.query.event);
 
         // validate JSON against schema
-        if(!this.jsonValidator.validate(jsonObj, eventSchema).valid) {
+        if(!jsonValidator.validate(eventData, eventSchema).valid) {
             response.json({
                 status: 400,
-                message: "Invalid parameter",
+                message: "Invalid json",
                 data: {}
             });
+
             return;
         }
 
-        // client -> createEvent -> api
-        // api -> check json -> send to redis
-        // eventQueue -> eventhandler process -> write result into eventqueue
-
-        if(request.userID !== jsonObj.ownerID) {
+        // check if owner exists and sender of event = owner
+        if(request.userID !== eventData.ownerID) {
             response.json({
                 status: 401,
                 message: "Event-creator is not currently authenticated user",
                 data: {}
             });
+
             return;
         }
 
-
-        let startPlanetQuery = squel.select()
+        let planetQuery = squel.select()
             .from("planets")
-            .where("`ownerID` = "+request.userID)
-            .where("`galaxy` = "+jsonObj.data.origin.galaxy)
-            .where("`system` = "+jsonObj.data.origin.system)
-            .where("`planet` = "+jsonObj.data.origin.planet).toString();
+            .where("galaxy = ?", eventData.data.origin.galaxy)
+            .where("system = ?", eventData.data.origin.system)
+            .where("planet = ?", eventData.data.origin.planet)
+            .where("planet_type = ?", (eventData.data.origin.type === "planet") ? 1 : 2)
+            .where("ownerID = ?", eventData.ownerID)
+            .toString();
 
-        Database.getConnection().query(startPlanetQuery, function(err, results) {
+        // check if origin-planet exists and the user owns it
+        Database.getConnection().query(planetQuery, function(err, results) {
             const startPlanet = results[0];
 
+            // planet does not exist or player does not own it
             if(!inputValidator.isSet(startPlanet)) {
                 response.json({
                     status: 401,
                     message: "Authentication failed",
                     data: {}
                 });
+
+                return;
             }
 
+            let planetQuery = squel.select()
+                .from("planets")
+                .where("galaxy = ?", eventData.data.destination.galaxy)
+                .where("system = ?", eventData.data.destination.system)
+                .where("planet = ?", eventData.data.destination.planet)
+                .where("planet_type = ?", (eventData.data.destination.type === "planet") ? 1 : 2)
+                .toString();
 
+            // gather data about destination
+            Database.getConnection().query(planetQuery, function(err, results) {
+                const destinationPlanet = results[0];
 
+                // destination does not exist
+                if(!inputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
+
+                    response.json({
+                        status: 401,
+                        message: "Destination does not exist",
+                        data: {}
+                    });
+
+                    return;
+
+                }
+
+                // calculate distance
+                // TODO
+
+                // calculate duration of flight
+                // TODO
+
+                // set start-time
+                // TODO
+
+                // set end-time
+                eventData.starttime = Math.round(+new Date / 1000);
+
+                // add event to redis-queue
+                // TODO
+                // const eventDueTime = +new Date / 1000;
+                //
+                // Redis.getConnection().zpopmin("eventQueue", function (error, result) {
+                //     if (error) {
+                //         console.log(error);
+                //         throw error;
+                //     }
+                //     console.log('GET result ->' + result);
+                // });
+                //
+                // Redis.getConnection().zadd("eventQueue", eventDueTime.toString(), "{\"dueDate\":\"" + eventDueTime.toString() + "\"}");
+                //
+                // console.log(eventDueTime.toString() + " -> " +  "{\"dueDate\":\"" + eventDueTime.toString() + "\"}");
+
+                // return result
+                response.json({
+                    status: 200,
+                    message: "success",
+                    data: eventData
+                });
+            });
         });
-
-
-
-        // check if owner exists and sender of event = owner
-        // const query : string = "SELECT * FROM `planets` WHERE `ownerID` = "+request.userID+" AND `galaxy` = "+jsonObj.data.origin.galaxy+" AND `system` = "+jsonObj.data.origin.system+" AND `planet` = "+jsonObj.data.origin.planet+";";
-
-        // let startPlanet = Database.getConnection().query(query).then( result => {
-        //
-        //         if(!inputValidator.isSet(result[0].planetID)) {
-        //             response.json({
-        //                 status: 400,
-        //                 message: "Invalid startplanet",
-        //                 data: {}
-        //             });
-        //             return;
-        //         }
-        //
-        //         return result[0];
-        //
-        //     });
-
-
-        // console.log(startPlanet);
-
-
-        // if returning = false, check if eventOwner = owner of origin
-        // check if destination exists
-        //      if not, check if mission is colonize
-        // check, if any ships are sent
-
-
-
-
-        // set starttime
-        // calculate endtime
-
-
-
-
-        response.json({
-            status: 200,
-            message: "Valid schema",
-            data: {}
-        });
-
-
-
-        // const eventDueTime = +new Date / 1000;
-        //
-        // Redis.getConnection().zpopmin("eventQueue", function (error, result) {
-        //     if (error) {
-        //         console.log(error);
-        //         throw error;
-        //     }
-        //     console.log('GET result ->' + result);
-        // });
-        //
-        // Redis.getConnection().zadd("eventQueue", eventDueTime.toString(), "{\"dueDate\":\"" + eventDueTime.toString() + "\"}");
-        //
-        // console.log(eventDueTime.toString() + " -> " +  "{\"dueDate\":\"" + eventDueTime.toString() + "\"}");
 
     }
 

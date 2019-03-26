@@ -246,13 +246,12 @@ export class EventRouter {
                 // set end-time
                 eventData.endtime = Math.round(eventData.starttime + timeOfFlight);
 
-
                 // store event in database
                 let eventQuery : string = squel.insert()
                     .into("flights")
                     .set("ownerID", eventData.ownerID)
                     .set("mission", eventRouter.getMissionTypeID(eventData.mission))
-                    .set("fleetlist", eventData.data.ships)
+                    .set("fleetlist", JSON.stringify(eventData.data.ships))
                     .set("start_id", startPlanet.planetID)
                     .set("start_type", eventRouter.getDestinationTypeID(eventData.data.origin.type))
                     .set("start_time", eventData.starttime)
@@ -264,34 +263,25 @@ export class EventRouter {
                     .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
                     .toString();
 
-                console.log(eventQuery);
+                Database.getConnection().query(eventQuery, function(err, result) {
 
-                // add event to redis-queue
-                // TODO
-                // const eventDueTime = +new Date / 1000;
-                //
-                // Redis.getConnection().zpopmin("eventQueue", function (error, result) {
-                //     if (error) {
-                //         console.log(error);
-                //         throw error;
-                //     }
-                //     console.log('GET result ->' + result);
-                // });
-                //
-                // Redis.getConnection().zadd("eventQueue", eventDueTime.toString(), "{\"dueDate\":\"" + eventDueTime.toString() + "\"}");
-                //
-                // console.log(eventDueTime.toString() + " -> " +  "{\"dueDate\":\"" + eventDueTime.toString() + "\"}");
+                    // add event to redis-queue
+                    Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
 
-                // return result
-                response.json({
-                    status: 200,
-                    message: "success",
-                    data: eventData
+                    // all done
+                    response.json({
+                        status: 200,
+                        message: "success",
+                        data: eventData
+                    });
                 });
             });
         });
 
     }
+
+    // TODO: cancel event
+    // pop from eventQueue where eventID == id of event to cancel
 
     /**
      * Take each handler, and attach to one of the Express.Router's

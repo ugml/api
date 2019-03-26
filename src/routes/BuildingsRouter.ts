@@ -6,12 +6,13 @@ import {Units} from "../common/Units";
 import {Config} from "../common/Config";
 
 
+const squel = require("squel");
 const validator = new Validator();
 
 const units = new Units();
 
 export class BuildingsRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -29,42 +30,49 @@ export class BuildingsRouter {
      */
     public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(validator.isSet(request.params.planetID) &&
-            validator.isValidInt(request.params.planetID)) {
+        if(!validator.isSet(request.params.planetID) ||
+            !validator.isValidInt(request.params.planetID)) {
 
-            const query : string = "SELECT p.ownerID, b.* FROM buildings b LEFT JOIN planets p ON b.planetID = p.planetID WHERE b.planetID = "+request.params.planetID+";";
-
-            // execute the query
-            Database.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-                return;
-
-            });
-
-
-
-        } else {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
+
             return;
+
         }
+
+        const query : string = squel.select()
+                                    .field("p.ownerID")
+                                    .field("b.*")
+                                    .from("buildings", "b")
+                                    .left_join("planets", "p", "b.planetID = p.planetID")
+                                    .where("b.planetID = ?", request.params.planetID)
+                                    .toString();
+
+
+        // execute the query
+        Database.getConnection().query(query, function (err, result) {
+
+            let data;
+
+            if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: 200,
+                message: "Success",
+                data: data
+            });
+
+            return;
+
+        });
     }
 
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -97,6 +105,7 @@ export class BuildingsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+
             return;
         }
 

@@ -13,6 +13,10 @@ const squel = require("squel");
 
 const eventSchema = require("../../event.schema.json");
 
+// TODO: validate input data:
+//  is start != end?
+//  is missionSpeed % 10 = 0 and 0 <= missionSpeed <= 100 (should already be handled by schema)
+
 
 export class EventRouter {
     router: Router;
@@ -23,6 +27,41 @@ export class EventRouter {
     constructor() {
         this.router = Router();
         this.init();
+    }
+
+    // TODO: relocate to own file with other game-related calculations
+    /**
+     * Calculates the distances between two planets
+     * Source: http://www.owiki.de/index.php?title=Entfernung
+     * @param origin The first planet
+     * @param destination The second planet
+     */
+    private calculateDistance(origin: ICoordinates, destination : ICoordinates) : number {
+
+        const distances = [
+            Math.abs(parseInt(origin.galaxy) - parseInt(destination.galaxy)),
+            Math.abs(parseInt(origin.system) - parseInt(destination.system)),
+            Math.abs(parseInt(origin.planet) - parseInt(destination.planet))
+        ];
+
+        let distance : number = 0;
+
+        if(distances[0] != 0) return distances[0] * 20000;
+        if(distances[1] != 0) return distances[1] * 95 + 2700;
+        if(distances[2] != 0) return distances[2] * 5 + 1000;
+
+        return distance;
+    }
+
+    /**
+     * Calculates the time of flight in seconds
+     * @param gameSpeed The speed of the game (default: 3500)
+     * @param missionSpeed The speed of the whole mission (possible values: 0, 10, 20, ..., 100)
+     * @param distance The distance between the start and the end
+     * @param slowestShipSpeed The speed of the slowest ship in the fleet
+     */
+    private calculateTimeOfFlight(gameSpeed : number, missionSpeed : number, distance : number, slowestShipSpeed : number) : number {
+        return Math.pow((gameSpeed / (missionSpeed/100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10;
     }
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -101,7 +140,9 @@ export class EventRouter {
                 }
 
                 // calculate distance
-                // TODO
+                let distance = eventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
+                console.log("distance: " + distance);
+
 
                 // calculate duration of flight
                 // TODO

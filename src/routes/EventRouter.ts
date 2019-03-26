@@ -1,4 +1,5 @@
 import {Router, Request, Response, NextFunction} from "express";
+import { BaseRouter } from "./BaseRouter";
 import { Database } from "../common/Database";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { Validator } from "../common/ValidationTools";
@@ -6,20 +7,18 @@ import { Redis } from "../common/Redis";
 import {start} from "repl";
 
 
-const JSONValidator = require('jsonschema').Validator;
-const jsonValidator = new JSONValidator();
-const inputValidator = new Validator();
-const squel = require("squel");
+
 
 const eventSchema = require("../../event.schema.json");
 
-export class EventRouter {
+export class EventRouter extends BaseRouter {
     router: Router
 
     /**
      * Initialize the Router
      */
     constructor() {
+        super();
         this.router = Router();
         this.init();
     }
@@ -30,7 +29,7 @@ export class EventRouter {
         let jsonObj = JSON.parse(request.query.event);
 
         // validate JSON against schema
-        if(!jsonValidator.validate(jsonObj, eventSchema).valid) {
+        if(!this.jsonValidator.validate(jsonObj, eventSchema).valid) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
@@ -60,11 +59,22 @@ export class EventRouter {
             .where("`system` = "+jsonObj.data.origin.system)
             .where("`planet` = "+jsonObj.data.origin.planet).toString();
 
-        let result = Database.getConnection().query(startPlanetQuery, function(err, results) {
-                return results;
+        Database.getConnection().query(startPlanetQuery, function(err, results) {
+            const startPlanet = results[0];
+
+            if(!inputValidator.isSet(startPlanet)) {
+                response.json({
+                    status: 401,
+                    message: "Authentication failed",
+                    data: {}
+                });
+            }
+
+
+
         });
 
-        console.log(result);
+
 
         // check if owner exists and sender of event = owner
         // const query : string = "SELECT * FROM `planets` WHERE `ownerID` = "+request.userID+" AND `galaxy` = "+jsonObj.data.origin.galaxy+" AND `system` = "+jsonObj.data.origin.system+" AND `planet` = "+jsonObj.data.origin.planet+";";
@@ -105,7 +115,7 @@ export class EventRouter {
         response.json({
             status: 200,
             message: "Valid schema",
-            data: {result}
+            data: {}
         });
 
 

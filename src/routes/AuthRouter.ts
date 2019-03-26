@@ -1,20 +1,19 @@
 import {Router, Request, Response, NextFunction} from 'express';
 
 import { Database } from '../common/Database';
-import { Validator } from "../common/ValidationTools";
 import { JwtHelper } from "../common/JwtHelper";
+import { BaseRouter } from "./BaseRouter";
 
 const jwt = new JwtHelper();
-const validator = new Validator();
 const bcrypt = require('bcrypt');
-const squel = require("squel");
 
 
-export class AuthRouter {
+export class AuthRouter extends BaseRouter {
     router: Router;
 
 
     constructor() {
+        super();
         this.router = Router();
         this.init();
     }
@@ -28,7 +27,7 @@ export class AuthRouter {
      */
     public authenticate(req: Request, response: Response, next: NextFunction) {
 
-        if(!validator.isSet(req.query['email'])) {
+        if(!this.inputValidator.isSet(req.query['email'])) {
 
             response.json({
                 status: 400,
@@ -39,9 +38,9 @@ export class AuthRouter {
             return;
         }
 
-        const email : string = validator.sanitizeString(req.query['email']);
+        const email : string = this.inputValidator.sanitizeString(req.query['email']);
 
-        const query : string = squel.select({ autoQuoteFieldNames: true })
+        const query : string = this.squel.select({ autoQuoteFieldNames: true })
                                     .field("userID")
                                     .field("email")
                                     .field("password")
@@ -50,7 +49,7 @@ export class AuthRouter {
                                     .toString();
 
         Database.getConnection().query(query, function(err, users) {
-            if(!validator.isSet(users)) {
+            if(!this.inputValidator.isSet(users)) {
                 response.json({
                     status: 401,
                     message: "Authentication failed",

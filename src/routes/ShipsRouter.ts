@@ -1,10 +1,9 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
-import { Validator } from "../common/ValidationTools";
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 const squel = require("squel");
-const validator = new Validator();
 
 export class ShipsRouter {
     router: Router;
@@ -20,8 +19,8 @@ export class ShipsRouter {
 
     public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!validator.isSet(request.params.planetID) ||
-            !validator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
@@ -43,7 +42,7 @@ export class ShipsRouter {
 
             let data;
 
-            if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+            if(!InputValidator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
                 data = {};
             } else {
                 data = result[0];

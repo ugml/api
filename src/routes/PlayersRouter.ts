@@ -1,12 +1,11 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
-import { Validator } from "../common/ValidationTools";
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { PlanetsRouter } from "./PlanetsRouter";
 
 
 const squel = require("squel");
-const validator = new Validator();
 
 export class PlayersRouter {
     router: Router;
@@ -37,7 +36,7 @@ export class PlayersRouter {
         Database.getConnection().query(query, function (err, result, fields) {
             let data;
 
-            if(!validator.isSet(result)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -60,8 +59,8 @@ export class PlayersRouter {
     public getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!validator.isSet(request.params.playerID) ||
-            !validator.isValidInt(request.params.playerID)) {
+        if(!InputValidator.isSet(request.params.playerID) ||
+            !InputValidator.isValidInt(request.params.playerID)) {
 
             response.json({
                 status: 400,
@@ -86,7 +85,7 @@ export class PlayersRouter {
 
             let data;
 
-            if(!validator.isSet(result)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -104,9 +103,9 @@ export class PlayersRouter {
 
     public createPlayer(request: Request, response: Response, next: NextFunction) {
 
-        if(!validator.isSet(request.query.username) ||
-            !validator.isSet(request.query.password) ||
-            !validator.isSet(request.query.email)) {
+        if(!InputValidator.isSet(request.query.username) ||
+            !InputValidator.isSet(request.query.password) ||
+            !InputValidator.isSet(request.query.email)) {
 
             response.json({
                 status: 400,

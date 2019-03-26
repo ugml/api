@@ -1,10 +1,9 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
-import { Validator } from "../common/ValidationTools";
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 const squel = require("squel");
-const validator = new Validator();
 
 export class PlanetsRouter {
     router: Router;
@@ -29,7 +28,7 @@ export class PlanetsRouter {
 
             let data;
 
-            if(!validator.isSet(result)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result;
@@ -48,8 +47,8 @@ export class PlanetsRouter {
     public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!validator.isSet(request.params.planetID) ||
-            !validator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
 
             response.json({
                 status: 400,
@@ -71,7 +70,7 @@ export class PlanetsRouter {
 
             let data;
 
-            if(!validator.isSet(result)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -94,8 +93,8 @@ export class PlanetsRouter {
     public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!validator.isSet(request.params.planetID) ||
-            !validator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
 
             response.json({
                 status: 400,
@@ -127,7 +126,7 @@ export class PlanetsRouter {
 
             let data;
 
-            if(!validator.isSet(result)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];

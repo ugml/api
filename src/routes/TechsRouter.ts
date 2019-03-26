@@ -1,11 +1,10 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
-import { Validator } from "../common/ValidationTools";
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 
 
 const squel = require("squel");
-const validator = new Validator();
 
 export class TechsRouter {
     router: Router;
@@ -27,8 +26,8 @@ export class TechsRouter {
      */
     public getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!validator.isSet(request.params.playerID) ||
-            !validator.isValidInt(request.params.playerID)) {
+        if(!InputValidator.isSet(request.params.playerID) ||
+            !InputValidator.isValidInt(request.params.playerID)) {
 
             response.json({
                 status: 400,

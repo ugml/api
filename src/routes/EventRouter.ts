@@ -1,14 +1,13 @@
 import {Router, Request, Response, NextFunction} from "express";
 import { Database } from "../common/Database";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
-import { Validator } from "../common/ValidationTools";
+import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+import { InputValidator } from "../common/InputValidator";
 import { Redis } from "../common/Redis";
 import {start} from "repl";
 
 
 const JSONValidator = require('jsonschema').Validator;
 const jsonValidator = new JSONValidator();
-const inputValidator = new Validator();
 const squel = require("squel");
 
 const eventSchema = require("../../event.schema.json");
@@ -195,7 +194,7 @@ export class EventRouter {
             const startPlanet = results[0];
 
             // planet does not exist or player does not own it
-            if(!inputValidator.isSet(startPlanet)) {
+            if(!InputValidator.isSet(startPlanet)) {
                 response.json({
                     status: 401,
                     message: "Authentication failed",
@@ -218,7 +217,7 @@ export class EventRouter {
                 const destinationPlanet = results[0];
 
                 // destination does not exist
-                if(!inputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
+                if(!InputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
 
                     response.json({
                         status: 401,

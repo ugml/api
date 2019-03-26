@@ -2,10 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 
 import { Database } from '../common/Database';
 import { JwtHelper } from "../common/JwtHelper";
-import { Validator } from "../common/ValidationTools";
-
-
-const inputValidator = new Validator();
+import { InputValidator } from "../common/InputValidator";
 const squel = require("squel");
 const jwt = new JwtHelper();
 const bcrypt = require('bcrypt');
@@ -29,7 +26,7 @@ export class AuthRouter {
      */
     public authenticate(req: Request, response: Response, next: NextFunction) {
 
-        if(!inputValidator.isSet(req.query['email'])) {
+        if(!InputValidator.isSet(req.query['email'])) {
 
             response.json({
                 status: 400,
@@ -40,7 +37,7 @@ export class AuthRouter {
             return;
         }
 
-        const email : string = inputValidator.sanitizeString(req.query['email']);
+        const email : string = InputValidator.sanitizeString(req.query['email']);
 
         const query : string = squel.select({ autoQuoteFieldNames: true })
                                     .field("userID")
@@ -51,7 +48,7 @@ export class AuthRouter {
                                     .toString();
 
         Database.getConnection().query(query, function(err, users) {
-            if(!inputValidator.isSet(users)) {
+            if(!InputValidator.isSet(users)) {
                 response.json({
                     status: 401,
                     message: "Authentication failed",

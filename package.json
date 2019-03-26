@@ -38,7 +38,7 @@
     "jsonwebtoken": "^8.4.0",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
-    "sequelize": "^4.41.2",
+    "squel": "^5.12.2",
     "winston": "^3.1.0",
     "redis": "^2.8.0",
     "jsonschema": "^1.2.4"

@@ -7,6 +7,7 @@ import { JwtHelper } from "../common/JwtHelper";
 const jwt = new JwtHelper();
 const validator = new Validator();
 const bcrypt = require('bcrypt');
+const squel = require("squel");
 
 
 export class AuthRouter {
@@ -40,18 +41,16 @@ export class AuthRouter {
 
         const email : string = validator.sanitizeString(req.query['email']);
 
-        const query : string = "SELECT `userID`, `email`, `password` FROM `users` WHERE `email` = :email;";
+        const query : string = squel.select({ autoQuoteFieldNames: true })
+                                    .field("userID")
+                                    .field("email")
+                                    .field("password")
+                                    .from("users")
+                                    .where("email = ?", email)
+                                    .toString();
 
-        Database.getConnection().query(query,
-            {
-                replacements: {
-                    email: email
-                },
-                type: Database.getConnection().QueryTypes.SELECT
-            }
-        ).then(user => {
-
-            if(!validator.isSet(user)) {
+        Database.getConnection().query(query, function(err, users) {
+            if(!validator.isSet(users)) {
                 response.json({
                     status: 401,
                     message: "Authentication failed",
@@ -59,7 +58,7 @@ export class AuthRouter {
                 });
             }
 
-            bcrypt.compare(req.query['password'], user[0].password).then(function(isValidPassword) {
+            bcrypt.compare(req.query['password'], users[0].password).then(function(isValidPassword) {
 
                 if(!isValidPassword) {
                     response.json({
@@ -74,12 +73,14 @@ export class AuthRouter {
                     status: 200,
                     message: "Success",
                     data: {
-                        token: jwt.generateToken(user[0].userID)
+                        token: jwt.generateToken(users[0].userID)
                     }
                 });
 
             });
         });
+
+
     }
 
     /***

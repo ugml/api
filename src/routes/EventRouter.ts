@@ -9,6 +9,7 @@ import {start} from "repl";
 const JSONValidator = require('jsonschema').Validator;
 const jsonValidator = new JSONValidator();
 const inputValidator = new Validator();
+const squel = require("squel");
 
 const eventSchema = require("../../event.schema.json");
 
@@ -52,26 +53,39 @@ export class EventRouter {
         }
 
 
+        let startPlanetQuery = squel.select()
+            .from("planets")
+            .where("`ownerID` = "+request.userID)
+            .where("`galaxy` = "+jsonObj.data.origin.galaxy)
+            .where("`system` = "+jsonObj.data.origin.system)
+            .where("`planet` = "+jsonObj.data.origin.planet).toString();
+
+        let result = Database.getConnection().query(startPlanetQuery, function(err, results) {
+                return results;
+        });
+
+        console.log(result);
+
         // check if owner exists and sender of event = owner
-        const query : string = "SELECT * FROM `planets` WHERE `ownerID` = "+request.userID+" AND `galaxy` = "+jsonObj.data.origin.galaxy+" AND `system` = "+jsonObj.data.origin.system+" AND `planet` = "+jsonObj.data.origin.planet+";";
+        // const query : string = "SELECT * FROM `planets` WHERE `ownerID` = "+request.userID+" AND `galaxy` = "+jsonObj.data.origin.galaxy+" AND `system` = "+jsonObj.data.origin.system+" AND `planet` = "+jsonObj.data.origin.planet+";";
 
-        let startPlanet = Database.getConnection().query(query).then( result => {
+        // let startPlanet = Database.getConnection().query(query).then( result => {
+        //
+        //         if(!inputValidator.isSet(result[0].planetID)) {
+        //             response.json({
+        //                 status: 400,
+        //                 message: "Invalid startplanet",
+        //                 data: {}
+        //             });
+        //             return;
+        //         }
+        //
+        //         return result[0];
+        //
+        //     });
 
-                if(!inputValidator.isSet(result[0].planetID)) {
-                    response.json({
-                        status: 400,
-                        message: "Invalid startplanet",
-                        data: {}
-                    });
-                    return;
-                }
 
-                return result[0];
-
-            });
-
-
-        console.log(startPlanet);
+        // console.log(startPlanet);
 
 
         // if returning = false, check if eventOwner = owner of origin
@@ -88,11 +102,11 @@ export class EventRouter {
 
 
 
-        // response.json({
-        //     status: 200,
-        //     message: "Valid schema",
-        //     data: {}
-        // });
+        response.json({
+            status: 200,
+            message: "Valid schema",
+            data: {result}
+        });
 
 
 

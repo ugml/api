@@ -24,9 +24,14 @@
       "type": "string",
       "enum": [
         "transport",
+        "deploy",
         "attack",
+        "acs",
+        "hold",
         "colonize",
-        "station"
+        "harvest",
+        "espionage",
+        "destroy"
       ]
     },
     "speed": {

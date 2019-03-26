@@ -17,6 +17,7 @@ const eventSchema = require("../../event.schema.json");
 //  is start != end?
 //  is missionSpeed % 10 = 0 and 0 <= missionSpeed <= 100 (should already be handled by schema)
 //  units.json => check all values (capacity, etc).
+//  loaded resources > storage?
 
 export class EventRouter {
     router: Router;
@@ -82,6 +83,65 @@ export class EventRouter {
         return minimum;
     }
 
+    /**
+     * Returns the ID of the destination-type
+     * @param type The type as a string (planet, moon or debris)
+     */
+    private getDestinationTypeID(type : string) :number {
+        let typeID : number;
+        switch(type) {
+            case "planet":
+                typeID = 1;
+                break;
+            case "moon":
+                typeID = 2;
+                break;
+            case "debris":
+                typeID = 3;
+                break;
+        }
+
+        return typeID;
+    }
+
+    /**
+     * Returns the ID of the mission-type
+     * @param mission The type as a string (transport, attack, ...)
+     */
+    private getMissionTypeID(mission : string) :number {
+        let missionTypeID : number;
+        switch(mission) {
+            case "transport":
+                missionTypeID = 0;
+                break;
+            case "deploy":
+                missionTypeID = 1;
+                break;
+            case "attack":
+                missionTypeID = 2;
+                break;
+            case "acs":
+                missionTypeID = 3;
+                break;
+            case "hold":
+                missionTypeID = 4;
+                break;
+            case "colonize":
+                missionTypeID = 5;
+                break;
+            case "harvest":
+                missionTypeID = 6;
+                break;
+            case "espionage":
+                missionTypeID = 7;
+                break;
+            case "destroy":
+                missionTypeID = 8;
+                break;
+        }
+
+        return missionTypeID;
+    }
 
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -99,6 +159,17 @@ export class EventRouter {
             return;
         }
 
+        // TODO: temporary
+        if(["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
+            response.json({
+                status: 500,
+                message: "Missiontype not yet supported",
+                data: {}
+            });
+
+            return;
+        }
+
         // check if owner exists and sender of event = owner
         if(request.userID !== eventData.ownerID) {
             response.json({
@@ -110,7 +181,7 @@ export class EventRouter {
             return;
         }
 
-        let planetQuery = squel.select()
+        let planetQuery : string = squel.select()
             .from("planets")
             .where("galaxy = ?", eventData.data.origin.galaxy)
             .where("system = ?", eventData.data.origin.system)
@@ -134,7 +205,7 @@ export class EventRouter {
                 return;
             }
 
-            let planetQuery = squel.select()
+            let planetQuery : string = squel.select()
                 .from("planets")
                 .where("galaxy = ?", eventData.data.destination.galaxy)
                 .where("system = ?", eventData.data.destination.system)
@@ -175,8 +246,25 @@ export class EventRouter {
                 // set end-time
                 eventData.endtime = Math.round(eventData.starttime + timeOfFlight);
 
+
                 // store event in database
-                // TODO
+                let eventQuery : string = squel.insert()
+                    .into("flights")
+                    .set("ownerID", eventData.ownerID)
+                    .set("mission", eventRouter.getMissionTypeID(eventData.mission))
+                    .set("fleetlist", eventData.data.ships)
+                    .set("start_id", startPlanet.planetID)
+                    .set("start_type", eventRouter.getDestinationTypeID(eventData.data.origin.type))
+                    .set("start_time", eventData.starttime)
+                    .set("end_id", destinationPlanet.planetID)
+                    .set("end_type", eventRouter.getDestinationTypeID(eventData.data.destination.type))
+                    .set("end_time", eventData.endtime)
+                    .set("loaded_metal", eventData.data.loadedRessources.metal)
+                    .set("loaded_crystal", eventData.data.loadedRessources.crystal)
+                    .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
+                    .toString();
+
+                console.log(eventQuery);
 
                 // add event to redis-queue
                 // TODO

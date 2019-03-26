@@ -16,7 +16,7 @@ const eventSchema = require("../../event.schema.json");
 // TODO: validate input data:
 //  is start != end?
 //  is missionSpeed % 10 = 0 and 0 <= missionSpeed <= 100 (should already be handled by schema)
-
+//  units.json => check all values (capacity, etc).
 
 export class EventRouter {
     router: Router;
@@ -63,6 +63,26 @@ export class EventRouter {
     private calculateTimeOfFlight(gameSpeed : number, missionSpeed : number, distance : number, slowestShipSpeed : number) : number {
         return Math.pow((gameSpeed / (missionSpeed/100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10;
     }
+
+    /**
+     * Returns the speed of the slowest ship in the fleet
+     * @param units The sent ship in this event
+     */
+    private getSlowestShipSpeed(units : IShipUnits) : number {
+        const unitData = require("../config/units.json");
+
+        let minimum : number = Number.MAX_VALUE;
+
+        for(let ship in units) {
+            if(units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
+                minimum = unitData.units.ships[ship].speed;
+            }
+        }
+
+        return minimum;
+    }
+
+
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
@@ -141,17 +161,22 @@ export class EventRouter {
 
                 // calculate distance
                 let distance = eventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
-                console.log("distance: " + distance);
 
+                const gameConfig = require("../config/game.json");
+
+                let slowestShipSpeed = eventRouter.getSlowestShipSpeed(eventData.ships);
 
                 // calculate duration of flight
-                // TODO
+                let timeOfFlight = eventRouter.calculateTimeOfFlight(gameConfig.speed, eventData.speed, distance, slowestShipSpeed);
 
                 // set start-time
-                // TODO
+                eventData.starttime = Math.round(+new Date / 1000);
 
                 // set end-time
-                eventData.starttime = Math.round(+new Date / 1000);
+                eventData.endtime = Math.round(eventData.starttime + timeOfFlight);
+
+                // store event in database
+                // TODO
 
                 // add event to redis-queue
                 // TODO

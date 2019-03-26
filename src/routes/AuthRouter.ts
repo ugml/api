@@ -57,6 +57,7 @@ export class AuthRouter {
                     message: "Authentication failed",
                     data: {}
                 });
+                return;
             }
 
             bcrypt.compare(req.query['password'], users[0].password).then(function(isValidPassword) {
@@ -67,16 +68,18 @@ export class AuthRouter {
                         message: "Authentication failed",
                         data: {}
                     });
+                    return;
                 }
 
 
-                return response.json({
+                response.json({
                     status: 200,
                     message: "Success",
                     data: {
                         token: jwt.generateToken(users[0].userID)
                     }
                 });
+                return;
 
             });
         });

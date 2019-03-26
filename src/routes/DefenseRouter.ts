@@ -43,6 +43,7 @@ export class DefenseRouter {
                     message: "Success",
                     data: data
                 });
+                return;
 
 
             });
@@ -55,6 +56,7 @@ export class DefenseRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
     }
 

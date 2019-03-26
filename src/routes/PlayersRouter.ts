@@ -42,6 +42,7 @@ export class PlayersRouter {
                 message: "Success",
                 data: data
             });
+            return;
         });
 
     }
@@ -73,6 +74,7 @@ export class PlayersRouter {
                     message: "Success",
                     data: data
                 });
+                return;
             });
 
 
@@ -82,6 +84,7 @@ export class PlayersRouter {
                 message: "Invalid parameter3",
                 data: {}
             });
+            return;
         }
     }
 
@@ -94,12 +97,14 @@ export class PlayersRouter {
                 message: "Success",
                 data: {}
             });
+            return;
         } else {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
     }
 
@@ -110,6 +115,7 @@ export class PlayersRouter {
             message: "test",
             data: {}
         });
+        return;
     }
 
     /**

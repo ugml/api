@@ -56,6 +56,7 @@ export class TechsRouter {
                 message: "Success",
                 data: techs
             });
+            return;
 
         });
     }

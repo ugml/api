@@ -42,6 +42,7 @@ export class ShipsRouter {
                     message: "Success",
                     data: data
                 });
+                return;
 
             });
 
@@ -53,6 +54,7 @@ export class ShipsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
     }
 

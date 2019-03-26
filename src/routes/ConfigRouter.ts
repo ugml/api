@@ -17,6 +17,7 @@ export class ConfigRouter {
         const data = require("../config/game.json");
 
         response.json(data);
+        return;
     }
 
     public getUnitsConfig(req: Request, response: Response, next: NextFunction) {
@@ -24,6 +25,7 @@ export class ConfigRouter {
         const data = require("../config/units.json");
 
         response.json(data);
+        return;
     }
 
     /**

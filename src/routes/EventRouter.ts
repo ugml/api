@@ -274,6 +274,7 @@ export class EventRouter {
                         message: "success",
                         data: eventData
                     });
+                    return;
                 });
             });
         });

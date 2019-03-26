@@ -38,6 +38,7 @@ export class PlanetsRouter {
                 message: "Success",
                 data: data
             });
+            return;
         });
     }
 
@@ -65,6 +66,7 @@ export class PlanetsRouter {
                     message: "Success",
                     data: data
                 });
+                return;
             });
         }
 
@@ -97,6 +99,7 @@ export class PlanetsRouter {
                     message: "Success",
                     data: data
                 });
+                return;
 
             });
 
@@ -107,6 +110,7 @@ export class PlanetsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
     }
 

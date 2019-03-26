@@ -51,6 +51,7 @@ export class BuildingsRouter {
                     message: "Success",
                     data: data
                 });
+                return;
 
 
             });
@@ -63,6 +64,7 @@ export class BuildingsRouter {
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
 
         response.json({
@@ -70,6 +72,7 @@ export class BuildingsRouter {
             message: "Server error",
             data: {}
         });
+        return;
     }
 
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -256,6 +259,7 @@ export class BuildingsRouter {
                     message: "Job started",
                     data: {planet}
                 });
+                return;
 
             });
         });

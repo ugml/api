@@ -74,6 +74,34 @@ export class BuildingsRouter {
         });
     }
 
+    public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID) ||
+            !InputValidator.isSet(request.params.buildingID) ||
+            !InputValidator.isValidInt(request.params.buildingID)) {
+            response.json({
+                status: 400,
+                message: "Invalid parameter",
+                data: {}
+            });
+            return;
+        }
+
+        if(request.params.buildingID < Globals.MIN_BUILDING_ID ||
+            request.params.buildingID > Globals.MAX_BUILDING_ID) {
+            response.json({
+
+                status: 400,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+        }
+
+
+    }
+
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // task                                                 | object needed
@@ -97,8 +125,9 @@ export class BuildingsRouter {
             return;
         }
 
-        // TODO: define global values for min- and max-IDs for buildings
-        if(request.params.buildingID < 1 || request.params.buildingID > 15) {
+        if(request.params.buildingID < Globals.MIN_BUILDING_ID ||
+            request.params.buildingID > Globals.MAX_BUILDING_ID) {
+
             response.json({
                 status: 400,
                 message: "Invalid parameter",
@@ -150,9 +179,9 @@ export class BuildingsRouter {
             }
 
             // can't build shipyard / robotic / nanite while ships or defenses are built
-            if((request.params.buildingID == 6 ||
-                    request.params.buildingID == 7 ||
-                    request.params.buildingID == 8
+            if((request.params.buildingID == Globals.Buildings.ROBOTIC_FACTORY ||
+                request.params.buildingID == Globals.Buildings.NANITE_FACTORY ||
+                request.params.buildingID == Globals.Buildings.SHIPYARD
                 )
                 &&
                 (planet.b_hangar_id > 0 ||
@@ -169,7 +198,7 @@ export class BuildingsRouter {
             }
 
             // can't build research lab while they are researching... poor scientists :(
-            if(request.params.buildingID == 12 &&
+            if(request.params.buildingID == Globals.Buildings.RESEARCH_LAB &&
                 (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
 
                 response.json({

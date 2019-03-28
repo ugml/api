@@ -1,14 +1,7 @@
-import * as path from 'path';
 import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import { JwtHelper } from "./common/JwtHelper";
-
-const jwt = new JwtHelper();
-const expressip = require('express-ip');
-
-require('dotenv-safe').config();
-
 
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest"
 
@@ -22,7 +15,13 @@ import ShipsRouter from "./routes/ShipsRouter";
 import DefenseRouter from "./routes/DefenseRouter";
 import EventRouter from "./routes/EventRouter";
 import {Router} from "express";
+import {Globals} from "./common/Globals";
 
+
+const jwt = new JwtHelper();
+const expressip = require('express-ip');
+
+require('dotenv-safe').config();
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -50,35 +49,47 @@ class App {
     private routes(): void {
         let self = this;
 
-        // check, if request contains valid jwt-token
         this.express.use('/*', (request, response, next) => {
 
-            console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
+            try {
 
-            // if the user tries to authenticate, we don't have a token yet
-            if(!request.originalUrl.toString().includes("\/auth\/") &&
-                !request.originalUrl.toString().includes("\/users\/create\/") &&
-                !request.originalUrl.toString().includes("\/config\/")) {
+                console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
 
-                const authString = request.header("authorization");
+                // if the user tries to authenticate, we don't have a token yet
+                if(!request.originalUrl.toString().includes("\/auth\/") &&
+                    !request.originalUrl.toString().includes("\/users\/create\/") &&
+                    !request.originalUrl.toString().includes("\/config\/")) {
 
-                const payload : string = jwt.validateToken(authString);
+                    const authString = request.header("authorization");
 
-                if(payload !== "" && payload !== undefined) {
+                    const payload : string = jwt.validateToken(authString);
 
-                    self.userID = eval(payload).userID;
-                    next();
+                    if(payload !== "" && payload !== undefined) {
+
+                        self.userID = eval(payload).userID;
+                        next();
+                    } else {
+                        return response.json({
+                            status: Globals.Statuscode.NOT_AUTHORIZED,
+                            message: "Authentication failed",
+                            data: {}
+                        });
+
+                        return;
+                    }
                 } else {
-                    return response.json({
-                        status: 401,
-                        message: "Authentication failed",
-                        data: {}
-                    });
-
-                    return;
+                    next();
                 }
-            } else {
-                next();
+
+
+            } catch(e) {
+                response.json({
+                    status: Globals.Statuscode.SERVER_ERROR,
+                    message: "Internal server error",
+                    data: {}
+                });
+
+                return;
             }
 
         });

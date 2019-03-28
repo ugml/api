@@ -28,6 +28,17 @@ module Globals
         ALLIANCE_DEPOT = 14,
         MISSILE_SILO = 15
     }
+
+    // 4xx - authentication failure
+    // 5xx - server errors
+
+    export enum Statuscode {
+        SUCCESS = 200,
+        CREATED = 201,
+        BAD_REQUEST = 400,
+        NOT_AUTHORIZED = 401,
+        SERVER_ERROR = 500
+    }
 }
 
 export { Globals }

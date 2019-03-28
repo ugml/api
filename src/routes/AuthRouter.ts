@@ -3,6 +3,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
 import { JwtHelper } from "../common/JwtHelper";
 import { InputValidator } from "../common/InputValidator";
+import {Globals} from "../common/Globals";
 const squel = require("squel");
 const jwt = new JwtHelper();
 const bcrypt = require('bcrypt');
@@ -29,7 +30,7 @@ export class AuthRouter {
         if(!InputValidator.isSet(req.query['email'])) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -50,7 +51,7 @@ export class AuthRouter {
         Database.getConnection().query(query, function(err, users) {
             if(!InputValidator.isSet(users)) {
                 response.json({
-                    status: 401,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Authentication failed",
                     data: {}
                 });
@@ -61,7 +62,7 @@ export class AuthRouter {
 
                 if(!isValidPassword) {
                     response.json({
-                        status: 401,
+                        status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Authentication failed",
                         data: {}
                     });
@@ -70,7 +71,7 @@ export class AuthRouter {
 
 
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {
                         token: jwt.generateToken(users[0].userID)

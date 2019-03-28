@@ -45,7 +45,7 @@ export class PlayersRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });
@@ -64,7 +64,7 @@ export class PlayersRouter {
             !InputValidator.isValidInt(request.params.playerID)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -94,7 +94,7 @@ export class PlayersRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });
@@ -109,7 +109,7 @@ export class PlayersRouter {
             !InputValidator.isSet(request.query.email)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -121,7 +121,7 @@ export class PlayersRouter {
 
 
         response.json({
-            status: 200,
+            status: Globals.Statuscode.SUCCESS,
             message: "Success",
             data: {}
         });

@@ -34,7 +34,7 @@ export class BuildingsRouter {
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -65,7 +65,7 @@ export class BuildingsRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });
@@ -79,7 +79,7 @@ export class BuildingsRouter {
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -99,7 +99,7 @@ export class BuildingsRouter {
 
             if(!InputValidator.isSet(result)) {
                 response.json({
-                    status: 400,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
                 });
@@ -111,7 +111,7 @@ export class BuildingsRouter {
             // player does not own the planet
             if(!InputValidator.isSet(planet)) {
                 response.json({
-                    status: 400,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
                 });
@@ -154,7 +154,7 @@ export class BuildingsRouter {
                     planet.crystal = planet.crystal + cost["crystal"];
 
                     response.json({
-                        status: 200,
+                        status: Globals.Statuscode.SUCCESS,
                         message: "Building canceled",
                         data: {planet}
                     });
@@ -163,7 +163,7 @@ export class BuildingsRouter {
 
             } else {
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Planet has no build-job",
                     data: {}
                 });
@@ -190,7 +190,7 @@ export class BuildingsRouter {
             !InputValidator.isSet(request.params.buildingID) ||
             !InputValidator.isValidInt(request.params.buildingID)) {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -201,7 +201,7 @@ export class BuildingsRouter {
             request.params.buildingID > Globals.MAX_BUILDING_ID) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -221,7 +221,7 @@ export class BuildingsRouter {
 
             if(!InputValidator.isSet(result)) {
                 response.json({
-                    status: 400,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
                 });
@@ -233,7 +233,7 @@ export class BuildingsRouter {
             // player does not own the planet
             if(!InputValidator.isSet(planet)) {
                 response.json({
-                    status: 400,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
                 });
@@ -244,7 +244,7 @@ export class BuildingsRouter {
             if(planet.b_building_id !== 0 ||
                 planet.b_building_endtime !== 0) {
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Planet already has a build-job",
                     data: {}
                 });
@@ -262,7 +262,7 @@ export class BuildingsRouter {
                 )) {
 
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Can't build this building while it is in use",
                     data: {}
                 });
@@ -275,7 +275,7 @@ export class BuildingsRouter {
                 (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
 
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Can't build this building while it is in use",
                     data: {}
                 });
@@ -306,7 +306,7 @@ export class BuildingsRouter {
 
                 if(!requirementsMet) {
                     response.json({
-                        status: 200,
+                        status: Globals.Statuscode.SUCCESS,
                         message: "Requirements are not met",
                         data: planet.planetID
                     });
@@ -334,7 +334,7 @@ export class BuildingsRouter {
                 planet.energy < cost["energy"]) {
 
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Not enough resources",
                     data: {}
                 });
@@ -370,7 +370,7 @@ export class BuildingsRouter {
                 if (err) throw err;
 
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Job started",
                     data: {planet}
                 });

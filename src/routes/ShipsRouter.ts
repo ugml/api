@@ -22,7 +22,7 @@ export class ShipsRouter {
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -50,7 +50,7 @@ export class ShipsRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });

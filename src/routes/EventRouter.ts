@@ -4,6 +4,7 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { InputValidator } from "../common/InputValidator";
 import { Redis } from "../common/Redis";
 import {start} from "repl";
+import {Globals} from "../common/Globals";
 
 
 const JSONValidator = require('jsonschema').Validator;
@@ -150,7 +151,7 @@ export class EventRouter {
         // validate JSON against schema
         if(!jsonValidator.validate(eventData, eventSchema).valid) {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid json",
                 data: {}
             });
@@ -161,7 +162,7 @@ export class EventRouter {
         // TODO: temporary
         if(["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
             response.json({
-                status: 500,
+                status: Globals.Statuscode.SERVER_ERROR,
                 message: "Missiontype not yet supported",
                 data: {}
             });
@@ -172,7 +173,7 @@ export class EventRouter {
         // check if owner exists and sender of event = owner
         if(request.userID !== eventData.ownerID) {
             response.json({
-                status: 401,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Event-creator is not currently authenticated user",
                 data: {}
             });
@@ -196,7 +197,7 @@ export class EventRouter {
             // planet does not exist or player does not own it
             if(!InputValidator.isSet(startPlanet)) {
                 response.json({
-                    status: 401,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Authentication failed",
                     data: {}
                 });
@@ -220,7 +221,7 @@ export class EventRouter {
                 if(!InputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
 
                     response.json({
-                        status: 401,
+                        status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Destination does not exist",
                         data: {}
                     });
@@ -269,7 +270,7 @@ export class EventRouter {
 
                     // all done
                     response.json({
-                        status: 200,
+                        status: Globals.Statuscode.SUCCESS,
                         message: "success",
                         data: eventData
                     });

@@ -23,7 +23,7 @@ export class PlanetsRouter {
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -42,7 +42,7 @@ export class PlanetsRouter {
             if(!InputValidator.isSet(result)) {
 
                 response.json({
-                    status: 400,
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The player does not own the planet",
                     data: {}
                 });
@@ -60,7 +60,7 @@ export class PlanetsRouter {
 
             return Database.getConnection().query(query, function (err, result) {
                 response.json({
-                    status: 200,
+                    status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {}
                 });
@@ -92,7 +92,7 @@ export class PlanetsRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });
@@ -107,7 +107,7 @@ export class PlanetsRouter {
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -134,7 +134,7 @@ export class PlanetsRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });
@@ -153,7 +153,7 @@ export class PlanetsRouter {
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -190,7 +190,7 @@ export class PlanetsRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });

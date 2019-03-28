@@ -53,7 +53,9 @@ export class BuildingsRouter {
 
 
         // execute the query
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             let data;
 
@@ -95,7 +97,9 @@ export class BuildingsRouter {
             .toString();
 
 
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             if(!InputValidator.isSet(result)) {
                 response.json({
@@ -145,7 +149,9 @@ export class BuildingsRouter {
                     .toString();
 
 
-                Database.getConnection().query(query, function (err, result) {
+                Database.getConnection().query(query, function (error, result) {
+
+                    if (error) throw error;
 
                     planet.b_building_id = 0;
                     planet.b_building_endtime = 0;
@@ -217,7 +223,9 @@ export class BuildingsRouter {
                             .toString();
 
 
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             if(!InputValidator.isSet(result)) {
                 response.json({
@@ -365,9 +373,9 @@ export class BuildingsRouter {
                                 .where("planetID = ?", request.params.planetID)
                                 .toString();
 
-            Database.getConnection().query(query, function (err, result) {
+            Database.getConnection().query(query, function (error, result) {
 
-                if (err) throw err;
+                if (error) throw error;
 
                 response.json({
                     status: Globals.Statuscode.SUCCESS,

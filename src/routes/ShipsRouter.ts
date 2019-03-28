@@ -2,6 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import {Globals} from "../common/Globals";
 
 const squel = require("squel");
 
@@ -38,7 +39,9 @@ export class ShipsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             let data;
 

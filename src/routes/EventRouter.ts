@@ -191,7 +191,10 @@ export class EventRouter {
             .toString();
 
         // check if origin-planet exists and the user owns it
-        Database.getConnection().query(planetQuery, function(err, results) {
+        Database.getConnection().query(planetQuery, function(error, results) {
+
+            if (error) throw error;
+
             const startPlanet = results[0];
 
             // planet does not exist or player does not own it
@@ -214,7 +217,10 @@ export class EventRouter {
                 .toString();
 
             // gather data about destination
-            Database.getConnection().query(planetQuery, function(err, results) {
+            Database.getConnection().query(planetQuery, function(error, results) {
+
+                if (error) throw error;
+
                 const destinationPlanet = results[0];
 
                 // destination does not exist
@@ -263,7 +269,9 @@ export class EventRouter {
                     .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
                     .toString();
 
-                Database.getConnection().query(eventQuery, function(err, result) {
+                Database.getConnection().query(eventQuery, function(error, result) {
+
+                    if (error) throw error;
 
                     // add event to redis-queue
                     Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());

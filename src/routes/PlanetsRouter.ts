@@ -2,6 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import { Database } from '../common/Database';
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import {Globals} from "../common/Globals";
 
 const squel = require("squel");
 
@@ -38,7 +39,10 @@ export class PlanetsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-        return Database.getConnection().query(query, function (err, result) {
+        return Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
+
             if(!InputValidator.isSet(result)) {
 
                 response.json({
@@ -58,7 +62,10 @@ export class PlanetsRouter {
                 .toString();
 
 
-            return Database.getConnection().query(query, function (err, result) {
+            return Database.getConnection().query(query, function (error, result) {
+
+                if (error) throw error;
+
                 response.json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
@@ -80,7 +87,9 @@ export class PlanetsRouter {
             .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             let data;
 
@@ -122,7 +131,9 @@ export class PlanetsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             let data;
 
@@ -178,7 +189,9 @@ export class PlanetsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             let data;
 

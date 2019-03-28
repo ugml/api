@@ -19,7 +19,7 @@ class JwtHelper {
 
                 const token = authString.split(" ")[1];
 
-                return jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+                return jwt.verify(token, process.env.JWT_SECRET, function(error, decoded) {
                     return decoded;
                 });
             }

@@ -3,6 +3,7 @@ import { Database } from '../common/Database';
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { PlanetsRouter } from "./PlanetsRouter";
+import {Globals} from "../common/Globals";
 
 
 const squel = require("squel");
@@ -34,7 +35,10 @@ export class PlayersRouter {
             .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (error, result, fields) {
+
+            if (error) throw error;
+
             let data;
 
             if(!InputValidator.isSet(result)) {
@@ -82,7 +86,9 @@ export class PlayersRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (error, result, fields) {
+
+            if (error) throw error;
 
             let data;
 

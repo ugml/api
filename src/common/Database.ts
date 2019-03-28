@@ -7,6 +7,9 @@ class Database {
         user: process.env.DB_USER,
         database: process.env.DB_NAME,
         password: process.env.DB_PASS
+    }).on('error', function(err) {
+        //TODO: log error
+        console.log(err);
     });
 
     public static getConnection() {

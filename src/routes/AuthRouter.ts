@@ -48,7 +48,10 @@ export class AuthRouter {
                                     .where("email = ?", email)
                                     .toString();
 
-        Database.getConnection().query(query, function(err, users) {
+        Database.getConnection().query(query, function(error, users) {
+            if (error) throw error;
+
+
             if(!InputValidator.isSet(users)) {
                 response.json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,

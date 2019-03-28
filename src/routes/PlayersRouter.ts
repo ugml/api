@@ -26,6 +26,7 @@ export class PlayersRouter {
         let query : string = squel.select()
             .field("userID")
             .field("username")
+            .field("email")
             .field("onlinetime")
             .field("currentplanet")
             .from("users")

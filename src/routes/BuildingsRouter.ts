@@ -77,6 +77,20 @@ export class BuildingsRouter {
         });
     }
 
+    public getCosts(buildingKey : string, currentLevel : number) : object {
+
+        let costs = units.getBuildings()[buildingKey];
+
+        return {
+            "metal": costs["metal"] * costs["factor"] ** currentLevel,
+            "crystal": costs["crystal"] * costs["factor"] ** currentLevel,
+            "deuterium": costs["deuterium"] * costs["factor"] ** currentLevel,
+            "energy": costs["energy"] * costs["factor"] ** currentLevel,
+        };
+
+    }
+
+
     public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
@@ -125,20 +139,14 @@ export class BuildingsRouter {
             // 1. check if there is already a build-job on the planet
             if(planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
 
+                const buildingKey = units.getMappings()[planet.b_building_id];
+
                 // give back the ressources
-                let buildingKey = units.getMappings()[planet.b_building_id];
-                let currentLevel = planet[buildingKey];
-                let costs = units.getBuildings()[planet.b_building_id];
+                const currentLevel = planet[buildingKey];
 
+                const cost = buildingRoutes.getCosts(buildingKey, currentLevel);
 
-                let cost = {
-                    "metal": costs["metal"] * costs["factor"] ** currentLevel,
-                    "crystal": costs["crystal"] * costs["factor"] ** currentLevel,
-                    "deuterium": costs["deuterium"] * costs["factor"] ** currentLevel,
-                    "energy": costs["energy"] * costs["factor"] ** currentLevel,
-                };
-
-                let query: string = squel.update()
+                const query: string = squel.update()
                     .table("planets")
                     .set("b_building_id", 0)
                     .set("b_building_endtime", 0)

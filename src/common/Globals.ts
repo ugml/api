@@ -29,3 +29,5 @@ module Globals
         MISSILE_SILO = 15
     }
 }
+
+export { Globals }

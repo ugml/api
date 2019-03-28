@@ -4,6 +4,7 @@ import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import {Units} from "../common/Units";
 import {Config} from "../common/Config";
+import {Globals} from "../common/Globals";
 
 
 const squel = require("squel");
@@ -76,9 +77,7 @@ export class BuildingsRouter {
 
     public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
         if(!InputValidator.isSet(request.params.planetID) ||
-            !InputValidator.isValidInt(request.params.planetID) ||
-            !InputValidator.isSet(request.params.buildingID) ||
-            !InputValidator.isValidInt(request.params.buildingID)) {
+            !InputValidator.isValidInt(request.params.planetID)) {
             response.json({
                 status: 400,
                 message: "Invalid parameter",
@@ -87,17 +86,90 @@ export class BuildingsRouter {
             return;
         }
 
-        if(request.params.buildingID < Globals.MIN_BUILDING_ID ||
-            request.params.buildingID > Globals.MAX_BUILDING_ID) {
-            response.json({
 
-                status: 400,
-                message: "Invalid parameter",
-                data: {}
-            });
+        // get the planet, on which the building should be canceled
+        let query: string = squel.select()
+            .from("planets", "p")
+            .join("buildings", "b", "p.planetID = b.planetID")
+            .where("p.planetID = ?", request.params.planetID)
+            .toString();
 
-            return;
-        }
+
+        Database.getConnection().query(query, function (err, result) {
+
+            if(!InputValidator.isSet(result)) {
+                response.json({
+                    status: 400,
+                    message: "Invalid parameter",
+                    data: {}
+                });
+                return;
+            }
+
+            let planet = result[0];
+
+            // player does not own the planet
+            if(!InputValidator.isSet(planet)) {
+                response.json({
+                    status: 400,
+                    message: "Invalid parameter",
+                    data: {}
+                });
+                return;
+            }
+
+            // 1. check if there is already a build-job on the planet
+            if(planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
+
+                // give back the ressources
+                let buildingKey = units.getMappings()[planet.b_building_id];
+                let currentLevel = planet[buildingKey];
+                let costs = units.getBuildings()[planet.b_building_id];
+
+
+                let cost = {
+                    "metal": costs["metal"] * costs["factor"] ** currentLevel,
+                    "crystal": costs["crystal"] * costs["factor"] ** currentLevel,
+                    "deuterium": costs["deuterium"] * costs["factor"] ** currentLevel,
+                    "energy": costs["energy"] * costs["factor"] ** currentLevel,
+                };
+
+                let query: string = squel.update()
+                    .table("planets")
+                    .set("b_building_id", 0)
+                    .set("b_building_endtime", 0)
+                    .set("metal", planet.metal + cost["metal"])
+                    .set("crystal", planet.crystal + cost["crystal"])
+                    .set("deuterium", planet.deuterium + cost["deuterium"])
+                    .where("planetID = ?", planet.planetID)
+                    .toString();
+
+
+                Database.getConnection().query(query, function (err, result) {
+
+                    planet.b_building_id = 0;
+                    planet.b_building_endtime = 0;
+                    planet.metal = planet.metal + cost["metal"];
+                    planet.crystal = planet.crystal + cost["crystal"];
+                    planet.crystal = planet.crystal + cost["crystal"];
+
+                    response.json({
+                        status: 200,
+                        message: "Building canceled",
+                        data: {planet}
+                    });
+                    return;
+                });
+
+            } else {
+                response.json({
+                    status: 200,
+                    message: "Planet has no build-job",
+                    data: {}
+                });
+                return;
+            }
+        });
 
 
     }
@@ -169,7 +241,8 @@ export class BuildingsRouter {
             }
 
             // 1. check if there is already a build-job on the planet
-            if(planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
+            if(planet.b_building_id !== 0 ||
+                planet.b_building_endtime !== 0) {
                 response.json({
                     status: 200,
                     message: "Planet already has a build-job",
@@ -317,6 +390,7 @@ export class BuildingsRouter {
         this.router.get('/:planetID', this.getAllBuildingsOnPlanet);
 
         this.router.get('/build/:planetID/:buildingID', this.startBuilding);
+        this.router.get('/cancel/:planetID/', this.cancelBuilding);
     }
 
 }

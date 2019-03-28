@@ -16,11 +16,67 @@ export class PlanetsRouter {
         this.init();
     }
 
+    public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
+
+            response.json({
+                status: 400,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+        }
+
+        // check if user owns the planet
+        let query : string = squel.select()
+            .from("planets")
+            .where("planetID = ?", request.params.planetID)
+            .where("ownerID = ?", request.userID)
+            .toString();
+
+        return Database.getConnection().query(query, function (err, result) {
+            if(!InputValidator.isSet(result)) {
+
+                response.json({
+                    status: 400,
+                    message: "The player does not own the planet",
+                    data: {}
+                });
+
+                return;
+            }
+
+
+            let query : string = squel.update()
+                .table("users")
+                .set("currentplanet = ?", request.params.planetID)
+                .where("userID = ?", request.userID)
+                .toString();
+
+
+            return Database.getConnection().query(query, function (err, result) {
+                response.json({
+                    status: 200,
+                    message: "Success",
+                    data: {}
+                });
+
+                return;
+            });
+        });
+
+
+    }
+
     public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         let query : string = squel.select()
             .from("planets")
-            .where("ownerID", request.userID)
+            .where("ownerID = ?", request.userID)
             .toString();
 
         // execute the query
@@ -61,7 +117,7 @@ export class PlanetsRouter {
 
         let query : string = squel.select()
                                 .from("planets")
-                                .where("planetID + ?", request.params.planetID)
+                                .where("planetID = ?", request.params.planetID)
                                 .where("ownerID = ?", request.userID)
                                 .toString();
 
@@ -118,7 +174,7 @@ export class PlanetsRouter {
                                 .field("image")
                                 .field("destroyed")
                                 .from("planets")
-                                .where("planetID", request.params.planetID)
+                                .where("planetID = ?", request.params.planetID)
                                 .toString();
 
         // execute the query

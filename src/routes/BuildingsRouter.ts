@@ -388,7 +388,6 @@ export class BuildingsRouter {
      */
     init() {
         this.router.get('/:planetID', this.getAllBuildingsOnPlanet);
-
         this.router.get('/build/:planetID/:buildingID', this.startBuilding);
         this.router.get('/cancel/:planetID/', this.cancelBuilding);
     }

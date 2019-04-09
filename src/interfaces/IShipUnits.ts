@@ -1,4 +1,4 @@
-interface IShipUnits {
+export interface IShipUnits {
     201 : number;
     202 : number;
     203 : number;

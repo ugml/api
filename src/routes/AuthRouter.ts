@@ -27,7 +27,8 @@ export class AuthRouter {
      */
     public authenticate(req: Request, response: Response, next: NextFunction) {
 
-        if(!InputValidator.isSet(req.query['email'])) {
+
+        if(!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
 
             response.json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -38,7 +39,9 @@ export class AuthRouter {
             return;
         }
 
-        const email : string = InputValidator.sanitizeString(req.query['email']);
+        const email : string = InputValidator.sanitizeString(req.body.email);
+
+        const password : string = InputValidator.sanitizeString(req.body.password);
 
         const query : string = squel.select({ autoQuoteFieldNames: true })
                                     .field("userID")
@@ -61,7 +64,7 @@ export class AuthRouter {
                 return;
             }
 
-            bcrypt.compare(req.query['password'], users[0].password).then(function(isValidPassword) {
+            bcrypt.compare(password, users[0].password).then(function(isValidPassword) {
 
                 if(!isValidPassword) {
                     response.json({

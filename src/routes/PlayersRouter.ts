@@ -123,7 +123,27 @@ export class PlayersRouter {
             return;
         }
 
-        // TODO
+        const username : string = InputValidator.sanitizeString(request.query.username);
+        const password : string = InputValidator.sanitizeString(request.query.password);
+        const email : string = InputValidator.sanitizeString(request.query.email);
+
+        // TODO: start transaction
+
+        // create user
+        const query = `CALL createUser (${username}, ${password}, ${email}, @userID); SELECT userID;`;
+
+        Database.getConnection().query(query, function (error, result, fields) {
+            if (error) throw error;
+
+            const userID = result[0];
+
+
+
+        });
+
+        // create planet with user as owner
+
+        // create galaxy-entry
 
 
         response.json({

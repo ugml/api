@@ -24,7 +24,7 @@
     "chai": "^3.5.0",
     "chai-http": "^4.2.0",
     "gulp": "^4.0.0",
-    "gulp-typescript": "^3.2.4",
+    "gulp-typescript": "^5.0.1",
     "mocha": "^5.2.0",
     "typescript": "^3.1.6"
   },
@@ -35,13 +35,14 @@
     "dotenv-safe": "^6.1.0",
     "express": "^4.16.4",
     "express-ip": "^1.0.3",
+    "helmet": "^3.16.0",
+    "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.4.0",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
-    "squel": "^5.12.2",
-    "winston": "^3.1.0",
     "redis": "^2.8.0",
-    "jsonschema": "^1.2.4"
+    "squel": "^5.12.2",
+    "winston": "^3.1.0"
   },
   "scripts": {
     "start": "node dist/index.js",

@@ -1,10 +1,11 @@
 import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
+
+const dotenv = require('dotenv-safe').config();
+
 import { JwtHelper } from "./common/JwtHelper";
-
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest"
-
 import ConfigRouter from './routes/ConfigRouter';
 import AuthRouter from './routes/AuthRouter';
 import PlayerRouter from "./routes/PlayersRouter";
@@ -20,8 +21,9 @@ import {Globals} from "./common/Globals";
 
 const jwt = new JwtHelper();
 const expressip = require('express-ip');
+const helmet = require('helmet');
 
-require('dotenv-safe').config();
+
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -42,7 +44,17 @@ class App {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
-        this.express.use(expressip().getIpInfoMiddleware);
+        // this.express.use(expressip().getIpInfoMiddleware);
+
+        this.express.use(helmet.hidePoweredBy());
+        this.express.use(helmet.noCache());
+        this.express.use(helmet.contentSecurityPolicy({
+            directives: {
+                defaultSrc: ["'self'"]
+            }
+        }));
+
+
     }
 
     // Configure API endpoints.
@@ -53,7 +65,7 @@ class App {
 
             try {
 
-                console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
+                // console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
 
                 // if the user tries to authenticate, we don't have a token yet
                 if(!request.originalUrl.toString().includes("\/auth\/") &&

@@ -1,12 +1,12 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { Database } from '../common/Database';
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { PlanetsRouter } from "./PlanetsRouter";
-import {Globals} from "../common/Globals";
+import { Globals } from "../common/Globals";
 
 
-const squel = require("squel");
+import squel = require("squel");
 
 export class PlayersRouter {
     router: Router;
@@ -19,12 +19,14 @@ export class PlayersRouter {
         this.init();
     }
 
+    // TODO test
+
     public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
         let playerId = parseInt(request.userID);
 
-        let query : string = squel.select()
+        let query: string = squel.select()
             .field("userID")
             .field("username")
             .field("email")
@@ -39,11 +41,9 @@ export class PlayersRouter {
 
             if (error) throw error;
 
-            let data;
+            let data: {};
 
-            if(!InputValidator.isSet(result)) {
-                data = {};
-            } else {
+            if (InputValidator.isSet(result)) {
                 data = result[0];
             }
 
@@ -64,7 +64,7 @@ export class PlayersRouter {
     public getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!InputValidator.isSet(request.params.playerID) ||
+        if (!InputValidator.isSet(request.params.playerID) ||
             !InputValidator.isValidInt(request.params.playerID)) {
 
             response.json({
@@ -77,24 +77,22 @@ export class PlayersRouter {
 
         }
 
-        const query : string = squel.select()
-                                .distinct()
-                                .field("userID")
-                                .field("username")
-                                .from("users")
-                                .where("userID = ?", request.params.playerID)
-                                .toString();
+        const query: string = squel.select()
+            .distinct()
+            .field("userID")
+            .field("username")
+            .from("users")
+            .where("userID = ?", request.params.playerID)
+            .toString();
 
         // execute the query
         Database.getConnection().query(query, function (error, result, fields) {
 
             if (error) throw error;
 
-            let data;
+            let data = {};
 
-            if(!InputValidator.isSet(result)) {
-                data = {};
-            } else {
+            if (InputValidator.isSet(result)) {
                 data = result[0];
             }
 
@@ -110,7 +108,7 @@ export class PlayersRouter {
 
     public createPlayer(request: Request, response: Response, next: NextFunction) {
 
-        if(!InputValidator.isSet(request.query.username) ||
+        if (!InputValidator.isSet(request.query.username) ||
             !InputValidator.isSet(request.query.password) ||
             !InputValidator.isSet(request.query.email)) {
 
@@ -123,34 +121,51 @@ export class PlayersRouter {
             return;
         }
 
-        const username : string = InputValidator.sanitizeString(request.query.username);
-        const password : string = InputValidator.sanitizeString(request.query.password);
-        const email : string = InputValidator.sanitizeString(request.query.email);
+        const username: string = InputValidator.sanitizeString(request.query.username);
+        const password: string = InputValidator.sanitizeString(request.query.password);
+        const email: string = InputValidator.sanitizeString(request.query.email);
 
         // TODO: start transaction
 
         // create user
-        const query = `CALL createUser (${username}, ${password}, ${email}, @userID); SELECT userID;`;
+        const query = `CALL createUser ("${username}", "${password}", "${email}");`;
 
-        Database.getConnection().query(query, function (error, result, fields) {
-            if (error) throw error;
+        console.log(query);
 
-            const userID = result[0];
+        try {
+            Database.getConnection().beginTransaction(function (err) {
+
+                if (err) { throw err; }
+
+                Database.getConnection().query(query, function (error, results, fields) {
+                    if (error) {
+                        return Database.getConnection().rollback(function () {
+                            throw error;
+                        });
+                    }
+
+                    const userID = results[0];
+
+                    response.json({
+                        status: Globals.Statuscode.SUCCESS,
+                        message: "Success",
+                        data: { userID }
+                    });
 
 
+                });
+            });
+        } catch (e) {
+            console.error(e);
+        }
 
-        });
 
         // create planet with user as owner
 
         // create galaxy-entry
 
 
-        response.json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data: {}
-        });
+
 
         return;
 

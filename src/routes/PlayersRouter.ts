@@ -141,7 +141,9 @@ export class PlayersRouter {
 
             Database.query(query).then(rows => {
 
-                console.log(Date.now() + " | [INFO] 1. check if username/email exists");
+
+
+                Logger.info("1. check if username/email exists");
 
                 if(rows[0].username_taken == 1) {
                     throw new Error('Username is already taken');
@@ -164,6 +166,8 @@ export class PlayersRouter {
                 });
 
             }).then(data => {
+
+                Logger.info("2. get new planetID");
 
                 console.log(Date.now() + " | [INFO] 2. get new planetID");
 

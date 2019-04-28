@@ -23,6 +23,8 @@ const jwt = new JwtHelper();
 const expressip = require('express-ip');
 const helmet = require('helmet');
 
+const Logger = require('./common/Logger.js');
+
 
 
 // Creates and configures an ExpressJS web server.

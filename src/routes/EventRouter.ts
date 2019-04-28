@@ -64,7 +64,7 @@ export class EventRouter {
      * @param slowestShipSpeed The speed of the slowest ship in the fleet
      */
     private calculateTimeOfFlight(gameSpeed : number, missionSpeed : number, distance : number, slowestShipSpeed : number) : number {
-        return Math.pow((gameSpeed / (missionSpeed/100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10;
+        return Math.pow((gameSpeed*3500 / (missionSpeed/100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10;
     }
 
     /**

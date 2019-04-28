@@ -7,6 +7,7 @@ import { Globals } from "../common/Globals";
 
 
 import squel = require("squel");
+const bcrypt = require('bcrypt');
 
 export class PlayersRouter {
     router: Router;
@@ -106,7 +107,7 @@ export class PlayersRouter {
         });
     }
 
-    public createPlayer(request: Request, response: Response, next: NextFunction) {
+    public async createPlayer(request: Request, response: Response, next: NextFunction) {
 
         if (!InputValidator.isSet(request.query.username) ||
             !InputValidator.isSet(request.query.password) ||
@@ -121,53 +122,220 @@ export class PlayersRouter {
             return;
         }
 
+        const gameConfig = require("../config/game.json");
+
         const username: string = InputValidator.sanitizeString(request.query.username);
         const password: string = InputValidator.sanitizeString(request.query.password);
         const email: string = InputValidator.sanitizeString(request.query.email);
 
-        // TODO: start transaction
 
-        // create user
-        const query = `CALL createUser ("${username}", "${password}", "${email}");`;
+        const hashedPassword = bcrypt.hashSync(password, 10);
 
-        console.log(query);
+        console.log(hashedPassword);
 
-        try {
-            Database.getConnection().beginTransaction(function (err) {
+        // check, if the username or the email is already taken
+        let query = `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
+                            `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
 
-                if (err) { throw err; }
+        Database.getConnection().beginTransaction(() => {
 
-                Database.getConnection().query(query, function (error, results, fields) {
-                    if (error) {
-                        return Database.getConnection().rollback(function () {
-                            throw error;
-                        });
+            Database.query(query).then(rows => {
+
+                console.log(Date.now() + " | [INFO] 1. check if username/email exists");
+
+                if(rows[0].username_taken == 1) {
+                    throw new Error('Username is already taken');
+                }
+
+                if(rows[0].email_taken == 1) {
+                    throw new Error('Email is already taken');
+                }
+
+            }).then(() => {
+
+                console.log(Date.now() + " | [INFO] 2. get new userID");
+
+                let query = 'CALL getNewUserId();';
+
+                return Database.query(query).then(row => {
+                    let userID = row[0][0].userID;
+
+                    return {userID: userID, planetID: -1, posGalaxy: -1, posSystem: -1, posPlanet: -1};
+                });
+
+            }).then(data => {
+
+                console.log(Date.now() + " | [INFO] 2. get new planetID");
+
+                let query = 'CALL getNewPlanetId();';
+
+                return Database.query(query).then(row => {
+                    data.planetID = row[0][0].planetID;
+
+                    return data;
+                });
+
+            }).then(data => {
+
+                console.log(Date.now() + " | [INFO] 3. finding free position for new planet");
+
+                // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
+                let query = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
+
+                return Database.query(query).then(row => {
+                    data.posGalaxy = row[0][0].posGalaxy;
+                    data.posSystem = row[0][0].posSystem;
+                    data.posPlanet = row[0][0].posPlanet;
+
+                    return data;
+                });
+
+            }).then(data => {
+
+                console.log(Date.now() + " | [INFO] 4. create new user");
+
+                query = `INSERT INTO ugamela.users (\`userID\`, \`username\`, \`password\`, \`email\`, \`onlinetime\`, \`currentplanet\`) VALUES ('${data.userID}',  '${username}', '${hashedPassword}', '${email}', '0', '${data.planetID}');`;
+
+                return Database.query(query).then(() => {
+                    return data;
+                });
+
+            }).then(data => {
+                console.log(Date.now() + " | [INFO] 5. create new planet");
+
+                // TODO: relocate this code to a planet-class
+
+                let name : string = gameConfig.startplanet_name;
+                let updateTime : number = Date.now()/1000|0;
+                let diameter : number = gameConfig.startplanet_diameter;
+                let fieldsMax : number = gameConfig.startplanet_maxfields;
+                let metal : number = gameConfig.metal_start;
+                let crystal : number = gameConfig.crystal_start;
+                let deuterium : number = gameConfig.deuterium_start;
+
+                let image : string;
+
+                let galaxy : number = data.posGalaxy;
+                let system : number = data.posSystem;
+                let planet : number = data.posPlanet;
+
+                let tempMin : number;
+                let tempMax : number;
+
+                switch (true) {
+                    case planet <= 5: {
+                        tempMin = Math.random() * (130 - 40) + 40;
+                        tempMax = Math.random() * (150 - 240) + 240;
+
+                        let images: Array<string> = ['desert', 'dry'];
+
+                        image = images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + '.png';
+
+                        break;
+                    }
+                    case planet <= 10: {
+                        tempMin = Math.random() * (130 - 40) + 40;
+                        tempMax = Math.random() * (150 - 240) + 240;
+
+                        let images : Array<string> = ['normal', 'jungle', 'gas'];
+
+                        image = images[Math.floor(Math.random()*images.length)] + Math.round(Math.random() * (10 - 1) + 1) + '.png';
+
+                        break;
+                    }
+                    case planet <= 15: {
+                        tempMin = Math.random() * (130 - 40) + 40;
+                        tempMax = Math.random() * (150 - 240) + 240;
+
+                        let images : Array<string> = ['ice', 'water'];
+
+                        image = images[Math.floor(Math.random()*images.length)] + Math.round(Math.random() * (10 - 1) + 1) + '.png';
+
+                        break;
                     }
 
-                    const userID = results[0];
+                }
 
-                    response.json({
-                        status: Globals.Statuscode.SUCCESS,
-                        message: "Success",
-                        data: { userID }
-                    });
+                query = `INSERT INTO planets (\`planetID\`, \`ownerID\`, \`name\`, \`galaxy\`, \`system\`, \`planet\`, \`last_update\`, \`planet_type\`, \`image\`, \`diameter\`, \`fields_current\`, \`fields_max\`, \`temp_min\`, \`temp_max\`, \`metal\`, \`crystal\`, \`deuterium\`, \`energy_used\`, \`energy_max\`, \`metal_mine_percent\`, \`crystal_mine_percent\`, \`deuterium_synthesizer_percent\`, \`solar_plant_percent\`, \`fusion_reactor_percent\`, \`solar_satellite_percent\`, \`b_building_id\`, \`b_building_endtime\`, \`b_tech_id\`, \`b_tech_endtime\`, \`b_hangar_id\`, \`b_hangar_start_time\`, \`b_hangar_plus\`, \`destroyed\`) VALUES `
+                    + `(${data.planetID}, ${data.userID}, '${name}', ${galaxy}, ${system}, ${planet}, ${updateTime}, 1, '${image}', ${diameter}, 0, ${fieldsMax}, ${tempMin}, ${tempMax}, ${metal}, ${crystal}, ${deuterium}, 0, 0, 100, 100, 100, 100, 100, 100, null, null, null, null, null, 0, 0, 0);`;
 
-
+                return Database.query(query).then(() => {
+                    return data;
                 });
+
+
+            }).then(data => {
+                console.log(Date.now() + " | [INFO] 6. create galaxy-entry and other entries in tables (buildings, defense, etc)");
+
+                query = `INSERT INTO buildings (\`planetID\`, \`metal_mine\`, \`crystal_mine\`, \`deuterium_synthesizer\`, \`solar_plant\`, \`fusion_reactor\`, \`robotic_factory\`, \`nanite_factory\`, \`shipyard\`, \`metal_storage\`, \`crystal_storage\`, \`deuterium_storage\`, \`research_lab\`, \`terraformer\`, \`alliance_depot\`, \`missile_silo\`) VALUES (${data.planetID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+
+                return Database.query(query).then(() => {
+                    return data;
+                });
+
+            }).then(data => {
+                query = `INSERT INTO defenses (\`planetID\`, \`rocket_launcher\`, \`light_laser\`, \`heavy_laser\`, \`ion_cannon\`, \`gauss_cannon\`, \`plasma_turret\`, \`small_shield_dome\`, \`large_shield_dome\`, \`anti_ballistic_missile\`, \`interplanetary_missile\`) VALUES (${data.planetID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+
+                return Database.query(query).then(() => {
+                    return data;
+                });
+
+            }).then(data => {
+                query = `INSERT INTO fleet (\`planetID\`, \`small_cargo_ship\`, \`large_cargo_ship\`, \`light_fighter\`, \`heavy_fighter\`, \`cruiser\`, \`battleship\`, \`colony_ship\`, \`recycler\`, \`espionage_probe\`, \`bomber\`, \`solar_satellite\`, \`destroyer\`, \`battlecruiser\`, \`deathstar\`) VALUES (${data.planetID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+
+                return Database.query(query).then(() => {
+                    return data;
+                });
+
+            }).then(data => {
+                query = `INSERT INTO galaxy (\`planetID\`, \`debris_metal\`, \`debris_crystal\`) VALUES (${data.planetID}, 0, 0);`;
+
+                return Database.query(query).then(() => {
+                    return data;
+                });
+
+            }).then(data => {
+                query = `INSERT INTO techs (\`userID\`, \`espionage_tech\`, \`computer_tech\`, \`weapon_tech\`, \`armour_tech\`, \`shielding_tech\`, \`energy_tech\`, \`hyperspace_tech\`, \`combustion_drive_tech\`, \`impulse_drive_tech\`, \`hyperspace_drive_tech\`, \`laser_tech\`, \`ion_tech\`, \`plasma_tech\`, \`intergalactic_research_tech\`, \`graviton_tech\`) VALUES (${data.userID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+
+                return Database.query(query);
+
+            }).then(() => {
+
+                Database.getConnection().commit(function(err) {
+                    if (err) {
+                        Database.getConnection().rollback(function () {
+                            throw err;
+                        });
+                    }
+                });
+
+                console.log(Date.now() + ' | [INFO] Transaction Complete.');
+
+                // return the result
+                response.json({
+                    status: Globals.Statuscode.SUCCESS,
+                    message: "Success",
+                    data: {}
+                });
+                return;
+
+            }).catch(err => {
+
+                if (err) {
+                    Database.getConnection().rollback();
+                }
+                console.log(Date.now() + ' | [INFO] rolled back transaction');
+
+                // return the result
+                response.json({
+                    status: Globals.Statuscode.SERVER_ERROR,
+                    message: `There was an error: ${err.message}`,
+                    data: {}
+                });
+
+                return;
             });
-        } catch (e) {
-            console.error(e);
-        }
-
-
-        // create planet with user as owner
-
-        // create galaxy-entry
-
-
-
-
-        return;
+        });
 
     }
 

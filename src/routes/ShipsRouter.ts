@@ -1,13 +1,13 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
-import { Validator } from "../common/ValidationTools";
+import { Database } from '../common/Database';
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import {Globals} from "../common/Globals";
 
-const db = new DB();
-const validator = new Validator();
+const squel = require("squel");
 
 export class ShipsRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -20,40 +20,47 @@ export class ShipsRouter {
 
     public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(validator.isSet(request.params.planetID) &&
-            validator.isValidInt(request.params.planetID)) {
-
-            let query : string = "SELECT p.ownerID, f.* FROM fleet f LEFT JOIN planets p ON f.planetID = p.planetID WHERE f.planetID = '" + request.params.planetID + "';";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-
-            });
-
-
-
-        } else {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
+
+        let query : string = squel.select()
+                                .field("p.ownerID")
+                                .field("f.*")
+                                .from("fleet", "f")
+                                .left_join("planets", "p", "f.planetID = p.planetID")
+                                .where("f.planetID = ?", request.params.planetID)
+                                .toString();
+
+        // execute the query
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
+
+            let data;
+
+            if(!InputValidator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Success",
+                data: data
+            });
+
+            return;
+
+        });
     }
 
     /**

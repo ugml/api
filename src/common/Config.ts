@@ -8,9 +8,9 @@ class Config {
 
 }
 
-var fs = require("fs");
+const fs = require("fs");
 
-var data = fs.readFileSync("dist/config/game.json", "utf8");
+const data = fs.readFileSync("dist/config/game.json", "utf8");
 
 
 Config.values = JSON.parse(data);

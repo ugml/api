@@ -1,7 +1,8 @@
 import {Router, Response, NextFunction, Request} from 'express';
 
 export class ConfigRouter {
-    router: Router
+
+    router: Router;
 
     /**
      * Initialize the Router
@@ -13,20 +14,20 @@ export class ConfigRouter {
 
     public getGameConfig(req: Request, response: Response, next: NextFunction) {
 
-        var fs = require("fs");
+        const data = require("../config/game.json");
 
-        var data = fs.readFileSync("dist/config/game.json", "utf8");
+        response.json(data);
 
-        response.json(JSON.parse(data));
+        return;
     }
 
     public getUnitsConfig(req: Request, response: Response, next: NextFunction) {
 
-        var fs = require("fs");
+        const data = require("../config/units.json");
 
-        var data = fs.readFileSync("dist/config/units.json", "utf8");
-
-        response.json(JSON.parse(data));
+        response.json(data);
+        
+        return;
     }
 
     /**

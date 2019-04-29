@@ -1,14 +1,14 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
-import { Validator } from "../common/ValidationTools";
+import { Database } from '../common/Database';
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import {Globals} from "../common/Globals";
 
 
-const db = new DB();
-const validator = new Validator();
+const squel = require("squel");
 
 export class DefenseRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -21,41 +21,47 @@ export class DefenseRouter {
 
     public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(validator.isSet(request.params.planetID) &&
-            validator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT p.ownerID AS ownerID, d.* FROM defenses d LEFT JOIN planets p ON d.planetID = p.planetID WHERE d.planetID = '" + request.params.planetID + "';";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-
-
-            });
-
-
-
-        } else {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
+            return;
         }
+
+        let query : string = squel.select()
+                                .field("p.ownerID", "ownerID")
+                                .field("d.*")
+                                .from("defenses", "d")
+                                .left_join("planets", "p", "d.planetID = p.planetID")
+                                .where("d.planetID = ?", request.params.planetID)
+                                .toString();
+
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
+
+            let data;
+
+            if(!InputValidator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Success",
+                data: data
+            });
+
+            return;
+
+        });
     }
 
     /**

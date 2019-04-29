@@ -1,0 +1,281 @@
+{
+  "definitions": {},
+  "$id": "https://api.ugamela.org/event.schema.json",
+  "$schema": "https://api.ugamela.org/event.schema.json",
+  "type": "object",
+  "title": "The event schema",
+  "required": [
+    "ownerID",
+    "mission",
+    "speed",
+    "holdDuration",
+    "returning",
+    "data"
+  ],
+  "properties": {
+    "ownerID": {
+      "$id": "#/properties/ownerID",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
+    "mission": {
+      "$id": "#/properties/mission",
+      "type": "string",
+      "enum": [
+        "transport",
+        "deploy",
+        "attack",
+        "acs",
+        "hold",
+        "colonize",
+        "harvest",
+        "espionage",
+        "destroy"
+      ]
+    },
+    "speed": {
+      "$id": "#/properties/speed",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "exclusiveMaximum": false,
+      "multipleOf": 10
+    },
+    "holdDuration": {
+      "$id": "#/properties/holdDuration",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
+    "returning": {
+      "$id": "#/properties/returning",
+      "type": "boolean",
+      "default": false
+    },
+    "data": {
+      "$id": "#/properties/data",
+      "type": "object",
+      "required": [
+        "origin",
+        "destination",
+        "ships",
+        "loadedRessources"
+      ],
+      "properties": {
+        "origin": {
+          "$id": "#/properties/data/properties/origin",
+          "type": "object",
+          "required": [
+            "galaxy",
+            "system",
+            "planet",
+            "type"
+          ],
+          "properties": {
+            "galaxy": {
+              "$id": "#/properties/data/properties/origin/properties/galaxy",
+              "type": "integer",
+              "minimum": 1,
+              "multipleOf": 1
+            },
+            "system": {
+              "$id": "#/properties/data/properties/origin/properties/system",
+              "type": "integer",
+              "minimum": 1,
+              "multipleOf": 1
+            },
+            "planet": {
+              "$id": "#/properties/data/properties/origin/properties/planet",
+              "type": "integer",
+              "minimum": 1,
+              "multipleOf": 1
+            },
+            "type": {
+              "$id": "#/properties/data/properties/origin/properties/type",
+              "type": "string",
+              "enum": [
+                "planet",
+                "moon",
+                "debris"
+              ]
+            }
+          }
+        },
+        "destination": {
+          "$id": "#/properties/data/properties/destination",
+          "type": "object",
+          "required": [
+            "galaxy",
+            "system",
+            "planet",
+            "type"
+          ],
+          "properties": {
+            "galaxy": {
+              "$id": "#/properties/data/properties/destination/properties/galaxy",
+              "type": "integer",
+              "minimum": 1,
+              "multipleOf": 1
+            },
+            "system": {
+              "$id": "#/properties/data/properties/destination/properties/system",
+              "type": "integer",
+              "minimum": 1,
+              "multipleOf": 1
+            },
+            "planet": {
+              "$id": "#/properties/data/properties/destination/properties/planet",
+              "type": "integer",
+              "minimum": 1,
+              "multipleOf": 1
+            },
+            "type": {
+              "$id": "#/properties/data/properties/destination/properties/type",
+              "type": "string",
+              "enum": [
+                "planet",
+                "moon",
+                "debris"
+              ]
+            }
+          }
+        },
+        "ships": {
+          "$id": "#/properties/data/properties/ships",
+          "type": "object",
+          "properties": {
+            "201": {
+              "$id": "#/properties/data/properties/ships/properties/201",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "202": {
+              "$id": "#/properties/data/properties/ships/properties/202",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "203": {
+              "$id": "#/properties/data/properties/ships/properties/203",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "204": {
+              "$id": "#/properties/data/properties/ships/properties/204",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "205": {
+              "$id": "#/properties/data/properties/ships/properties/205",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "206": {
+              "$id": "#/properties/data/properties/ships/properties/206",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "207": {
+              "$1id": "#/properties/data/properties/ships/properties/207",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "208": {
+              "$id": "#/properties/data/properties/ships/properties/208",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "209": {
+              "$id": "#/properties/data/properties/ships/properties/209",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "210": {
+              "$id": "#/properties/data/properties/ships/properties/210",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "211": {
+              "$id": "#/properties/data/properties/ships/properties/211",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "212": {
+              "$id": "#/properties/data/properties/ships/properties/212",
+              "type": "integer",
+              "constant": [0]
+
+            },
+            "213": {
+              "$id": "#/properties/data/properties/ships/properties/213",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "214": {
+              "$id": "#/properties/data/properties/ships/properties/214",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            }
+          }
+        },
+        "loadedRessources": {
+          "$id": "#/properties/data/properties/loadedRessources",
+          "type": "object",
+          "required": [
+            "metal",
+            "crystal",
+            "deuterium"
+          ],
+          "properties": {
+            "metal": {
+              "$id": "#/properties/data/properties/loadedRessources/properties/metal",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "crystal": {
+              "$id": "#/properties/data/properties/loadedRessources/properties/crystal",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            },
+            "deuterium": {
+              "$id": "#/properties/data/properties/loadedRessources/properties/deuterium",
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "multipleOf": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

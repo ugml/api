@@ -1,14 +1,14 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
-import { Validator } from "../common/ValidationTools";
+import { Database } from '../common/Database';
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import {Globals} from "../common/Globals";
 
 
-const db = new DB();
-const validator = new Validator();
+const squel = require("squel");
 
 export class TechsRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -27,11 +27,11 @@ export class TechsRouter {
      */
     public getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!validator.isSet(request.params.playerID) ||
-            !validator.isValidInt(request.params.playerID)) {
+        if(!InputValidator.isSet(request.params.playerID) ||
+            !InputValidator.isValidInt(request.params.playerID)) {
 
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
@@ -39,23 +39,22 @@ export class TechsRouter {
             return;
         }
 
-        let query : string = "SELECT * FROM techs WHERE userID =  :userID;";
+        let query : string = squel.select()
+                                .from("techs")
+                                .where("userID = ?", request.params.playerID)
+                                .toString();
 
-        db.getConnection().query(query,
-            {
-                replacements: {
-                    userID: request.params.playerID
-                },
-                type: db.getConnection().QueryTypes.SELECT
-            }
-        ).then(techs => {
+        Database.getConnection().query(query, function(error, result) {
+
+            if (error) throw error;
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: techs
+                data: result
             });
+            return;
 
         });
     }

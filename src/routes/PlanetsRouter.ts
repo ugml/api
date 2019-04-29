@@ -1,13 +1,13 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import { DB } from '../common/db';
-import { Validator } from "../common/ValidationTools";
+import { Database } from '../common/Database';
+import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
+import {Globals} from "../common/Globals";
 
-const db = new DB();
-const validator = new Validator();
+const squel = require("squel");
 
 export class PlanetsRouter {
-    router: Router
+    router: Router;
 
     /**
      * Initialize the Router
@@ -17,16 +17,83 @@ export class PlanetsRouter {
         this.init();
     }
 
+    public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
+
+            response.json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+        }
+
+        // check if user owns the planet
+        let query : string = squel.select()
+            .from("planets")
+            .where("planetID = ?", request.params.planetID)
+            .where("ownerID = ?", request.userID)
+            .toString();
+
+        return Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
+
+            if(!InputValidator.isSet(result)) {
+
+                response.json({
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "The player does not own the planet",
+                    data: {}
+                });
+
+                return;
+            }
+
+
+            let query : string = squel.update()
+                .table("users")
+                .set("currentplanet = ?", request.params.planetID)
+                .where("userID = ?", request.userID)
+                .toString();
+
+
+            return Database.getConnection().query(query, function (error, result) {
+
+                if (error) throw error;
+
+                response.json({
+                    status: Globals.Statuscode.SUCCESS,
+                    message: "Success",
+                    data: {}
+                });
+
+                return;
+            });
+        });
+
+
+    }
+
     public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        let query : string = "SELECT * FROM `planets` WHERE `ownerID` = '" + request.userID + "';";
+        let query : string = squel.select()
+            .from("planets")
+            .where("ownerID = ?", request.userID)
+            .toString();
 
         // execute the query
-        db.getConnection().query(query, function (err, result, fields) {
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
 
             let data;
 
-            if(!validator.isSet(result)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result;
@@ -34,39 +101,56 @@ export class PlanetsRouter {
 
             // return the result
             response.json({
-                status: 200,
+                status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
             });
+            return;
         });
     }
 
     public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(validator.isSet(request.params.planetID) && validator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT * FROM `planets` WHERE `planetID` = '" + request.params.planetID + "' AND `ownerID` = '" + request.userID + "';";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
+            response.json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
             });
+
+            return;
         }
+
+        let query : string = squel.select()
+                                .from("planets")
+                                .where("planetID = ?", request.params.planetID)
+                                .where("ownerID = ?", request.userID)
+                                .toString();
+
+        // execute the query
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
+
+            let data;
+
+            if(!InputValidator.isSet(result)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Success",
+                data: data
+            });
+            return;
+        });
 
     }
 
@@ -76,38 +160,56 @@ export class PlanetsRouter {
     public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(validator.isSet(request.params.planetID) && validator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
 
-            let query : string = "SELECT `planetID`, `ownerID`, `name`, `galaxy`, `system`, `planet`, `last_update`, `planet_type`, `image`, `destroyed` FROM `planets` WHERE `planetID` = '" + request.params.planetID + "'";
-
-            // execute the query
-            db.getConnection().query(query, function (err, result, fields) {
-
-                let data;
-
-                if(!validator.isSet(result)) {
-                    data = {};
-                } else {
-                    data = result[0];
-                }
-
-                // return the result
-                response.json({
-                    status: 200,
-                    message: "Success",
-                    data: data
-                });
-
-            });
-
-
-        } else {
             response.json({
-                status: 400,
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
+
+            return;
+
         }
+
+        let query : string = squel.select()
+                                .field("planetID")
+                                .field("ownerID")
+                                .field("name")
+                                .field("galaxy")
+                                .field("system")
+                                .field("planet")
+                                .field("last_update")
+                                .field("planet_type")
+                                .field("image")
+                                .field("destroyed")
+                                .from("planets")
+                                .where("planetID = ?", request.params.planetID)
+                                .toString();
+
+        // execute the query
+        Database.getConnection().query(query, function (error, result) {
+
+            if (error) throw error;
+
+            let data;
+
+            if(!InputValidator.isSet(result)) {
+                data = {};
+            } else {
+                data = result[0];
+            }
+
+            // return the result
+            response.json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Success",
+                data: data
+            });
+            return;
+
+        });
     }
 
     /**

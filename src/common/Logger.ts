@@ -15,7 +15,8 @@ const Logger = createLogger({
     ),
     transports: [
         new winston.transports.Console(),
-        new winston.transports.File({ filename: 'api.log' })
+        // TODO: split into different files by log-level - afaik, winston has huge problems doing that
+        new winston.transports.File({ filename: 'logs/api.log' })
     ]
 });
 

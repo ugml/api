@@ -23,9 +23,18 @@ const jwt = new JwtHelper();
 const expressip = require('express-ip');
 const helmet = require('helmet');
 
+const winston = require('winston');
+const expressWinston = require('express-winston');
+
+const {format} = winston;
+const { combine, timestamp, printf } = format;
+
 const Logger = require('./common/Logger.js');
 
 
+const myFormat = printf(({ message, timestamp }) => {
+    return `${timestamp} [REQUEST] ${message}`;
+});
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -43,10 +52,10 @@ class App {
 
     // Configure Express middleware.
     private middleware(): void {
-        this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
-        // this.express.use(expressip().getIpInfoMiddleware);
+
+
 
         this.express.use(helmet.hidePoweredBy());
         this.express.use(helmet.noCache());
@@ -107,6 +116,21 @@ class App {
             }
 
         });
+
+
+        this.express.use(expressWinston.logger({
+            transports: [
+                new winston.transports.Console(),
+                new winston.transports.File({ filename: 'logs/access.log' })
+            ],
+            format: combine(
+                format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }),
+                myFormat
+            ),
+            msg: "{\"ip\": \"{{req.connection.remoteAddress}}\", \"userID\": \"{{req.userID}}\", \"method\": \"{{req.method}}\", \"url\": \"{{req.url}}\", \"params\": {{JSON.stringify(req.params)}}}"
+        }));
 
         this.register('/v1/config', ConfigRouter);
 

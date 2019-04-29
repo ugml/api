@@ -8,6 +8,8 @@ const squel = require("squel");
 const jwt = new JwtHelper();
 const bcrypt = require('bcrypt');
 
+const Logger = require('../common/Logger');
+
 
 export class AuthRouter {
     router: Router;
@@ -51,9 +53,7 @@ export class AuthRouter {
                                     .where("email = ?", email)
                                     .toString();
 
-        Database.getConnection().query(query, function(error, users) {
-            if (error) throw error;
-
+        Database.query(query).then(users => {
 
             if(!InputValidator.isSet(users)) {
                 response.json({
@@ -75,7 +75,6 @@ export class AuthRouter {
                     return;
                 }
 
-
                 response.json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
@@ -86,8 +85,21 @@ export class AuthRouter {
                 return;
 
             });
-        });
 
+
+        }).catch(err => {
+
+            Logger.error(err);
+
+            // return the result
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: `There was an error: ${err.message}`,
+                data: {}
+            });
+
+            return;
+        });
 
     }
 

@@ -6,11 +6,11 @@ class Units {
 
     public constructor()
     {
-        var fs = require("fs");
+        const fs = require("fs");
 
-        var data = fs.readFileSync("dist/config/units.json", "utf8");
+        const data = fs.readFileSync("dist/config/units.json", "utf8");
 
-        var jsonObj = JSON.parse(data);
+        const jsonObj = JSON.parse(data);
 
         this._units = jsonObj.units;
         this._requirements = jsonObj.requirements;

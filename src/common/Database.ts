@@ -1,5 +1,7 @@
 const mysql = require('mysql2');
 
+const Logger = require('./Logger');
+
 class Database {
 
     private static connection = mysql.createConnection({
@@ -9,8 +11,7 @@ class Database {
         password: process.env.DB_PASS,
         port: process.env.DB_PORT
     }).on('error', function(err) {
-        //TODO: log error
-        console.log(err);
+        Logger.error(err);
     });
 
     public static getConnection() {
@@ -18,6 +19,7 @@ class Database {
     }
 
     public static query(sql, args = null) {
+
         return new Promise((resolve, reject) => {
             this.connection.query(sql, args, (err, rows) => {
                     if (err) return reject(err);
@@ -25,7 +27,7 @@ class Database {
                 });
             }
         ).catch(err => {
-            console.error(err);
+            Logger.error(err);
             return Promise.reject(err);
         });
     }

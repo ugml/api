@@ -41,7 +41,8 @@
     "mysql2": "^1.6.5",
     "redis": "^2.8.0",
     "squel": "^5.12.2",
-    "winston": "^3.1.0"
+    "winston": "^3.1.0",
+    "express-winston": "^3.1.0"
   },
   "scripts": {
     "start": "node dist/index.js",

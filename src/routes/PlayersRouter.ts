@@ -54,6 +54,14 @@ export class PlayersRouter {
             return;
         }).catch(error => {
             Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
         });
 
     }
@@ -103,6 +111,14 @@ export class PlayersRouter {
             return;
         }).catch(error => {
             Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
         });
     }
 
@@ -336,13 +352,14 @@ export class PlayersRouter {
                 // return the result
                 response.json({
                     status: Globals.Statuscode.SERVER_ERROR,
-                    message: `There was an error: ${err.message}`,
+                    message: "There was an error while handling the request.",
                     data: {}
                 });
 
                 return;
             });
         });
+
 
     }
 

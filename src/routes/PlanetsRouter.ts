@@ -39,9 +39,7 @@ export class PlanetsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-        return Database.getConnection().query(query, function (error, result) {
-
-            if (error) throw error;
+        return Database.getConnection().query(query).then(result => {
 
             if(!InputValidator.isSet(result)) {
 
@@ -62,9 +60,7 @@ export class PlanetsRouter {
                 .toString();
 
 
-            return Database.getConnection().query(query, function (error, result) {
-
-                if (error) throw error;
+            return Database.getConnection().query(query).then(result => {
 
                 response.json({
                     status: Globals.Statuscode.SUCCESS,
@@ -73,9 +69,21 @@ export class PlanetsRouter {
                 });
 
                 return;
+            }).catch(error => {
+                throw error;
             });
-        });
 
+        }).catch(error => {
+            Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
+        });
 
     }
 
@@ -87,9 +95,7 @@ export class PlanetsRouter {
             .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (error, result) {
-
-            if (error) throw error;
+        Database.getConnection().query(query).then(result => {
 
             let data;
 
@@ -105,6 +111,17 @@ export class PlanetsRouter {
                 message: "Success",
                 data: data
             });
+            return;
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
             return;
         });
     }
@@ -131,9 +148,7 @@ export class PlanetsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (error, result) {
-
-            if (error) throw error;
+        Database.getConnection().query(query).then(result => {
 
             let data;
 
@@ -149,6 +164,17 @@ export class PlanetsRouter {
                 message: "Success",
                 data: data
             });
+            return;
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
             return;
         });
 
@@ -189,9 +215,7 @@ export class PlanetsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query, function (error, result) {
-
-            if (error) throw error;
+        Database.getConnection().query(query).then(result => {
 
             let data;
 
@@ -209,6 +233,16 @@ export class PlanetsRouter {
             });
             return;
 
+        }).catch(error => {
+            Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
         });
     }
 

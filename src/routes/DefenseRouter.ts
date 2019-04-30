@@ -40,9 +40,7 @@ export class DefenseRouter {
                                 .where("d.planetID = ?", request.params.planetID)
                                 .toString();
 
-        Database.getConnection().query(query, function (error, result) {
-
-            if (error) throw error;
+        Database.getConnection().query(query).then(result => {
 
             let data;
 
@@ -61,6 +59,16 @@ export class DefenseRouter {
 
             return;
 
+        }).catch(error => {
+            Logger.error(error);
+
+            response.json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
         });
     }
 

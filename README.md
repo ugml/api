@@ -83,13 +83,35 @@ npm start
 **Example:**
 
 ```
-
+{
+    "status": 200,
+    "message": "Success",
+    "data": {
+        "ownerID": 1,
+        "planetID": 60881,
+        "metal_mine": 1,
+        "crystal_mine": 1,
+        "deuterium_synthesizer": 4,
+        "solar_plant": 1,
+        "fusion_reactor": 0,
+        "robotic_factory": 3,
+        "nanite_factory": 0,
+        "shipyard": 8,
+        "metal_storage": 2,
+        "crystal_storage": 3,
+        "deuterium_storage": 2,
+        "research_lab": 1,
+        "terraformer": 0,
+        "alliance_depot": 0,
+        "missile_silo": 0
+    }
+}
 ```
 
 
-#### Get a specific buildings on a planet
+#### Build a specific buildings on a planet
 ```
-/build/:planetID/:buildingID
+/v1/build/:planetID/:buildingID
 ```
 **Request-Type:** GET
 
@@ -98,6 +120,27 @@ npm start
 | planetID  | The ID of the planet     |
 | buildingID| The ID of the building   |
 
+**Example:**
+
+```
+{
+    "status": 200,
+    "message": "Job started",
+    "data": {
+        "planet": {
+            "planetID": 60881,
+            "ownerID": 1,
+            "name": "Heimatplanet",
+            "galaxy": 1,
+            "system": 4,
+            "planet": 3,
+            .
+            .
+            .
+        }
+    }
+}
+```
 
 ### Configurations
 
@@ -121,6 +164,8 @@ npm start
 ```
 /v1/defenses
 ```
+
+**Request-Type:** GET
 
 ### Planets
 
@@ -150,6 +195,9 @@ npm start
 /v1/users
 ```
 
+```
+/v1/users/create
+```
 
 
 # Support / Questions

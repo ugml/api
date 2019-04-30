@@ -68,6 +68,7 @@ class App {
 
     }
 
+
     // Configure API endpoints.
     private routes(): void {
         let self = this;
@@ -117,7 +118,9 @@ class App {
 
         });
 
+        expressWinston.bodyBlacklist.push('password');
 
+        // TODO: find better method to filter out passwords in requests
         this.express.use(expressWinston.logger({
             transports: [
                 new winston.transports.Console(),
@@ -129,7 +132,8 @@ class App {
                 }),
                 myFormat
             ),
-            msg: "{\"ip\": \"{{req.connection.remoteAddress}}\", \"userID\": \"{{req.userID}}\", \"method\": \"{{req.method}}\", \"url\": \"{{req.url}}\", \"params\": { \"query:\": {{JSON.stringify(req.params)}}, \"body\": {{JSON.stringify(req.body)}} }}"
+            maxsize: 10,
+            msg: "{\"ip\": \"{{req.connection.remoteAddress}}\", \"userID\": \"{{req.userID}}\", \"method\": \"{{req.method}}\", \"url\": \"{{req.url}}\", \"params\": { \"query:\": {{JSON.stringify(req.params).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, \"body\": {{JSON.stringify(req.body).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} }}"
         }));
 
         this.register('/v1/config', ConfigRouter);

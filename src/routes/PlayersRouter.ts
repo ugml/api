@@ -125,9 +125,9 @@ export class PlayersRouter {
 
     public async createPlayer(request: Request, response: Response, next: NextFunction) {
 
-        if (!InputValidator.isSet(request.query.username) ||
-            !InputValidator.isSet(request.query.password) ||
-            !InputValidator.isSet(request.query.email)) {
+        if (!InputValidator.isSet(request.body.username) ||
+            !InputValidator.isSet(request.body.password) ||
+            !InputValidator.isSet(request.body.email)) {
 
             response.json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -140,9 +140,9 @@ export class PlayersRouter {
 
         const gameConfig = require("../config/game.json");
 
-        const username: string = InputValidator.sanitizeString(request.query.username);
-        const password: string = InputValidator.sanitizeString(request.query.password);
-        const email: string = InputValidator.sanitizeString(request.query.email);
+        const username: string = InputValidator.sanitizeString(request.body.username);
+        const password: string = InputValidator.sanitizeString(request.body.password);
+        const email: string = InputValidator.sanitizeString(request.body.email);
 
 
         const hashedPassword = bcrypt.hashSync(password, 10);

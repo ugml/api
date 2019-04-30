@@ -148,7 +148,7 @@ export class EventRouter {
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        let eventData = JSON.parse(request.query.event);
+        let eventData = JSON.parse(request.body.event);
 
         // validate JSON against schema
         if(!jsonValidator.validate(eventData, eventSchema).valid) {

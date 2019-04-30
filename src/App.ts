@@ -129,7 +129,7 @@ class App {
                 }),
                 myFormat
             ),
-            msg: "{\"ip\": \"{{req.connection.remoteAddress}}\", \"userID\": \"{{req.userID}}\", \"method\": \"{{req.method}}\", \"url\": \"{{req.url}}\", \"params\": {{JSON.stringify(req.params)}}}"
+            msg: "{\"ip\": \"{{req.connection.remoteAddress}}\", \"userID\": \"{{req.userID}}\", \"method\": \"{{req.method}}\", \"url\": \"{{req.url}}\", \"params\": { \"query:\": {{JSON.stringify(req.params)}}, \"body\": {{JSON.stringify(req.body)}} }}"
         }));
 
         this.register('/v1/config', ConfigRouter);

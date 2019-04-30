@@ -3,6 +3,9 @@ class Globals {
     static MIN_BUILDING_ID : number = 1;
     static MAX_BUILDING_ID : number = 15;
 
+    static MIN_DEFENSE_ID : number = 301;
+    static MAX_DEFENSE_ID : number = 310;
+
 
 
 

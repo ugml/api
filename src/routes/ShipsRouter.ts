@@ -39,7 +39,7 @@ export class ShipsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             let data;
 

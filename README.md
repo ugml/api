@@ -47,6 +47,8 @@ npm start
 
 **Request-Type:** POST
 
+**Parameters:**
+
 | Parameter | Description              |
 |-----------|--------------------------|
 | email     | The email of the user    |
@@ -60,7 +62,7 @@ npm start
     "status": 200,
     "message": "Success",
     "data": {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImlhdCI6MTU1MzA3NDk2MSwiZXhwIjoxNTUzMDc2NzYxfQ.sT3tsVg7rHoPtk0iTYFau5Wd9KeCLJY6qFxM1yIJ3rU"
+        "token": "JWT-TOKEN"
     }
 }
 ```
@@ -74,11 +76,13 @@ npm start
 ```
 **Request-Type:** GET
 
+**Parameters:**
+
 | Parameter | Description              |
 |-----------|--------------------------|
 | planetID  | The ID of the planet     |
 
-**Returns:** a list of all buildings on the given planet.
+**Returns:** A list of all buildings on the given planet.
 
 **Example:**
 
@@ -115,10 +119,15 @@ npm start
 ```
 **Request-Type:** GET
 
+**Parameters:**
+
 | Parameter | Description              |
 |-----------|--------------------------|
 | planetID  | The ID of the planet     |
 | buildingID| The ID of the building   |
+
+
+**Returns:** The updated planet.
 
 **Example:**
 
@@ -130,7 +139,7 @@ npm start
         "planet": {
             "planetID": 60881,
             "ownerID": 1,
-            "name": "Heimatplanet",
+            "name": "Sampleplanet",
             "galaxy": 1,
             "system": 4,
             "planet": 3,
@@ -144,20 +153,60 @@ npm start
 
 ### Configurations
 
-#### Get a specific buildings on a planet
+#### Get the current game-configuration
 
 ```
 /v1/config/game
 ```
 **Request-Type:** GET
 
-#### Get a specific buildings on a planet
+**Parameters:** none
+
+**Returns:** The current game-config
+
+**Example:**
+
+```
+{
+    "speed": 1,
+    "metal_start": 500,
+    "crystal_start": 500,
+    "deuterium_start": 500,
+    "startplanet_name": "Homeplanet",
+    "startplanet_diameter": 150000,
+    "startplanet_maxfields": 138,
+    "pos_galaxy_max": 9,
+    "pos_system_max": 100,
+    "pos_planet_max": 15
+}
+```
+
+#### Get the current unit-configuration
 
 ```
 /v1/config/units
 ```
 
 **Request-Type:** GET
+
+**Parameters:** none
+
+**Returns:** The config for all ingame-units
+
+**Example:**
+
+```
+{
+    "units": {
+        "buildings":  { ... },
+        "ships":  { ... },
+        "defenses":  { ... },
+        "technologies":  { ... }
+     }
+    "requirements":  { ... },
+    "mappings": { ... }
+}
+```
 
 
 ### Defenses
@@ -187,17 +236,121 @@ npm start
 
 
 ### Users
+
+#### Get the current user
 ```
 /v1/user
 ```
+**Request-Type:** GET
+
+**Parameters:** none
+
+**Returns:** The current user
+
+**Example:**
 
 ```
-/v1/users
+{
+    "status": 200,
+    "message": "Success",
+    "data": {
+        "userID": 1,
+        "username": "admin",
+        "email": "xxx@xxx.xx",
+        "onlinetime": "1548524754",
+        "currentplanet": 167546850
+    }
+}
 ```
 
+#### Get a specific user
+
+```
+/v1/users/:userID
+```
+**Request-Type:** GET
+
+**Parameters:**
+
+| Parameter | Description              |
+|-----------|--------------------------|
+| userID    | The ID of the user       |
+
+**Returns:** The current user
+
+**Example:**
+```
+{
+    "status": 200,
+    "message": "Success",
+    "data": {
+        "userID": 1,
+        "username": "xxx"
+    }
+}
+```
+
+#### Get all planets of the current player
 ```
 /v1/users/create
 ```
+**Request-Type:** GET
+
+**Parameters:** none
+
+**Returns:** A list of all planets owned by the current player
+
+**Example:**
+```
+{
+    "status": 200,
+    "message": "Success",
+    "data": [
+        {
+            "planetID": 60881,
+            "ownerID": 1,
+            "name": "Homeplanet",
+            .
+            .
+            .
+        },
+        {
+            "planetID": 167546850,
+            "ownerID": 1,
+            "name": "Planet",
+            .
+            .
+            .
+        }
+    ]
+}
+```
+
+#### Create a new user
+```
+/v1/users/create
+```
+**Request-Type:** POST
+
+**Parameters:**
+
+| Parameter   | Description                   |
+|-------------|-------------------------------|
+| username    | The username for the new user |
+| email       | The email for the new user    |
+| password    | The password for the new user |
+
+**Returns:** The current user
+
+**Example:**
+```
+{
+    "status": 200,
+    "message": "Success",
+    "data": {}
+}
+```
+
 
 
 # Support / Questions

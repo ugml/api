@@ -53,7 +53,7 @@ export class BuildingsRouter {
 
 
         // execute the query
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             let data;
 
@@ -119,7 +119,7 @@ export class BuildingsRouter {
             .toString();
 
 
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             if(!InputValidator.isSet(result)) {
                 response.json({
@@ -247,7 +247,7 @@ export class BuildingsRouter {
                             .toString();
 
 
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             if(!InputValidator.isSet(result)) {
                 response.json({
@@ -395,7 +395,7 @@ export class BuildingsRouter {
                                 .where("planetID = ?", request.params.planetID)
                                 .toString();
 
-            Database.getConnection().query(query).then(result => {
+            Database.query(query).then(result => {
 
                 response.json({
                     status: Globals.Statuscode.SUCCESS,

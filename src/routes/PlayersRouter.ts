@@ -4,6 +4,7 @@ import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import { PlanetsRouter } from "./PlanetsRouter";
 import { Globals } from "../common/Globals";
+import { DuplicateRecordError } from "../common/Exceptions";
 const Logger = require('../common/Logger');
 
 
@@ -155,11 +156,11 @@ export class PlayersRouter {
             Database.query(query).then(rows => {
 
                 if(rows[0].username_taken == 1) {
-                    throw new Error('Username is already taken');
+                    throw new DuplicateRecordError('Username is already taken');
                 }
 
                 if(rows[0].email_taken == 1) {
-                    throw new Error('Email is already taken');
+                    throw new DuplicateRecordError('Email is already taken');
                 }
 
             }).then(() => {
@@ -349,12 +350,23 @@ export class PlayersRouter {
 
                 Logger.info('Rolled back transaction');
 
-                // return the result
-                response.json({
-                    status: Globals.Statuscode.SERVER_ERROR,
-                    message: "There was an error while handling the request.",
-                    data: {}
-                });
+                if(err instanceof DuplicateRecordError) {
+                    // return the result
+                    response.json({
+                        status: Globals.Statuscode.SERVER_ERROR,
+                        message: `There was an error while handling the request: ${err.message}`,
+                        data: {}
+                    });
+                } else {
+                    // return the result
+                    response.json({
+                        status: Globals.Statuscode.SERVER_ERROR,
+                        message: "There was an error while handling the request.",
+                        data: {}
+                    });
+                }
+
+
 
                 return;
             });

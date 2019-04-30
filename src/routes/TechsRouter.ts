@@ -44,7 +44,7 @@ export class TechsRouter {
                                 .where("userID = ?", request.params.playerID)
                                 .toString();
 
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             // return the result
             response.json({

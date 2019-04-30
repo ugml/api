@@ -40,7 +40,7 @@ export class DefenseRouter {
                                 .where("d.planetID = ?", request.params.planetID)
                                 .toString();
 
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             let data;
 

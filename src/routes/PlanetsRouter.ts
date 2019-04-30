@@ -39,7 +39,7 @@ export class PlanetsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-        return Database.getConnection().query(query).then(result => {
+        return Database.query(query).then(result => {
 
             if(!InputValidator.isSet(result)) {
 
@@ -60,7 +60,7 @@ export class PlanetsRouter {
                 .toString();
 
 
-            return Database.getConnection().query(query).then(result => {
+            return Database.query(query).then(result => {
 
                 response.json({
                     status: Globals.Statuscode.SUCCESS,
@@ -95,7 +95,7 @@ export class PlanetsRouter {
             .toString();
 
         // execute the query
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             let data;
 
@@ -148,7 +148,7 @@ export class PlanetsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             let data;
 
@@ -215,7 +215,7 @@ export class PlanetsRouter {
                                 .toString();
 
         // execute the query
-        Database.getConnection().query(query).then(result => {
+        Database.query(query).then(result => {
 
             let data;
 

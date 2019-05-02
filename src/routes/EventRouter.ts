@@ -13,7 +13,7 @@ const JSONValidator = require('jsonschema').Validator;
 const jsonValidator = new JSONValidator();
 const squel = require("squel");
 
-const eventSchema = require("../../event.schema.json");
+const eventSchema = require("../schemas/fleetevent.schema.json");
 
 // TODO: validate input data:
 //  is start != end?

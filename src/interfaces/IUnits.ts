@@ -1,4 +1,5 @@
 export interface IUnits {
-    save();
-    create();
+    save() : Promise<{}>;
+    create() : Promise<{}>;
+    isValid() : boolean;
 }

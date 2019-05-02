@@ -19,7 +19,7 @@ class Defenses implements IUnits {
     interplanetary_missile : number;
 
 
-    public save() {
+    public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
@@ -47,7 +47,7 @@ class Defenses implements IUnits {
         });
     }
 
-    public create() {
+    public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
@@ -73,6 +73,10 @@ class Defenses implements IUnits {
             });
 
         });
+    }
+
+    isValid() : boolean {
+        return false;
     }
 
 }

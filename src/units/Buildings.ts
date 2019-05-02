@@ -24,7 +24,7 @@ class Buildings implements IUnits {
     missile_silo : number;
 
 
-    public save() {
+    public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
@@ -57,7 +57,7 @@ class Buildings implements IUnits {
         });
     }
 
-    public create() {
+    public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
@@ -88,6 +88,10 @@ class Buildings implements IUnits {
             });
 
         });
+    }
+
+    isValid() : boolean {
+        return false;
     }
 
 }

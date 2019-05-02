@@ -14,7 +14,7 @@ class User implements IUnits {
     currentplanet : number;
 
 
-    public save() {
+    public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
@@ -37,7 +37,7 @@ class User implements IUnits {
         });
     }
 
-    public create() {
+    public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
@@ -58,6 +58,10 @@ class User implements IUnits {
             });
 
         });
+    }
+
+    isValid() : boolean {
+        return false;
     }
 
 }

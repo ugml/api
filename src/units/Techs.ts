@@ -24,7 +24,7 @@ class Techs implements IUnits {
     graviton_tech : number;
 
 
-    public save() {
+    public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
@@ -57,7 +57,7 @@ class Techs implements IUnits {
         });
     }
 
-    public create() {
+    public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
@@ -88,6 +88,10 @@ class Techs implements IUnits {
             });
 
         });
+    }
+
+    isValid() : boolean {
+        return false;
     }
 
 }

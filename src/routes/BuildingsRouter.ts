@@ -163,9 +163,7 @@ export class BuildingsRouter {
                     .toString();
 
 
-                Database.getConnection().query(query, function (error, result) {
-
-                    if (error) throw error;
+                return Database.query(query).then(result => {
 
                     planet.b_building_id = 0;
                     planet.b_building_endtime = 0;
@@ -178,6 +176,16 @@ export class BuildingsRouter {
                         message: "Building canceled",
                         data: {planet}
                     });
+                    return;
+                }).catch(error => {
+                    Logger.error(error);
+
+                    response.json({
+                        status: Globals.Statuscode.SERVER_ERROR,
+                        message: "There was an error while handling the request.",
+                        data: {}
+                    });
+
                     return;
                 });
 

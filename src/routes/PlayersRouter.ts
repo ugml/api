@@ -219,8 +219,6 @@ export class PlayersRouter {
             }).then(data => {
                 Logger.info('Creating a new planet');
 
-                // TODO: relocate this code to a planet-class
-
                 data.planet.name = gameConfig.startplanet_name;
                 data.planet.last_update = Date.now()/1000|0;
                 data.planet.diameter = gameConfig.startplanet_diameter;
@@ -357,8 +355,6 @@ export class PlayersRouter {
                         data: {}
                     });
                 }
-
-
 
                 return;
             });

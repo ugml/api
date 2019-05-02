@@ -3,6 +3,7 @@ import { Database } from '../common/Database';
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import {Globals} from "../common/Globals";
+const Logger = require('../common/Logger');
 
 const squel = require("squel");
 

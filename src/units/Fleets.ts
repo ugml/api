@@ -27,7 +27,7 @@ class Fleets implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
-                .table("planets")
+                .table("fleets")
                 .set("small_cargo_ship", this.small_cargo_ship)
                 .set("large_cargo_ship", this.large_cargo_ship)
                 .set("light_fighter", this.light_fighter)
@@ -59,6 +59,7 @@ class Fleets implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
+                .table("fleets")
                 .set("planetID", this.planetID)
                 .set("small_cargo_ship", this.small_cargo_ship)
                 .set("large_cargo_ship", this.large_cargo_ship)

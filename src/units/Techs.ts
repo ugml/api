@@ -28,7 +28,7 @@ class Techs implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
-                .table("planets")
+                .table("techs")
                 .set("espionage_tech", this.espionage_tech)
                 .set("computer_tech", this.computer_tech)
                 .set("weapon_tech", this.weapon_tech)
@@ -61,6 +61,7 @@ class Techs implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
+                .table("techs")
                 .set("userID", this.userID)
                 .set("espionage_tech", this.espionage_tech)
                 .set("computer_tech", this.computer_tech)

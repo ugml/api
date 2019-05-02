@@ -28,7 +28,7 @@ class Buildings implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.update()
-                .table("planets")
+                .table("buildings")
                 .set("metal_mine", this.metal_mine)
                 .set("crystal_mine", this.crystal_mine)
                 .set("deuterium_synthesizer", this.deuterium_synthesizer)
@@ -61,6 +61,7 @@ class Buildings implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
+                .table("buildings")
                 .set("planetID", this.planetID)
                 .set("metal_mine", this.metal_mine)
                 .set("crystal_mine", this.crystal_mine)

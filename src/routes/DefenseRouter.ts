@@ -7,11 +7,6 @@ import { QueueItem } from "../common/QueueItem";
 import {Units} from "../common/Units";
 
 
-const JSONValidator = require('jsonschema').Validator;
-const jsonValidator = new JSONValidator();
-
-const queueSchema = require("../schemas/queue.schema.json");
-
 const units = new Units();
 const Logger = require('../common/Logger');
 
@@ -42,6 +37,7 @@ export class DefenseRouter {
 
     }
 
+    // TODO: relocate to Validator-class
     private static isValidBuildOrder(buildOrders : object) : boolean {
 
         for(let order in buildOrders) {
@@ -62,7 +58,6 @@ export class DefenseRouter {
     private static getBuildTimeInSeconds(costMetal, costCrystal, shipyardLvl, naniteLvl) {
         return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
     }
-
 
     public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
@@ -118,7 +113,6 @@ export class DefenseRouter {
     }
 
     public buildDefense(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-
 
         if(!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID) ||
@@ -204,8 +198,6 @@ export class DefenseRouter {
             for(let item in buildOrders) {
                 let count : number = buildOrders[item];
                 let cost = DefenseRouter.getCosts(parseInt(item));
-
-                console.log(metal + " | " + crystal + " | " + deuterium);
 
                 // if the user has not enough ressources to fullfill the complete build-order
                 if(metal < cost["metal"] * count ||
@@ -321,8 +313,6 @@ export class DefenseRouter {
                 return;
             });
 
-            // TODO: if it is a rocket, check if silo has enough free space
-
 
         }).catch(error => {
             Logger.error(error);
@@ -338,7 +328,6 @@ export class DefenseRouter {
 
     }
 
-
     /**
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
@@ -346,7 +335,6 @@ export class DefenseRouter {
     init() {
         this.router.get('/:planetID', this.getAllDefensesOnPlanet);
         this.router.post('/build/', this.buildDefense);
-        // this.router.get('/get/:planetID/:buildingID', this.getBuildingById);
     }
 
 }

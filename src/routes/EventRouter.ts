@@ -151,7 +151,7 @@ export class EventRouter {
 
         // validate JSON against schema
         if(!jsonValidator.validate(eventData, eventSchema).valid) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid json",
                 data: {}
@@ -162,7 +162,7 @@ export class EventRouter {
 
         // TODO: temporary
         if(["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "Missiontype not yet supported",
                 data: {}
@@ -173,7 +173,7 @@ export class EventRouter {
 
         // check if owner exists and sender of event = owner
         if(request.userID !== eventData.ownerID) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Event-creator is not currently authenticated user",
                 data: {}
@@ -200,8 +200,8 @@ export class EventRouter {
 
             // planet does not exist or player does not own it
             if(!InputValidator.isSet(startPlanet)) {
-                response.json({
-                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Authentication failed",
                     data: {}
                 });
@@ -227,8 +227,8 @@ export class EventRouter {
                 // destination does not exist
                 if(!InputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
 
-                    response.json({
-                        status: Globals.Statuscode.NOT_AUTHORIZED,
+                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Destination does not exist",
                         data: {}
                     });
@@ -278,7 +278,7 @@ export class EventRouter {
                     Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
 
                     // all done
-                    response.json({
+                    response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "success",
                         data: eventData

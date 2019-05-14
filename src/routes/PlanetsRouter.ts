@@ -20,13 +20,11 @@ export class PlanetsRouter {
 
     public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        // TODO: make this a POST request
-
         // validate parameters
         if(!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -46,7 +44,7 @@ export class PlanetsRouter {
 
             if(!InputValidator.isSet(result)) {
 
-                response.json({
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The player does not own the planet",
                     data: {}
@@ -67,7 +65,7 @@ export class PlanetsRouter {
 
             return Database.query(query).then(result => {
 
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {}
@@ -81,7 +79,7 @@ export class PlanetsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -111,7 +109,7 @@ export class PlanetsRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -121,7 +119,7 @@ export class PlanetsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -137,7 +135,7 @@ export class PlanetsRouter {
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -164,7 +162,7 @@ export class PlanetsRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -174,7 +172,7 @@ export class PlanetsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -194,7 +192,7 @@ export class PlanetsRouter {
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -231,7 +229,7 @@ export class PlanetsRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -241,7 +239,7 @@ export class PlanetsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}

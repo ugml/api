@@ -33,7 +33,7 @@ export class TechsRouter {
         if(!InputValidator.isSet(request.params.playerID) ||
             !InputValidator.isValidInt(request.params.playerID)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -50,7 +50,7 @@ export class TechsRouter {
         Database.query(query).then(result => {
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: result
@@ -60,7 +60,7 @@ export class TechsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -91,12 +91,14 @@ export class TechsRouter {
 
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
-            response.json({
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
             return;
+
         }
 
 
@@ -111,7 +113,7 @@ export class TechsRouter {
         Database.query(query).then(result => {
 
             if(!InputValidator.isSet(result)) {
-                response.json({
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
@@ -123,7 +125,7 @@ export class TechsRouter {
 
             // player does not own the planet
             if(!InputValidator.isSet(planet)) {
-                response.json({
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
@@ -160,7 +162,7 @@ export class TechsRouter {
                     planet.crystal = planet.crystal + cost["crystal"];
                     planet.crystal = planet.crystal + cost["crystal"];
 
-                    response.json({
+                    response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Building canceled",
                         data: {planet}
@@ -169,7 +171,7 @@ export class TechsRouter {
                 }).catch(error => {
                     Logger.error(error);
 
-                    response.json({
+                    response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: "There was an error while handling the request.",
                         data: {}
@@ -179,7 +181,7 @@ export class TechsRouter {
                 });
 
             } else {
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet has no build-job",
                     data: {}
@@ -189,7 +191,7 @@ export class TechsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -209,7 +211,7 @@ export class TechsRouter {
             !InputValidator.isValidInt(request.params.planetID) ||
             !InputValidator.isSet(request.params.techID) ||
             !InputValidator.isValidInt(request.params.techID)) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -220,7 +222,7 @@ export class TechsRouter {
         if(request.params.techID < Globals.MIN_TECH_ID ||
             request.params.techID > Globals.MAX_TECH_ID) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -240,7 +242,7 @@ export class TechsRouter {
         Database.query(query).then(result => {
 
             if(!InputValidator.isSet(result)) {
-                response.json({
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
@@ -252,7 +254,7 @@ export class TechsRouter {
 
             // player does not own the planet
             if(!InputValidator.isSet(planet)) {
-                response.json({
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
                     data: {}
@@ -263,7 +265,7 @@ export class TechsRouter {
             // 1. check if there is already a build-job on the planet
             if(planet.b_building_id !== 0 ||
                 planet.b_building_endtime !== 0) {
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet already has a build-job",
                     data: {}
@@ -281,7 +283,7 @@ export class TechsRouter {
                     planet.b_hangar_starttime > 0
                 )) {
 
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Can't build this building while it is in use",
                     data: {}
@@ -294,7 +296,7 @@ export class TechsRouter {
             if(request.params.techID == Globals.Buildings.RESEARCH_LAB &&
                 (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
 
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Can't build this building while it is in use",
                     data: {}
@@ -325,7 +327,7 @@ export class TechsRouter {
                 }
 
                 if(!requirementsMet) {
-                    response.json({
+                    response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Requirements are not met",
                         data: planet.planetID
@@ -353,7 +355,7 @@ export class TechsRouter {
                 planet.deuterium < cost["deuterium"] ||
                 planet.energy < cost["energy"]) {
 
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Not enough resources",
                     data: {}
@@ -387,7 +389,7 @@ export class TechsRouter {
 
             Database.query(query).then(result => {
 
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Job started",
                     data: {planet}
@@ -403,7 +405,7 @@ export class TechsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}

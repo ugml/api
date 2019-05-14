@@ -61,12 +61,14 @@ export class ShipsRouter {
 
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
-            response.json({
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
             return;
+
         }
 
         let query : string = squel.select()
@@ -89,7 +91,7 @@ export class ShipsRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -100,7 +102,7 @@ export class ShipsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -116,12 +118,14 @@ export class ShipsRouter {
             !InputValidator.isValidInt(request.body.planetID) ||
             !InputValidator.isSet(request.body.buildOrder) ||
             !InputValidator.isValidJson(request.body.buildOrder)) {
-            response.json({
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
             return;
+
         }
 
         const buildOrders = JSON.parse(request.body.buildOrder);
@@ -132,7 +136,7 @@ export class ShipsRouter {
 
         // validate build-order
         if(!ShipsRouter.isValidBuildOrder(buildOrders)) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -163,7 +167,7 @@ export class ShipsRouter {
 
             if(!InputValidator.isSet(result[0])) {
 
-                response.json({
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The player does not own the planet",
                     data: {}
@@ -173,7 +177,7 @@ export class ShipsRouter {
             }
 
             if(result[0].b_hangar_plus == 1) {
-                return response.json({
+                return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Shipyard is currently upgrading.",
                     data: {}
@@ -271,7 +275,7 @@ export class ShipsRouter {
                 .toString();
 
             Database.query(query).then(result => {
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {}
@@ -284,7 +288,7 @@ export class ShipsRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}

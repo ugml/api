@@ -1,4 +1,5 @@
 import {Router, Response, NextFunction, Request} from 'express';
+import {Globals} from "../common/Globals";
 
 export class ConfigRouter {
 
@@ -16,7 +17,7 @@ export class ConfigRouter {
 
         const data = require("../config/game.json");
 
-        response.json(data);
+        response.status(Globals.Statuscode.SUCCESS).json(data);
 
         return;
     }
@@ -25,7 +26,7 @@ export class ConfigRouter {
 
         const data = require("../config/units.json");
 
-        response.json(data);
+        response.status(Globals.Statuscode.SUCCESS).json(data);
         
         return;
     }

@@ -64,7 +64,7 @@ export class DefenseRouter {
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -91,7 +91,7 @@ export class DefenseRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -102,7 +102,7 @@ export class DefenseRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -118,12 +118,14 @@ export class DefenseRouter {
             !InputValidator.isValidInt(request.body.planetID) ||
             !InputValidator.isSet(request.body.buildOrder) ||
             !InputValidator.isValidJson(request.body.buildOrder)) {
-            response.json({
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
             return;
+
         }
 
         const buildOrders = JSON.parse(request.body.buildOrder);
@@ -134,7 +136,7 @@ export class DefenseRouter {
 
         // validate build-order
         if(!DefenseRouter.isValidBuildOrder(buildOrders)) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -170,8 +172,8 @@ export class DefenseRouter {
 
             if(!InputValidator.isSet(result[0])) {
 
-                response.json({
-                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The player does not own the planet",
                     data: {}
                 });
@@ -180,7 +182,7 @@ export class DefenseRouter {
             }
 
             if(result[0].b_hangar_plus == 1) {
-                return response.json({
+                return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Shipyard is currently upgrading.",
                     data: {}
@@ -304,7 +306,7 @@ export class DefenseRouter {
                 .toString();
 
             Database.query(query).then(result => {
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {}
@@ -317,7 +319,7 @@ export class DefenseRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}

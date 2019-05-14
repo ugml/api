@@ -49,7 +49,7 @@ export class PlayersRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -58,7 +58,7 @@ export class PlayersRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -78,7 +78,7 @@ export class PlayersRouter {
         if (!InputValidator.isSet(request.params.playerID) ||
             !InputValidator.isValidInt(request.params.playerID)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -106,7 +106,7 @@ export class PlayersRouter {
             }
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
                 data: data
@@ -115,7 +115,7 @@ export class PlayersRouter {
         }).catch(error => {
             Logger.error(error);
 
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
                 data: {}
@@ -131,7 +131,7 @@ export class PlayersRouter {
             !InputValidator.isSet(request.body.password) ||
             !InputValidator.isSet(request.body.email)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -140,6 +140,7 @@ export class PlayersRouter {
             return;
         }
 
+        // TODO: use the config-class
         const gameConfig = require("../config/game.json");
 
         const username: string = InputValidator.sanitizeString(request.body.username);
@@ -176,6 +177,7 @@ export class PlayersRouter {
 
                 return Database.query(query).then(row => {
                     newPlayer.userID = row[0][0].userID;
+                    newPlayer.password = hashedPassword;
 
                     return {player: newPlayer, planet: newPlanet};
                 });
@@ -323,7 +325,7 @@ export class PlayersRouter {
                 Logger.info('Transaction complete');
 
                 // return the result
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {}
@@ -342,14 +344,14 @@ export class PlayersRouter {
 
                 if(err instanceof DuplicateRecordError) {
                     // return the result
-                    response.json({
+                    response.status(Globals.Statuscode.BAD_REQUEST).json({
                         status: Globals.Statuscode.BAD_REQUEST,
                         message: `There was an error while handling the request: ${err.message}`,
                         data: {}
                     });
                 } else {
                     // return the result
-                    response.json({
+                    response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: "There was an error while handling the request.",
                         data: {}

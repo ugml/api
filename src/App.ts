@@ -93,8 +93,8 @@ class App {
                         self.userID = eval(payload).userID;
                         next();
                     } else {
-                        return response.json({
-                            status: Globals.Statuscode.NOT_AUTHORIZED,
+                        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                             message: "Authentication failed",
                             data: {}
                         });
@@ -107,7 +107,7 @@ class App {
 
 
             } catch(e) {
-                response.json({
+                response.status(Globals.Statuscode.SERVER_ERROR).json({
                     status: Globals.Statuscode.SERVER_ERROR,
                     message: "Internal server error",
                     data: {}

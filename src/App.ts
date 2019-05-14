@@ -32,7 +32,7 @@ const { combine, timestamp, printf } = format;
 const Logger = require('./common/Logger.js');
 
 
-const myFormat = printf(({ message, timestamp }) => {
+const logFormat = printf(({ message, timestamp }) => {
     return `${timestamp} [REQUEST] ${message}`;
 });
 
@@ -130,10 +130,19 @@ class App {
                 format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }),
-                myFormat
+                logFormat
             ),
             maxsize: 10,
-            msg: "{\"ip\": \"{{req.connection.remoteAddress}}\", \"userID\": \"{{req.userID}}\", \"method\": \"{{req.method}}\", \"url\": \"{{req.url}}\", \"params\": { \"query:\": {{JSON.stringify(req.params).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, \"body\": {{JSON.stringify(req.body).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} }}"
+            msg: "{" +
+                    "\"ip\": \"{{req.connection.remoteAddress}}\", " +
+                    "\"userID\": \"{{req.userID}}\", " +
+                    "\"method\": \"{{req.method}}\", " +
+                    "\"url\": \"{{req.url}}\", " +
+                    "\"params\": { " +
+                        "\"query:\": {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
+                        "\"body\": {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
+                    "}" +
+                "}"
         }));
 
         this.register('/v1/config', ConfigRouter);
@@ -157,6 +166,18 @@ class App {
         this.register('/v1/defenses', DefenseRouter);
 
         this.register('/v1/events', EventRouter);
+
+
+        this.express.use(function(request, response){
+
+            response.status(Globals.Statuscode.NOT_FOUND).json({
+                status: Globals.Statuscode.NOT_FOUND,
+                message: "The route does not exist",
+                data: {}
+            });
+
+            return;
+        });
     }
 
     private register(route : string, router : Router) {

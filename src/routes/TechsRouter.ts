@@ -7,6 +7,9 @@ import {Config} from "../common/Config";
 import {Units} from "../common/Units";
 
 
+const Logger = require('../common/Logger');
+
+
 const squel = require("squel");
 const units = new Units();
 
@@ -70,9 +73,9 @@ export class TechsRouter {
         });
     }
 
-    private getCosts(buildingKey : string, currentLevel : number) : object {
+    private static getCosts(buildingKey : string, currentLevel : number) : object {
 
-        let costs = units.getBuildings()[buildingKey];
+        let costs = units.getTechnologies()[buildingKey];
 
         return {
             "metal": costs["metal"] * costs["factor"] ** currentLevel,
@@ -83,14 +86,11 @@ export class TechsRouter {
 
     }
 
-
-
     public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        // TODO: make this a POST-request
 
-        if(!InputValidator.isSet(request.params.planetID) ||
-            !InputValidator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -106,7 +106,8 @@ export class TechsRouter {
         let query: string = squel.select()
             .from("planets", "p")
             .join("buildings", "b", "p.planetID = b.planetID")
-            .where("p.planetID = ?", request.params.planetID)
+            .join("techs", "t", "t.userID = p.ownerID")
+            .where("p.planetID = ?", request.body.planetID)
             .toString();
 
 
@@ -134,30 +135,31 @@ export class TechsRouter {
             }
 
             // 1. check if there is already a build-job on the planet
-            if(planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
+            if(planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
 
-                const buildingKey = units.getMappings()[planet.b_building_id];
+                const buildingKey = units.getMappings()[planet.b_tech_id];
 
                 // give back the ressources
                 const currentLevel = planet[buildingKey];
 
-                const cost = techsRouter.getCosts(buildingKey, currentLevel);
+                const cost = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
 
                 const query: string = squel.update()
                     .table("planets")
-                    .set("b_building_id", 0)
-                    .set("b_building_endtime", 0)
+                    .set("b_tech_id", 0)
+                    .set("b_tech_endtime", 0)
                     .set("metal", planet.metal + cost["metal"])
                     .set("crystal", planet.crystal + cost["crystal"])
                     .set("deuterium", planet.deuterium + cost["deuterium"])
                     .where("planetID = ?", planet.planetID)
+                    .where("ownerID = ?", request.userID)
                     .toString();
 
 
                 return Database.query(query).then(result => {
 
-                    planet.b_building_id = 0;
-                    planet.b_building_endtime = 0;
+                    planet.b_tech_id = 0;
+                    planet.b_tech_endtime = 0;
                     planet.metal = planet.metal + cost["metal"];
                     planet.crystal = planet.crystal + cost["crystal"];
                     planet.crystal = planet.crystal + cost["crystal"];
@@ -203,24 +205,24 @@ export class TechsRouter {
 
     }
 
-    public startTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    public buildTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        // TODO: make this a POST-request
+        if(!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID) ||
+            !InputValidator.isSet(request.body.techID) ||
+            !InputValidator.isValidInt(request.body.techID)) {
 
-        if(!InputValidator.isSet(request.params.planetID) ||
-            !InputValidator.isValidInt(request.params.planetID) ||
-            !InputValidator.isSet(request.params.techID) ||
-            !InputValidator.isValidInt(request.params.techID)) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
             });
             return;
+
         }
 
-        if(request.params.techID < Globals.MIN_TECH_ID ||
-            request.params.techID > Globals.MAX_TECH_ID) {
+        if(request.body.techID < Globals.MIN_TECH_ID ||
+            request.body.techID > Globals.MAX_TECH_ID) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -233,11 +235,12 @@ export class TechsRouter {
 
         // get the planet, on which the building should be built
         let query: string = squel.select()
-            .from("users", "u")
-            .join("techs", "t", "p.ow = t.planetID")
-            .where("p.planetID = ?", request.params.planetID)
+            .from("planets", "p")
+            .left_join("buildings", "b", "b.planetID = p.planetID")
+            .left_join("techs", "t", "t.userID = p.ownerID")
+            .where("p.planetID = ?", request.body.planetID)
+            .where("p.ownerID = ?", request.userID)
             .toString();
-
 
         Database.query(query).then(result => {
 
@@ -263,8 +266,8 @@ export class TechsRouter {
             }
 
             // 1. check if there is already a build-job on the planet
-            if(planet.b_building_id !== 0 ||
-                planet.b_building_endtime !== 0) {
+            if(planet.b_tech_id !== 0 ||
+                planet.b_tech_endtime !== 0) {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet already has a build-job",
@@ -273,41 +276,22 @@ export class TechsRouter {
                 return;
             }
 
-            // can't build shipyard / robotic / nanite while ships or defenses are built
-            if((request.params.techID == Globals.Buildings.ROBOTIC_FACTORY ||
-                    request.params.techID == Globals.Buildings.NANITE_FACTORY ||
-                    request.params.techID == Globals.Buildings.SHIPYARD
-                )
-                &&
-                (planet.b_hangar_id > 0 ||
-                    planet.b_hangar_starttime > 0
-                )) {
-
-                response.status(Globals.Statuscode.SUCCESS).json({
-                    status: Globals.Statuscode.SUCCESS,
-                    message: "Can't build this building while it is in use",
-                    data: {}
-                });
-
-                return;
-            }
-
             // can't build research lab while they are researching... poor scientists :(
-            if(request.params.techID == Globals.Buildings.RESEARCH_LAB &&
-                (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
-
-                response.status(Globals.Statuscode.SUCCESS).json({
-                    status: Globals.Statuscode.SUCCESS,
-                    message: "Can't build this building while it is in use",
-                    data: {}
-                });
-
-                return;
-            }
+            // if(request.body.techID == Globals.Buildings.RESEARCH_LAB &&
+            //     (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
+            //
+            //     response.status(Globals.Statuscode.SUCCESS).json({
+            //         status: Globals.Statuscode.SUCCESS,
+            //         message: "Can't build this building while it is in use",
+            //         data: {}
+            //     });
+            //
+            //     return;
+            // }
 
 
             // 2. check, if requirements are met
-            let requirements = units.getRequirements()[request.params.techID];
+            let requirements = units.getRequirements()[request.body.techID];
 
             // building has requirements
             if(requirements !== undefined) {
@@ -318,7 +302,7 @@ export class TechsRouter {
                 {
 
                     let reqLevel = requirements[reqID];
-                    let key = units.getMappings()[request.params.techID];
+                    let key = units.getMappings()[reqID];
 
                     if(planet[key] < reqLevel) {
                         requirementsMet = false;
@@ -338,22 +322,18 @@ export class TechsRouter {
             }
 
             // 3. check if there are enough resources on the planet for the building to be built
-            let buildingKey = units.getMappings()[request.params.techID];
+            let buildingKey = units.getMappings()[request.body.techID];
+
             let currentLevel = planet[buildingKey];
-            let costs = units.getBuildings()[request.params.techID];
 
 
-            let cost = {
-                "metal": costs["metal"] * costs["factor"] ** currentLevel,
-                "crystal": costs["crystal"] * costs["factor"] ** currentLevel,
-                "deuterium": costs["deuterium"] * costs["factor"] ** currentLevel,
-                "energy": costs["energy"] * costs["factor"] ** currentLevel,
-            };
+            let cost = TechsRouter.getCosts(request.body.techID, currentLevel);
+
 
             if(planet.metal < cost["metal"] ||
                 planet.crystal < cost["crystal"] ||
                 planet.deuterium < cost["deuterium"] ||
-                planet.energy < cost["energy"]) {
+                planet.energy_max < cost["energy"]) {
 
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
@@ -365,16 +345,15 @@ export class TechsRouter {
             }
 
             // 4. start the build-job
-            let buildTime = Math.round((cost["metal"] + cost["crystal"]) / (2500 * (1 + planet["robotic_factory"]) * (2 ** planet["nanite_factory"]) * Config.Get["speed"]));
+            let buildTime = Math.round((cost["metal"] + cost["crystal"]) / (Config.Get["speed"] * 1000 * result[0].research_lab));
 
             let endTime = Math.round(+new Date()/1000) + buildTime;
-
 
             planet.metal = planet.metal - cost['metal'];
             planet.crystal = planet.crystal - cost['crystal'];
             planet.deuterium = planet.deuterium - cost['deuterium'];
-            planet.b_building_id = request.params.techID;
-            planet.b_building_endtime = endTime;
+            planet.b_tech_id = request.body.techID;
+            planet.b_tech_endtime = endTime;
 
 
             let query : string = squel.update()
@@ -382,9 +361,9 @@ export class TechsRouter {
                 .set("metal", planet.metal)
                 .set("crystal", planet.crystal)
                 .set("deuterium", planet.deuterium)
-                .set("b_building_id", planet.b_building_id)
-                .set("b_building_endtime", planet.b_building_endtime)
-                .where("planetID = ?", request.params.planetID)
+                .set("b_tech_id", planet.b_tech_id)
+                .set("b_tech_endtime", planet.b_tech_endtime)
+                .where("planetID = ?", request.body.planetID)
                 .toString();
 
             Database.query(query).then(result => {
@@ -422,6 +401,8 @@ export class TechsRouter {
      */
     init() {
         this.router.get('/:playerID', this.getTechs);
+        this.router.post('/build/', this.buildTech);
+        this.router.post('/cancel/', this.cancelTech);
     }
 
 }

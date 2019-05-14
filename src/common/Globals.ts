@@ -9,6 +9,9 @@ class Globals {
     static MIN_TECH_ID : number = 101;
     static MAX_TECH_ID : number = 115;
 
+    static MIN_SHIP_ID : number = 201;
+    static MAX_SHIP_ID : number = 214;
+
 
 
 

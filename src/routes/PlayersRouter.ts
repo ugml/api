@@ -343,7 +343,7 @@ export class PlayersRouter {
                 if(err instanceof DuplicateRecordError) {
                     // return the result
                     response.json({
-                        status: Globals.Statuscode.SERVER_ERROR,
+                        status: Globals.Statuscode.BAD_REQUEST,
                         message: `There was an error while handling the request: ${err.message}`,
                         data: {}
                     });

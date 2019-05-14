@@ -3,10 +3,9 @@ import { Database } from "../common/Database";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { InputValidator } from "../common/InputValidator";
 import { Redis } from "../common/Redis";
-import {start} from "repl";
 import {Globals} from "../common/Globals";
-import {ICoordinates} from '../../src/interfaces/ICoordinates'
-import {IShipUnits} from '../../src/interfaces/IShipUnits'
+import {ICoordinates} from '../interfaces/ICoordinates'
+import {IShipUnits} from '../interfaces/IShipUnits'
 
 
 const JSONValidator = require('jsonschema').Validator;

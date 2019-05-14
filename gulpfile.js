@@ -9,6 +9,7 @@ gulp.task('scripts', () => {
     const tsResult = tsProject.src()
         .pipe(tsProject());
     gulp.src(['src/config/**/*']).pipe(gulp.dest('dist/config'));
+    gulp.src(['src/schemas/**/*']).pipe(gulp.dest('dist/schemas'));
     return tsResult.js.pipe(gulp.dest('dist'));
 });
 

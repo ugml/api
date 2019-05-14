@@ -100,6 +100,9 @@ export class BuildingsRouter {
 
 
     public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+        
+        // TODO: make this a POST-request
+
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
             response.json({
@@ -213,6 +216,8 @@ export class BuildingsRouter {
     }
 
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // TODO: make this a POST-request
 
         // task                                                 | object needed
         // -----------------------------------------------------|-------------------------------------------

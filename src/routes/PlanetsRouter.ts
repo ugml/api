@@ -20,6 +20,8 @@ export class PlanetsRouter {
 
     public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
+        // TODO: make this a POST request
+
         // validate parameters
         if(!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {

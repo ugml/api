@@ -356,15 +356,9 @@ export class BuildingsRouter {
             // 3. check if there are enough resources on the planet for the building to be built
             let buildingKey = units.getMappings()[request.body.buildingID];
             let currentLevel = planet[buildingKey];
-            let costs = units.getBuildings()[request.body.buildingID];
 
+            let cost = buildingRoutes.getCosts(request.body.buildingID, currentLevel);
 
-            let cost = {
-                "metal": costs["metal"] * costs["factor"] ** currentLevel,
-                "crystal": costs["crystal"] * costs["factor"] ** currentLevel,
-                "deuterium": costs["deuterium"] * costs["factor"] ** currentLevel,
-                "energy": costs["energy"] * costs["factor"] ** currentLevel,
-            };
 
             if(planet.metal < cost["metal"] ||
                 planet.crystal < cost["crystal"] ||

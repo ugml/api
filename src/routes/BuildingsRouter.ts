@@ -85,7 +85,7 @@ export class BuildingsRouter {
         });
     }
 
-    public getCosts(buildingKey : string, currentLevel : number) : object {
+    private getCosts(buildingKey : string, currentLevel : number) : object {
 
         let costs = units.getBuildings()[buildingKey];
 
@@ -103,8 +103,8 @@ export class BuildingsRouter {
         
         // TODO: make this a POST-request
 
-        if(!InputValidator.isSet(request.params.planetID) ||
-            !InputValidator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID)) {
             response.json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
@@ -118,7 +118,7 @@ export class BuildingsRouter {
         let query: string = squel.select()
             .from("planets", "p")
             .join("buildings", "b", "p.planetID = b.planetID")
-            .where("p.planetID = ?", request.params.planetID)
+            .where("p.planetID = ?", request.body.planetID)
             .toString();
 
 
@@ -228,10 +228,10 @@ export class BuildingsRouter {
         //    3.1. substract resources form planet              | current planet
         //    3.2. set b_building_id and b_building_endtime     | current planet
 
-        if(!InputValidator.isSet(request.params.planetID) ||
-            !InputValidator.isValidInt(request.params.planetID) ||
-            !InputValidator.isSet(request.params.buildingID) ||
-            !InputValidator.isValidInt(request.params.buildingID)) {
+        if(!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID) ||
+            !InputValidator.isSet(request.body.buildingID) ||
+            !InputValidator.isValidInt(request.body.buildingID)) {
             response.json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
@@ -240,8 +240,8 @@ export class BuildingsRouter {
             return;
         }
 
-        if(request.params.buildingID < Globals.MIN_BUILDING_ID ||
-            request.params.buildingID > Globals.MAX_BUILDING_ID) {
+        if(request.body.buildingID < Globals.MIN_BUILDING_ID ||
+            request.body.buildingID > Globals.MAX_BUILDING_ID) {
 
             response.json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -256,7 +256,7 @@ export class BuildingsRouter {
         let query: string = squel.select()
                             .from("planets", "p")
                             .join("buildings", "b", "p.planetID = b.planetID")
-                            .where("p.planetID = ?", request.params.planetID)
+                            .where("p.planetID = ?", request.body.planetID)
                             .toString();
 
 
@@ -295,9 +295,9 @@ export class BuildingsRouter {
             }
 
             // can't build shipyard / robotic / nanite while ships or defenses are built
-            if((request.params.buildingID == Globals.Buildings.ROBOTIC_FACTORY ||
-                request.params.buildingID == Globals.Buildings.NANITE_FACTORY ||
-                request.params.buildingID == Globals.Buildings.SHIPYARD
+            if((request.body.buildingID == Globals.Buildings.ROBOTIC_FACTORY ||
+                request.body.buildingID == Globals.Buildings.NANITE_FACTORY ||
+                request.body.buildingID == Globals.Buildings.SHIPYARD
                 )
                 &&
                 (planet.b_hangar_id > 0 ||
@@ -314,7 +314,7 @@ export class BuildingsRouter {
             }
 
             // can't build research lab while they are researching... poor scientists :(
-            if(request.params.buildingID == Globals.Buildings.RESEARCH_LAB &&
+            if(request.body.buildingID == Globals.Buildings.RESEARCH_LAB &&
                 (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
 
                 response.json({
@@ -328,7 +328,7 @@ export class BuildingsRouter {
 
 
             // 2. check, if requirements are met
-            let requirements = units.getRequirements()[request.params.buildingID];
+            let requirements = units.getRequirements()[request.body.buildingID];
 
             // building has requirements
             if(requirements !== undefined) {
@@ -339,7 +339,7 @@ export class BuildingsRouter {
                 {
 
                     let reqLevel = requirements[reqID];
-                    let key = units.getMappings()[request.params.buildingID];
+                    let key = units.getMappings()[request.body.buildingID];
 
                     if(planet[key] < reqLevel) {
                         requirementsMet = false;
@@ -359,9 +359,9 @@ export class BuildingsRouter {
             }
 
             // 3. check if there are enough resources on the planet for the building to be built
-            let buildingKey = units.getMappings()[request.params.buildingID];
+            let buildingKey = units.getMappings()[request.body.buildingID];
             let currentLevel = planet[buildingKey];
-            let costs = units.getBuildings()[request.params.buildingID];
+            let costs = units.getBuildings()[request.body.buildingID];
 
 
             let cost = {
@@ -394,7 +394,7 @@ export class BuildingsRouter {
             planet.metal = planet.metal - cost['metal'];
             planet.crystal = planet.crystal - cost['crystal'];
             planet.deuterium = planet.deuterium - cost['deuterium'];
-            planet.b_building_id = request.params.buildingID;
+            planet.b_building_id = request.body.buildingID;
             planet.b_building_endtime = endTime;
 
 
@@ -405,7 +405,7 @@ export class BuildingsRouter {
                                 .set("deuterium", planet.deuterium)
                                 .set("b_building_id", planet.b_building_id)
                                 .set("b_building_endtime", planet.b_building_endtime)
-                                .where("planetID = ?", request.params.planetID)
+                                .where("planetID = ?", request.body.planetID)
                                 .toString();
 
             Database.query(query).then(result => {
@@ -443,8 +443,8 @@ export class BuildingsRouter {
      */
     init() {
         this.router.get('/:planetID', this.getAllBuildingsOnPlanet);
-        this.router.get('/build/:planetID/:buildingID', this.startBuilding);
-        this.router.get('/cancel/:planetID/', this.cancelBuilding);
+        this.router.post('/build', this.startBuilding);
+        this.router.post('/cancel', this.cancelBuilding);
     }
 
 }

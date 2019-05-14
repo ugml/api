@@ -56,6 +56,8 @@ export class PlanetsRouter {
             }
 
 
+
+            // TODO: check for unique-constraint violation
             let query : string = squel.update()
                 .table("users")
                 .set("currentplanet = ?", request.body.planetID)

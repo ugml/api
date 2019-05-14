@@ -5,6 +5,10 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import {Units} from "../common/Units";
 import {Config} from "../common/Config";
 import {Globals} from "../common/Globals";
+import {SerializationHelper} from "../common/SerializationHelper";
+import {Planet} from "../units/Planet";
+
+const Logger = require('../common/Logger');
 
 
 const squel = require("squel");
@@ -85,9 +89,9 @@ export class BuildingsRouter {
         });
     }
 
-    private getCosts(buildingKey : string, currentLevel : number) : object {
+    private getCosts(buildingID : number, currentLevel : number) : object {
 
-        let costs = units.getBuildings()[buildingKey];
+        let costs = units.getBuildings()[buildingID];
 
         return {
             "metal": costs["metal"] * costs["factor"] ** currentLevel,
@@ -100,8 +104,7 @@ export class BuildingsRouter {
 
 
     public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-        
-        // TODO: make this a POST-request
+
 
         if(!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID)) {
@@ -133,10 +136,10 @@ export class BuildingsRouter {
                 return;
             }
 
-            let planet = result[0];
+
 
             // player does not own the planet
-            if(!InputValidator.isSet(planet)) {
+            if(!InputValidator.isSet(result[0])) {
                 response.json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
@@ -144,6 +147,9 @@ export class BuildingsRouter {
                 });
                 return;
             }
+
+            let planet : Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
+
 
             // 1. check if there is already a build-job on the planet
             if(planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
@@ -153,7 +159,7 @@ export class BuildingsRouter {
                 // give back the ressources
                 const currentLevel = planet[buildingKey];
 
-                const cost = buildingRoutes.getCosts(buildingKey, currentLevel);
+                const cost = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
 
                 const query: string = squel.update()
                     .table("planets")
@@ -216,17 +222,6 @@ export class BuildingsRouter {
     }
 
     public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-
-        // TODO: make this a POST-request
-
-        // task                                                 | object needed
-        // -----------------------------------------------------|-------------------------------------------
-        // 0. check, if planet already building a building      | current planet
-        // 1. check if requirements met for building            | current buildings on planet & requirements
-        // 2. check if enough ressources                        | current planet
-        // 3. start building-process                            | current planet
-        //    3.1. substract resources form planet              | current planet
-        //    3.2. set b_building_id and b_building_endtime     | current planet
 
         if(!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID) ||

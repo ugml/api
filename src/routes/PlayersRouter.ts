@@ -376,7 +376,7 @@ export class PlayersRouter {
         this.router.get('/planetlist/', new PlanetsRouter().getAllPlanetsOfPlayer);
 
         // /user/currentplanet/set/:planetID
-        this.router.get('/currentplanet/set/:planetID', new PlanetsRouter().setCurrentPlanet);
+        this.router.post('/currentplanet/set', new PlanetsRouter().setCurrentPlanet);
 
         // /user/create/
         this.router.post('/create', this.createPlayer);

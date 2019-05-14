@@ -23,8 +23,8 @@ export class PlanetsRouter {
         // TODO: make this a POST request
 
         // validate parameters
-        if(!InputValidator.isSet(request.params.planetID) ||
-            !InputValidator.isValidInt(request.params.planetID)) {
+        if(!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID)) {
 
             response.json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -38,7 +38,7 @@ export class PlanetsRouter {
         // check if user owns the planet
         let query : string = squel.select()
             .from("planets")
-            .where("planetID = ?", request.params.planetID)
+            .where("planetID = ?", request.body.planetID)
             .where("ownerID = ?", request.userID)
             .toString();
 
@@ -58,7 +58,7 @@ export class PlanetsRouter {
 
             let query : string = squel.update()
                 .table("users")
-                .set("currentplanet = ?", request.params.planetID)
+                .set("currentplanet = ?", request.body.planetID)
                 .where("userID = ?", request.userID)
                 .toString();
 

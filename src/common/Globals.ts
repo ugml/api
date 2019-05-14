@@ -6,6 +6,9 @@ class Globals {
     static MIN_DEFENSE_ID : number = 301;
     static MAX_DEFENSE_ID : number = 310;
 
+    static MIN_TECH_ID : number = 101;
+    static MAX_TECH_ID : number = 115;
+
 
 
 

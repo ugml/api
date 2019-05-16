@@ -341,6 +341,69 @@ export class PlanetsRouter {
         });
     }
 
+    public renamePlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        if (!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID) ||
+            !InputValidator.isSet(request.body.name)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+        }
+
+        const newName : string = InputValidator.sanitizeString(request.body.name);
+
+        if(newName.length <= 4) {
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "New name is too short. Minimum length is 4 characters.",
+                data: {}
+            });
+
+            return;
+        }
+
+        // check if it is the last planet of the user
+        let query: string = squel.update()
+            .table("planets")
+            .set("name", newName)
+            .where("planetID = ?", request.body.planetID)
+            .where("ownerID = ?", request.userID)
+            .toString();
+
+        Database.query(query).then(() => {
+
+            // return the result
+            response.status(Globals.Statuscode.SUCCESS).json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Success",
+                data: {}
+            });
+            return;
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
+        });
+
+
+
+
+    }
+
     /**
      * GET planet by ID
      */
@@ -418,6 +481,7 @@ export class PlanetsRouter {
         this.router.get('/:planetID', this.getPlanetByID);
         this.router.get('/movement/:planetID', this.getMovement);
         this.router.post('/destroy/', this.destroyPlanet);
+        this.router.post('/rename/', this.renamePlanet);
     }
 
 }

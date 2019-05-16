@@ -9,7 +9,6 @@
     "mission",
     "speed",
     "holdDuration",
-    "returning",
     "data"
   ],
   "properties": {
@@ -59,11 +58,6 @@
       "type": "integer",
       "minimum": 0,
       "multipleOf": 1
-    },
-    "returning": {
-      "$id": "#/properties/returning",
-      "type": "boolean",
-      "default": false
     },
     "data": {
       "$id": "#/properties/data",

@@ -407,8 +407,6 @@ export class PlayersRouter {
 
         const query : string = queryBuilder.where("userID = ?", request.userID).toString();
 
-        console.log(query);
-
         // execute the update
         Database.query(query).then(() => {
 

@@ -17,6 +17,7 @@ import ShipsRouter from "./routes/ShipsRouter";
 import DefenseRouter from "./routes/DefenseRouter";
 import EventRouter from "./routes/EventRouter";
 import GalaxyRouter from "./routes/GalaxyRouter";
+import MessagesRouter from "./routes/MessagesRouter";
 
 import {Router} from "express";
 import {Globals} from "./common/Globals";
@@ -185,6 +186,8 @@ class App {
         this.register('/v1/events', EventRouter);
 
         this.register('/v1/galaxy', GalaxyRouter);
+
+        this.register('/v1/messages', MessagesRouter);
 
 
         this.express.use(function(request, response){

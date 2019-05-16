@@ -147,6 +147,18 @@ export class EventRouter {
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
+        if(!InputValidator.isSet(request.body.event)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+
+        }
+
         let eventData = JSON.parse(request.body.event);
 
         // validate JSON against schema
@@ -160,6 +172,19 @@ export class EventRouter {
             return;
         }
 
+
+        // check if sender of event == currently authenticated user
+        if(request.userID !== eventData.ownerID) {
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Event-creator is not currently authenticated user",
+                data: {}
+            });
+
+            return;
+        }
+
+
         // TODO: temporary
         if(["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -171,16 +196,6 @@ export class EventRouter {
             return;
         }
 
-        // check if owner exists and sender of event = owner
-        if(request.userID !== eventData.ownerID) {
-            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Event-creator is not currently authenticated user",
-                data: {}
-            });
-
-            return;
-        }
 
         let planetQuery : string = squel.select()
             .from("planets")
@@ -188,7 +203,7 @@ export class EventRouter {
             .where("system = ?", eventData.data.origin.system)
             .where("planet = ?", eventData.data.origin.planet)
             .where("planet_type = ?", (eventData.data.origin.type === "planet") ? 1 : 2)
-            .where("ownerID = ?", eventData.ownerID)
+            .where("ownerID = ?", request.userID)
             .toString();
 
         // check if origin-planet exists and the user owns it
@@ -202,13 +217,14 @@ export class EventRouter {
             if(!InputValidator.isSet(startPlanet)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
-                    message: "Authentication failed",
+                    message: "Invalid parameter",
                     data: {}
                 });
 
                 return;
             }
 
+            // get the destination-planet
             let planetQuery : string = squel.select()
                 .from("planets")
                 .where("galaxy = ?", eventData.data.destination.galaxy)
@@ -228,7 +244,7 @@ export class EventRouter {
                 if(!InputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
 
                     response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
+                        status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Destination does not exist",
                         data: {}
                     });
@@ -284,6 +300,16 @@ export class EventRouter {
                         data: eventData
                     });
                     return;
+                }).catch(error => {
+                    Logger.error(error);
+
+                    response.status(Globals.Statuscode.SERVER_ERROR).json({
+                        status: Globals.Statuscode.SERVER_ERROR,
+                        message: `An error occured: ${error.message}`,
+                        data: eventData
+                    });
+                    return;
+
                 });
             });
         });

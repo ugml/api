@@ -148,6 +148,8 @@ export class PlayersRouter {
 
         const hashedPassword = bcrypt.hashSync(password, 10);
 
+        // TODO: use squel
+
         // check, if the username or the email is already taken
         let query = `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
                             `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
@@ -340,7 +342,7 @@ export class PlayersRouter {
 
                 Logger.info('Rolled back transaction');
 
-                if(err instanceof DuplicateRecordError) {
+                if(err instanceof DuplicateRecordError || err.message.includes("Duplicate entry")) {
                     // return the result
                     response.status(Globals.Statuscode.BAD_REQUEST).json({
                         status: Globals.Statuscode.BAD_REQUEST,
@@ -359,6 +361,112 @@ export class PlayersRouter {
                 return;
             });
         });
+
+
+    }
+
+    public updatePlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // if no parameters are set
+        if (!InputValidator.isSet(request.body.username) &&
+            !InputValidator.isSet(request.body.password) &&
+            !InputValidator.isSet(request.body.email)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "No parameters were passed",
+                data: {}
+            });
+
+            return;
+        }
+
+        let queryBuilder : squel.Update = squel.update()
+            .table("users");
+
+
+        if (InputValidator.isSet(request.body.username)) {
+            const username: string = InputValidator.sanitizeString(request.body.username);
+
+            queryBuilder.set("username", username);
+
+        }
+
+        if (InputValidator.isSet(request.body.password)) {
+            const password: string = InputValidator.sanitizeString(request.body.password);
+
+            queryBuilder.set("password", bcrypt.hashSync(password, 10));
+        }
+
+        if (InputValidator.isSet(request.body.email)) {
+            const email: string = InputValidator.sanitizeString(request.body.email);
+
+            queryBuilder.set("email", email);
+        }
+
+
+        const query : string = queryBuilder.where("userID = ?", request.userID).toString();
+
+        console.log(query);
+
+        // execute the update
+        Database.query(query).then(() => {
+
+            let query: string = squel.select()
+                .field("userID")
+                .field("username")
+                .field("email")
+                .field("onlinetime")
+                .field("currentplanet")
+                .from("users")
+                .where("userID = ?", request.userID)
+                .toString();
+
+            // return the updated userdata
+            return Database.query(query).then( result => {
+
+                let data: {};
+
+                if (InputValidator.isSet(result)) {
+                    data = result[0];
+                }
+
+                // return the result
+                return response.status(Globals.Statuscode.SUCCESS).json({
+                    status: Globals.Statuscode.SUCCESS,
+                    message: "Success",
+                    data: data
+                });
+            });
+
+        }).catch(err => {
+
+            Logger.error(err);
+
+            if(err instanceof DuplicateRecordError || err.message.includes("Duplicate entry")) {
+                // return the result
+                response.status(Globals.Statuscode.BAD_REQUEST).json({
+                    status: Globals.Statuscode.BAD_REQUEST,
+                    message: `There was an error while handling the request: ${err.message}`,
+                    data: {}
+                });
+            } else {
+
+                // return the result
+                response.status(Globals.Statuscode.SERVER_ERROR).json({
+                    status: Globals.Statuscode.SERVER_ERROR,
+                    message: "There was an error while handling the request.",
+                    data: {}
+                });
+            }
+
+            return;
+        });
+
+
+
+
+
 
 
     }
@@ -386,6 +494,9 @@ export class PlayersRouter {
 
         // /users/:playerID
         this.router.get('/:playerID', this.getPlayerByID);
+
+        // /user/update
+        this.router.post('/update', this.updatePlayer);
     }
 
 }

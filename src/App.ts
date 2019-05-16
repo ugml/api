@@ -20,6 +20,7 @@ import GalaxyRouter from "./routes/GalaxyRouter";
 
 import {Router} from "express";
 import {Globals} from "./common/Globals";
+import {InputValidator} from "./common/InputValidator";
 
 
 const jwt = new JwtHelper();
@@ -91,7 +92,7 @@ class App {
 
                     const payload : string = jwt.validateToken(authString);
 
-                    if(payload !== "" && payload !== undefined) {
+                    if(InputValidator.isSet(payload)) {
 
                         self.userID = eval(payload).userID;
 
@@ -108,6 +109,7 @@ class App {
                             next();
                         }
                     } else {
+
                         response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                             status: Globals.Statuscode.NOT_AUTHORIZED,
                             message: "Authentication failed",

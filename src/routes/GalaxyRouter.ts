@@ -53,12 +53,14 @@ export class GalaxyRouter {
             .field("g.debris_metal")
             .field("g.debris_crystal")
             .field("p.destroyed")
-            .from("planets", "p")
-            .left_join("galaxy", "g", "g.planetID = p.planetID")
+            .from("galaxy", "g")
+            .left_join("planets", "p", "g.planetID = p.planetID")
             .left_join("users", "u", "u.userID = p.ownerID")
-            .where("galaxy = ?", request.params.galaxy)
-            .where("`system` = ?", request.params.system)
+            .where("pos_galaxy = ?", request.params.galaxy)
+            .where("`pos_system` = ?", request.params.system)
             .toString();
+
+        console.log(query);
 
         // execute the query
         Database.query(query).then(result => {

@@ -94,10 +94,22 @@ class App {
                     if(payload !== "" && payload !== undefined) {
 
                         self.userID = eval(payload).userID;
-                        next();
+
+                        // check if userID is a valid integer
+                        if(isNaN(parseInt(self.userID))) {
+                            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                                status: Globals.Statuscode.NOT_AUTHORIZED,
+                                message: "Invalid parameter",
+                                data: {}
+                            });
+
+                            return;
+                        } else {
+                            next();
+                        }
                     } else {
-                        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
+                        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                            status: Globals.Statuscode.NOT_AUTHORIZED,
                             message: "Authentication failed",
                             data: {}
                         });

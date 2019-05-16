@@ -78,13 +78,14 @@ export class DefenseRouter {
                                 .from("defenses", "d")
                                 .left_join("planets", "p", "d.planetID = p.planetID")
                                 .where("d.planetID = ?", request.params.planetID)
+                                .where("p.ownerID = ?", request.userID)
                                 .toString();
 
         Database.query(query).then(result => {
 
             let data;
 
-            if(!InputValidator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -144,9 +145,6 @@ export class DefenseRouter {
             return;
         }
 
-
-        let playerId = parseInt(request.userID);
-
         let query : string = squel.select()
             .field("metal")
             .field("crystal")
@@ -165,7 +163,7 @@ export class DefenseRouter {
             .left_join("buildings", "b", "b.planetID = p.planetID")
             .left_join("defenses", "d", "d.planetID = p.planetID")
             .where("p.planetID = ?", request.body.planetID)
-            .where("p.ownerID = ?", playerId)
+            .where("p.ownerID = ?", request.userID)
             .toString();
 
         Database.query(query).then(result => {

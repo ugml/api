@@ -26,8 +26,6 @@ export class PlayersRouter {
 
     public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        // validate parameters
-        let playerId = parseInt(request.userID);
 
         let query: string = squel.select()
             .field("userID")
@@ -36,7 +34,7 @@ export class PlayersRouter {
             .field("onlinetime")
             .field("currentplanet")
             .from("users")
-            .where("userID = ?", playerId)
+            .where("userID = ?", request.userID)
             .toString();
 
         // execute the query

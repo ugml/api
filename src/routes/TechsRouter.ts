@@ -33,21 +33,10 @@ export class TechsRouter {
      */
     public getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!InputValidator.isSet(request.params.playerID) ||
-            !InputValidator.isValidInt(request.params.playerID)) {
-
-            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
-            });
-
-            return;
-        }
 
         let query : string = squel.select()
                                 .from("techs")
-                                .where("userID = ?", request.params.playerID)
+                                .where("userID = ?", request.userID)
                                 .toString();
 
         Database.query(query).then(result => {
@@ -108,6 +97,7 @@ export class TechsRouter {
             .join("buildings", "b", "p.planetID = b.planetID")
             .join("techs", "t", "t.userID = p.ownerID")
             .where("p.planetID = ?", request.body.planetID)
+            .where("p.ownerID = ?", request.userID)
             .toString();
 
 
@@ -400,7 +390,7 @@ export class TechsRouter {
      * Initializes the routes
      */
     init() {
-        this.router.get('/:playerID', this.getTechs);
+        this.router.get('/', this.getTechs);
         this.router.post('/build/', this.buildTech);
         this.router.post('/cancel/', this.cancelTech);
     }

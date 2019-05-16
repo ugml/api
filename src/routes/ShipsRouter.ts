@@ -77,6 +77,7 @@ export class ShipsRouter {
                                 .from("fleet", "f")
                                 .left_join("planets", "p", "f.planetID = p.planetID")
                                 .where("f.planetID = ?", request.params.planetID)
+                                .where("p.ownerID = ?", request.userID)
                                 .toString();
 
         // execute the query
@@ -84,7 +85,7 @@ export class ShipsRouter {
 
             let data;
 
-            if(!InputValidator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -144,9 +145,6 @@ export class ShipsRouter {
             return;
         }
 
-
-        let playerId = parseInt(request.userID);
-
         let query : string = squel.select()
             .field("metal")
             .field("crystal")
@@ -160,7 +158,7 @@ export class ShipsRouter {
             .from("planets", "p")
             .left_join("buildings", "b", "b.planetID = p.planetID")
             .where("p.planetID = ?", request.body.planetID)
-            .where("p.ownerID = ?", playerId)
+            .where("p.ownerID = ?", request.userID)
             .toString();
 
         Database.query(query).then(result => {

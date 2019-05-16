@@ -53,6 +53,7 @@ export class BuildingsRouter {
                                     .from("buildings", "b")
                                     .left_join("planets", "p", "b.planetID = p.planetID")
                                     .where("b.planetID = ?", request.params.planetID)
+                                    .where("p.ownerID = ?", request.userID)
                                     .toString();
 
 
@@ -61,7 +62,7 @@ export class BuildingsRouter {
 
             let data;
 
-            if(!InputValidator.isSet(result) || parseInt(result[0].ownerID) !== parseInt(request.userID)) {
+            if(!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -123,6 +124,7 @@ export class BuildingsRouter {
             .from("planets", "p")
             .join("buildings", "b", "p.planetID = b.planetID")
             .where("p.planetID = ?", request.body.planetID)
+            .where("p.ownerID = ?", request.userID)
             .toString();
 
 
@@ -257,6 +259,7 @@ export class BuildingsRouter {
                             .from("planets", "p")
                             .join("buildings", "b", "p.planetID = b.planetID")
                             .where("p.planetID = ?", request.body.planetID)
+                            .where("p.ownerID = ?", request.userID)
                             .toString();
 
 

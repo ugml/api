@@ -6,6 +6,7 @@ const dotenv = require('dotenv-safe').config();
 
 import { JwtHelper } from "./common/JwtHelper";
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest"
+
 import ConfigRouter from './routes/ConfigRouter';
 import AuthRouter from './routes/AuthRouter';
 import PlayerRouter from "./routes/PlayersRouter";
@@ -15,6 +16,8 @@ import TechsRouter from "./routes/TechsRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import DefenseRouter from "./routes/DefenseRouter";
 import EventRouter from "./routes/EventRouter";
+import GalaxyRouter from "./routes/GalaxyRouter";
+
 import {Router} from "express";
 import {Globals} from "./common/Globals";
 
@@ -166,6 +169,8 @@ class App {
         this.register('/v1/defenses', DefenseRouter);
 
         this.register('/v1/events', EventRouter);
+
+        this.register('/v1/galaxy', GalaxyRouter);
 
 
         this.express.use(function(request, response){

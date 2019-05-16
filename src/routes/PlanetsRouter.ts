@@ -3,6 +3,8 @@ import { Database } from '../common/Database';
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
 import {Globals} from "../common/Globals";
+import {DuplicateRecordError} from "../common/Exceptions";
+const mysql = require('mysql2');
 const Logger = require('../common/Logger');
 
 const squel = require("squel");
@@ -241,6 +243,104 @@ export class PlanetsRouter {
         });
     }
 
+    public destroyPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        if (!InputValidator.isSet(request.body.planetID) ||
+            !InputValidator.isValidInt(request.body.planetID)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+
+        }
+
+        // check if it is the last planet of the user
+        let query: string = squel.select()
+            .from("planets")
+            .where("ownerID = ?", request.userID)
+            .toString();
+
+        // execute the query
+        Database.query(query).then(result => {
+
+            const numRows : number = Object.keys(result).length;
+
+            if(numRows <= 1) {
+                response.status(Globals.Statuscode.SUCCESS).json({
+                    status: Globals.Statuscode.SUCCESS,
+                    message: "The last planet cannot be destroyed.",
+                    data: {}
+                });
+                return;
+            }
+
+            // destroy the planet
+            Database.getConnection().beginTransaction(() => {
+
+                Logger.info('Transaction started');
+
+                let query : string = squel
+                    .delete()
+                    .from("planets")
+                    .where("planetID = ?", request.body.planetID)
+                    .where("ownerID = ?", request.userID)
+                    .toString();
+
+                Database.query(query).then(() => {
+
+                    Database.getConnection().commit(function(err) {
+                        if (err) {
+                            Database.getConnection().rollback(function () {
+                                Logger.error(err);
+                                throw err;
+                            });
+                        }
+                    });
+
+                    Logger.info('Transaction complete');
+
+                    // TODO: if the deleted planet was the current planet -> set another one as current planet
+
+                    response.status(Globals.Statuscode.SUCCESS).json({
+                        status: Globals.Statuscode.SUCCESS,
+                        message: "The planet was deleted.",
+                        data: {}
+                    });
+
+                    return;
+                }).catch(error => {
+                    Logger.error(error);
+
+                    response.status(Globals.Statuscode.SERVER_ERROR).json({
+                        status: Globals.Statuscode.SERVER_ERROR,
+                        message: "There was an error while handling the request.",
+                        data: {}
+                    });
+
+                    return;
+                });
+
+
+            });
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
+        });
+    }
+
     /**
      * GET planet by ID
      */
@@ -317,6 +417,7 @@ export class PlanetsRouter {
         // /planets/:planetID
         this.router.get('/:planetID', this.getPlanetByID);
         this.router.get('/movement/:planetID', this.getMovement);
+        this.router.post('/destroy/', this.destroyPlanet);
     }
 
 }

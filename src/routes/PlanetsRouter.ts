@@ -183,6 +183,64 @@ export class PlanetsRouter {
 
     }
 
+    public getMovement(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // validate parameters
+        if(!InputValidator.isSet(request.params.planetID) ||
+            !InputValidator.isValidInt(request.params.planetID)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+
+        }
+
+        let query : string = squel.select()
+            .from("flights")
+            .where("ownerID = ?", request.userID)
+            .where(
+                squel.expr()
+                    .or(`start_id = ${request.params.planetID}`)
+                    .or(`end_id = ${request.params.planetID}`)
+            )
+            .toString();
+
+        // execute the query
+        Database.query(query).then(result => {
+
+            let data;
+
+            if(!InputValidator.isSet(result)) {
+                data = {};
+            } else {
+                data = Object.assign({}, result);
+            }
+
+            // return the result
+            response.status(Globals.Statuscode.SUCCESS).json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Success",
+                data: data
+            });
+            return;
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {}
+            });
+
+            return;
+        });
+    }
+
     /**
      * GET planet by ID
      */
@@ -203,19 +261,19 @@ export class PlanetsRouter {
         }
 
         let query : string = squel.select()
-                                .field("planetID")
-                                .field("ownerID")
-                                .field("name")
-                                .field("galaxy")
-                                .field("system")
-                                .field("planet")
-                                .field("last_update")
-                                .field("planet_type")
-                                .field("image")
-                                .field("destroyed")
-                                .from("planets")
-                                .where("planetID = ?", request.params.planetID)
-                                .toString();
+            .field("planetID")
+            .field("ownerID")
+            .field("name")
+            .field("galaxy")
+            .field("system")
+            .field("planet")
+            .field("last_update")
+            .field("planet_type")
+            .field("image")
+            .field("destroyed")
+            .from("planets")
+            .where("planetID = ?", request.params.planetID)
+            .toString();
 
         // execute the query
         Database.query(query).then(result => {
@@ -257,6 +315,7 @@ export class PlanetsRouter {
 
         // /planets/:planetID
         this.router.get('/:planetID', this.getPlanetByID);
+        this.router.get('/movement/:planetID', this.getMovement);
     }
 
 }

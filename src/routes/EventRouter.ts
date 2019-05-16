@@ -207,9 +207,7 @@ export class EventRouter {
             .toString();
 
         // check if origin-planet exists and the user owns it
-        Database.getConnection().query(planetQuery, function(error, results) {
-
-            if (error) throw error;
+        Database.query(planetQuery).then(results => {
 
             const startPlanet = results[0];
 
@@ -234,9 +232,7 @@ export class EventRouter {
                 .toString();
 
             // gather data about destination
-            Database.getConnection().query(planetQuery, function(error, results) {
-
-                if (error) throw error;
+            Database.query(planetQuery).then(results => {
 
                 const destinationPlanet = results[0];
 
@@ -313,6 +309,26 @@ export class EventRouter {
 
                 });
             });
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: `An error occured: ${error.message}`,
+                data: eventData
+            });
+            return;
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: `An error occured: ${error.message}`,
+                data: eventData
+            });
+            return;
+
         });
 
     }

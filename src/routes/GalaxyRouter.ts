@@ -23,9 +23,6 @@ export class GalaxyRouter {
      */
     public getGalaxyInformation(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        console.log(request.params.galaxy);
-        console.log(request.params.system);
-
         // validate parameters
         if(!InputValidator.isSet(request.params.galaxy) ||
             !InputValidator.isValidInt(request.params.galaxy) ||
@@ -62,8 +59,6 @@ export class GalaxyRouter {
             .where("galaxy = ?", request.params.galaxy)
             .where("`system` = ?", request.params.system)
             .toString();
-
-        console.log(query);
 
         // execute the query
         Database.query(query).then(result => {

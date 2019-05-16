@@ -50,6 +50,7 @@ create table flights
 	loaded_metal int default 0 not null,
 	loaded_crystal int default 0 not null,
 	loaded_deuterium int default 0 not null,
+	returning tinyint(1) default 0 not null,
 	constraint fk_flight_ownerid
 		foreign key (ownerID) references users (userID)
 			on delete cascade
@@ -60,10 +61,11 @@ create table messages
 	messageID int auto_increment,
 	senderID int not null,
 	receiverID int not null,
-	sendtime timestamp default current_timestamp() not null on update current_timestamp(),
+	sendtime int null,
 	type tinyint(1) not null,
 	subject varchar(45) not null,
 	body text not null,
+	deleted tinyint(1) default 0 null,
 	constraint messageID_UNIQUE
 		unique (messageID),
 	constraint fk_messages_users1
@@ -436,4 +438,3 @@ BEGIN
 	SELECT usr_userid AS `userID`;
 
 END;
-

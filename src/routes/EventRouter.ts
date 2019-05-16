@@ -286,20 +286,21 @@ export class EventRouter {
                     .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
                     .toString();
 
-                Database.getConnection().query(eventQuery, function(error, result) {
 
-                    if (error) throw error;
+
+                Database.query(eventQuery).then( result  => {
 
                     // add event to redis-queue
-                    Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
+                    Redis.getConnection().zadd("eventQueue", result["insertId"].toString(), eventData.endtime.toString());
 
                     // all done
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
-                        message: "success",
+                        message: "Event successfully created.",
                         data: eventData
                     });
                     return;
+
                 }).catch(error => {
                     Logger.error(error);
 

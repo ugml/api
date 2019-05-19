@@ -3,6 +3,15 @@ class Globals {
     static MIN_BUILDING_ID : number = 1;
     static MAX_BUILDING_ID : number = 15;
 
+    static MIN_DEFENSE_ID : number = 301;
+    static MAX_DEFENSE_ID : number = 310;
+
+    static MIN_TECH_ID : number = 101;
+    static MAX_TECH_ID : number = 115;
+
+    static MIN_SHIP_ID : number = 201;
+    static MAX_SHIP_ID : number = 214;
+
 
 
 
@@ -37,6 +46,7 @@ module Globals
         CREATED = 201,
         BAD_REQUEST = 400,
         NOT_AUTHORIZED = 401,
+        NOT_FOUND = 404,
         SERVER_ERROR = 500
     }
 }

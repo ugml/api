@@ -32,7 +32,7 @@ export class AuthRouter {
 
         if(!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
 
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
                 data: {}
@@ -56,8 +56,8 @@ export class AuthRouter {
         Database.query(query).then(users => {
 
             if(!InputValidator.isSet(users)) {
-                response.json({
-                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Authentication failed",
                     data: {}
                 });
@@ -67,7 +67,7 @@ export class AuthRouter {
             bcrypt.compare(password, users[0].password).then(function(isValidPassword) {
 
                 if(!isValidPassword) {
-                    response.json({
+                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                         status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Authentication failed",
                         data: {}
@@ -75,7 +75,7 @@ export class AuthRouter {
                     return;
                 }
 
-                response.json({
+                response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {
@@ -92,7 +92,7 @@ export class AuthRouter {
             Logger.error(err);
 
             // return the result
-            response.json({
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: `There was an error: ${err.message}`,
                 data: {}

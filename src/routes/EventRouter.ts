@@ -3,17 +3,16 @@ import { Database } from "../common/Database";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { InputValidator } from "../common/InputValidator";
 import { Redis } from "../common/Redis";
-import {start} from "repl";
 import {Globals} from "../common/Globals";
-import {ICoordinates} from '../../src/interfaces/ICoordinates'
-import {IShipUnits} from '../../src/interfaces/IShipUnits'
+import {ICoordinates} from '../interfaces/ICoordinates'
+import {IShipUnits} from '../interfaces/IShipUnits'
 
 
 const JSONValidator = require('jsonschema').Validator;
 const jsonValidator = new JSONValidator();
 const squel = require("squel");
 
-const eventSchema = require("../../event.schema.json");
+const eventSchema = require("../schemas/fleetevent.schema.json");
 
 // TODO: validate input data:
 //  is start != end?
@@ -148,11 +147,23 @@ export class EventRouter {
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        let eventData = JSON.parse(request.query.event);
+        if(!InputValidator.isSet(request.body.event)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+
+        }
+
+        let eventData = JSON.parse(request.body.event);
 
         // validate JSON against schema
         if(!jsonValidator.validate(eventData, eventSchema).valid) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid json",
                 data: {}
@@ -161,20 +172,10 @@ export class EventRouter {
             return;
         }
 
-        // TODO: temporary
-        if(["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
-            response.json({
-                status: Globals.Statuscode.SERVER_ERROR,
-                message: "Missiontype not yet supported",
-                data: {}
-            });
 
-            return;
-        }
-
-        // check if owner exists and sender of event = owner
+        // check if sender of event == currently authenticated user
         if(request.userID !== eventData.ownerID) {
-            response.json({
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Event-creator is not currently authenticated user",
                 data: {}
@@ -183,33 +184,45 @@ export class EventRouter {
             return;
         }
 
+
+        // TODO: temporary
+        if(["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "Missiontype not yet supported",
+                data: {}
+            });
+
+            return;
+        }
+
+
         let planetQuery : string = squel.select()
             .from("planets")
             .where("galaxy = ?", eventData.data.origin.galaxy)
             .where("system = ?", eventData.data.origin.system)
             .where("planet = ?", eventData.data.origin.planet)
             .where("planet_type = ?", (eventData.data.origin.type === "planet") ? 1 : 2)
-            .where("ownerID = ?", eventData.ownerID)
+            .where("ownerID = ?", request.userID)
             .toString();
 
         // check if origin-planet exists and the user owns it
-        Database.getConnection().query(planetQuery, function(error, results) {
-
-            if (error) throw error;
+        Database.query(planetQuery).then(results => {
 
             const startPlanet = results[0];
 
             // planet does not exist or player does not own it
             if(!InputValidator.isSet(startPlanet)) {
-                response.json({
-                    status: Globals.Statuscode.NOT_AUTHORIZED,
-                    message: "Authentication failed",
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Invalid parameter",
                     data: {}
                 });
 
                 return;
             }
 
+            // get the destination-planet
             let planetQuery : string = squel.select()
                 .from("planets")
                 .where("galaxy = ?", eventData.data.destination.galaxy)
@@ -219,16 +232,14 @@ export class EventRouter {
                 .toString();
 
             // gather data about destination
-            Database.getConnection().query(planetQuery, function(error, results) {
-
-                if (error) throw error;
+            Database.query(planetQuery).then(results => {
 
                 const destinationPlanet = results[0];
 
                 // destination does not exist
                 if(!InputValidator.isSet(destinationPlanet) && eventData.mission !== 'colonize') {
 
-                    response.json({
+                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                         status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Destination does not exist",
                         data: {}
@@ -271,22 +282,53 @@ export class EventRouter {
                     .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
                     .toString();
 
-                Database.getConnection().query(eventQuery, function(error, result) {
 
-                    if (error) throw error;
+
+                Database.query(eventQuery).then( result  => {
 
                     // add event to redis-queue
-                    Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
+                    Redis.getConnection().zadd("eventQueue", result["insertId"].toString(), eventData.endtime.toString());
 
                     // all done
-                    response.json({
+                    response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
-                        message: "success",
+                        message: "Event successfully created.",
                         data: eventData
                     });
                     return;
+
+                }).catch(error => {
+                    Logger.error(error);
+
+                    response.status(Globals.Statuscode.SERVER_ERROR).json({
+                        status: Globals.Statuscode.SERVER_ERROR,
+                        message: `An error occured: ${error.message}`,
+                        data: eventData
+                    });
+                    return;
+
                 });
             });
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: `An error occured: ${error.message}`,
+                data: eventData
+            });
+            return;
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: `An error occured: ${error.message}`,
+                data: eventData
+            });
+            return;
+
         });
 
     }

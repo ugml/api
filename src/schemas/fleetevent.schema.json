@@ -1,15 +1,14 @@
 {
   "definitions": {},
   "$id": "https://api.ugamela.org/event.schema.json",
-  "$schema": "https://api.ugamela.org/event.schema.json",
+  "$schema": "https://api.ugamela.org/fleetevent.schema.json",
   "type": "object",
-  "title": "The event schema",
+  "title": "The fleet-event schema",
   "required": [
     "ownerID",
     "mission",
     "speed",
     "holdDuration",
-    "returning",
     "data"
   ],
   "properties": {
@@ -34,6 +33,18 @@
         "destroy"
       ]
     },
+    "starttime": {
+      "$id": "#/properties/starttime",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
+    "endtime": {
+      "$id": "#/properties/endtime",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
     "speed": {
       "$id": "#/properties/speed",
       "type": "integer",
@@ -47,11 +58,6 @@
       "type": "integer",
       "minimum": 0,
       "multipleOf": 1
-    },
-    "returning": {
-      "$id": "#/properties/returning",
-      "type": "boolean",
-      "default": false
     },
     "data": {
       "$id": "#/properties/data",

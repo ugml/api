@@ -14,6 +14,16 @@ class InputValidator {
 
     }
 
+    public static isValidJson(input : string) : boolean {
+        try {
+            JSON.parse(input);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
+
+
     public static isSet(input) : boolean {
         return !(input === undefined || input === "" || typeof input === 'undefined' || input === null || input.length == 0);
     }

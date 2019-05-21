@@ -19,6 +19,7 @@ class Database {
     }
 
     public static query(sql, args = null) {
+        Logger.info(sql);
 
         return new Promise((resolve, reject) => {
             this.connection.query(sql, args, (err, rows) => {

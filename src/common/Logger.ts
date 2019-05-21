@@ -7,6 +7,12 @@ const myFormat = printf(({ level, message, timestamp }) => {
 });
 
 const Logger = createLogger({
+    levels: {
+        'error': 0,
+        'info': 1,
+        'warn': 2,
+        'debug': 3
+    },
     format: combine(
         format.timestamp({
             format: 'YYYY-MM-DD HH:mm:ss'
@@ -15,8 +21,10 @@ const Logger = createLogger({
     ),
     transports: [
         new winston.transports.Console(),
-        // TODO: split into different files by log-level - afaik, winston has huge problems doing that
-        new winston.transports.File({ filename: 'logs/api.log' })
+        new winston.transports.File({ filename: 'logs/info.log', level: 'info' }),
+        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'logs/warn.log', level: 'warn' }),
+        new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' })
     ]
 });
 

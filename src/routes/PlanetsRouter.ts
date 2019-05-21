@@ -1,21 +1,21 @@
-import {Router, Request, Response, NextFunction} from 'express';
-import { Database } from '../common/Database';
+import { NextFunction, Response, Router } from "express";
+import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
-import {Globals} from "../common/Globals";
-import {DuplicateRecordError} from "../common/Exceptions";
-const mysql = require('mysql2');
-const Logger = require('../common/Logger');
+import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+
+const mysql = require("mysql2");
+const Logger = require("../common/Logger");
 
 const squel = require("squel");
 
 export class PlanetsRouter {
-    router: Router;
+    public router: Router;
 
     /**
      * Initialize the Router
      */
-    constructor() {
+    public constructor() {
         this.router = Router();
         this.init();
     }
@@ -23,7 +23,7 @@ export class PlanetsRouter {
     public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!InputValidator.isSet(request.body.planetID) ||
+        if (!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -36,15 +36,15 @@ export class PlanetsRouter {
         }
 
         // check if user owns the planet
-        let query : string = squel.select()
+        const query : string = squel.select()
             .from("planets")
             .where("planetID = ?", request.body.planetID)
             .where("ownerID = ?", request.userID)
             .toString();
 
-        return Database.query(query).then(result => {
+        return Database.query(query).then((result) => {
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
 
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -58,14 +58,14 @@ export class PlanetsRouter {
 
 
             // TODO: check for unique-constraint violation
-            let query : string = squel.update()
+            const query : string = squel.update()
                 .table("users")
                 .set("currentplanet = ?", request.body.planetID)
                 .where("userID = ?", request.userID)
                 .toString();
 
 
-            return Database.query(query).then(result => {
+            return Database.query(query).then((result) => {
 
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
@@ -74,11 +74,11 @@ export class PlanetsRouter {
                 });
 
                 return;
-            }).catch(error => {
+            }).catch((error) => {
                 throw error;
             });
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -94,17 +94,17 @@ export class PlanetsRouter {
 
     public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        let query : string = squel.select()
+        const query : string = squel.select()
             .from("planets")
             .where("ownerID = ?", request.userID)
             .toString();
 
         // execute the query
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             let data;
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result;
@@ -114,11 +114,11 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: data
+                data
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SUCCESS).json({
@@ -134,7 +134,7 @@ export class PlanetsRouter {
     public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!InputValidator.isSet(request.params.planetID) ||
+        if (!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -146,18 +146,18 @@ export class PlanetsRouter {
             return;
         }
 
-        let query : string = squel.select()
+        const query : string = squel.select()
                                 .from("planets")
                                 .where("planetID = ?", request.params.planetID)
                                 .where("ownerID = ?", request.userID)
                                 .toString();
 
         // execute the query
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             let data;
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -167,11 +167,11 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: data
+                data
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -188,7 +188,7 @@ export class PlanetsRouter {
     public getMovement(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!InputValidator.isSet(request.params.planetID) ||
+        if (!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -201,7 +201,7 @@ export class PlanetsRouter {
 
         }
 
-        let query : string = squel.select()
+        const query : string = squel.select()
             .from("flights")
             .where("ownerID = ?", request.userID)
             .where(
@@ -212,11 +212,11 @@ export class PlanetsRouter {
             .toString();
 
         // execute the query
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             let data;
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = Object.assign({}, result);
@@ -226,11 +226,11 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: data
+                data
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -260,17 +260,17 @@ export class PlanetsRouter {
         }
 
         // check if it is the last planet of the user
-        let query: string = squel.select()
+        const query: string = squel.select()
             .from("planets")
             .where("ownerID = ?", request.userID)
             .toString();
 
         // execute the query
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             const numRows : number = Object.keys(result).length;
 
-            if(numRows <= 1) {
+            if (numRows <= 1) {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "The last planet cannot be destroyed.",
@@ -282,9 +282,9 @@ export class PlanetsRouter {
             // destroy the planet
             Database.getConnection().beginTransaction(() => {
 
-                Logger.info('Transaction started');
+                Logger.info("Transaction started");
 
-                let query : string = squel
+                const query : string = squel
                     .delete()
                     .from("planets")
                     .where("planetID = ?", request.body.planetID)
@@ -295,14 +295,14 @@ export class PlanetsRouter {
 
                     Database.getConnection().commit(function(err) {
                         if (err) {
-                            Database.getConnection().rollback(function () {
+                            Database.getConnection().rollback(function() {
                                 Logger.error(err);
                                 throw err;
                             });
                         }
                     });
 
-                    Logger.info('Transaction complete');
+                    Logger.info("Transaction complete");
 
                     // TODO: if the deleted planet was the current planet -> set another one as current planet
 
@@ -313,7 +313,7 @@ export class PlanetsRouter {
                     });
 
                     return;
-                }).catch(error => {
+                }).catch((error) => {
                     Logger.error(error);
 
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -328,7 +328,7 @@ export class PlanetsRouter {
 
             });
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -359,7 +359,7 @@ export class PlanetsRouter {
 
         const newName : string = InputValidator.sanitizeString(request.body.name);
 
-        if(newName.length <= 4) {
+        if (newName.length <= 4) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "New name is too short. Minimum length is 4 characters.",
@@ -370,7 +370,7 @@ export class PlanetsRouter {
         }
 
         // check if it is the last planet of the user
-        let query: string = squel.update()
+        const query: string = squel.update()
             .table("planets")
             .set("name", newName)
             .where("planetID = ?", request.body.planetID)
@@ -387,7 +387,7 @@ export class PlanetsRouter {
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -410,7 +410,7 @@ export class PlanetsRouter {
     public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!InputValidator.isSet(request.params.planetID) ||
+        if (!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -423,7 +423,7 @@ export class PlanetsRouter {
 
         }
 
-        let query : string = squel.select()
+        const query : string = squel.select()
             .field("planetID")
             .field("ownerID")
             .field("name")
@@ -439,11 +439,11 @@ export class PlanetsRouter {
             .toString();
 
         // execute the query
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             let data;
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -453,11 +453,11 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: data
+                data
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -474,13 +474,13 @@ export class PlanetsRouter {
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
      */
-    init() {
+    public init() {
 
         // /planets/:planetID
-        this.router.get('/:planetID', this.getPlanetByID);
-        this.router.get('/movement/:planetID', this.getMovement);
-        this.router.post('/destroy/', this.destroyPlanet);
-        this.router.post('/rename/', this.renamePlanet);
+        this.router.get("/:planetID", this.getPlanetByID);
+        this.router.get("/movement/:planetID", this.getMovement);
+        this.router.post("/destroy/", this.destroyPlanet);
+        this.router.post("/rename/", this.renamePlanet);
     }
 
 }

@@ -1,7 +1,8 @@
-import { Database } from '../common/Database';
-import { IUnits } from '../interfaces/IUnits';
+import { Database } from "../common/Database";
+import { IUnits } from "../interfaces/IUnits";
+
 const squel = require("squel");
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 
@@ -17,7 +18,7 @@ class Planet implements IUnits {
     public name : string;
     public galaxy : number;
     public system : number;
-    public planet :number;
+    public planet : number;
     public last_update: number;
     public planet_type : PlanetType;
     public image : string;
@@ -50,7 +51,7 @@ class Planet implements IUnits {
     public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.update()
+            const query = squel.update()
                 .table("planets")
                 .set("name", this.name)
                 .set("galaxy", this.galaxy)
@@ -83,7 +84,7 @@ class Planet implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -93,7 +94,7 @@ class Planet implements IUnits {
 
     public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
-            let query = squel.insert()
+            const query = squel.insert()
                 .into("planets")
                 .set("planetID", this.planetID)
                 .set("ownerID", this.ownerID)
@@ -132,17 +133,17 @@ class Planet implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
         });
     }
 
-    isValid() : boolean {
+    public isValid() : boolean {
         return false;
     }
 
 }
 
-export { Planet, PlanetType }
+export { Planet, PlanetType };

@@ -1,25 +1,25 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 class JwtHelper {
 
-    generateToken(userID : number) : string {
+    public generateToken(userID : number) : string {
         return jwt.sign({
-                userID: userID
+                userID
             },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: '30m'
+                        process.env.JWT_SECRET,
+                        {
+                expiresIn: "30m"
             });
     }
 
-    validateToken(authString : string) : string {
+    public validateToken(authString : string) : string {
 
-        if(authString !== undefined) {
-            if(authString.startsWith("Bearer ")) {
+        if (authString !== undefined) {
+            if (authString.startsWith("Bearer ")) {
 
-                const token = authString.split(" ")[1];
+                const token : string = authString.split(" ")[1];
 
-                return jwt.verify(token, process.env.JWT_SECRET, function(error, decoded) {
+                return jwt.verify(token, process.env.JWT_SECRET, function(error : any, decoded : any) {
                     return decoded;
                 });
             }
@@ -30,4 +30,4 @@ class JwtHelper {
 }
 
 
-export { JwtHelper }
+export { JwtHelper };

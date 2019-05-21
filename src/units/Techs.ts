@@ -1,33 +1,34 @@
-import { Database } from '../common/Database';
-import {IUnits} from "../interfaces/IUnits";
+import { Database } from "../common/Database";
+import { IUnits } from "../interfaces/IUnits";
+
 const squel = require("squel");
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 class Techs implements IUnits {
 
-    userID : number;
-    espionage_tech : number;
-    computer_tech : number;
-    weapon_tech : number;
-    armour_tech : number;
-    shielding_tech : number;
-    energy_tech : number;
-    hyperspace_tech : number;
-    combustion_drive_tech : number;
-    impulse_drive_tech : number;
-    hyperspace_drive_tech : number;
-    laser_tech : number;
-    ion_tech : number;
-    plasma_tech : number;
-    intergalactic_research_tech : number;
-    graviton_tech : number;
+    public userID : number;
+    public espionage_tech : number;
+    public computer_tech : number;
+    public weapon_tech : number;
+    public armour_tech : number;
+    public shielding_tech : number;
+    public energy_tech : number;
+    public hyperspace_tech : number;
+    public combustion_drive_tech : number;
+    public impulse_drive_tech : number;
+    public hyperspace_drive_tech : number;
+    public laser_tech : number;
+    public ion_tech : number;
+    public plasma_tech : number;
+    public intergalactic_research_tech : number;
+    public graviton_tech : number;
 
 
     public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.update()
+            const query = squel.update()
                 .table("techs")
                 .set("espionage_tech", this.espionage_tech)
                 .set("computer_tech", this.computer_tech)
@@ -49,7 +50,7 @@ class Techs implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -60,7 +61,7 @@ class Techs implements IUnits {
     public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.insert()
+            const query = squel.insert()
                 .table("techs")
                 .set("userID", this.userID)
                 .set("espionage_tech", this.espionage_tech)
@@ -82,7 +83,7 @@ class Techs implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -90,10 +91,10 @@ class Techs implements IUnits {
         });
     }
 
-    isValid() : boolean {
+    public isValid() : boolean {
         return false;
     }
 
 }
 
-export { Techs }
+export { Techs };

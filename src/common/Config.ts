@@ -1,10 +1,15 @@
+/***
+ * Helper-class to get the current game-configuration
+ */
 class Config {
 
-    static get Get() {
+    /***
+     * Returns the current game-configuration
+     */
+    public static get Get() : object {
         return require("../config/game.json");
     }
 
 }
 
-
-export { Config }
+export { Config };

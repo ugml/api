@@ -1,27 +1,40 @@
-import {Router, Request, Response, NextFunction} from 'express';
-import { Database } from '../common/Database';
+import { NextFunction, Response, Router } from "express";
+import { Config } from "../common/Config";
+import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
-import {Globals} from "../common/Globals";
-import {Config} from "../common/Config";
-import {Units} from "../common/Units";
+import { Units } from "../common/Units";
+import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
 
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 const squel = require("squel");
 const units = new Units();
 
 export class TechsRouter {
-    router: Router;
+    public router: Router;
 
     /**
      * Initialize the Router
      */
-    constructor() {
+    public constructor() {
         this.router = Router();
         this.init();
+    }
+
+    private static getCosts(buildingKey : string, currentLevel : number) : object {
+
+        const costs = units.getTechnologies()[buildingKey];
+
+        return {
+            metal: costs.metal * costs.factor ** currentLevel,
+            crystal: costs.crystal * costs.factor ** currentLevel,
+            deuterium: costs.deuterium * costs.factor ** currentLevel,
+            energy: costs.energy * costs.factor ** currentLevel
+        };
+
     }
 
 
@@ -34,12 +47,12 @@ export class TechsRouter {
     public getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
 
-        let query : string = squel.select()
+        const query : string = squel.select()
                                 .from("techs")
                                 .where("userID = ?", request.userID)
                                 .toString();
 
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             // return the result
             response.status(Globals.Statuscode.SUCCESS).json({
@@ -49,7 +62,7 @@ export class TechsRouter {
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -62,23 +75,10 @@ export class TechsRouter {
         });
     }
 
-    private static getCosts(buildingKey : string, currentLevel : number) : object {
-
-        let costs = units.getTechnologies()[buildingKey];
-
-        return {
-            "metal": costs["metal"] * costs["factor"] ** currentLevel,
-            "crystal": costs["crystal"] * costs["factor"] ** currentLevel,
-            "deuterium": costs["deuterium"] * costs["factor"] ** currentLevel,
-            "energy": costs["energy"] * costs["factor"] ** currentLevel,
-        };
-
-    }
-
     public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
 
-        if(!InputValidator.isSet(request.body.planetID) ||
+        if (!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -92,7 +92,7 @@ export class TechsRouter {
 
 
         // get the planet, on which the building should be canceled
-        let query: string = squel.select()
+        const query: string = squel.select()
             .from("planets", "p")
             .join("buildings", "b", "p.planetID = b.planetID")
             .join("techs", "t", "t.userID = p.ownerID")
@@ -101,9 +101,9 @@ export class TechsRouter {
             .toString();
 
 
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
@@ -112,10 +112,10 @@ export class TechsRouter {
                 return;
             }
 
-            let planet = result[0];
+            const planet = result[0];
 
             // player does not own the planet
-            if(!InputValidator.isSet(planet)) {
+            if (!InputValidator.isSet(planet)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
@@ -125,7 +125,7 @@ export class TechsRouter {
             }
 
             // 1. check if there is already a build-job on the planet
-            if(planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
+            if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
 
                 const buildingKey = units.getMappings()[planet.b_tech_id];
 
@@ -138,21 +138,21 @@ export class TechsRouter {
                     .table("planets")
                     .set("b_tech_id", 0)
                     .set("b_tech_endtime", 0)
-                    .set("metal", planet.metal + cost["metal"])
-                    .set("crystal", planet.crystal + cost["crystal"])
-                    .set("deuterium", planet.deuterium + cost["deuterium"])
+                    .set("metal", planet.metal + cost.metal)
+                    .set("crystal", planet.crystal + cost.crystal)
+                    .set("deuterium", planet.deuterium + cost.deuterium)
                     .where("planetID = ?", planet.planetID)
                     .where("ownerID = ?", request.userID)
                     .toString();
 
 
-                return Database.query(query).then(result => {
+                return Database.query(query).then((result) => {
 
                     planet.b_tech_id = 0;
                     planet.b_tech_endtime = 0;
-                    planet.metal = planet.metal + cost["metal"];
-                    planet.crystal = planet.crystal + cost["crystal"];
-                    planet.crystal = planet.crystal + cost["crystal"];
+                    planet.metal = planet.metal + cost.metal;
+                    planet.crystal = planet.crystal + cost.crystal;
+                    planet.crystal = planet.crystal + cost.crystal;
 
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
@@ -160,7 +160,7 @@ export class TechsRouter {
                         data: {planet}
                     });
                     return;
-                }).catch(error => {
+                }).catch((error) => {
                     Logger.error(error);
 
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -180,7 +180,7 @@ export class TechsRouter {
                 });
                 return;
             }
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -197,7 +197,7 @@ export class TechsRouter {
 
     public buildTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!InputValidator.isSet(request.body.planetID) ||
+        if (!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID) ||
             !InputValidator.isSet(request.body.techID) ||
             !InputValidator.isValidInt(request.body.techID)) {
@@ -211,7 +211,7 @@ export class TechsRouter {
 
         }
 
-        if(request.body.techID < Globals.MIN_TECH_ID ||
+        if (request.body.techID < Globals.MIN_TECH_ID ||
             request.body.techID > Globals.MAX_TECH_ID) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -224,7 +224,7 @@ export class TechsRouter {
         }
 
         // get the planet, on which the building should be built
-        let query: string = squel.select()
+        const query: string = squel.select()
             .from("planets", "p")
             .left_join("buildings", "b", "b.planetID = p.planetID")
             .left_join("techs", "t", "t.userID = p.ownerID")
@@ -232,9 +232,9 @@ export class TechsRouter {
             .where("p.ownerID = ?", request.userID)
             .toString();
 
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
@@ -243,10 +243,10 @@ export class TechsRouter {
                 return;
             }
 
-            let planet = result[0];
+            const planet = result[0];
 
             // player does not own the planet
-            if(!InputValidator.isSet(planet)) {
+            if (!InputValidator.isSet(planet)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
@@ -256,7 +256,7 @@ export class TechsRouter {
             }
 
             // 1. check if there is already a build-job on the planet
-            if(planet.b_tech_id !== 0 ||
+            if (planet.b_tech_id !== 0 ||
                 planet.b_tech_endtime !== 0) {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
@@ -281,26 +281,25 @@ export class TechsRouter {
 
 
             // 2. check, if requirements are met
-            let requirements = units.getRequirements()[request.body.techID];
+            const requirements = units.getRequirements()[request.body.techID];
 
             // building has requirements
-            if(requirements !== undefined) {
+            if (requirements !== undefined) {
 
                 let requirementsMet : boolean = true;
 
-                for(var reqID in requirements)
-                {
+                for (const reqID in requirements) {
 
-                    let reqLevel = requirements[reqID];
-                    let key = units.getMappings()[reqID];
+                    const reqLevel = requirements[reqID];
+                    const key = units.getMappings()[reqID];
 
-                    if(planet[key] < reqLevel) {
+                    if (planet[key] < reqLevel) {
                         requirementsMet = false;
                         break;
                     }
                 }
 
-                if(!requirementsMet) {
+                if (!requirementsMet) {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Requirements are not met",
@@ -312,18 +311,18 @@ export class TechsRouter {
             }
 
             // 3. check if there are enough resources on the planet for the building to be built
-            let buildingKey = units.getMappings()[request.body.techID];
+            const buildingKey = units.getMappings()[request.body.techID];
 
-            let currentLevel = planet[buildingKey];
-
-
-            let cost = TechsRouter.getCosts(request.body.techID, currentLevel);
+            const currentLevel = planet[buildingKey];
 
 
-            if(planet.metal < cost["metal"] ||
-                planet.crystal < cost["crystal"] ||
-                planet.deuterium < cost["deuterium"] ||
-                planet.energy_max < cost["energy"]) {
+            const cost = TechsRouter.getCosts(request.body.techID, currentLevel);
+
+
+            if (planet.metal < cost.metal ||
+                planet.crystal < cost.crystal ||
+                planet.deuterium < cost.deuterium ||
+                planet.energy_max < cost.energy) {
 
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
@@ -335,18 +334,18 @@ export class TechsRouter {
             }
 
             // 4. start the build-job
-            let buildTime = Math.round((cost["metal"] + cost["crystal"]) / (Config.Get["speed"] * 1000 * result[0].research_lab));
+            const buildTime = Math.round((cost.metal + cost.crystal) / (Config.Get.speed * 1000 * result[0].research_lab));
 
-            let endTime = Math.round(+new Date()/1000) + buildTime;
+            const endTime = Math.round(+new Date() / 1000) + buildTime;
 
-            planet.metal = planet.metal - cost['metal'];
-            planet.crystal = planet.crystal - cost['crystal'];
-            planet.deuterium = planet.deuterium - cost['deuterium'];
+            planet.metal = planet.metal - cost.metal;
+            planet.crystal = planet.crystal - cost.crystal;
+            planet.deuterium = planet.deuterium - cost.deuterium;
             planet.b_tech_id = request.body.techID;
             planet.b_tech_endtime = endTime;
 
 
-            let query : string = squel.update()
+            const query : string = squel.update()
                 .table("planets")
                 .set("metal", planet.metal)
                 .set("crystal", planet.crystal)
@@ -356,7 +355,7 @@ export class TechsRouter {
                 .where("planetID = ?", request.body.planetID)
                 .toString();
 
-            Database.query(query).then(result => {
+            Database.query(query).then((result) => {
 
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
@@ -366,12 +365,12 @@ export class TechsRouter {
 
                 return;
 
-            }).catch(error => {
+            }).catch((error) => {
                 throw error;
             });
 
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -389,10 +388,10 @@ export class TechsRouter {
     /***
      * Initializes the routes
      */
-    init() {
-        this.router.get('/', this.getTechs);
-        this.router.post('/build/', this.buildTech);
-        this.router.post('/cancel/', this.cancelTech);
+    public init() {
+        this.router.get("/", this.getTechs);
+        this.router.post("/build/", this.buildTech);
+        this.router.post("/cancel/", this.cancelTech);
     }
 
 }

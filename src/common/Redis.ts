@@ -3,7 +3,7 @@ const client = redis.createClient(process.env.REDIS_PORT || 6379, process.env.RE
 
 class Redis {
 
-    static getConnection() {
+    public static getConnection() {
         return client;
     }
 

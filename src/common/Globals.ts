@@ -1,26 +1,26 @@
-
+/***
+ * This class holds all global variables
+ */
 class Globals {
-    static MIN_BUILDING_ID : number = 1;
-    static MAX_BUILDING_ID : number = 15;
+    public static MIN_BUILDING_ID : number = 1;
+    public static MAX_BUILDING_ID : number = 15;
 
-    static MIN_DEFENSE_ID : number = 301;
-    static MAX_DEFENSE_ID : number = 310;
+    public static MIN_DEFENSE_ID : number = 301;
+    public static MAX_DEFENSE_ID : number = 310;
 
-    static MIN_TECH_ID : number = 101;
-    static MAX_TECH_ID : number = 115;
+    public static MIN_TECH_ID : number = 101;
+    public static MAX_TECH_ID : number = 115;
 
-    static MIN_SHIP_ID : number = 201;
-    static MAX_SHIP_ID : number = 214;
+    public static MIN_SHIP_ID : number = 201;
+    public static MAX_SHIP_ID : number = 214;
 
 
 
 
 }
 
-module Globals
-{
-    export enum Buildings
-    {
+namespace Globals {
+    export enum Buildings {
         METAL_MINE = 1,
         CRYSTAL_MINE = 2,
         DEUTERIUM_SYNTHESIZER = 3,
@@ -51,4 +51,4 @@ module Globals
     }
 }
 
-export { Globals }
+export { Globals };

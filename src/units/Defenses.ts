@@ -1,28 +1,29 @@
-import { Database } from '../common/Database';
-import {IUnits} from "../interfaces/IUnits";
+import { Database } from "../common/Database";
+import { IUnits } from "../interfaces/IUnits";
+
 const squel = require("squel");
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 class Defenses implements IUnits {
 
-    planetID : number;
-    rocket_launcher : number;
-    light_laser : number;
-    heavy_laser : number;
-    ion_cannon : number;
-    gauss_cannon : number;
-    plasma_turret : number;
-    small_shield_dome : boolean;
-    large_shield_dome : boolean;
-    anti_ballistic_missile : number;
-    interplanetary_missile : number;
+    public planetID : number;
+    public rocket_launcher : number;
+    public light_laser : number;
+    public heavy_laser : number;
+    public ion_cannon : number;
+    public gauss_cannon : number;
+    public plasma_turret : number;
+    public small_shield_dome : boolean;
+    public large_shield_dome : boolean;
+    public anti_ballistic_missile : number;
+    public interplanetary_missile : number;
 
 
     public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.update()
+            const query = squel.update()
                 .table("defenses")
                 .set("rocket_launcher", this.rocket_launcher)
                 .set("light_laser", this.light_laser)
@@ -39,7 +40,7 @@ class Defenses implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -50,7 +51,7 @@ class Defenses implements IUnits {
     public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.insert()
+            const query = squel.insert()
                 .table("defenses")
                 .set("planetID", this.planetID)
                 .set("rocket_launcher", this.rocket_launcher)
@@ -67,7 +68,7 @@ class Defenses implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -75,10 +76,10 @@ class Defenses implements IUnits {
         });
     }
 
-    isValid() : boolean {
+    public isValid() : boolean {
         return false;
     }
 
 }
 
-export { Defenses }
+export { Defenses };

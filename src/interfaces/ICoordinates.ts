@@ -1,6 +1,6 @@
 export interface ICoordinates {
-    galaxy : string;
-    system : string;
-    planet : string;
-    type : string;
+    galaxy : number;
+    system : number;
+    planet : number;
+    type : number;
 }

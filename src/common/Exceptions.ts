@@ -1,5 +1,9 @@
+/***
+ * Helper class to distinguish errors.
+ * This error is thrown when a record already exists in the database.
+ */
 class DuplicateRecordError extends Error {
-    constructor(m: string) {
+    public constructor(m: string) {
         super(m);
 
         // Set the prototype explicitly.
@@ -7,8 +11,12 @@ class DuplicateRecordError extends Error {
     }
 }
 
+/***
+ * Helper class to distinguish errors.
+ * This error is thrown when a parameter is invalid.
+ */
 class InvalidParameter extends Error {
-    constructor(m: string) {
+    public constructor(m: string) {
         super(m);
 
         // Set the prototype explicitly.
@@ -16,4 +24,4 @@ class InvalidParameter extends Error {
     }
 }
 
-export { DuplicateRecordError, InvalidParameter }
+export { DuplicateRecordError, InvalidParameter };

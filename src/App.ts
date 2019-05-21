@@ -1,35 +1,32 @@
-import * as express from 'express';
-import * as logger from 'morgan';
-import * as bodyParser from 'body-parser';
-
-const dotenv = require('dotenv-safe').config();
-
+import * as bodyParser from "body-parser";
+import * as express from "express";
+import { Router } from "express";
 import { JwtHelper } from "./common/JwtHelper";
-import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest"
+import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest";
 
-import ConfigRouter from './routes/ConfigRouter';
-import AuthRouter from './routes/AuthRouter';
-import PlayerRouter from "./routes/PlayersRouter";
-import PlanetRouter from "./routes/PlanetsRouter";
+import { Globals } from "./common/Globals";
+import { InputValidator } from "./common/InputValidator";
+import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
-import TechsRouter from "./routes/TechsRouter";
-import ShipsRouter from "./routes/ShipsRouter";
+import ConfigRouter from "./routes/ConfigRouter";
 import DefenseRouter from "./routes/DefenseRouter";
 import EventRouter from "./routes/EventRouter";
 import GalaxyRouter from "./routes/GalaxyRouter";
 import MessagesRouter from "./routes/MessagesRouter";
+import PlanetRouter from "./routes/PlanetsRouter";
+import PlayerRouter from "./routes/PlayersRouter";
+import ShipsRouter from "./routes/ShipsRouter";
+import TechsRouter from "./routes/TechsRouter";
 
-import {Router} from "express";
-import {Globals} from "./common/Globals";
-import {InputValidator} from "./common/InputValidator";
+const dotenv = require("dotenv-safe").config();
 
 
 const jwt = new JwtHelper();
-const expressip = require('express-ip');
-const helmet = require('helmet');
+const expressip = require("express-ip");
+const helmet = require("helmet");
 
-const winston = require('winston');
-const expressWinston = require('express-winston');
+const winston = require("winston");
+const expressWinston = require("express-winston");
 
 const {format} = winston;
 const { combine, timestamp, printf } = format;
@@ -48,8 +45,8 @@ class App {
     public express: express.Application;
     public userID: string;
 
-    //Run configuration methods on the Express instance.
-    constructor() {
+    // Run configuration methods on the Express instance.
+    public constructor() {
         this.express = express();
         this.middleware();
         this.routes();
@@ -76,16 +73,16 @@ class App {
 
     // Configure API endpoints.
     private routes(): void {
-        let self = this;
+        const self = this;
 
-        this.express.use('/*', (request, response, next) => {
+        this.express.use("/*", (request, response, next) => {
 
             try {
 
                 // console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
 
                 // if the user tries to authenticate, we don't have a token yet
-                if(!request.originalUrl.toString().includes("\/auth\/") &&
+                if (!request.originalUrl.toString().includes("\/auth\/") &&
                     !request.originalUrl.toString().includes("\/users\/create\/") &&
                     !request.originalUrl.toString().includes("\/config\/")) {
 
@@ -93,12 +90,12 @@ class App {
 
                     const payload : string = jwt.validateToken(authString);
 
-                    if(InputValidator.isSet(payload)) {
+                    if (InputValidator.isSet(payload)) {
 
                         self.userID = eval(payload).userID;
 
                         // check if userID is a valid integer
-                        if(isNaN(parseInt(self.userID))) {
+                        if (isNaN(parseInt(self.userID))) {
                             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                                 status: Globals.Statuscode.NOT_AUTHORIZED,
                                 message: "Invalid parameter",
@@ -124,7 +121,7 @@ class App {
                 }
 
 
-            } catch(e) {
+            } catch (e) {
                 response.status(Globals.Statuscode.SERVER_ERROR).json({
                     status: Globals.Statuscode.SERVER_ERROR,
                     message: "Internal server error",
@@ -136,17 +133,17 @@ class App {
 
         });
 
-        expressWinston.bodyBlacklist.push('password');
+        expressWinston.bodyBlacklist.push("password");
 
         // TODO: find better method to filter out passwords in requests
         this.express.use(expressWinston.logger({
             transports: [
                 new winston.transports.Console(),
-                new winston.transports.File({ filename: 'logs/access.log' })
+                new winston.transports.File({ filename: "logs/access.log" })
             ],
             format: combine(
                 format.timestamp({
-                    format: 'YYYY-MM-DD HH:mm:ss'
+                    format: "YYYY-MM-DD HH:mm:ss"
                 }),
                 logFormat
             ),
@@ -163,34 +160,34 @@ class App {
                 "}"
         }));
 
-        this.register('/v1/config', ConfigRouter);
+        this.register("/v1/config", ConfigRouter);
 
-        this.register('/v1/auth', AuthRouter);
+        this.register("/v1/auth", AuthRouter);
 
-        this.register('/v1/user', PlayerRouter);
+        this.register("/v1/user", PlayerRouter);
 
-        this.register('/v1/users', PlayerRouter);
+        this.register("/v1/users", PlayerRouter);
 
-        this.register('/v1/planet', PlanetRouter);
+        this.register("/v1/planet", PlanetRouter);
 
-        this.register('/v1/planets', PlanetRouter);
+        this.register("/v1/planets", PlanetRouter);
 
-        this.register('/v1/buildings', BuildingRouter);
+        this.register("/v1/buildings", BuildingRouter);
 
-        this.register('/v1/techs', TechsRouter);
+        this.register("/v1/techs", TechsRouter);
 
-        this.register('/v1/ships', ShipsRouter);
+        this.register("/v1/ships", ShipsRouter);
 
-        this.register('/v1/defenses', DefenseRouter);
+        this.register("/v1/defenses", DefenseRouter);
 
-        this.register('/v1/events', EventRouter);
+        this.register("/v1/events", EventRouter);
 
-        this.register('/v1/galaxy', GalaxyRouter);
+        this.register("/v1/galaxy", GalaxyRouter);
 
-        this.register('/v1/messages', MessagesRouter);
+        this.register("/v1/messages", MessagesRouter);
 
 
-        this.express.use(function(request, response){
+        this.express.use(function(request, response) {
 
             response.status(Globals.Statuscode.NOT_FOUND).json({
                 status: Globals.Statuscode.NOT_FOUND,
@@ -204,12 +201,12 @@ class App {
 
     private register(route : string, router : Router) {
 
-        let self = this;
+        const self = this;
 
-        this.express.use(route, function (req : IAuthorizedRequest, res, next) {
+        this.express.use(route, function(req : IAuthorizedRequest, res, next) {
             req.userID = self.userID;
             next();
-        }, router);
+        },               router);
     }
 
 }

@@ -1,32 +1,33 @@
-import { Database } from '../common/Database';
-import {IUnits} from "../interfaces/IUnits";
+import { Database } from "../common/Database";
+import { IUnits } from "../interfaces/IUnits";
+
 const squel = require("squel");
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 class Fleets implements IUnits {
 
-    planetID : number;
-    small_cargo_ship : number;
-    large_cargo_ship : number;
-    light_fighter : number;
-    heavy_fighter : number;
-    cruiser : number;
-    battleship : number;
-    colony_ship : boolean;
-    recycler : boolean;
-    espionage_probe : number;
-    bomber : number;
-    solar_satellite : number;
-    destroyer : number;
-    battlecruiser : number;
-    deathstar : number;
+    public planetID : number;
+    public small_cargo_ship : number;
+    public large_cargo_ship : number;
+    public light_fighter : number;
+    public heavy_fighter : number;
+    public cruiser : number;
+    public battleship : number;
+    public colony_ship : boolean;
+    public recycler : boolean;
+    public espionage_probe : number;
+    public bomber : number;
+    public solar_satellite : number;
+    public destroyer : number;
+    public battlecruiser : number;
+    public deathstar : number;
 
 
     public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.update()
+            const query = squel.update()
                 .table("fleets")
                 .set("small_cargo_ship", this.small_cargo_ship)
                 .set("large_cargo_ship", this.large_cargo_ship)
@@ -47,7 +48,7 @@ class Fleets implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -58,7 +59,7 @@ class Fleets implements IUnits {
     public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.insert()
+            const query = squel.insert()
                 .table("fleets")
                 .set("planetID", this.planetID)
                 .set("small_cargo_ship", this.small_cargo_ship)
@@ -79,7 +80,7 @@ class Fleets implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -87,10 +88,10 @@ class Fleets implements IUnits {
         });
     }
 
-    isValid() : boolean {
+    public isValid() : boolean {
         return false;
     }
 
 }
 
-export { Fleets }
+export { Fleets };

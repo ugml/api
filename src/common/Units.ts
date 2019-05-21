@@ -2,8 +2,7 @@ class Units {
 
     private _data;
 
-    public constructor()
-    {
+    public constructor() {
         this._data = require("../config/units.json");
     }
 
@@ -33,4 +32,4 @@ class Units {
 }
 
 
-export { Units }
+export { Units };

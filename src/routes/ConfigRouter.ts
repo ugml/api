@@ -1,14 +1,14 @@
-import {Router, Response, NextFunction, Request} from 'express';
-import {Globals} from "../common/Globals";
+import { NextFunction, Request, Response, Router } from "express";
+import { Globals } from "../common/Globals";
 
 export class ConfigRouter {
 
-    router: Router;
+    public router: Router;
 
     /**
      * Initialize the Router
      */
-    constructor() {
+    public constructor() {
         this.router = Router();
         this.init();
     }
@@ -27,7 +27,7 @@ export class ConfigRouter {
         const data = require("../config/units.json");
 
         response.status(Globals.Statuscode.SUCCESS).json(data);
-        
+
         return;
     }
 
@@ -35,9 +35,9 @@ export class ConfigRouter {
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
      */
-    init() {
-        this.router.get('/game', this.getGameConfig);
-        this.router.get('/units', this.getUnitsConfig);
+    public init() {
+        this.router.get("/game", this.getGameConfig);
+        this.router.get("/units", this.getUnitsConfig);
     }
 
 }

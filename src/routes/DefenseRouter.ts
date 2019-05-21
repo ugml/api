@@ -1,38 +1,38 @@
-import {Router, Request, Response, NextFunction} from 'express';
-import { Database } from '../common/Database';
+import { NextFunction, Response, Router } from "express";
+import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
-import {Globals} from "../common/Globals";
 import { QueueItem } from "../common/QueueItem";
-import {Units} from "../common/Units";
+import { Units } from "../common/Units";
+import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
 
 const units = new Units();
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 const squel = require("squel");
 
 export class DefenseRouter {
-    router: Router;
+    public router: Router;
 
     /**
      * Initialize the Router
      */
-    constructor() {
+    public constructor() {
         this.router = Router();
         this.init();
     }
 
     private static getCosts(buildingID : number) : object {
 
-        let costs = units.getDefenses()[buildingID];
+        const costs = units.getDefenses()[buildingID];
 
         return {
-            "metal": costs["metal"],
-            "crystal": costs["crystal"],
-            "deuterium": costs["deuterium"],
-            "energy": costs["energy"],
+            metal: costs.metal,
+            crystal: costs.crystal,
+            deuterium: costs.deuterium,
+            energy: costs.energy
         };
 
     }
@@ -40,9 +40,9 @@ export class DefenseRouter {
     // TODO: relocate to Validator-class
     private static isValidBuildOrder(buildOrders : object) : boolean {
 
-        for(let order in buildOrders) {
+        for (const order in buildOrders) {
 
-            if(!InputValidator.isValidInt(order) ||
+            if (!InputValidator.isValidInt(order) ||
                 !InputValidator.isValidInt(buildOrders[order]) ||
                 parseInt(order) < Globals.MIN_DEFENSE_ID ||
                 parseInt(order) > Globals.MAX_DEFENSE_ID ||
@@ -61,7 +61,7 @@ export class DefenseRouter {
 
     public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!InputValidator.isSet(request.params.planetID) ||
+        if (!InputValidator.isSet(request.params.planetID) ||
             !InputValidator.isValidInt(request.params.planetID)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -72,7 +72,7 @@ export class DefenseRouter {
             return;
         }
 
-        let query : string = squel.select()
+        const query : string = squel.select()
                                 .field("p.ownerID", "ownerID")
                                 .field("d.*")
                                 .from("defenses", "d")
@@ -81,11 +81,11 @@ export class DefenseRouter {
                                 .where("p.ownerID = ?", request.userID)
                                 .toString();
 
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             let data;
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = result[0];
@@ -95,12 +95,12 @@ export class DefenseRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: data
+                data
             });
 
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -115,7 +115,7 @@ export class DefenseRouter {
 
     public buildDefense(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        if(!InputValidator.isSet(request.body.planetID) ||
+        if (!InputValidator.isSet(request.body.planetID) ||
             !InputValidator.isValidInt(request.body.planetID) ||
             !InputValidator.isSet(request.body.buildOrder) ||
             !InputValidator.isValidJson(request.body.buildOrder)) {
@@ -136,7 +136,7 @@ export class DefenseRouter {
         queueItem.setPlanetID(request.body.planetID);
 
         // validate build-order
-        if(!DefenseRouter.isValidBuildOrder(buildOrders)) {
+        if (!DefenseRouter.isValidBuildOrder(buildOrders)) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
@@ -145,7 +145,7 @@ export class DefenseRouter {
             return;
         }
 
-        let query : string = squel.select()
+        const query : string = squel.select()
             .field("metal")
             .field("crystal")
             .field("deuterium")
@@ -166,20 +166,20 @@ export class DefenseRouter {
             .where("p.ownerID = ?", request.userID)
             .toString();
 
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
-            if(!InputValidator.isSet(result[0])) {
+            if (!InputValidator.isSet(result[0])) {
 
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
-                    message: "The player does not own the planet",
-                    data: {}
+                message: "The player does not own the planet",
+                data: {}
                 });
 
                 return;
             }
 
-            if(result[0].b_hangar_plus == 1) {
+            if (result[0].b_hangar_plus == 1) {
                 return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Shipyard is currently upgrading.",
@@ -195,38 +195,38 @@ export class DefenseRouter {
             let buildTime : number = 0;
             let freeSiloSlots : number = (result[0].missile_silo * 10) - result[0].anti_ballistic_missile - (result[0].interplanetary_missile * 2);
 
-            for(let item in buildOrders) {
+            for (const item in buildOrders) {
                 let count : number = buildOrders[item];
-                let cost = DefenseRouter.getCosts(parseInt(item));
+                const cost = DefenseRouter.getCosts(parseInt(item));
 
                 // if the user has not enough ressources to fullfill the complete build-order
-                if(metal < cost["metal"] * count ||
-                    crystal < cost["crystal"] * count ||
-                    deuterium < cost["deuterium"] * count) {
+                if (metal < cost.metal * count ||
+                    crystal < cost.crystal * count ||
+                    deuterium < cost.deuterium * count) {
 
                     let tempCount : number;
 
-                    if(cost["metal"] > 0) {
-                        tempCount = metal / cost["metal"];
+                    if (cost.metal > 0) {
+                        tempCount = metal / cost.metal;
 
-                        if(tempCount < count) {
+                        if (tempCount < count) {
                             count = tempCount;
                         }
 
                     }
 
-                    if(cost["crystal"] > 0) {
-                        tempCount = crystal / cost["crystal"];
+                    if (cost.crystal > 0) {
+                        tempCount = crystal / cost.crystal;
 
-                        if(tempCount < count) {
+                        if (tempCount < count) {
                             count = tempCount;
                         }
                     }
 
-                    if(cost["deuterium"] > 0) {
-                        tempCount = deuterium / cost["deuterium"];
+                    if (cost.deuterium > 0) {
+                        tempCount = deuterium / cost.deuterium;
 
-                        if(tempCount < count) {
+                        if (tempCount < count) {
                             count = tempCount;
                         }
                     }
@@ -238,7 +238,7 @@ export class DefenseRouter {
 
 
                 // check free slots in silo
-                if(item === "309") {
+                if (item === "309") {
 
                     // can't build any more rockets
                     if (freeSiloSlots == 0) {
@@ -250,7 +250,7 @@ export class DefenseRouter {
 
                 }
 
-                if(item === "310") {
+                if (item === "310") {
 
                     // can't build any more rockets
                     if (freeSiloSlots == 0) {
@@ -262,24 +262,24 @@ export class DefenseRouter {
                 }
 
                 // build time in seconds
-                buildTime += DefenseRouter.getBuildTimeInSeconds(cost["metal"], cost["crystal"], result[0].shipyard, result[0].nanite_factory) * Math.floor(count);
+                buildTime += DefenseRouter.getBuildTimeInSeconds(cost.metal, cost.crystal, result[0].shipyard, result[0].nanite_factory) * Math.floor(count);
 
                 queueItem.addToQueue(item, Math.floor(count));
 
-                metal -= cost["metal"] * count;
-                crystal -= cost["crystal"] * count;
-                deuterium -= cost["deuterium"] * count;
+                metal -= cost.metal * count;
+                crystal -= cost.crystal * count;
+                deuterium -= cost.deuterium * count;
 
-                if(stopProcessing) break;
+                if (stopProcessing) break;
             }
 
             queueItem.setTimeRemaining(buildTime);
-            queueItem.setLastUpdateTime(Math.floor(Date.now()/1000));
+            queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
             let b_hangar_id_new : string = result[0].b_hangar_id;
             let b_hangar_start_time_new : number;
 
-            if(InputValidator.isSet(b_hangar_id_new)) {
+            if (InputValidator.isSet(b_hangar_id_new)) {
                 b_hangar_id_new += ", ";
             }
 
@@ -287,13 +287,13 @@ export class DefenseRouter {
 
             b_hangar_start_time_new = result[0].b_hangar_start_time;
 
-            if(result[0].b_hangar_start_time === 0) {
-                b_hangar_start_time_new = Math.floor(Date.now()/1000);
+            if (result[0].b_hangar_start_time === 0) {
+                b_hangar_start_time_new = Math.floor(Date.now() / 1000);
             }
 
 
             // update planet
-            let query : string = squel.update()
+            const query : string = squel.update()
                 .table("planets")
                 .set("b_hangar_id", b_hangar_id_new)
                 .set("b_hangar_start_time", b_hangar_start_time_new)
@@ -303,7 +303,7 @@ export class DefenseRouter {
                 .where("planetID = ?", request.body.planetID)
                 .toString();
 
-            Database.query(query).then(result => {
+            Database.query(query).then((result) => {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
@@ -314,7 +314,7 @@ export class DefenseRouter {
             });
 
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -332,9 +332,9 @@ export class DefenseRouter {
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
      */
-    init() {
-        this.router.get('/:planetID', this.getAllDefensesOnPlanet);
-        this.router.post('/build/', this.buildDefense);
+    public init() {
+        this.router.get("/:planetID", this.getAllDefensesOnPlanet);
+        this.router.post("/build/", this.buildDefense);
     }
 
 }

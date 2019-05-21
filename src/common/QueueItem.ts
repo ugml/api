@@ -5,7 +5,7 @@ class QueueItem {
     private timeRemaining : number;
     private queue : object;
 
-    constructor() {
+    public constructor() {
         this.planetID = -1;
         this.lastUpdateTime = 0;
         this.timeRemaining = 0;
@@ -30,12 +30,13 @@ class QueueItem {
 
     public addToQueue(key : string, value : number) {
 
-        if(value <= 0) return;
+        if (value <= 0) return;
 
-        if(this.queue[key] === undefined)
+        if (this.queue[key] === undefined) {
             this.queue[key] = value;
+        }
     }
 
 }
 
-export { QueueItem }
+export { QueueItem };

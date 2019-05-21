@@ -1,19 +1,20 @@
-import {Router, Request, Response, NextFunction} from 'express';
-import { Database } from '../common/Database';
+import { NextFunction, Response, Router } from "express";
+import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
-import {Globals} from "../common/Globals";
-const Logger = require('../common/Logger');
+import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+
+const Logger = require("../common/Logger");
 
 const squel = require("squel");
 
 export class GalaxyRouter {
-    router: Router;
+    public router: Router;
 
     /**
      * Initialize the Router
      */
-    constructor() {
+    public constructor() {
         this.router = Router();
         this.init();
     }
@@ -24,7 +25,7 @@ export class GalaxyRouter {
     public getGalaxyInformation(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
         // validate parameters
-        if(!InputValidator.isSet(request.params.galaxy) ||
+        if (!InputValidator.isSet(request.params.galaxy) ||
             !InputValidator.isValidInt(request.params.galaxy) ||
             !InputValidator.isSet(request.params.system) ||
             !InputValidator.isValidInt(request.params.system)) {
@@ -39,7 +40,7 @@ export class GalaxyRouter {
 
         }
 
-        let query : string = squel.select()
+        const query : string = squel.select()
             .field("p.planetID")
             .field("p.ownerID")
             .field("u.username")
@@ -63,11 +64,11 @@ export class GalaxyRouter {
         console.log(query);
 
         // execute the query
-        Database.query(query).then(result => {
+        Database.query(query).then((result) => {
 
             let data;
 
-            if(!InputValidator.isSet(result)) {
+            if (!InputValidator.isSet(result)) {
                 data = {};
             } else {
                 data = Object.assign({}, result);
@@ -77,11 +78,11 @@ export class GalaxyRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: data
+                data
             });
             return;
 
-        }).catch(error => {
+        }).catch((error) => {
             Logger.error(error);
 
             response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -98,9 +99,9 @@ export class GalaxyRouter {
      * Take each handler, and attach to one of the Express.Router's
      * endpoints.
      */
-    init() {
+    public init() {
 
-        this.router.get('/:galaxy/:system', this.getGalaxyInformation);
+        this.router.get("/:galaxy/:system", this.getGalaxyInformation);
     }
 
 }

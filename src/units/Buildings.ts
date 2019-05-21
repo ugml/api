@@ -1,33 +1,34 @@
-import { Database } from '../common/Database';
-import {IUnits} from "../interfaces/IUnits";
+import { Database } from "../common/Database";
+import { IUnits } from "../interfaces/IUnits";
+
 const squel = require("squel");
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 class Buildings implements IUnits {
 
-    planetID : number;
-    metal_mine : number;
-    crystal_mine : number;
-    deuterium_synthesizer : number;
-    solar_plant : number;
-    fusion_reactor : number;
-    robotic_factory : number;
-    nanite_factory : number;
-    shipyard : number;
-    metal_storage : number;
-    crystal_storage : number;
-    deuterium_storage : number;
-    research_lab : number;
-    terraformer : number;
-    alliance_depot : number;
-    missile_silo : number;
+    public planetID : number;
+    public metal_mine : number;
+    public crystal_mine : number;
+    public deuterium_synthesizer : number;
+    public solar_plant : number;
+    public fusion_reactor : number;
+    public robotic_factory : number;
+    public nanite_factory : number;
+    public shipyard : number;
+    public metal_storage : number;
+    public crystal_storage : number;
+    public deuterium_storage : number;
+    public research_lab : number;
+    public terraformer : number;
+    public alliance_depot : number;
+    public missile_silo : number;
 
 
     public save() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.update()
+            const query = squel.update()
                 .table("buildings")
                 .set("metal_mine", this.metal_mine)
                 .set("crystal_mine", this.crystal_mine)
@@ -49,7 +50,7 @@ class Buildings implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -60,7 +61,7 @@ class Buildings implements IUnits {
     public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            let query = squel.insert()
+            const query = squel.insert()
                 .table("buildings")
                 .set("planetID", this.planetID)
                 .set("metal_mine", this.metal_mine)
@@ -82,7 +83,7 @@ class Buildings implements IUnits {
 
             Database.query(query).then(() => {
                 return resolve(this);
-            }).catch(error => {
+            }).catch((error) => {
                 Logger.error(error);
                 return reject(error);
             });
@@ -90,10 +91,10 @@ class Buildings implements IUnits {
         });
     }
 
-    isValid() : boolean {
+    public isValid() : boolean {
         return false;
     }
 
 }
 
-export { Buildings }
+export { Buildings };

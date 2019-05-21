@@ -1,21 +1,22 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import { NextFunction, Request, Response, Router } from "express";
 
-import { Database } from '../common/Database';
-import { JwtHelper } from "../common/JwtHelper";
+import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import {Globals} from "../common/Globals";
+import { JwtHelper } from "../common/JwtHelper";
+
 const squel = require("squel");
 const jwt = new JwtHelper();
 const bcrypt = require('bcryptjs');
 
-const Logger = require('../common/Logger');
+const Logger = require("../common/Logger");
 
 
 export class AuthRouter {
-    router: Router;
+    public router: Router;
 
 
-    constructor() {
+    public constructor() {
         this.router = Router();
         this.init();
     }
@@ -30,7 +31,7 @@ export class AuthRouter {
     public authenticate(req: Request, response: Response, next: NextFunction) {
 
 
-        if(!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
+        if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
 
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -53,20 +54,20 @@ export class AuthRouter {
                                     .where("email = ?", email)
                                     .toString();
 
-        Database.query(query).then(users => {
+        Database.query(query).then((users) => {
 
-            if(!InputValidator.isSet(users)) {
+            if (!InputValidator.isSet(users)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
-                    message: "Authentication failed",
-                    data: {}
+                message: "Authentication failed",
+                data: {}
                 });
                 return;
             }
 
             bcrypt.compare(password, users[0].password).then(function(isValidPassword) {
 
-                if(!isValidPassword) {
+                if (!isValidPassword) {
                     response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                         status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Authentication failed",
@@ -87,7 +88,7 @@ export class AuthRouter {
             });
 
 
-        }).catch(err => {
+        }).catch((err) => {
 
             Logger.error(err);
 
@@ -106,8 +107,8 @@ export class AuthRouter {
     /***
      * Initializes the routes
      */
-    init() {
-        this.router.post('/login', this.authenticate);
+    public init() {
+        this.router.post("/login", this.authenticate);
     }
 
 }

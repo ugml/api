@@ -9,3 +9,4 @@ declare class Config {
 }
 
 export = Config;
+

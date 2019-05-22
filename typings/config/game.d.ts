@@ -1,3 +1,3 @@
-declare module 'game.json' {
+declare module "game.json" {
     export const speed: number;
 }

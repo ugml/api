@@ -176,6 +176,7 @@
             "members",
             "elements"
         ],
+        "no-reference": false,
         "eofline":true,
         "import-spacing":true,
         "indent":[

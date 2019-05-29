@@ -9,7 +9,6 @@ const Logger = require('../common/Logger');
 
 
 import squel = require("squel");
-const bcrypt = require('bcrypt');
 
 export class MessagesRouter {
     router: Router;

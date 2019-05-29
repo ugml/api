@@ -8,7 +8,7 @@ const jwt = new JwtHelper();
 const db = new DB();
 const validator = new Validator();
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 export class AuthRouter {
@@ -31,9 +31,7 @@ export class AuthRouter {
      */
     public authenticate(req: Request, response: Response, next: NextFunction) {
 
-        if(!validator.isSet(req.query['email'])) {
-
-            console.log("AuthRouter.ts: 400");
+        if(!validator.isSet(req.body['email'])) {
 
             response.json({
                 status: 400,
@@ -44,7 +42,7 @@ export class AuthRouter {
             return;
         }
 
-        let email = validator.sanitizeString(req.query['email']);
+        let email = validator.sanitizeString(req.body['email']);
 
         let query : string = "SELECT `userID`, `email`, `password` FROM `users` WHERE `email` = :email;";
 
@@ -57,7 +55,7 @@ export class AuthRouter {
             }
         ).then(user => {
 
-            bcrypt.compare(req.query['password'], user[0].password).then(function(isValidPassword) {
+            bcrypt.compare(req.body['password'], user[0].password).then(function(isValidPassword) {
 
                 if(!validator.isSet(user) || !isValidPassword) {
                     response.json({

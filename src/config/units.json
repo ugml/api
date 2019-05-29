@@ -201,6 +201,9 @@
                 "deuterium": 10000,
                 "energy": 0,
                 "factor": 1,
+                "consumption": 1000,
+                "speed": 2500,
+                "capacity": 7500,
                 "rapidfire": {
                     "209": 5,
                     "211": 5
@@ -255,6 +258,9 @@
                 "deuterium": 500,
                 "energy": 0,
                 "factor": 1,
+                "consumption": 0,
+                "speed": 0,
+                "capacity": 0,
                 "rapidfire": {}
             },
             "212": {
@@ -279,6 +285,9 @@
                 "deuterium": 15000,
                 "energy": 0,
                 "factor": 1,
+                "consumption": 250,
+                "speed": 10000,
+                "capacity": 750,
                 "rapidfire": {
                     "201": 3,
                     "202": 3,
@@ -295,6 +304,9 @@
                 "deuterium": 1000000,
                 "energy": 0,
                 "factor": 1,
+                "consumption": 1,
+                "speed": 100,
+                "capacity": 1000000,
                 "rapidfire": {
                     "201": 250,
                     "202": 250,

@@ -1,14 +1,10 @@
-import * as path from 'path';
 import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
+
+const dotenv = require('dotenv-safe').config();
+
 import { JwtHelper } from "./common/JwtHelper";
-
-const jwt = new JwtHelper();
-
-require('dotenv-safe').config();
-
-
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest"
 
 import ConfigRouter from './routes/ConfigRouter';
@@ -19,8 +15,31 @@ import BuildingRouter from "./routes/BuildingsRouter";
 import TechsRouter from "./routes/TechsRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import DefenseRouter from "./routes/DefenseRouter";
-import {Router} from "express";
+import EventRouter from "./routes/EventRouter";
+import GalaxyRouter from "./routes/GalaxyRouter";
+import MessagesRouter from "./routes/MessagesRouter";
 
+import {Router} from "express";
+import {Globals} from "./common/Globals";
+import {InputValidator} from "./common/InputValidator";
+
+
+const jwt = new JwtHelper();
+const expressip = require('express-ip');
+const helmet = require('helmet');
+
+const winston = require('winston');
+const expressWinston = require('express-winston');
+
+const {format} = winston;
+const { combine, timestamp, printf } = format;
+
+const Logger = require('./common/Logger.js');
+
+
+const logFormat = printf(({ message, timestamp }) => {
+    return `${timestamp} [REQUEST] ${message}`;
+});
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -38,46 +57,111 @@ class App {
 
     // Configure Express middleware.
     private middleware(): void {
-        this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
+
+
+
+        this.express.use(helmet.hidePoweredBy());
+        this.express.use(helmet.noCache());
+        this.express.use(helmet.contentSecurityPolicy({
+            directives: {
+                defaultSrc: ["'self'"]
+            }
+        }));
+
+
     }
+
 
     // Configure API endpoints.
     private routes(): void {
         let self = this;
 
-
-        // check, if request contains valid jwt-token
         this.express.use('/*', (request, response, next) => {
 
-            // if the user tries to authenticate, we don't have a token yet
-            if(!request.originalUrl.toString().includes("\/auth\/") &&
-                !request.originalUrl.toString().includes("\/users\/create\/") &&
-                !request.originalUrl.toString().includes("\/config\/")) {
+            try {
 
-                const authString = request.header("authorization");
+                // console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
 
-                const payload : string = jwt.validateToken(authString);
+                // if the user tries to authenticate, we don't have a token yet
+                if(!request.originalUrl.toString().includes("\/auth\/") &&
+                    !request.originalUrl.toString().includes("\/users\/create\/") &&
+                    !request.originalUrl.toString().includes("\/config\/")) {
 
-                if(payload !== "" && payload !== undefined) {
+                    const authString = request.header("authorization");
 
-                    self.userID = eval(payload).userID;
-                    next();
+                    const payload : string = jwt.validateToken(authString);
+
+                    if(InputValidator.isSet(payload)) {
+
+                        self.userID = eval(payload).userID;
+
+                        // check if userID is a valid integer
+                        if(isNaN(parseInt(self.userID))) {
+                            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                                status: Globals.Statuscode.NOT_AUTHORIZED,
+                                message: "Invalid parameter",
+                                data: {}
+                            });
+
+                            return;
+                        } else {
+                            next();
+                        }
+                    } else {
+
+                        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                            status: Globals.Statuscode.NOT_AUTHORIZED,
+                            message: "Authentication failed",
+                            data: {}
+                        });
+
+                        return;
+                    }
                 } else {
-                    return response.json({
-                        status: 401,
-                        message: "Authentication failed",
-                        data: {}
-                    });
-
-                    return;
+                    next();
                 }
-            } else {
-                next();
+
+
+            } catch(e) {
+                response.status(Globals.Statuscode.SERVER_ERROR).json({
+                    status: Globals.Statuscode.SERVER_ERROR,
+                    message: "Internal server error",
+                    data: {}
+                });
+
+                return;
             }
 
         });
+
+        expressWinston.bodyBlacklist.push('password');
+
+        // TODO: find better method to filter out passwords in requests
+        this.express.use(expressWinston.logger({
+            transports: [
+                new winston.transports.Console(),
+                new winston.transports.File({ filename: 'logs/access.log' })
+            ],
+            format: combine(
+                format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }),
+                logFormat
+            ),
+            maxsize: 10,
+            msg: "{" +
+                    "\"ip\": \"{{req.connection.remoteAddress}}\", " +
+                    "\"userID\": \"{{req.userID}}\", " +
+                    "\"method\": \"{{req.method}}\", " +
+                    "\"url\": \"{{req.url}}\", " +
+                    "\"params\": { " +
+                        "\"query:\": {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
+                        "\"body\": {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
+                    "}" +
+                "}"
+        }));
 
         this.register('/v1/config', ConfigRouter);
 
@@ -86,6 +170,8 @@ class App {
         this.register('/v1/user', PlayerRouter);
 
         this.register('/v1/users', PlayerRouter);
+
+        this.register('/v1/planet', PlanetRouter);
 
         this.register('/v1/planets', PlanetRouter);
 
@@ -96,6 +182,24 @@ class App {
         this.register('/v1/ships', ShipsRouter);
 
         this.register('/v1/defenses', DefenseRouter);
+
+        this.register('/v1/events', EventRouter);
+
+        this.register('/v1/galaxy', GalaxyRouter);
+
+        this.register('/v1/messages', MessagesRouter);
+
+
+        this.express.use(function(request, response){
+
+            response.status(Globals.Statuscode.NOT_FOUND).json({
+                status: Globals.Statuscode.NOT_FOUND,
+                message: "The route does not exist",
+                data: {}
+            });
+
+            return;
+        });
     }
 
     private register(route : string, router : Router) {

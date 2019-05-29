@@ -1,0 +1,210 @@
+{
+  "definitions": {},
+  "$id": "https://api.ugamela.org/queue.schema.json",
+  "$schema": "https://api.ugamela.org/queue.schema.json",
+  "type": "object",
+  "title": "The build-order schema",
+  "required": [
+    "planetID",
+    "lastUpdateTime",
+    "timeRemaining",
+    "queue"
+  ],
+  "properties": {
+    "planetID": {
+      "$id": "#/properties/planetID",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
+    "lastUpdateTime": {
+      "$id": "#/properties/lastUpdateTime",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
+    "timeRemaining": {
+      "$id": "#/properties/timeRemaining",
+      "type": "integer",
+      "minimum": 0,
+      "multipleOf": 1
+    },
+    "queue": {
+      "$id": "#/properties/queue",
+      "type": "object",
+      "units": {
+        "$id": "#/properties/queue/properties/ships",
+        "type": "object",
+        "properties": {
+          "201": {
+            "$id": "#/properties/queue/properties/units/properties/201",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "202": {
+            "$id": "#/properties/queue/properties/units/properties/202",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "203": {
+            "$id": "#/properties/queue/properties/units/properties/203",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "204": {
+            "$id": "#/properties/queue/properties/units/properties/204",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "205": {
+            "$id": "#/properties/queue/properties/units/properties/205",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "206": {
+            "$id": "#/properties/queue/properties/units/properties/206",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "207": {
+            "$1id": "#/properties/queue/properties/units/properties/207",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "208": {
+            "$id": "#/properties/queue/properties/units/properties/208",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "209": {
+            "$id": "#/properties/queue/properties/units/properties/209",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "210": {
+            "$id": "#/properties/queue/properties/units/properties/210",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "211": {
+            "$id": "#/properties/queue/properties/units/properties/211",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "212": {
+            "$id": "#/properties/queue/properties/units/properties/212",
+            "type": "integer",
+            "constant": [
+              0
+            ]
+          },
+          "213": {
+            "$id": "#/properties/queue/properties/units/properties/213",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "214": {
+            "$id": "#/properties/queue/properties/units/properties/214",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "301": {
+            "$id": "#/properties/queue/properties/units/properties/301",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "302": {
+            "$id": "#/properties/queue/properties/units/properties/302",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "303": {
+            "$id": "#/properties/queue/properties/units/properties/303",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "304": {
+            "$id": "#/properties/queue/properties/units/properties/304",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "305": {
+            "$id": "#/properties/queue/properties/units/properties/305",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "306": {
+            "$id": "#/properties/queue/properties/units/properties/306",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "307": {
+            "$1id": "#/properties/queue/properties/units/properties/307",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "308": {
+            "$id": "#/properties/queue/properties/units/properties/308",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "309": {
+            "$id": "#/properties/queue/properties/units/properties/309",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          },
+          "310": {
+            "$id": "#/properties/queue/properties/units/properties/310",
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "multipleOf": 1
+          }
+        }
+      }
+    }
+  }
+}

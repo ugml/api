@@ -1,7 +1,7 @@
 import mysql = require("mysql2");
-import winston = require("winston");
+import { Logger } from "./Logger";
 
-const Logger : winston.Logger = require("./Logger");
+require("dotenv-safe").config();
 
 /***
  * Manages the connection to the (mysql/mariaDB)-database
@@ -22,7 +22,7 @@ class Database {
     /***
      * Returns the current connection to the mysql-database
      */
-    public static getConnection() : object {
+    public static getConnection() : any {
         return this.connection;
     }
 
@@ -31,7 +31,7 @@ class Database {
      * @param sql
      * @param args
      */
-    public static query(sql : string, args : object = null) : Promise<object> {
+    public static query(sql : string, args : object = null) : Promise<any> {
         Logger.info(sql);
 
         return new Promise((resolve : any, reject : any) : any => {
@@ -41,7 +41,7 @@ class Database {
                 });
             }
         ).catch((err : string) => {
-            Logger.error(err);
+            //Logger.error(err);
             return Promise.reject(err);
         });
     }

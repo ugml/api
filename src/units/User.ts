@@ -1,6 +1,6 @@
 import squel = require("squel");
 import { Database } from "../common/Database";
-import Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 import { IUnits } from "../interfaces/IUnits";
 
 /***

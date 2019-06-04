@@ -1,2 +1,2 @@
-/// <reference path="game.d.ts" />
-/// <reference path="units.d.ts" />
+/// <reference path="Game.d.ts" />
+/// <reference path="Units.d.ts" />

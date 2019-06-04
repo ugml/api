@@ -44,7 +44,7 @@ export class ShipsRouter {
         return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
     }
 
-    private static getCosts(shipID : number) : object {
+    private static getCosts(shipID : number) : ICosts {
 
         const costs = units.getShips()[shipID];
 
@@ -191,7 +191,7 @@ export class ShipsRouter {
 
             for (const item in buildOrders) {
                 let count : number = buildOrders[item];
-                const cost = ShipsRouter.getCosts(parseInt(item));
+                const cost : ICosts = ShipsRouter.getCosts(parseInt(item, 10));
 
                 // if the user has not enough ressources to fullfill the complete build-order
                 if (metal < cost.metal * count ||

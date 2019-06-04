@@ -1,32 +1,23 @@
-import winston = require("winston");
-
+const winston = require('winston');
 const { createLogger, format} = winston;
-const { combine, printf } = format;
+const { combine, timestamp, printf } = format;
 
 const myFormat = printf(({ level, message, timestamp }) => {
     return `${timestamp} [${level.toUpperCase()}] ${message}`;
 });
 
-const Logger : winston.Logger = createLogger({
-    levels: {
-        error: 0,
-        info: 1,
-        warn: 2,
-        debug: 3
-    },
+const Logger = createLogger({
     format: combine(
         format.timestamp({
-            format: "YYYY-MM-DD HH:mm:ss"
+            format: 'YYYY-MM-DD HH:mm:ss'
         }),
         myFormat
     ),
     transports: [
         new winston.transports.Console(),
-        new winston.transports.File({ filename: "logs/info.log", level: "info" }),
-        new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-        new winston.transports.File({ filename: "logs/warn.log", level: "warn" }),
-        new winston.transports.File({ filename: "logs/debug.log", level: "debug" })
+        // TODO: split into different files by log-level - afaik, winston has huge problems doing that
+        new winston.transports.File({ filename: 'logs/api.log' })
     ]
 });
 
-module.exports = Logger;
+export { Logger };

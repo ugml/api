@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
+    "watch": true,
     "target": "es6",
     "module": "commonjs",
-    "outDir": "dist"
+    "outDir": "dist",
+    "typeRoots" : ["typings/"]
   },
+  "compileOnSave": true,
   "include": [
     "src/**/*.ts",
     "src/config/*.json",
-    ".schema.json"
+    ".schema.json",
+    "typings/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

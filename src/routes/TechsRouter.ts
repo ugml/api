@@ -24,7 +24,7 @@ export class TechsRouter {
         this.init();
     }
 
-    private static getCosts(buildingKey : string, currentLevel : number) : object {
+    private static getCosts(buildingKey : string, currentLevel : number) : ICosts {
 
         const costs = units.getTechnologies()[buildingKey];
 
@@ -132,7 +132,7 @@ export class TechsRouter {
                 // give back the ressources
                 const currentLevel = planet[buildingKey];
 
-                const cost = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
+                const cost : ICosts = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
 
                 const query: string = squel.update()
                     .table("planets")

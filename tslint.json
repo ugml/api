@@ -36,6 +36,7 @@
         "no-parameter-reassignment":true,
         "prefer-for-of":true,
         "promise-function-async":true,
+        "forin": false,
         "typedef":[
             true,
             "call-signature",

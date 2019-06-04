@@ -181,7 +181,7 @@ export class EventRouter {
 
 
 
-                Database.query(eventQuery).then((result)  => {
+                Database.query(eventQuery).then((result : any)  => {
 
                     // add event to redis-queue
                     Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());

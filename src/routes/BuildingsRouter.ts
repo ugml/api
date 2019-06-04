@@ -153,7 +153,7 @@ export class BuildingsRouter {
                 // give back the ressources
                 const currentLevel = planet[buildingKey];
 
-                const cost = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
+                const cost : ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
 
                 const query: string = squel.update()
                     .table("planets")
@@ -373,9 +373,14 @@ export class BuildingsRouter {
             }
 
             // 4. start the build-job
-            const buildTime = Math.round((cost.metal + cost.crystal) / (2500 * (1 + planet.robotic_factory) * (2 ** planet.nanite_factory) * Config.Get.speed));
+            const buildTime : number = Math.round(
+                (cost.metal + cost.crystal)
+                    / (2500 * (1 + planet.robotic_factory)
+                    * (2 ** planet.nanite_factory)
+                    * Config.Get.speed)
+            );
 
-            const endTime = Math.round(+new Date() / 1000) + buildTime;
+            const endTime : number = Math.round(+new Date() / 1000) + buildTime;
 
 
             planet.metal = planet.metal - cost.metal;
@@ -434,9 +439,9 @@ export class BuildingsRouter {
         this.router.post("/cancel", this.cancelBuilding);
     }
 
-    private getCosts(buildingID : number, currentLevel : number) : object {
+    private getCosts(buildingID : number, currentLevel : number) : ICosts {
 
-        const costs = units.getBuildings()[buildingID];
+        const costs : IBuildings = units.getBuildings()[buildingID];
 
         return {
             metal: costs.metal * costs.factor ** currentLevel,

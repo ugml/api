@@ -18,7 +18,7 @@ import PlayerRouter from "./routes/PlayersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
 
-const dotenv = require("dotenv-safe").config();
+require("dotenv-safe").config();
 
 
 const jwt = new JwtHelper();
@@ -31,7 +31,7 @@ const expressWinston = require("express-winston");
 const {format} = winston;
 const { combine, timestamp, printf } = format;
 
-const Logger = require('./common/Logger');
+const Logger = require("./common/Logger");
 
 
 const logFormat = printf(({ message, timestamp }) => {

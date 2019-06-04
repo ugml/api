@@ -24,7 +24,7 @@ export class DefenseRouter {
         this.init();
     }
 
-    private static getCosts(buildingID : number) : object {
+    private static getCosts(buildingID : number) : ICosts {
 
         const costs = units.getDefenses()[buildingID];
 
@@ -197,7 +197,7 @@ export class DefenseRouter {
 
             for (const item in buildOrders) {
                 let count : number = buildOrders[item];
-                const cost = DefenseRouter.getCosts(parseInt(item));
+                const cost : ICosts = DefenseRouter.getCosts(parseInt(item, 10));
 
                 // if the user has not enough ressources to fullfill the complete build-order
                 if (metal < cost.metal * count ||

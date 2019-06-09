@@ -5,11 +5,11 @@ const Logger = require('./Logger');
 class Database {
 
     private static connection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        database: process.env.DB_NAME,
-        password: process.env.DB_PASS,
-        port: process.env.DB_PORT
+        host: process.env.DB_HOST || "localhost",
+        user: process.env.DB_USER || "root",
+        database: process.env.DB_NAME || "ugamela",
+        password: process.env.DB_PASS || '',
+        port: process.env.DB_PORT || 3306
     }).on('error', function(err) {
         Logger.error(err);
     });

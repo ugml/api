@@ -114,7 +114,7 @@ class App {
                         response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                             status: Globals.Statuscode.NOT_AUTHORIZED,
                             message: "Authentication failed",
-                            data: {}
+                            data: { }
                         });
 
                         return;

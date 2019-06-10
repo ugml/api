@@ -7,7 +7,7 @@ import { JwtHelper } from "../common/JwtHelper";
 
 const squel = require("squel");
 const jwt = new JwtHelper();
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 
 const Logger = require("../common/Logger");
 

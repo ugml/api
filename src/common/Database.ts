@@ -12,9 +12,9 @@ class Database {
         host: process.env.DB_HOST || "localhost",
         user: process.env.DB_USER || "root",
         database: process.env.DB_NAME || "ugamela",
-        password: process.env.DB_PASS || '',
+        password: process.env.DB_PASS || "",
         port: process.env.DB_PORT || 3306,
-    }).on('error', function(err) {
+    }).on("error", function(err) {
         Logger.error(err);
     });
 

@@ -9,16 +9,8 @@ import { User } from "../units/User";
 import { PlanetsRouter } from "./PlanetsRouter";
 
 const Logger = require("../common/Logger");
-
-
+const bcrypt = require("bcryptjs");
 import squel = require("squel");
-import {User} from "../units/User";
-
-
-import {Planet, PlanetType} from "../units/Planet";
-const bcrypt = require('bcryptjs');
-
-const bcrypt = require("bcrypt");
 
 export class PlayersRouter {
     public router: Router;

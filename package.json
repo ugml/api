@@ -20,14 +20,17 @@
     "@types/passport": "^0.4.7",
     "@types/passport-jwt": "^3.0.1",
     "@types/superagent": "^3.8.4",
+    "@typescript-eslint/eslint-plugin": "^1.10.2",
+    "@typescript-eslint/parser": "^1.10.2",
     "chai": "^3.5.0",
     "chai-http": "^4.3.0",
+    "eslint": "^5.16.0",
     "gulp": "^4.0.0",
     "gulp-typescript": "^5.0.1",
     "mocha": "^5.2.0",
     "ts-node": "^8.2.0",
+    "tslint": "^5.16.0",
     "typescript": "^3.4.5"
-    "tslint": "^5.16.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -49,6 +52,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
+    "lint": "eslint src/**/*.ts",
+    "lint-fix": "eslint src/**/*.ts --fix",
+    "tslint": "tslint --project .",
     "build": "gulp scripts"
   }
 }

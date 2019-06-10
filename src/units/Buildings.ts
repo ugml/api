@@ -7,25 +7,25 @@ const Logger = require("../common/Logger");
 
 class Buildings implements IUnits {
 
-    public planetID : number;
-    public metal_mine : number;
-    public crystal_mine : number;
-    public deuterium_synthesizer : number;
-    public solar_plant : number;
-    public fusion_reactor : number;
-    public robotic_factory : number;
-    public nanite_factory : number;
-    public shipyard : number;
-    public metal_storage : number;
-    public crystal_storage : number;
-    public deuterium_storage : number;
-    public research_lab : number;
-    public terraformer : number;
-    public alliance_depot : number;
-    public missile_silo : number;
+    public planetID: number;
+    public metal_mine: number;
+    public crystal_mine: number;
+    public deuterium_synthesizer: number;
+    public solar_plant: number;
+    public fusion_reactor: number;
+    public robotic_factory: number;
+    public nanite_factory: number;
+    public shipyard: number;
+    public metal_storage: number;
+    public crystal_storage: number;
+    public deuterium_storage: number;
+    public research_lab: number;
+    public terraformer: number;
+    public alliance_depot: number;
+    public missile_silo: number;
 
 
-    public save() : Promise<{}> {
+    public save(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.update()
@@ -58,7 +58,7 @@ class Buildings implements IUnits {
         });
     }
 
-    public create() : Promise<{}> {
+    public create(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.insert()
@@ -91,7 +91,7 @@ class Buildings implements IUnits {
         });
     }
 
-    public isValid() : boolean {
+    public isValid(): boolean {
         return false;
     }
 

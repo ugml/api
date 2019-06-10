@@ -29,14 +29,14 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
         }
 
         // check if user owns the planet
-        const query : string = squel.select()
+        const query: string = squel.select()
             .from("planets")
             .where("planetID = ?", request.body.planetID)
             .where("ownerID = ?", request.userID)
@@ -49,7 +49,7 @@ export class PlanetsRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The player does not own the planet",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -58,7 +58,7 @@ export class PlanetsRouter {
 
 
             // TODO: check for unique-constraint violation
-            const query : string = squel.update()
+            const query: string = squel.update()
                 .table("users")
                 .set("currentplanet = ?", request.body.planetID)
                 .where("userID = ?", request.userID)
@@ -70,7 +70,7 @@ export class PlanetsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -84,7 +84,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -94,7 +94,7 @@ export class PlanetsRouter {
 
     public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
-        const query : string = squel.select()
+        const query: string = squel.select()
             .from("planets")
             .where("ownerID = ?", request.userID)
             .toString();
@@ -114,7 +114,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
 
@@ -124,7 +124,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -140,17 +140,17 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
         }
 
-        const query : string = squel.select()
-                                .from("planets")
-                                .where("planetID = ?", request.params.planetID)
-                                .where("ownerID = ?", request.userID)
-                                .toString();
+        const query: string = squel.select()
+            .from("planets")
+            .where("planetID = ?", request.params.planetID)
+            .where("ownerID = ?", request.userID)
+            .toString();
 
         // execute the query
         Database.query(query).then((result) => {
@@ -167,7 +167,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
 
@@ -177,7 +177,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -194,14 +194,14 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
 
         }
 
-        const query : string = squel.select()
+        const query: string = squel.select()
             .from("flights")
             .where("ownerID = ?", request.userID)
             .where(
@@ -226,7 +226,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
 
@@ -236,7 +236,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -252,7 +252,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -268,13 +268,13 @@ export class PlanetsRouter {
         // execute the query
         Database.query(query).then((result) => {
 
-            const numRows : number = Object.keys(result).length;
+            const numRows: number = Object.keys(result).length;
 
             if (numRows <= 1) {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "The last planet cannot be destroyed.",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -284,7 +284,7 @@ export class PlanetsRouter {
 
                 Logger.info("Transaction started");
 
-                const query : string = squel
+                const query: string = squel
                     .delete()
                     .from("planets")
                     .where("planetID = ?", request.body.planetID)
@@ -309,7 +309,7 @@ export class PlanetsRouter {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "The planet was deleted.",
-                        data: {}
+                        data: {},
                     });
 
                     return;
@@ -319,7 +319,7 @@ export class PlanetsRouter {
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: "There was an error while handling the request.",
-                        data: {}
+                        data: {},
                     });
 
                     return;
@@ -334,7 +334,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -351,19 +351,19 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
         }
 
-        const newName : string = InputValidator.sanitizeString(request.body.name);
+        const newName: string = InputValidator.sanitizeString(request.body.name);
 
         if (newName.length <= 4) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "New name is too short. Minimum length is 4 characters.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -383,7 +383,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: {}
+                data: {},
             });
             return;
 
@@ -393,7 +393,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -416,14 +416,14 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
 
         }
 
-        const query : string = squel.select()
+        const query: string = squel.select()
             .field("planetID")
             .field("ownerID")
             .field("name")
@@ -453,7 +453,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
 
@@ -463,7 +463,7 @@ export class PlanetsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;

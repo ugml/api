@@ -57,7 +57,7 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
         }).catch((error) => {
@@ -66,7 +66,7 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -86,7 +86,7 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -114,7 +114,7 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
         }).catch((error) => {
@@ -123,7 +123,7 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -139,7 +139,7 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -178,8 +178,8 @@ export class PlayersRouter {
 
                 const query = "CALL getNewUserId();";
 
-                const newPlayer : User = new User();
-                const newPlanet : Planet = new Planet();
+                const newPlayer: User = new User();
+                const newPlanet: Planet = new Planet();
 
                 newPlayer.username = username;
                 newPlayer.email = email;
@@ -255,7 +255,7 @@ export class PlayersRouter {
                         data.planet.temp_min = Math.random() * (130 - 40) + 40;
                         data.planet.temp_max = Math.random() * (150 - 240) + 240;
 
-                        const images : string[] = ["normal", "jungle", "gas"];
+                        const images: string[] = ["normal", "jungle", "gas"];
 
                         data.planet.image = images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
 
@@ -265,7 +265,7 @@ export class PlayersRouter {
                         data.planet.temp_min = Math.random() * (130 - 40) + 40;
                         data.planet.temp_max = Math.random() * (150 - 240) + 240;
 
-                        const images : string[] = ["ice", "water"];
+                        const images: string[] = ["ice", "water"];
 
                         data.planet.image = images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
                     }
@@ -337,7 +337,7 @@ export class PlayersRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
-                    data: {}
+                    data: {},
                 });
                 return;
 
@@ -356,14 +356,14 @@ export class PlayersRouter {
                     response.status(Globals.Statuscode.BAD_REQUEST).json({
                         status: Globals.Statuscode.BAD_REQUEST,
                         message: `There was an error while handling the request: ${err.message}`,
-                        data: {}
+                        data: {},
                     });
                 } else {
                     // return the result
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: "There was an error while handling the request.",
-                        data: {}
+                        data: {},
                     });
                 }
 
@@ -384,13 +384,13 @@ export class PlayersRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "No parameters were passed",
-                data: {}
+                data: {},
             });
 
             return;
         }
 
-        const queryBuilder : squel.Update = squel.update()
+        const queryBuilder: squel.Update = squel.update()
             .table("users");
 
 
@@ -414,7 +414,7 @@ export class PlayersRouter {
         }
 
 
-        const query : string = queryBuilder.where("userID = ?", request.userID).toString();
+        const query: string = queryBuilder.where("userID = ?", request.userID).toString();
 
         // execute the update
         Database.query(query).then(() => {
@@ -442,7 +442,7 @@ export class PlayersRouter {
                 return response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
-                    data
+                    data,
                 });
             });
 
@@ -455,7 +455,7 @@ export class PlayersRouter {
                 response.status(Globals.Statuscode.BAD_REQUEST).json({
                     status: Globals.Statuscode.BAD_REQUEST,
                     message: `There was an error while handling the request: ${err.message}`,
-                    data: {}
+                    data: {},
                 });
             } else {
 
@@ -463,7 +463,7 @@ export class PlayersRouter {
                 response.status(Globals.Statuscode.SERVER_ERROR).json({
                     status: Globals.Statuscode.SERVER_ERROR,
                     message: "There was an error while handling the request.",
-                    data: {}
+                    data: {},
                 });
             }
 

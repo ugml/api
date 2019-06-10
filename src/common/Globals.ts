@@ -2,17 +2,17 @@
  * This class holds all global variables
  */
 class Globals {
-    public static MIN_BUILDING_ID : number = 1;
-    public static MAX_BUILDING_ID : number = 15;
+    public static MIN_BUILDING_ID: number = 1;
+    public static MAX_BUILDING_ID: number = 15;
 
-    public static MIN_DEFENSE_ID : number = 301;
-    public static MAX_DEFENSE_ID : number = 310;
+    public static MIN_DEFENSE_ID: number = 301;
+    public static MAX_DEFENSE_ID: number = 310;
 
-    public static MIN_TECH_ID : number = 101;
-    public static MAX_TECH_ID : number = 115;
+    public static MIN_TECH_ID: number = 101;
+    public static MAX_TECH_ID: number = 115;
 
-    public static MIN_SHIP_ID : number = 201;
-    public static MAX_SHIP_ID : number = 214;
+    public static MIN_SHIP_ID: number = 201;
+    public static MAX_SHIP_ID: number = 214;
 
 
 

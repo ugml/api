@@ -40,21 +40,21 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
 
         }
 
-        const query : string = squel.select()
-                                    .field("p.ownerID")
-                                    .field("b.*")
-                                    .from("buildings", "b")
-                                    .left_join("planets", "p", "b.planetID = p.planetID")
-                                    .where("b.planetID = ?", request.params.planetID)
-                                    .where("p.ownerID = ?", request.userID)
-                                    .toString();
+        const query: string = squel.select()
+            .field("p.ownerID")
+            .field("b.*")
+            .from("buildings", "b")
+            .left_join("planets", "p", "b.planetID = p.planetID")
+            .where("b.planetID = ?", request.params.planetID)
+            .where("p.ownerID = ?", request.userID)
+            .toString();
 
 
         // execute the query
@@ -72,7 +72,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
 
             return;
@@ -83,7 +83,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -99,7 +99,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
 
@@ -120,9 +120,9 @@ export class BuildingsRouter {
             if (!InputValidator.isSet(result)) {
 
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Invalid parameter",
+                    data: {},
                 });
                 return;
 
@@ -134,15 +134,15 @@ export class BuildingsRouter {
             if (!InputValidator.isSet(result[0])) {
 
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Invalid parameter",
+                    data: {},
                 });
                 return;
 
             }
 
-            const planet : Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
+            const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
 
 
             // 1. check if there is already a build-job on the planet
@@ -153,7 +153,7 @@ export class BuildingsRouter {
                 // give back the ressources
                 const currentLevel = planet[buildingKey];
 
-                const cost : ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
+                const cost: ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
 
                 const query: string = squel.update()
                     .table("planets")
@@ -177,7 +177,7 @@ export class BuildingsRouter {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Building canceled",
-                        data: {planet}
+                        data: {planet},
                     });
                     return;
                 }).catch((error) => {
@@ -186,7 +186,7 @@ export class BuildingsRouter {
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: "There was an error while handling the request.",
-                        data: {}
+                        data: {},
                     });
 
                     return;
@@ -196,7 +196,7 @@ export class BuildingsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet has no build-job",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -206,7 +206,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -224,7 +224,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
         }
@@ -235,7 +235,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -243,11 +243,11 @@ export class BuildingsRouter {
 
         // get the planet, on which the building should be built
         const query: string = squel.select()
-                            .from("planets", "p")
-                            .join("buildings", "b", "p.planetID = b.planetID")
-                            .where("p.planetID = ?", request.body.planetID)
-                            .where("p.ownerID = ?", request.userID)
-                            .toString();
+            .from("planets", "p")
+            .join("buildings", "b", "p.planetID = b.planetID")
+            .where("p.planetID = ?", request.body.planetID)
+            .where("p.ownerID = ?", request.userID)
+            .toString();
 
 
         Database.query(query).then((result) => {
@@ -255,9 +255,9 @@ export class BuildingsRouter {
             if (!InputValidator.isSet(result)) {
 
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Invalid parameter",
+                    data: {},
                 });
                 return;
 
@@ -269,9 +269,9 @@ export class BuildingsRouter {
             if (!InputValidator.isSet(planet)) {
 
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Invalid parameter",
+                    data: {},
                 });
                 return;
 
@@ -283,7 +283,7 @@ export class BuildingsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet already has a build-job",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -292,7 +292,7 @@ export class BuildingsRouter {
             if ((request.body.buildingID == Globals.Buildings.ROBOTIC_FACTORY ||
                 request.body.buildingID == Globals.Buildings.NANITE_FACTORY ||
                 request.body.buildingID == Globals.Buildings.SHIPYARD
-                )
+            )
                 &&
                 (planet.b_hangar_id > 0 ||
                  planet.b_hangar_starttime > 0
@@ -301,7 +301,7 @@ export class BuildingsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Can't build this building while it is in use",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -314,7 +314,7 @@ export class BuildingsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Can't build this building while it is in use",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -327,7 +327,7 @@ export class BuildingsRouter {
             // building has requirements
             if (requirements !== undefined) {
 
-                let requirementsMet : boolean = true;
+                let requirementsMet = true;
 
                 for (const reqID in requirements) {
 
@@ -344,7 +344,7 @@ export class BuildingsRouter {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Requirements are not met",
-                        data: planet.planetID
+                        data: planet.planetID,
                     });
 
                     return;
@@ -366,21 +366,21 @@ export class BuildingsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Not enough resources",
-                    data: {}
+                    data: {},
                 });
                 return;
 
             }
 
             // 4. start the build-job
-            const buildTime : number = Math.round(
+            const buildTime: number = Math.round(
                 (cost.metal + cost.crystal)
                     / (2500 * (1 + planet.robotic_factory)
                     * (2 ** planet.nanite_factory)
                     * Config.Get.speed)
             );
 
-            const endTime : number = Math.round(+new Date() / 1000) + buildTime;
+            const endTime: number = Math.round(+new Date() / 1000) + buildTime;
 
 
             planet.metal = planet.metal - cost.metal;
@@ -390,22 +390,22 @@ export class BuildingsRouter {
             planet.b_building_endtime = endTime;
 
 
-            const query : string = squel.update()
-                                .table("planets")
-                                .set("metal", planet.metal)
-                                .set("crystal", planet.crystal)
-                                .set("deuterium", planet.deuterium)
-                                .set("b_building_id", planet.b_building_id)
-                                .set("b_building_endtime", planet.b_building_endtime)
-                                .where("planetID = ?", request.body.planetID)
-                                .toString();
+            const query: string = squel.update()
+                .table("planets")
+                .set("metal", planet.metal)
+                .set("crystal", planet.crystal)
+                .set("deuterium", planet.deuterium)
+                .set("b_building_id", planet.b_building_id)
+                .set("b_building_endtime", planet.b_building_endtime)
+                .where("planetID = ?", request.body.planetID)
+                .toString();
 
             Database.query(query).then((result) => {
 
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Job started",
-                    data: {planet}
+                    data: {planet},
                 });
 
                 return;
@@ -421,7 +421,7 @@ export class BuildingsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -439,15 +439,15 @@ export class BuildingsRouter {
         this.router.post("/cancel", this.cancelBuilding);
     }
 
-    private getCosts(buildingID : number, currentLevel : number) : ICosts {
+    private getCosts(buildingID: number, currentLevel: number): ICosts {
 
-        const costs : IBuildings = units.getBuildings()[buildingID];
+        const costs: IBuildings = units.getBuildings()[buildingID];
 
         return {
             metal: costs.metal * costs.factor ** currentLevel,
             crystal: costs.crystal * costs.factor ** currentLevel,
             deuterium: costs.deuterium * costs.factor ** currentLevel,
-            energy: costs.energy * costs.factor ** currentLevel
+            energy: costs.energy * costs.factor ** currentLevel,
         };
 
     }

@@ -24,7 +24,7 @@ export class TechsRouter {
         this.init();
     }
 
-    private static getCosts(buildingKey : string, currentLevel : number) : ICosts {
+    private static getCosts(buildingKey: string, currentLevel: number): ICosts {
 
         const costs = units.getTechnologies()[buildingKey];
 
@@ -32,7 +32,7 @@ export class TechsRouter {
             metal: costs.metal * costs.factor ** currentLevel,
             crystal: costs.crystal * costs.factor ** currentLevel,
             deuterium: costs.deuterium * costs.factor ** currentLevel,
-            energy: costs.energy * costs.factor ** currentLevel
+            energy: costs.energy * costs.factor ** currentLevel,
         };
 
     }
@@ -47,10 +47,10 @@ export class TechsRouter {
     public getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
 
 
-        const query : string = squel.select()
-                                .from("techs")
-                                .where("userID = ?", request.userID)
-                                .toString();
+        const query: string = squel.select()
+            .from("techs")
+            .where("userID = ?", request.userID)
+            .toString();
 
         Database.query(query).then((result) => {
 
@@ -58,7 +58,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data: result
+                data: result,
             });
             return;
 
@@ -68,7 +68,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -84,7 +84,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
 
@@ -107,7 +107,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -119,7 +119,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -132,7 +132,7 @@ export class TechsRouter {
                 // give back the ressources
                 const currentLevel = planet[buildingKey];
 
-                const cost : ICosts = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
+                const cost: ICosts = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
 
                 const query: string = squel.update()
                     .table("planets")
@@ -157,7 +157,7 @@ export class TechsRouter {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Building canceled",
-                        data: {planet}
+                        data: {planet},
                     });
                     return;
                 }).catch((error) => {
@@ -166,7 +166,7 @@ export class TechsRouter {
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: "There was an error while handling the request.",
-                        data: {}
+                        data: {},
                     });
 
                     return;
@@ -176,7 +176,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet has no build-job",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -186,7 +186,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -205,7 +205,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
 
@@ -217,7 +217,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -238,7 +238,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -250,7 +250,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Invalid parameter",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -261,7 +261,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Planet already has a build-job",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
@@ -286,7 +286,7 @@ export class TechsRouter {
             // building has requirements
             if (requirements !== undefined) {
 
-                let requirementsMet : boolean = true;
+                let requirementsMet = true;
 
                 for (const reqID in requirements) {
 
@@ -303,7 +303,7 @@ export class TechsRouter {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Requirements are not met",
-                        data: planet.planetID
+                        data: planet.planetID,
                     });
 
                     return;
@@ -327,7 +327,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Not enough resources",
-                    data: {}
+                    data: {},
                 });
                 return;
 
@@ -345,7 +345,7 @@ export class TechsRouter {
             planet.b_tech_endtime = endTime;
 
 
-            const query : string = squel.update()
+            const query: string = squel.update()
                 .table("planets")
                 .set("metal", planet.metal)
                 .set("crystal", planet.crystal)
@@ -360,7 +360,7 @@ export class TechsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Job started",
-                    data: {planet}
+                    data: {planet},
                 });
 
                 return;
@@ -376,7 +376,7 @@ export class TechsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;

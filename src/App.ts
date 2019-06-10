@@ -63,8 +63,8 @@ class App {
         this.express.use(helmet.noCache());
         this.express.use(helmet.contentSecurityPolicy({
             directives: {
-                defaultSrc: ["'self'"]
-            }
+                defaultSrc: ["'self'"],
+            },
         }));
 
 
@@ -88,7 +88,7 @@ class App {
 
                     const authString = request.header("authorization");
 
-                    const payload : string = jwt.validateToken(authString);
+                    const payload: string = jwt.validateToken(authString);
 
                     if (InputValidator.isSet(payload)) {
 
@@ -99,7 +99,7 @@ class App {
                             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                                 status: Globals.Statuscode.NOT_AUTHORIZED,
                                 message: "Invalid parameter",
-                                data: {}
+                                data: {},
                             });
 
                             return;
@@ -111,7 +111,7 @@ class App {
                         response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                             status: Globals.Statuscode.NOT_AUTHORIZED,
                             message: "Authentication failed",
-                            data: { }
+                            data: { },
                         });
 
                         return;
@@ -125,7 +125,7 @@ class App {
                 response.status(Globals.Statuscode.SERVER_ERROR).json({
                     status: Globals.Statuscode.SERVER_ERROR,
                     message: "Internal server error",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -139,11 +139,11 @@ class App {
         this.express.use(expressWinston.logger({
             transports: [
                 new winston.transports.Console(),
-                new winston.transports.File({ filename: "logs/access.log" })
+                new winston.transports.File({ filename: "logs/access.log" }),
             ],
             format: combine(
                 format.timestamp({
-                    format: "YYYY-MM-DD HH:mm:ss"
+                    format: "YYYY-MM-DD HH:mm:ss",
                 }),
                 logFormat
             ),
@@ -157,7 +157,7 @@ class App {
                         "\"query:\": {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
                         "\"body\": {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
                     "}" +
-                "}"
+                "}",
         }));
 
         this.register("/v1/config", ConfigRouter);
@@ -192,18 +192,18 @@ class App {
             response.status(Globals.Statuscode.NOT_FOUND).json({
                 status: Globals.Statuscode.NOT_FOUND,
                 message: "The route does not exist",
-                data: {}
+                data: {},
             });
 
             return;
         });
     }
 
-    private register(route : string, router : Router) {
+    private register(route: string, router: Router) {
 
         const self = this;
 
-        this.express.use(route, function(req : IAuthorizedRequest, res, next) {
+        this.express.use(route, function(req: IAuthorizedRequest, res, next) {
             req.userID = self.userID;
             next();
         },               router);

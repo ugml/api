@@ -53,7 +53,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
         }).catch((error) => {
@@ -62,7 +62,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -78,7 +78,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -114,7 +114,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
         }).catch((error) => {
@@ -123,7 +123,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -140,14 +140,14 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
 
         }
 
-        const query : string = squel
+        const query: string = squel
             .update()
             .table("messages")
             .set("deleted", 1)
@@ -160,7 +160,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "The message was deleted.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -171,7 +171,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -191,14 +191,14 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
 
         }
 
-        const query : string = squel.select()
+        const query: string = squel.select()
             .from("users")
             .field("userID")
             .where("userID = ?", request.body.receiverID)
@@ -206,18 +206,18 @@ export class MessagesRouter {
 
         Database.query(query).then((result) => {
 
-            const numRows : number = Object.keys(result).length;
+            const numRows: number = Object.keys(result).length;
 
             if (numRows == 0) {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "The receiver does not exist.",
-                    data: {}
+                    data: {},
                 });
                 return;
             }
 
-            const query : string = squel.insert()
+            const query: string = squel.insert()
                 .into("messages")
                 .set("senderID", request.userID)
                 .set("receiverID", result[0].userID)
@@ -232,7 +232,7 @@ export class MessagesRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Message sent.",
-                    data: {}
+                    data: {},
                 });
                 return;
 
@@ -244,7 +244,7 @@ export class MessagesRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;

@@ -10,7 +10,9 @@ const Logger = require('../common/Logger');
 
 import squel = require("squel");
 import {User} from "../units/User";
-import {Planet} from "../units/Planet";
+
+
+import {Planet, PlanetType} from "../units/Planet";
 const bcrypt = require('bcryptjs');
 
 export class PlayersRouter {
@@ -145,7 +147,6 @@ export class PlayersRouter {
         const password: string = InputValidator.sanitizeString(request.body.password);
         const email: string = InputValidator.sanitizeString(request.body.email);
 
-
         const hashedPassword = bcrypt.hashSync(password, 10);
 
         // TODO: use squel
@@ -175,9 +176,14 @@ export class PlayersRouter {
                 let newPlayer : User = new User();
                 let newPlanet : Planet = new Planet();
 
+                newPlayer.username = username;
+                newPlayer.email = email;
+
                 return Database.query(query).then(row => {
                     newPlayer.userID = row[0][0].userID;
                     newPlayer.password = hashedPassword;
+                    newPlanet.ownerID = newPlayer.userID;
+                    newPlanet.planet_type = PlanetType.Planet;
 
                     return {player: newPlayer, planet: newPlanet};
                 });
@@ -214,7 +220,7 @@ export class PlayersRouter {
 
                 Logger.info('Creating a new user');
 
-                return data.player.save().then(() => {
+                return data.player.create().then(() => {
                     return data;
                 });
 
@@ -263,7 +269,7 @@ export class PlayersRouter {
 
                 }
 
-                return data.planet.save().then(() => {
+                return data.planet.create().then(() => {
                     return data;
                 });
 
@@ -298,7 +304,7 @@ export class PlayersRouter {
             }).then(data => {
                 Logger.info('Creating entry in galaxy-table');
 
-                query = `INSERT INTO galaxy (\`planetID\`, \`debris_metal\`, \`debris_crystal\`) VALUES (${data.planet.planetID}, 0, 0);`;
+                query = `INSERT INTO galaxy (\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`, \`debris_metal\`, \`debris_crystal\`) VALUES (${data.planet.planetID}, ${data.planet.galaxy}, ${data.planet.system}, ${data.planet.planet}, 0, 0);`;
 
                 return Database.query(query).then(() => {
                     return data;

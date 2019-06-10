@@ -436,7 +436,6 @@ export class PlanetsRouter {
             .field("destroyed")
             .from("planets")
             .where("planetID = ?", request.params.planetID)
-            .where("ownerID = ?", request.userID)
             .toString();
 
         // execute the query

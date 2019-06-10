@@ -12,6 +12,8 @@ const JSONValidator = require('jsonschema').Validator;
 const jsonValidator = new JSONValidator();
 const squel = require("squel");
 
+const Logger = require('../common/Logger');
+
 const eventSchema = require("../schemas/fleetevent.schema.json");
 
 // TODO: validate input data:
@@ -41,9 +43,9 @@ export class EventRouter {
     private calculateDistance(origin: ICoordinates, destination : ICoordinates) : number {
 
         const distances = [
-            Math.abs(parseInt(origin.galaxy) - parseInt(destination.galaxy)),
-            Math.abs(parseInt(origin.system) - parseInt(destination.system)),
-            Math.abs(parseInt(origin.planet) - parseInt(destination.planet))
+            Math.abs(origin.galaxy - destination.galaxy),
+            Math.abs(origin.system - destination.system),
+            Math.abs(origin.planet - destination.planet)
         ];
 
         let distance : number = 0;
@@ -63,7 +65,8 @@ export class EventRouter {
      * @param slowestShipSpeed The speed of the slowest ship in the fleet
      */
     private calculateTimeOfFlight(gameSpeed : number, missionSpeed : number, distance : number, slowestShipSpeed : number) : number {
-        return Math.pow((gameSpeed*3500 / (missionSpeed/100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10;
+        // source: http://owiki.de/index.php?title=Flugzeit
+        return Math.round(Math.pow((3500 / (missionSpeed/100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10 / gameSpeed);
     }
 
     /**
@@ -146,6 +149,10 @@ export class EventRouter {
 
 
     public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        // TODO: check if enough ships on planet
+        // TODO: check if planet has enough deuterium
+
 
         if(!InputValidator.isSet(request.body.event)) {
 
@@ -254,10 +261,14 @@ export class EventRouter {
 
                 const gameConfig = require("../config/game.json");
 
-                let slowestShipSpeed = eventRouter.getSlowestShipSpeed(eventData.ships);
+                let slowestShipSpeed = eventRouter.getSlowestShipSpeed(eventData.data.ships);
+
+                console.log(slowestShipSpeed);
 
                 // calculate duration of flight
                 let timeOfFlight = eventRouter.calculateTimeOfFlight(gameConfig.speed, eventData.speed, distance, slowestShipSpeed);
+
+                console.log(timeOfFlight);
 
                 // set start-time
                 eventData.starttime = Math.round(+new Date / 1000);
@@ -288,6 +299,8 @@ export class EventRouter {
 
                     // add event to redis-queue
                     Redis.getConnection().zadd("eventQueue", result["insertId"].toString(), eventData.endtime.toString());
+
+                    eventData.eventID = parseInt(result["insertId"]);
 
                     // all done
                     response.status(Globals.Statuscode.SUCCESS).json({
@@ -333,8 +346,108 @@ export class EventRouter {
 
     }
 
-    // TODO: cancel event
-    // pop from eventQueue where eventID == id of event to cancel
+    public cancelEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
+        if(!InputValidator.isSet(request.body.eventID) ||
+            !InputValidator.isValidInt(request.body.eventID)) {
+
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                status: Globals.Statuscode.NOT_AUTHORIZED,
+                message: "Invalid parameter",
+                data: {}
+            });
+
+            return;
+
+        }
+
+
+        let planetQuery : string = squel.select()
+            .from("flights")
+            .where("flightID = ?", request.body.eventID)
+            .where("`returning` = ?", 0)
+            .where("ownerID = ?", request.userID)
+            .toString();
+
+        // check if origin-planet exists and the user owns it
+        Database.query(planetQuery).then(results => {
+
+            const event = results[0];
+
+            // destination does not exist
+            if(!InputValidator.isSet(event)) {
+
+                response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "The event does not exist or can't be canceled",
+                    data: {}
+                });
+
+                return;
+
+            }
+
+            // (time passed from start until cancel) + (time now)
+            let newEndTime : number = (Math.round(+new Date / 1000) - event.start_time) + Math.round(+new Date / 1000);
+
+
+            let updateQuery : string = squel.update()
+                .table("flights")
+                .set("start_id", event.end_id)
+                .set("start_type", event.end_type)
+                .set("start_time", Math.round(+new Date / 1000))
+                .set("end_id", event.start_id)
+                .set("end_type", event.start_type)
+                .set("end_time", newEndTime)
+                .set("`returning`", 1)
+                .where("flightID = ?", request.body.eventID)
+                .where("`returning` = ?", 0)
+                .where("ownerID = ?", request.userID)
+                .toString();
+
+            Database.query(updateQuery).then( result  => {
+
+                // remove the event from the redis-queue
+                Redis.getConnection().zremrangebyscore("eventQueue", request.body.eventID, request.body.eventID);
+
+
+                // add the event with the new endtime
+                Redis.getConnection().zadd("eventQueue", request.body.eventID, newEndTime);
+
+
+                // all done
+                response.status(Globals.Statuscode.SUCCESS).json({
+                    status: Globals.Statuscode.SUCCESS,
+                    message: "Event successfully canceled.",
+                    data: {}
+                });
+                return;
+
+            }).catch(error => {
+                Logger.error(error);
+
+                response.status(Globals.Statuscode.SERVER_ERROR).json({
+                    status: Globals.Statuscode.SERVER_ERROR,
+                    message: `An error occured: ${error.message}`,
+                    data: {}
+                });
+                return;
+
+            });
+
+
+        }).catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: `An error occured: ${error.message}`,
+                data: {}
+            });
+            return;
+
+        });
+    }
 
     /**
      * Take each handler, and attach to one of the Express.Router's
@@ -342,6 +455,7 @@ export class EventRouter {
      */
     init() {
         this.router.post('/create/', this.createEvent);
+        this.router.post('/cancel/', this.cancelEvent);
     }
 
 }

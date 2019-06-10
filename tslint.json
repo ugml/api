@@ -9,6 +9,11 @@
     ]
   },
   "rules": {
+    "no-var-requires": false,
+    "only-arrow-functions": false,
+    "variable-name": {
+      "options": ["allow-snake-case"]
+    },
     "indent": [true, "spaces", 2],
     "interface-name": false,
     "ordered-imports": false,

@@ -14,6 +14,7 @@ module.exports =  {
   rules:  {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     "comma-dangle": ["error", "always-multiline"],
+    "quotes": ["error", "double"],
     // TODO turn these rules on again
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/no-use-before-define": "off",

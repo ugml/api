@@ -36,31 +36,31 @@ export class AuthRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
         }
 
-        const email : string = InputValidator.sanitizeString(req.body.email);
+        const email: string = InputValidator.sanitizeString(req.body.email);
 
-        const password : string = InputValidator.sanitizeString(req.body.password);
+        const password: string = InputValidator.sanitizeString(req.body.password);
 
-        const query : string = squel.select({ autoQuoteFieldNames: true })
-                                    .field("userID")
-                                    .field("email")
-                                    .field("password")
-                                    .from("users")
-                                    .where("email = ?", email)
-                                    .toString();
+        const query: string = squel.select({ autoQuoteFieldNames: true })
+            .field("userID")
+            .field("email")
+            .field("password")
+            .from("users")
+            .where("email = ?", email)
+            .toString();
 
         Database.query(query).then((users) => {
 
             if (!InputValidator.isSet(users)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Authentication failed",
-                data: {}
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Authentication failed",
+                    data: {},
                 });
                 return;
             }
@@ -71,7 +71,7 @@ export class AuthRouter {
                     response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                         status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Authentication failed",
-                        data: {}
+                        data: {},
                     });
                     return;
                 }
@@ -80,8 +80,8 @@ export class AuthRouter {
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
                     data: {
-                        token: jwt.generateToken(users[0].userID)
-                    }
+                        token: jwt.generateToken(users[0].userID),
+                    },
                 });
                 return;
 
@@ -96,7 +96,7 @@ export class AuthRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: `There was an error: ${err.message}`,
-                data: {}
+                data: {},
             });
 
             return;

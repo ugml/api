@@ -13,42 +13,42 @@ enum PlanetType {
 
 class Planet implements IUnits {
 
-    public planetID : number;
+    public planetID: number;
     public ownerID: number;
-    public name : string;
-    public galaxy : number;
-    public system : number;
-    public planet : number;
+    public name: string;
+    public galaxy: number;
+    public system: number;
+    public planet: number;
     public last_update: number;
-    public planet_type : PlanetType;
-    public image : string;
-    public diameter : number;
-    public fields_current : number = 0;
-    public fields_max : number = 0;
-    public temp_min : number = 0;
-    public temp_max : number = 0;
-    public metal : number = 0;
-    public crystal : number = 0;
-    public deuterium : number = 0;
-    public energy_used : number = 0;
-    public energy_max : number = 0;
-    public metal_mine_percent : number = 100;
-    public crystal_mine_percent : number = 100;
-    public deuterium_synthesizer_percent : number = 100;
-    public solar_plant_percent : number = 100;
-    public fusion_reactor_percent : number = 100;
-    public solar_satellite_percent : number = 100;
-    public b_building_id : number = 0;
-    public b_building_endtime : number = 0;
-    public b_tech_id : number = 0;
-    public b_tech_endtime : number = 0;
-    public b_hangar_id : number = 0;
-    public b_hangar_start_time : number = 0;
-    public b_hangar_plus : boolean = false;
-    public destroyed : boolean = false;
+    public planet_type: PlanetType;
+    public image: string;
+    public diameter: number;
+    public fields_current: number = 0;
+    public fields_max: number = 0;
+    public temp_min: number = 0;
+    public temp_max: number = 0;
+    public metal: number = 0;
+    public crystal: number = 0;
+    public deuterium: number = 0;
+    public energy_used: number = 0;
+    public energy_max: number = 0;
+    public metal_mine_percent: number = 100;
+    public crystal_mine_percent: number = 100;
+    public deuterium_synthesizer_percent: number = 100;
+    public solar_plant_percent: number = 100;
+    public fusion_reactor_percent: number = 100;
+    public solar_satellite_percent: number = 100;
+    public b_building_id: number = 0;
+    public b_building_endtime: number = 0;
+    public b_tech_id: number = 0;
+    public b_tech_endtime: number = 0;
+    public b_hangar_id: number = 0;
+    public b_hangar_start_time: number = 0;
+    public b_hangar_plus: boolean = false;
+    public destroyed: boolean = false;
 
 
-    public save() : Promise<{}> {
+    public save(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.update()
@@ -92,7 +92,7 @@ class Planet implements IUnits {
         });
     }
 
-    public create() : Promise<{}> {
+    public create(): Promise<{}> {
         return new Promise((resolve, reject) => {
             const query = squel.insert()
                 .into("planets")
@@ -140,7 +140,7 @@ class Planet implements IUnits {
         });
     }
 
-    public isValid() : boolean {
+    public isValid(): boolean {
         return false;
     }
 

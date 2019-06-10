@@ -1,6 +1,6 @@
 class InputValidator {
 
-    public static isValidInt(input : string) : boolean {
+    public static isValidInt(input: string): boolean {
 
         if (input == undefined || input === "") {
             return false;
@@ -14,7 +14,7 @@ class InputValidator {
 
     }
 
-    public static isValidJson(input : string) : boolean {
+    public static isValidJson(input: string): boolean {
         try {
             JSON.parse(input);
         } catch (e) {
@@ -24,7 +24,7 @@ class InputValidator {
     }
 
 
-    public static isSet(input : any) : boolean {
+    public static isSet(input: any): boolean {
         return !(
             input === undefined ||
             input === "" ||
@@ -34,7 +34,7 @@ class InputValidator {
         );
     }
 
-    public static sanitizeString(input : string) : string {
+    public static sanitizeString(input: string): string {
         return input.replace(/[^a-z0-9@áéíóúñü .,_-]/gim, "").trim();
     }
 

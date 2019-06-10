@@ -33,14 +33,14 @@ export class GalaxyRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
 
         }
 
-        const query : string = squel.select()
+        const query: string = squel.select()
             .field("p.planetID")
             .field("p.ownerID")
             .field("u.username")
@@ -78,7 +78,7 @@ export class GalaxyRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
             return;
 
@@ -88,7 +88,7 @@ export class GalaxyRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;

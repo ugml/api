@@ -14,45 +14,45 @@ class User implements IUnits {
      * The ID of the user
      * @type {number}
      */
-    public userID : number;
+    public userID: number;
 
     /**
      * The name of the user
      * @type {string}
      */
-    public username : string;
+    public username: string;
 
     /**
      * The encrypted password of the user
      * @type {string}
      */
-    public password : string;
+    public password: string;
 
     /**
      * The e-mail address of the user
      * @type {string}
      */
-    public email : string;
+    public email: string;
 
     /**
      * The unix-timestamp of the last time the user was online
      * @type {number}
      */
-    public onlinetime : number = 0;
+    public onlinetime: number = 0;
 
     /**
      * The current planet of the user
      * @type {number}
      */
-    public currentplanet : number;
+    public currentplanet: number;
 
     /***
      * Updates the current object in the database
      */
-    public save() : Promise<{}> {
+    public save(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            const query : string = squel.update()
+            const query: string = squel.update()
                 .table("users")
                 .set("username", this.username)
                 .set("password", this.password)
@@ -66,7 +66,7 @@ class User implements IUnits {
                 .then(() => {
                     return resolve(this);
                 })
-                .catch((error : string) => {
+                .catch((error: string) => {
                     Logger.error(error);
                     return reject(error);
                 });
@@ -78,10 +78,10 @@ class User implements IUnits {
     /***
      * Stores the current object in the database
      */
-    public create() : Promise<{}> {
+    public create(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
-            const query : string = squel.insert()
+            const query: string = squel.insert()
                 .into("users")
                 .set("userID", this.userID)
                 .set("username", this.username)
@@ -95,7 +95,7 @@ class User implements IUnits {
                 .then(() => {
                     return resolve(this);
                 })
-                .catch((error : string) => {
+                .catch((error: string) => {
                     Logger.error(error);
                     return reject(error);
                 });
@@ -106,7 +106,7 @@ class User implements IUnits {
     /**
      * Checks, if the object holds valid data
      */
-    public isValid() : boolean {
+    public isValid(): boolean {
         return false;
     }
 

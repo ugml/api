@@ -7,20 +7,20 @@ const Logger = require("../common/Logger");
 
 class Defenses implements IUnits {
 
-    public planetID : number;
-    public rocket_launcher : number;
-    public light_laser : number;
-    public heavy_laser : number;
-    public ion_cannon : number;
-    public gauss_cannon : number;
-    public plasma_turret : number;
-    public small_shield_dome : boolean;
-    public large_shield_dome : boolean;
-    public anti_ballistic_missile : number;
-    public interplanetary_missile : number;
+    public planetID: number;
+    public rocket_launcher: number;
+    public light_laser: number;
+    public heavy_laser: number;
+    public ion_cannon: number;
+    public gauss_cannon: number;
+    public plasma_turret: number;
+    public small_shield_dome: boolean;
+    public large_shield_dome: boolean;
+    public anti_ballistic_missile: number;
+    public interplanetary_missile: number;
 
 
-    public save() : Promise<{}> {
+    public save(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.update()
@@ -48,7 +48,7 @@ class Defenses implements IUnits {
         });
     }
 
-    public create() : Promise<{}> {
+    public create(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.insert()
@@ -76,7 +76,7 @@ class Defenses implements IUnits {
         });
     }
 
-    public isValid() : boolean {
+    public isValid(): boolean {
         return false;
     }
 

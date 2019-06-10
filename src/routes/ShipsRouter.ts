@@ -23,7 +23,7 @@ export class ShipsRouter {
     }
 
     // TODO: relocate to Validator-class
-    private static isValidBuildOrder(buildOrders : object) : boolean {
+    private static isValidBuildOrder(buildOrders: object): boolean {
 
         for (const order in buildOrders) {
 
@@ -44,7 +44,7 @@ export class ShipsRouter {
         return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
     }
 
-    private static getCosts(shipID : number) : ICosts {
+    private static getCosts(shipID: number): ICosts {
 
         const costs = units.getShips()[shipID];
 
@@ -52,7 +52,7 @@ export class ShipsRouter {
             metal: costs.metal,
             crystal: costs.crystal,
             deuterium: costs.deuterium,
-            energy: costs.energy
+            energy: costs.energy,
         };
 
     }
@@ -65,20 +65,20 @@ export class ShipsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
 
         }
 
-        const query : string = squel.select()
-                                .field("p.ownerID")
-                                .field("f.*")
-                                .from("fleet", "f")
-                                .left_join("planets", "p", "f.planetID = p.planetID")
-                                .where("f.planetID = ?", request.params.planetID)
-                                .where("p.ownerID = ?", request.userID)
-                                .toString();
+        const query: string = squel.select()
+            .field("p.ownerID")
+            .field("f.*")
+            .from("fleet", "f")
+            .left_join("planets", "p", "f.planetID = p.planetID")
+            .where("f.planetID = ?", request.params.planetID)
+            .where("p.ownerID = ?", request.userID)
+            .toString();
 
         // execute the query
         Database.query(query).then((result) => {
@@ -95,7 +95,7 @@ export class ShipsRouter {
             response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Success",
-                data
+                data,
             });
 
             return;
@@ -106,7 +106,7 @@ export class ShipsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;
@@ -123,7 +123,7 @@ export class ShipsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
 
@@ -131,7 +131,7 @@ export class ShipsRouter {
 
         const buildOrders = JSON.parse(request.body.buildOrder);
 
-        const queueItem : QueueItem = new QueueItem();
+        const queueItem: QueueItem = new QueueItem();
 
         queueItem.setPlanetID(request.body.planetID);
 
@@ -140,12 +140,12 @@ export class ShipsRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
             return;
         }
 
-        const query : string = squel.select()
+        const query: string = squel.select()
             .field("metal")
             .field("crystal")
             .field("deuterium")
@@ -168,7 +168,7 @@ export class ShipsRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The player does not own the planet",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -178,7 +178,7 @@ export class ShipsRouter {
                 return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Shipyard is currently upgrading.",
-                    data: {}
+                    data: {},
                 });
             }
 
@@ -186,19 +186,19 @@ export class ShipsRouter {
             let crystal = result[0].crystal;
             let deuterium = result[0].deuterium;
 
-            let stopProcessing : boolean = false;
-            let buildTime : number = 0;
+            let stopProcessing = false;
+            let buildTime = 0;
 
             for (const item in buildOrders) {
-                let count : number = buildOrders[item];
-                const cost : ICosts = ShipsRouter.getCosts(parseInt(item, 10));
+                let count: number = buildOrders[item];
+                const cost: ICosts = ShipsRouter.getCosts(parseInt(item, 10));
 
                 // if the user has not enough ressources to fullfill the complete build-order
                 if (metal < cost.metal * count ||
                     crystal < cost.crystal * count ||
                     deuterium < cost.deuterium * count) {
 
-                    let tempCount : number;
+                    let tempCount: number;
 
                     if (cost.metal > 0) {
                         tempCount = metal / cost.metal;
@@ -245,8 +245,8 @@ export class ShipsRouter {
             queueItem.setTimeRemaining(buildTime);
             queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
-            let b_hangar_id_new : string = result[0].b_hangar_id;
-            let b_hangar_start_time_new : number;
+            let b_hangar_id_new: string = result[0].b_hangar_id;
+            let b_hangar_start_time_new: number;
 
             if (InputValidator.isSet(b_hangar_id_new)) {
                 b_hangar_id_new += ", ";
@@ -262,7 +262,7 @@ export class ShipsRouter {
 
 
             // update planet
-            const query : string = squel.update()
+            const query: string = squel.update()
                 .table("planets")
                 .set("b_hangar_id", b_hangar_id_new)
                 .set("b_hangar_start_time", b_hangar_start_time_new)
@@ -276,7 +276,7 @@ export class ShipsRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Success",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -289,7 +289,7 @@ export class ShipsRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "There was an error while handling the request.",
-                data: {}
+                data: {},
             });
 
             return;

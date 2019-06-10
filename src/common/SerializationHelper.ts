@@ -1,6 +1,6 @@
 class SerializationHelper {
-    public static toInstance<T>(obj: T, json: string) : T {
-        const jsonObj : object = JSON.parse(json);
+    public static toInstance<T>(obj: T, json: string): T {
+        const jsonObj: object = JSON.parse(json);
 
         // @ts-ignore
         if (typeof obj.fromJSON === "function") {

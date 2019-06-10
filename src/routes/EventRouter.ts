@@ -45,7 +45,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -59,7 +59,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid json",
-                data: {}
+                data: {},
             });
 
             return;
@@ -71,7 +71,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Event-creator is not currently authenticated user",
-                data: {}
+                data: {},
             });
 
             return;
@@ -83,14 +83,14 @@ export class EventRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: "Missiontype not yet supported",
-                data: {}
+                data: {},
             });
 
             return;
         }
 
 
-        const planetQuery : string = squel.select()
+        const planetQuery: string = squel.select()
             .from("planets")
             .where("galaxy = ?", eventData.data.origin.galaxy)
             .where("system = ?", eventData.data.origin.system)
@@ -107,16 +107,16 @@ export class EventRouter {
             // planet does not exist or player does not own it
             if (!InputValidator.isSet(startPlanet)) {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
+                    status: Globals.Statuscode.NOT_AUTHORIZED,
+                    message: "Invalid parameter",
+                    data: {},
                 });
 
                 return;
             }
 
             // get the destination-planet
-            const planetQuery : string = squel.select()
+            const planetQuery: string = squel.select()
                 .from("planets")
                 .where("galaxy = ?", eventData.data.destination.galaxy)
                 .where("system = ?", eventData.data.destination.system)
@@ -135,7 +135,7 @@ export class EventRouter {
                     response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                         status: Globals.Statuscode.NOT_AUTHORIZED,
                         message: "Destination does not exist",
-                        data: {}
+                        data: {},
                     });
 
                     return;
@@ -163,7 +163,7 @@ export class EventRouter {
                 eventData.endtime = Math.round(eventData.starttime + timeOfFlight);
 
                 // store event in database
-                const eventQuery : string = squel.insert()
+                const eventQuery: string = squel.insert()
                     .into("flights")
                     .set("ownerID", eventData.ownerID)
                     .set("mission", eventRouter.getMissionTypeID(eventData.mission))
@@ -181,7 +181,7 @@ export class EventRouter {
 
 
 
-                Database.query(eventQuery).then((result : any)  => {
+                Database.query(eventQuery).then((result: any)  => {
 
                     // add event to redis-queue
                     Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
@@ -192,7 +192,7 @@ export class EventRouter {
                     response.status(Globals.Statuscode.SUCCESS).json({
                         status: Globals.Statuscode.SUCCESS,
                         message: "Event successfully created.",
-                        data: eventData
+                        data: eventData,
                     });
                     return;
 
@@ -202,7 +202,7 @@ export class EventRouter {
                     response.status(Globals.Statuscode.SERVER_ERROR).json({
                         status: Globals.Statuscode.SERVER_ERROR,
                         message: `An error occured: ${error.message}`,
-                        data: eventData
+                        data: eventData,
                     });
                     return;
 
@@ -214,7 +214,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: `An error occured: ${error.message}`,
-                data: eventData
+                data: eventData,
             });
             return;
 
@@ -224,7 +224,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: `An error occured: ${error.message}`,
-                data: eventData
+                data: eventData,
             });
             return;
 
@@ -240,7 +240,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
-                data: {}
+                data: {},
             });
 
             return;
@@ -248,7 +248,7 @@ export class EventRouter {
         }
 
 
-        const planetQuery : string = squel.select()
+        const planetQuery: string = squel.select()
             .from("flights")
             .where("flightID = ?", request.body.eventID)
             .where("`returning` = ?", 0)
@@ -266,7 +266,7 @@ export class EventRouter {
                 response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "The event does not exist or can't be canceled",
-                    data: {}
+                    data: {},
                 });
 
                 return;
@@ -274,10 +274,10 @@ export class EventRouter {
             }
 
             // (time passed from start until cancel) + (time now)
-            const newEndTime : number = (Math.round(+new Date / 1000) - event.start_time) + Math.round(+new Date / 1000);
+            const newEndTime: number = (Math.round(+new Date / 1000) - event.start_time) + Math.round(+new Date / 1000);
 
 
-            const updateQuery : string = squel.update()
+            const updateQuery: string = squel.update()
                 .table("flights")
                 .set("start_id", event.end_id)
                 .set("start_type", event.end_type)
@@ -305,7 +305,7 @@ export class EventRouter {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "Event successfully canceled.",
-                    data: {}
+                    data: {},
                 });
                 return;
 
@@ -315,7 +315,7 @@ export class EventRouter {
                 response.status(Globals.Statuscode.SERVER_ERROR).json({
                     status: Globals.Statuscode.SERVER_ERROR,
                     message: `An error occured: ${error.message}`,
-                    data: {}
+                    data: {},
                 });
                 return;
 
@@ -328,7 +328,7 @@ export class EventRouter {
             response.status(Globals.Statuscode.SERVER_ERROR).json({
                 status: Globals.Statuscode.SERVER_ERROR,
                 message: `An error occured: ${error.message}`,
-                data: {}
+                data: {},
             });
             return;
 
@@ -351,15 +351,15 @@ export class EventRouter {
      * @param origin The first planet
      * @param destination The second planet
      */
-    private calculateDistance(origin: ICoordinates, destination : ICoordinates) : number {
+    private calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
 
         const distances = [
             Math.abs(origin.galaxy - destination.galaxy),
             Math.abs(origin.system - destination.system),
-            Math.abs(origin.planet - destination.planet)
+            Math.abs(origin.planet - destination.planet),
         ];
 
-        const distance : number = 0;
+        const distance = 0;
 
         if (distances[0] != 0) return distances[0] * 20000;
         if (distances[1] != 0) return distances[1] * 95 + 2700;
@@ -375,7 +375,7 @@ export class EventRouter {
      * @param distance The distance between the start and the end
      * @param slowestShipSpeed The speed of the slowest ship in the fleet
      */
-    private calculateTimeOfFlight(gameSpeed : number, missionSpeed : number, distance : number, slowestShipSpeed : number) : number {
+    private calculateTimeOfFlight(gameSpeed: number, missionSpeed: number, distance: number, slowestShipSpeed: number): number {
         // source: http://owiki.de/index.php?title=Flugzeit
         return Math.round(Math.pow((3500 / (missionSpeed / 100)) * (distance * 10 / slowestShipSpeed), 0.5) + 10 / gameSpeed);
     }
@@ -384,10 +384,10 @@ export class EventRouter {
      * Returns the speed of the slowest ship in the fleet
      * @param units The sent ship in this event
      */
-    private getSlowestShipSpeed(units : IShipUnits) : number {
+    private getSlowestShipSpeed(units: IShipUnits): number {
         const unitData = require("../config/units.json");
 
-        let minimum : number = Number.MAX_VALUE;
+        let minimum: number = Number.MAX_VALUE;
 
         for (const ship in units) {
             if (units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
@@ -402,8 +402,8 @@ export class EventRouter {
      * Returns the ID of the destination-type
      * @param type The type as a string (planet, moon or debris)
      */
-    private getDestinationTypeID(type : string) : number {
-        let typeID : number;
+    private getDestinationTypeID(type: string): number {
+        let typeID: number;
         switch (type) {
             case "planet":
                 typeID = 1;
@@ -422,8 +422,8 @@ export class EventRouter {
      * Returns the ID of the mission-type
      * @param mission The type as a string (transport, attack, ...)
      */
-    private getMissionTypeID(mission : string) : number {
-        let missionTypeID : number;
+    private getMissionTypeID(mission: string): number {
+        let missionTypeID: number;
         switch (mission) {
             case "transport":
                 missionTypeID = 0;

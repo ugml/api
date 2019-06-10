@@ -7,25 +7,25 @@ const Logger = require("../common/Logger");
 
 class Techs implements IUnits {
 
-    public userID : number;
-    public espionage_tech : number;
-    public computer_tech : number;
-    public weapon_tech : number;
-    public armour_tech : number;
-    public shielding_tech : number;
-    public energy_tech : number;
-    public hyperspace_tech : number;
-    public combustion_drive_tech : number;
-    public impulse_drive_tech : number;
-    public hyperspace_drive_tech : number;
-    public laser_tech : number;
-    public ion_tech : number;
-    public plasma_tech : number;
-    public intergalactic_research_tech : number;
-    public graviton_tech : number;
+    public userID: number;
+    public espionage_tech: number;
+    public computer_tech: number;
+    public weapon_tech: number;
+    public armour_tech: number;
+    public shielding_tech: number;
+    public energy_tech: number;
+    public hyperspace_tech: number;
+    public combustion_drive_tech: number;
+    public impulse_drive_tech: number;
+    public hyperspace_drive_tech: number;
+    public laser_tech: number;
+    public ion_tech: number;
+    public plasma_tech: number;
+    public intergalactic_research_tech: number;
+    public graviton_tech: number;
 
 
-    public save() : Promise<{}> {
+    public save(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.update()
@@ -58,7 +58,7 @@ class Techs implements IUnits {
         });
     }
 
-    public create() : Promise<{}> {
+    public create(): Promise<{}> {
         return new Promise((resolve, reject) => {
 
             const query = squel.insert()
@@ -91,7 +91,7 @@ class Techs implements IUnits {
         });
     }
 
-    public isValid() : boolean {
+    public isValid(): boolean {
         return false;
     }
 

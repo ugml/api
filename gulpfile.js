@@ -14,7 +14,7 @@ gulp.task('scripts', () => {
 });
 
 gulp.task('watch', gulp.series('scripts', () => {
-    gulp.watch('src/**/*.ts', ['scripts']);
+    gulp.watch(['src/**/*.ts', '!src/**/*.spec.ts'], ['scripts']);
 }));
 
 gulp.task('assets', function() {

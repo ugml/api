@@ -10,8 +10,10 @@ const Logger = require('../common/Logger');
 
 import squel = require("squel");
 import {User} from "../units/User";
+
+
 import {Planet, PlanetType} from "../units/Planet";
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 export class PlayersRouter {
     router: Router;

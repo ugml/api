@@ -6,7 +6,7 @@ import { InputValidator } from "../common/InputValidator";
 import {Globals} from "../common/Globals";
 const squel = require("squel");
 const jwt = new JwtHelper();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const Logger = require('../common/Logger');
 

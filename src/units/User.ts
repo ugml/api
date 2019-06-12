@@ -10,7 +10,7 @@ class User implements IUnits {
     username : string;
     password : string;
     email : string;
-    onlinetime : number;
+    onlinetime : number = 0;
     currentplanet : number;
 
 
@@ -41,7 +41,7 @@ class User implements IUnits {
         return new Promise((resolve, reject) => {
 
             let query = squel.insert()
-                .table("users")
+                .into("users")
                 .set("userID", this.userID)
                 .set("username", this.username)
                 .set("password", this.password)

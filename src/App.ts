@@ -34,7 +34,7 @@ const expressWinston = require('express-winston');
 const {format} = winston;
 const { combine, timestamp, printf } = format;
 
-const Logger = require('./common/Logger.js');
+const Logger = require('./common/Logger');
 
 
 const logFormat = printf(({ message, timestamp }) => {
@@ -114,7 +114,7 @@ class App {
                         response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                             status: Globals.Statuscode.NOT_AUTHORIZED,
                             message: "Authentication failed",
-                            data: {}
+                            data: { }
                         });
 
                         return;

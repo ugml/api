@@ -5,7 +5,7 @@ const Logger = require('../common/Logger');
 
 
 
-enum Type {
+enum PlanetType {
     Planet = 1,
     Moon = 2
 }
@@ -19,32 +19,32 @@ class Planet implements IUnits {
     public system : number;
     public planet :number;
     public last_update: number;
-    public planet_type : Type;
+    public planet_type : PlanetType;
     public image : string;
     public diameter : number;
-    public fields_current : number;
-    public fields_max : number;
-    public temp_min : number;
-    public temp_max : number;
-    public metal : number;
-    public crystal : number;
-    public deuterium : number;
-    public energy_used : number;
-    public energy_max : number;
-    public metal_mine_percent : number;
-    public crystal_mine_percent : number;
-    public deuterium_synthesizer_percent : number;
-    public solar_plant_percent : number;
-    public fusion_reactor_percent : number;
-    public solar_satellite_percent : number;
-    public b_building_id : number;
-    public b_building_endtime : number;
-    public b_tech_id : number;
-    public b_tech_endtime : number;
-    public b_hangar_id : number;
-    public b_hangar_start_time : number;
-    public b_hangar_plus : boolean;
-    public destroyed : boolean;
+    public fields_current : number = 0;
+    public fields_max : number = 0;
+    public temp_min : number = 0;
+    public temp_max : number = 0;
+    public metal : number = 0;
+    public crystal : number = 0;
+    public deuterium : number = 0;
+    public energy_used : number = 0;
+    public energy_max : number = 0;
+    public metal_mine_percent : number = 100;
+    public crystal_mine_percent : number = 100;
+    public deuterium_synthesizer_percent : number = 100;
+    public solar_plant_percent : number = 100;
+    public fusion_reactor_percent : number = 100;
+    public solar_satellite_percent : number = 100;
+    public b_building_id : number = 0;
+    public b_building_endtime : number = 0;
+    public b_tech_id : number = 0;
+    public b_tech_endtime : number = 0;
+    public b_hangar_id : number = 0;
+    public b_hangar_start_time : number = 0;
+    public b_hangar_plus : boolean = false;
+    public destroyed : boolean = false;
 
 
     public save() : Promise<{}> {
@@ -93,16 +93,22 @@ class Planet implements IUnits {
 
     public create() : Promise<{}> {
         return new Promise((resolve, reject) => {
-            let query = squel.update()
-                .table("planets")
+            let query = squel.insert()
+                .into("planets")
                 .set("planetID", this.planetID)
+                .set("ownerID", this.ownerID)
                 .set("name", this.name)
                 .set("galaxy", this.galaxy)
                 .set("system", this.system)
                 .set("planet", this.planet)
                 .set("last_update", this.last_update)
+                .set("planet_type", this.planet_type)
+                .set("image", this.image)
+                .set("diameter", this.diameter)
                 .set("fields_current", this.fields_current)
                 .set("fields_max", this.fields_max)
+                .set("temp_min", this.temp_min)
+                .set("temp_max", this.temp_max)
                 .set("metal", this.metal)
                 .set("crystal", this.crystal)
                 .set("deuterium", this.deuterium)
@@ -139,4 +145,4 @@ class Planet implements IUnits {
 
 }
 
-export { Planet }
+export { Planet, PlanetType }

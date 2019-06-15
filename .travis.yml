@@ -5,6 +5,7 @@ cache:
     - "node_modules"
 
 before_script:
+  - npm install gulp -g
   - gulp scripts
 
 script:

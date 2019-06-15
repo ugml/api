@@ -1,6 +1,6 @@
-![Travis-ci](https://travis-ci.org/ugml/api.svg?branch=master)
 ![N|Solid](https://mamen.at/ugamela/images/logo.png)
 
+![Travis-ci](https://travis-ci.org/ugml/api.svg?branch=master)
 [![Discord Server](https://discordapp.com/api/guilds/339129999082913794/embed.png)](https://discord.gg/YDUHM3k)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](./LICENSE)
 

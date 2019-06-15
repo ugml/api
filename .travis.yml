@@ -1,12 +1,13 @@
 language: nodejs
 node_js:
-  - "12"
+  - "0.12"
 
 env:
   - NODE_ENV=TEST
 
 before_script:
   - npm config set -g production false
+  - npm install gulp
   - npm run-script build
 script:
   - npm run-script test

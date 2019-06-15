@@ -208,7 +208,7 @@ export class MessagesRouter {
 
             const numRows: number = Object.keys(result).length;
 
-            if (numRows == 0) {
+            if (numRows === 0) {
                 response.status(Globals.Statuscode.SUCCESS).json({
                     status: Globals.Statuscode.SUCCESS,
                     message: "The receiver does not exist.",

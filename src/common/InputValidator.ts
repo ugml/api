@@ -2,7 +2,7 @@ class InputValidator {
 
     public static isValidInt(input: string): boolean {
 
-        if (input == undefined || input === "") {
+        if (typeof input === undefined || input === "") {
             return false;
         }
 

@@ -174,7 +174,7 @@ export class ShipsRouter {
                 return;
             }
 
-            if (result[0].b_hangar_plus == 1) {
+            if (result[0].b_hangar_plus === 1) {
                 return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Shipyard is currently upgrading.",

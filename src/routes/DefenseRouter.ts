@@ -179,7 +179,7 @@ export class DefenseRouter {
                 return;
             }
 
-            if (result[0].b_hangar_plus == 1) {
+            if (result[0].b_hangar_plus === 1) {
                 return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                     status: Globals.Statuscode.NOT_AUTHORIZED,
                     message: "Shipyard is currently upgrading.",
@@ -241,7 +241,7 @@ export class DefenseRouter {
                 if (item === "309") {
 
                     // can't build any more rockets
-                    if (freeSiloSlots == 0) {
+                    if (freeSiloSlots === 0) {
                         buildOrders[item] = 0;
                     } else {
                         buildOrders[item] = Math.min(freeSiloSlots, buildOrders[item]);
@@ -253,7 +253,7 @@ export class DefenseRouter {
                 if (item === "310") {
 
                     // can't build any more rockets
-                    if (freeSiloSlots == 0) {
+                    if (freeSiloSlots === 0) {
                         buildOrders[item] = 0;
                     } else {
                         buildOrders[item] = Math.floor(freeSiloSlots / 2) * buildOrders[item];

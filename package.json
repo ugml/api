@@ -54,7 +54,8 @@
     "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",
-    "tslint": "tslint --project . --fix",
+    "tslint": "tslint --project .",
+    "tslint-fix": "tslint --project . --fix",
     "build": "gulp scripts"
   }
 }

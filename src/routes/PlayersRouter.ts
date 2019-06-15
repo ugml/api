@@ -156,11 +156,11 @@ export class PlayersRouter {
 
             Database.query(query).then((rows) => {
 
-                if (rows[0].username_taken == 1) {
+                if (rows[0].username_taken === 1) {
                     throw new DuplicateRecordError("Username is already taken");
                 }
 
-                if (rows[0].email_taken == 1) {
+                if (rows[0].email_taken === 1) {
                     throw new DuplicateRecordError("Email is already taken");
                 }
 

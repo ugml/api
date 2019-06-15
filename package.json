@@ -10,7 +10,6 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "0.0.33",
-    "@types/chai": "^3.4.34",
     "@types/debug": "0.0.29",
     "@types/express": "^4.16.1",
     "@types/jwt-simple": "^0.5.33",
@@ -59,6 +58,7 @@
     "lint-fix": "eslint src/**/*.ts --fix",
     "tslint": "tslint --project .",
     "tslint-fix": "tslint --project . --fix",
+    "tsc": "tsc --noEmit --project .",
     "build": "gulp scripts"
   }
 }

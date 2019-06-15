@@ -15,403 +15,399 @@ const squel = require("squel");
 const units = new Units();
 
 export class BuildingsRouter {
-    public router: Router;
+  public router: Router;
 
-    /**
-     * Initialize the Router
-     */
-    public constructor() {
-      this.router = Router();
-      this.init();
+  /**
+   * Initialize the Router
+   */
+  public constructor() {
+    this.router = Router();
+    this.init();
+  }
+
+  /**
+   * Returns all buildings on a given planet
+   * @param request
+   * @param response
+   * @param next
+   */
+  public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+        status: Globals.Statuscode.NOT_AUTHORIZED,
+        message: "Invalid parameter",
+        data: {},
+      });
+
+      return;
     }
 
-    /**
-     * Returns all buildings on a given planet
-     * @param request
-     * @param response
-     * @param next
-     */
-    public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-        if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          status: Globals.Statuscode.NOT_AUTHORIZED,
-          message: "Invalid parameter",
-          data: {},
-        });
+    const query: string = squel
+      .select()
+      .field("p.ownerID")
+      .field("b.*")
+      .from("buildings", "b")
+      .left_join("planets", "p", "b.planetID = p.planetID")
+      .where("b.planetID = ?", request.params.planetID)
+      .where("p.ownerID = ?", request.userID)
+      .toString();
 
-        return;
-        }
+    // execute the query
+    Database.query(query)
+      .then(result => {
+        let data;
 
-      const query: string = squel
-            .select()
-        .field("p.ownerID")
-        .field("b.*")
-        .from("buildings", "b")
-        .left_join("planets", "p", "b.planetID = p.planetID")
-        .where("b.planetID = ?", request.params.planetID)
-        .where("p.ownerID = ?", request.userID)
-        .toString();
-
-        // execute the query
-      Database.query(query)
-            .then(result => {
-                let data;
-
-                if (!InputValidator.isSet(result)) {
-                    data = {};
+        if (!InputValidator.isSet(result)) {
+          data = {};
         } else {
-                    data = result[0];
-                }
+          data = result[0];
+        }
 
         // return the result
-                response.status(Globals.Statuscode.SUCCESS).json({
+        response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
-                    message: "Success",
-                    data,
+          message: "Success",
+          data,
         });
 
-                return;
-            })
-      }).catch((error) => {
-                Logger.error(error);
+        return;
+      })
+      .catch(error => {
+        Logger.error(error);
 
-                response.status(Globals.Statuscode.SERVER_ERROR).json({
+        response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
-                    message: "There was an error while handling the request.",
+          message: "There was an error while handling the request.",
           data: {},
-                });
+        });
 
-                return;
-            });
+        return;
+      });
+  }
+
+  public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+        status: Globals.Statuscode.NOT_AUTHORIZED,
+        message: "Invalid parameter",
+        data: {},
+      });
+      return;
     }
 
-    public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-        if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          status: Globals.Statuscode.NOT_AUTHORIZED,
-          message: "Invalid parameter",
-          data: {},
-        });
-        return;
-        }
+    // get the planet, on which the building should be canceled
+    const query: string = squel
+      .select()
+      .from("planets", "p")
+      .join("buildings", "b", "p.planetID = b.planetID")
+      .where("p.planetID = ?", request.body.planetID)
+      .where("p.ownerID = ?", request.userID)
+      .toString();
 
-      // get the planet, on which the building should be canceled
-      const query: string = squel
-            .select()
-        .from("planets", "p")
-        .join("buildings", "b", "p.planetID = b.planetID")
-        .where("p.planetID = ?", request.body.planetID)
-        .where("p.ownerID = ?", request.userID)
-        .toString();
-
-        Database.query(query)
-            .then(result => {
-                if (!InputValidator.isSet(result)) {
-                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                        status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Invalid parameter",
-                        data: {},
-                    });
-          return;
-
-        }
-
-
-                // player does not own the planet
-                if (!InputValidator.isSet(result[0])) {
-                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                        status: Globals.Statuscode.NOT_AUTHORIZED,
+    Database.query(query)
+      .then(result => {
+        if (!InputValidator.isSet(result)) {
+          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+            status: Globals.Statuscode.NOT_AUTHORIZED,
             message: "Invalid parameter",
             data: {},
           });
-                    return;
-                }
+          return;
+        }
 
-                const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
+        // player does not own the planet
+        if (!InputValidator.isSet(result[0])) {
+          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+            status: Globals.Statuscode.NOT_AUTHORIZED,
+            message: "Invalid parameter",
+            data: {},
+          });
+          return;
+        }
 
-                // 1. check if there is already a build-job on the planet
+        const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
+
+        // 1. check if there is already a build-job on the planet
         if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
-                    const buildingKey = units.getMappings()[planet.b_building_id];
+          const buildingKey = units.getMappings()[planet.b_building_id];
 
-                    // give back the ressources
+          // give back the ressources
           const currentLevel = planet[buildingKey];
 
-                    const cost: ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
+          const cost: ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
 
-          const query: string = squel.update()
-                        .table("planets")
-                        .set("b_building_id", 0)
-                        .set("b_building_endtime", 0)
-                        .set("metal", planet.metal + cost.metal)
-                        .set("crystal", planet.crystal + cost.crystal)
+          const query: string = squel
+            .update()
+            .table("planets")
+            .set("b_building_id", 0)
+            .set("b_building_endtime", 0)
+            .set("metal", planet.metal + cost.metal)
+            .set("crystal", planet.crystal + cost.crystal)
             .set("deuterium", planet.deuterium + cost.deuterium)
-                        .where("planetID = ?", planet.planetID)
+            .where("planetID = ?", planet.planetID)
             .toString();
 
-                    return Database.query(query)
-                        .then(result => {
-                            planet.b_building_id = 0;
-            planet.b_building_endtime = 0;
-                            planet.metal = planet.metal + cost.metal;
-                            planet.crystal = planet.crystal + cost.crystal;
-                            planet.crystal = planet.crystal + cost.crystal;
+          return Database.query(query)
+            .then(result => {
+              planet.b_building_id = 0;
+              planet.b_building_endtime = 0;
+              planet.metal = planet.metal + cost.metal;
+              planet.crystal = planet.crystal + cost.crystal;
+              planet.crystal = planet.crystal + cost.crystal;
 
-                            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-                                message: "Building canceled",
-              data: {planet},
-                            });
-                            return;
-          }).catch((error) => {
-                            Logger.error(error);
+              response.status(Globals.Statuscode.SUCCESS).json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Building canceled",
+                data: { planet },
+              });
+              return;
+            })
+            .catch(error => {
+              Logger.error(error);
 
-                            response.status(Globals.Statuscode.SERVER_ERROR).json({
-                                status: Globals.Statuscode.SERVER_ERROR,
-                                message: "There was an error while handling the request.",
-              data: {},
-                            });
+              response.status(Globals.Statuscode.SERVER_ERROR).json({
+                status: Globals.Statuscode.SERVER_ERROR,
+                message: "There was an error while handling the request.",
+                data: {},
+              });
 
-            return;
-                        });
-                } else {
-                    response.status(Globals.Statuscode.SUCCESS).json({
+              return;
+            });
+        } else {
+          response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
-                        message: "Planet has no build-job",
+            message: "Planet has no build-job",
             data: {},
-                    });
-                    return;
+          });
+          return;
         }
-      }).catch((error) => {
-                Logger.error(error);
+      })
+      .catch(error => {
+        Logger.error(error);
 
-                response.status(Globals.Statuscode.SERVER_ERROR).json({
-                    status: Globals.Statuscode.SERVER_ERROR,
-                    message: "There was an error while handling the request.",
+        response.status(Globals.Statuscode.SERVER_ERROR).json({
+          status: Globals.Statuscode.SERVER_ERROR,
+          message: "There was an error while handling the request.",
           data: {},
-                });
+        });
 
-                return;
+        return;
       });
+  }
+
+  public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    if (
+      !InputValidator.isSet(request.body.planetID) ||
+      !InputValidator.isValidInt(request.body.planetID) ||
+      !InputValidator.isSet(request.body.buildingID) ||
+      !InputValidator.isValidInt(request.body.buildingID)
+    ) {
+      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+        status: Globals.Statuscode.NOT_AUTHORIZED,
+        message: "Invalid parameter",
+        data: {},
+      });
+      return;
     }
 
-    public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-        if (
-            !InputValidator.isSet(request.body.planetID) ||
-            !InputValidator.isValidInt(request.body.planetID) ||
-            !InputValidator.isSet(request.body.buildingID) ||
-            !InputValidator.isValidInt(request.body.buildingID)
-        ) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          status: Globals.Statuscode.NOT_AUTHORIZED,
-          message: "Invalid parameter",
-          data: {},
-        });
-        return;
-      }
+    if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
+      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+        status: Globals.Statuscode.NOT_AUTHORIZED,
+        message: "Invalid parameter",
+        data: {},
+      });
 
-      if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          status: Globals.Statuscode.NOT_AUTHORIZED,
-          message: "Invalid parameter",
-          data: {},
-        });
+      return;
+    }
 
-        return;
-      }
+    // get the planet, on which the building should be built
+    const query: string = squel
+      .select()
+      .from("planets", "p")
+      .join("buildings", "b", "p.planetID = b.planetID")
+      .where("p.planetID = ?", request.body.planetID)
+      .where("p.ownerID = ?", request.userID)
+      .toString();
 
-      // get the planet, on which the building should be built
-      const query: string = squel
-            .select()
-        .from("planets", "p")
-        .join("buildings", "b", "p.planetID = b.planetID")
-        .where("p.planetID = ?", request.body.planetID)
-        .where("p.ownerID = ?", request.userID)
-        .toString();
-
-        Database.query(query)
-            .then(result => {
-                if (!InputValidator.isSet(result)) {
-                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+    Database.query(query)
+      .then(result => {
+        if (!InputValidator.isSet(result)) {
+          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
-                        message: "Invalid parameter",
+            message: "Invalid parameter",
             data: {},
           });
-                    return;
-                }
-
-                const planet = result[0];
-
-                // player does not own the planet
-                if (!InputValidator.isSet(planet)) {
-                    response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
-                        message: "Invalid parameter",
-            data: {},
-                    });
-                    return;
-                }
-
-                // 1. check if there is already a build-job on the planet
-        if (planet.b_building_id !== 0 ||
-                planet.b_building_endtime !== 0) {
-                    response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-                        message: "Planet already has a build-job",
-                        data: {},
-                    });
           return;
-                }
+        }
+
+        const planet = result[0];
+
+        // player does not own the planet
+        if (!InputValidator.isSet(planet)) {
+          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+            status: Globals.Statuscode.NOT_AUTHORIZED,
+            message: "Invalid parameter",
+            data: {},
+          });
+          return;
+        }
+
+        // 1. check if there is already a build-job on the planet
+        if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Planet already has a build-job",
+            data: {},
+          });
+          return;
+        }
 
         // can't build shipyard / robotic / nanite while ships or defenses are built
-        if ((request.body.buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
-                        request.body.buildingID === Globals.Buildings.NANITE_FACTORY ||
-                        request.body.buildingID === Globals.Buildings.SHIPYARD) &&
-                    (planet.b_hangar_id > 0 || planet.b_hangar_starttime > 0)
-                ) {
-                    response.status(Globals.Statuscode.SUCCESS).json({
+        if (
+          (request.body.buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
+            request.body.buildingID === Globals.Buildings.NANITE_FACTORY ||
+            request.body.buildingID === Globals.Buildings.SHIPYARD) &&
+          (planet.b_hangar_id > 0 || planet.b_hangar_starttime > 0)
+        ) {
+          response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
-                        message: "Can't build this building while it is in use",
-                        data: {},
+            message: "Can't build this building while it is in use",
+            data: {},
           });
-
-                    return;
-        }
-
-                // can't build research lab while they are researching... poor scientists :(
-        if (request.body.buildingID === Globals.Buildings.RESEARCH_LAB &&
-                    (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)
-                ) {
-                    response.status(Globals.Statuscode.SUCCESS).json({
-                        status: Globals.Statuscode.SUCCESS,
-                        message: "Can't build this building while it is in use",
-                        data: {},
-                    });
 
           return;
         }
 
-
-                // 2. check, if requirements are met
-                const requirements = units.getRequirements()[request.body.buildingID];
-
-                // building has requirements
-                if (requirements !== undefined) {
-                    let requirementsMet = true;
-
-          for (const reqID in requirements) {
-                        const reqLevel = requirements[reqID];
-                        const key = units.getMappings()[request.body.buildingID];
-
-            if (planet[key] < reqLevel) {
-                            requirementsMet = false;
-                            break;
-            }
-                    }
-
-                    if (!requirementsMet) {
-                        response.status(Globals.Statuscode.SUCCESS).json({
-                            status: Globals.Statuscode.SUCCESS,
-              message: "Requirements are not met",
-                            data: planet.planetID,
-                        });
-
-            return;
-                    }
-                }
-
-                // 3. check if there are enough resources on the planet for the building to be built
-                const buildingKey = units.getMappings()[request.body.buildingID];
-        const currentLevel = planet[buildingKey];
-
-                const cost = buildingRoutes.getCosts(request.body.buildingID, currentLevel);
-
-                if (
-                    planet.metal < cost.metal ||
-                    planet.crystal < cost.crystal ||
-                    planet.deuterium < cost.deuterium ||
-                    planet.energy < cost.energy
-                ) {
-                    response.status(Globals.Statuscode.SUCCESS).json({
+        // can't build research lab while they are researching... poor scientists :(
+        if (
+          request.body.buildingID === Globals.Buildings.RESEARCH_LAB &&
+          (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)
+        ) {
+          response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
-                        message: "Not enough resources",
+            message: "Can't build this building while it is in use",
             data: {},
           });
-                    return;
-                }
 
-                // 4. start the build-job
-                const buildTime: number = Math.round(
-          (cost.metal + cost.crystal)
-                        (2500 * (1 + planet.robotic_factory) * 2 ** planet.nanite_factory * Config.Get.speed),
+          return;
+        }
+
+        // 2. check, if requirements are met
+        const requirements = units.getRequirements()[request.body.buildingID];
+
+        // building has requirements
+        if (requirements !== undefined) {
+          let requirementsMet = true;
+
+          for (const reqID in requirements) {
+            const reqLevel = requirements[reqID];
+            const key = units.getMappings()[request.body.buildingID];
+
+            if (planet[key] < reqLevel) {
+              requirementsMet = false;
+              break;
+            }
+          }
+
+          if (!requirementsMet) {
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Requirements are not met",
+              data: planet.planetID,
+            });
+
+            return;
+          }
+        }
+
+        // 3. check if there are enough resources on the planet for the building to be built
+        const buildingKey = units.getMappings()[request.body.buildingID];
+        const currentLevel = planet[buildingKey];
+
+        const cost = buildingRoutes.getCosts(request.body.buildingID, currentLevel);
+
+        if (
+          planet.metal < cost.metal ||
+          planet.crystal < cost.crystal ||
+          planet.deuterium < cost.deuterium ||
+          planet.energy < cost.energy
+        ) {
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Not enough resources",
+            data: {},
+          });
+          return;
+        }
+
+        // 4. start the build-job
+        const buildTime: number = Math.round(
+          (cost.metal + cost.crystal) /
+            (2500 * (1 + planet.robotic_factory) * 2 ** planet.nanite_factory * Config.Get.speed),
         );
 
         const endTime: number = Math.round(+new Date() / 1000) + buildTime;
 
-
         planet.metal = planet.metal - cost.metal;
-                planet.crystal = planet.crystal - cost.crystal;
-                planet.deuterium = planet.deuterium - cost.deuterium;
-                planet.b_building_id = request.body.buildingID;
+        planet.crystal = planet.crystal - cost.crystal;
+        planet.deuterium = planet.deuterium - cost.deuterium;
+        planet.b_building_id = request.body.buildingID;
         planet.b_building_endtime = endTime;
 
-                const query: string = squel
-                    .update()
-                    .table("planets")
+        const query: string = squel
+          .update()
+          .table("planets")
           .set("metal", planet.metal)
-                    .set("crystal", planet.crystal)
-                    .set("deuterium", planet.deuterium)
-                    .set("b_building_id", planet.b_building_id)
-                    .set("b_building_endtime", planet.b_building_endtime)
+          .set("crystal", planet.crystal)
+          .set("deuterium", planet.deuterium)
+          .set("b_building_id", planet.b_building_id)
+          .set("b_building_endtime", planet.b_building_endtime)
           .where("planetID = ?", request.body.planetID)
-                    .toString();
+          .toString();
 
-        Database.query(query).then((result) => {
-                        response.status(Globals.Statuscode.SUCCESS).json({
+        return Database.query(query).then(result => {
+          response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
-                            message: "Job started",
-            data: {planet},
+            message: "Job started",
+            data: { planet },
           });
 
-                        return;
-                    })
-        }).catch((error) => {
-                        throw error;
-                    });
-            })
-            .catch(error => {
-                Logger.error(error);
+          return;
+        });
+      })
+      .catch(error => {
+        Logger.error(error);
 
-                response.status(Globals.Statuscode.SERVER_ERROR).json({
+        response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
-                    message: "There was an error while handling the request.",
+          message: "There was an error while handling the request.",
           data: {},
         });
 
-                return;
+        return;
       });
+  }
 
-    }
+  /**
+   * Take each handler, and attach to one of the Express.Router's
+   * endpoints.
+   */
+  public init() {
+    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
+    this.router.post("/build", this.startBuilding);
+    this.router.post("/cancel", this.cancelBuilding);
+  }
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
-     */
-    public init() {
-      this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
-      this.router.post("/build", this.startBuilding);
-      this.router.post("/cancel", this.cancelBuilding);
-    }
+  private getCosts(buildingID: number, currentLevel: number): ICosts {
+    const costs/*: IBuildings*/ = units.getBuildings()[buildingID];
 
-    private getCosts(buildingID: number, currentLevel: number): ICosts {
-        const costs: IBuildings = units.getBuildings()[buildingID];
-
-      return {
-        metal: costs.metal * costs.factor ** currentLevel,
-        crystal: costs.crystal * costs.factor ** currentLevel,
-        deuterium: costs.deuterium * costs.factor ** currentLevel,
-        energy: costs.energy * costs.factor ** currentLevel,
-      };
-    }
+    return {
+      metal: costs.metal * costs.factor ** currentLevel,
+      crystal: costs.crystal * costs.factor ** currentLevel,
+      deuterium: costs.deuterium * costs.factor ** currentLevel,
+      energy: costs.energy * costs.factor ** currentLevel,
+    };
+  }
 }
 
 const buildingRoutes = new BuildingsRouter();

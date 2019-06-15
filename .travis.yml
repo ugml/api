@@ -9,7 +9,7 @@ env:
   - NODE_ENV=development
 
 before_script:
-  - npm i -g npm@6.9.0
+  - npm i -g npm@latest
   - npm install gulp-cli gulp-typescript
   - npm run-script build
 script:

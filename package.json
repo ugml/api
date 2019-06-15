@@ -6,6 +6,10 @@
   "typings": "typings/",
   "keywords": [],
   "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ugml/api"
+  },
   "license": "AGPL",
   "scripts": {
     "start": "node dist/index.js",
@@ -16,7 +20,7 @@
     "tslint": "tslint --project .",
     "tslint-fix": "tslint --project . --fix",
     "tsc": "tsc --noEmit --project .",
-    "build": "gulp scripts",
+    "build": "gulp compile",
     "watch": "gulp"
   },
   "devDependencies": {

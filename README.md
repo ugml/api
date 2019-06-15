@@ -1,3 +1,4 @@
+![Travis-ci](https://travis-ci.org/ugml/api.svg?branch=master)
 ![N|Solid](https://mamen.at/ugamela/images/logo.png)
 
 [![Discord Server](https://discordapp.com/api/guilds/339129999082913794/embed.png)](https://discord.gg/YDUHM3k)

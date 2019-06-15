@@ -361,9 +361,9 @@ export class EventRouter {
 
         const distance = 0;
 
-        if (distances[0] != 0) { return distances[0] * 20000; }
-        if (distances[1] != 0) { return distances[1] * 95 + 2700; }
-        if (distances[2] != 0) { return distances[2] * 5 + 1000; }
+        if (distances[0] !== 0) { return distances[0] * 20000; }
+        if (distances[1] !== 0) { return distances[1] * 95 + 2700; }
+        if (distances[2] !== 0) { return distances[2] * 5 + 1000; }
 
         return distance;
     }

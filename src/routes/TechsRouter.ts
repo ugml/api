@@ -267,7 +267,7 @@ export class TechsRouter {
             }
 
             // can't build research lab while they are researching... poor scientists :(
-            // if(request.body.techID == Globals.Buildings.RESEARCH_LAB &&
+            // if(request.body.techID === Globals.Buildings.RESEARCH_LAB &&
             //     (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
             //
             //     response.status(Globals.Statuscode.SUCCESS).json({

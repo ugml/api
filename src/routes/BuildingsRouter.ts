@@ -289,9 +289,9 @@ export class BuildingsRouter {
             }
 
             // can't build shipyard / robotic / nanite while ships or defenses are built
-            if ((request.body.buildingID == Globals.Buildings.ROBOTIC_FACTORY ||
-                request.body.buildingID == Globals.Buildings.NANITE_FACTORY ||
-                request.body.buildingID == Globals.Buildings.SHIPYARD
+            if ((request.body.buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
+                request.body.buildingID === Globals.Buildings.NANITE_FACTORY ||
+                request.body.buildingID === Globals.Buildings.SHIPYARD
             )
                 &&
                 (planet.b_hangar_id > 0 ||
@@ -308,7 +308,7 @@ export class BuildingsRouter {
             }
 
             // can't build research lab while they are researching... poor scientists :(
-            if (request.body.buildingID == Globals.Buildings.RESEARCH_LAB &&
+            if (request.body.buildingID === Globals.Buildings.RESEARCH_LAB &&
                 (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
 
                 response.status(Globals.Statuscode.SUCCESS).json({

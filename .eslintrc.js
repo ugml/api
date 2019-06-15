@@ -15,10 +15,11 @@ module.exports =  {
   },
   rules:  {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
-    "indent": ["error", 2],
+    // "indent": ["error", 2], handled better by formatters
     "comma-dangle": ["error", "always-multiline"],
     "quotes": ["error", "double"],
     "eqeqeq": ["error", "always"],
+    //"arrow-parens": ["error", "always"], // prettier has a different opinion, maybe we really don't need these parens
     "max-len": ["warn", { "code": 120, "tabWidth": 2 }],
     // TODO turn these rules on again
     "@typescript-eslint/interface-name-prefix": "off",

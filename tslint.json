@@ -9,6 +9,7 @@
     ]
   },
   "rules": {
+    "arrow-parens": [true, "ban-single-arg-parens"],
     "no-var-requires": false,
     "only-arrow-functions": false,
     "variable-name": {

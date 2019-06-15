@@ -75,7 +75,7 @@ export class ShipsRouter {
 
     // execute the query
     Database.query(query)
-      .then((result) => {
+      .then(result => {
         let data;
 
         if (!InputValidator.isSet(result)) {
@@ -155,7 +155,7 @@ export class ShipsRouter {
       .toString();
 
     return Database.query(query)
-      .then((result) => {
+      .then(result => {
         if (!InputValidator.isSet(result[0])) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -275,7 +275,7 @@ export class ShipsRouter {
           return;
         });
       })
-      .catch((error) => {
+      .catch(error => {
         Logger.error(error);
 
         response.status(Globals.Statuscode.SERVER_ERROR).json({

@@ -399,7 +399,7 @@ export class BuildingsRouter {
   }
 
   private getCosts(buildingID: number, currentLevel: number): ICosts {
-    const costs/*: IBuildings*/ = units.getBuildings()[buildingID];
+    const costs /*: IBuildings*/ = units.getBuildings()[buildingID];
 
     return {
       metal: costs.metal * costs.factor ** currentLevel,

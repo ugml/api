@@ -8,7 +8,7 @@ node_js:
 env:
   - NODE_ENV=development
 
-before_script
+before_script:
   #- npm install gulp-cli gulp-typescript
   - npm run-script build
 script:

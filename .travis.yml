@@ -12,6 +12,6 @@ services:
   - redis-server
 
 before_script:
-  - npm run-script build
+  - npm run-script compile
 script:
   - npm run-script test

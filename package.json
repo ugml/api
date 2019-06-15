@@ -20,7 +20,7 @@
     "tslint": "tslint --project .",
     "tslint-fix": "tslint --project . --fix",
     "tsc": "tsc --noEmit --project .",
-    "build": "gulp scripts",
+    "build": "gulp compile",
     "watch": "gulp"
   },
   "devDependencies": {

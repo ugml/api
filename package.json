@@ -6,6 +6,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ugml/api"
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "0.0.33",

@@ -7,7 +7,7 @@ cache:
     - "node_modules"
 
 before_script:
+  - npm install gulp
   - npm run-script build
-
 script:
   - npm run-script test

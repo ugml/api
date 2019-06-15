@@ -5,7 +5,7 @@ const JSON_FILES = ['src/*.json', 'src/**/*.json'];
 // pull in the project TypeScript config
 const tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('scripts', () => {
+gulp.task('scripts', function() {
     const tsResult = tsProject.src()
         .pipe(tsProject());
     gulp.src(['src/config/**/*']).pipe(gulp.dest('dist/config'));
@@ -13,7 +13,7 @@ gulp.task('scripts', () => {
     return tsResult.js.pipe(gulp.dest('dist'));
 });
 
-gulp.task('watch', gulp.series('scripts', () => {
+gulp.task('watch', gulp.series('scripts', function() {
     gulp.watch(['src/**/*.ts', '!src/**/*.spec.ts'], ['scripts']);
 }));
 

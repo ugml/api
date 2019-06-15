@@ -1,4 +1,5 @@
-interface ICosts {
+
+export interface ICosts {
   metal: number;
   crystal: number;
   deuterium: number;

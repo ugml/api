@@ -5,6 +5,7 @@ import { InputValidator } from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
 import { Units } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+import { ICosts } from "../interfaces/ICosts";
 
 const units = new Units();
 const Logger = require("../common/Logger");

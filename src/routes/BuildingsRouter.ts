@@ -7,6 +7,7 @@ import { SerializationHelper } from "../common/SerializationHelper";
 import { Units } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet } from "../units/Planet";
+import { ICosts } from "../interfaces/ICosts";
 
 const Logger = require("../common/Logger");
 

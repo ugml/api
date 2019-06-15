@@ -196,6 +196,9 @@ export class DefenseRouter {
             let freeSiloSlots: number = (result[0].missile_silo * 10) - result[0].anti_ballistic_missile - (result[0].interplanetary_missile * 2);
 
             for (const item in buildOrders) {
+                if (!buildOrders.hasOwnProperty(item)) {
+                    continue;
+                }
                 let count: number = buildOrders[item];
                 const cost: ICosts = DefenseRouter.getCosts(parseInt(item, 10));
 

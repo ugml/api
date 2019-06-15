@@ -30,7 +30,7 @@ class QueueItem {
 
     public addToQueue(key: string, value: number) {
 
-        if (value <= 0) return;
+        if (value <= 0) { return; }
 
         if (this.queue[key] === undefined) {
             this.queue[key] = value;

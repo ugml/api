@@ -377,7 +377,7 @@ export class BuildingsRouter {
                 (cost.metal + cost.crystal)
                     / (2500 * (1 + planet.robotic_factory)
                     * (2 ** planet.nanite_factory)
-                    * Config.Get.speed)
+                    * Config.Get.speed),
             );
 
             const endTime: number = Math.round(+new Date() / 1000) + buildTime;

@@ -14,15 +14,6 @@ const squel = require("squel");
 const units = new Units();
 
 export class TechsRouter {
-    public router: Router;
-
-    /**
-     * Initialize the Router
-     */
-    public constructor() {
-        this.router = Router();
-        this.init();
-    }
 
     private static getCosts(buildingKey: string, currentLevel: number): ICosts {
 
@@ -35,6 +26,15 @@ export class TechsRouter {
             energy: costs.energy * costs.factor ** currentLevel,
         };
 
+    }
+    public router: Router;
+
+    /**
+     * Initialize the Router
+     */
+    public constructor() {
+        this.router = Router();
+        this.init();
     }
 
 

@@ -145,7 +145,7 @@ class App {
                 format.timestamp({
                     format: "YYYY-MM-DD HH:mm:ss",
                 }),
-                logFormat
+                logFormat,
             ),
             maxsize: 10,
             msg: "{" +

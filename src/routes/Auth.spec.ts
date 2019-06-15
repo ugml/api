@@ -14,14 +14,14 @@ describe("authRoute", () => {
 
     it("should be json", async () => {
         return request.get("/v1/auth")
-            .then(res => {
+            .then((res) => {
                 expect(res.type).to.eql("application/json");
             });
     });
 
     it.skip("should have a message prop", () => {
         return request.get("/v1/")
-            .then(res => {
+            .then((res) => {
                 console.log(res.body.message);
                 expect(res.body.message).to.eql("Hello World!");
             });

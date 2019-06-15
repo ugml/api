@@ -207,7 +207,7 @@ export class PlanetsRouter {
             .where(
                 squel.expr()
                     .or(`start_id = ${request.params.planetID}`)
-                    .or(`end_id = ${request.params.planetID}`)
+                    .or(`end_id = ${request.params.planetID}`),
             )
             .toString();
 

@@ -14,15 +14,6 @@ const Logger = require("../common/Logger");
 const squel = require("squel");
 
 export class DefenseRouter {
-    public router: Router;
-
-    /**
-     * Initialize the Router
-     */
-    public constructor() {
-        this.router = Router();
-        this.init();
-    }
 
     private static getCosts(buildingID: number): ICosts {
 
@@ -57,6 +48,15 @@ export class DefenseRouter {
 
     private static getBuildTimeInSeconds(costMetal, costCrystal, shipyardLvl, naniteLvl) {
         return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
+    }
+    public router: Router;
+
+    /**
+     * Initialize the Router
+     */
+    public constructor() {
+        this.router = Router();
+        this.init();
     }
 
     public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -270,7 +270,7 @@ export class DefenseRouter {
                 crystal -= cost.crystal * count;
                 deuterium -= cost.deuterium * count;
 
-                if (stopProcessing) break;
+                if (stopProcessing) { break; }
             }
 
             queueItem.setTimeRemaining(buildTime);

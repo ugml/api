@@ -12,15 +12,6 @@ const units = new Units();
 const Logger = require("../common/Logger");
 
 export class ShipsRouter {
-    public router: Router;
-
-    /**
-     * Initialize the Router
-     */
-    public constructor() {
-        this.router = Router();
-        this.init();
-    }
 
     // TODO: relocate to Validator-class
     private static isValidBuildOrder(buildOrders: object): boolean {
@@ -55,6 +46,15 @@ export class ShipsRouter {
             energy: costs.energy,
         };
 
+    }
+    public router: Router;
+
+    /**
+     * Initialize the Router
+     */
+    public constructor() {
+        this.router = Router();
+        this.init();
     }
 
     public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -239,7 +239,7 @@ export class ShipsRouter {
                 crystal -= cost.crystal * count;
                 deuterium -= cost.deuterium * count;
 
-                if (stopProcessing) break;
+                if (stopProcessing) { break; }
             }
 
             queueItem.setTimeRemaining(buildTime);

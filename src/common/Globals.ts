@@ -35,7 +35,7 @@ namespace Globals {
         RESEARCH_LAB = 12,
         TERRAFORMER = 13,
         ALLIANCE_DEPOT = 14,
-        MISSILE_SILO = 15
+        MISSILE_SILO = 15,
     }
 
     // 4xx - authentication failure
@@ -47,7 +47,7 @@ namespace Globals {
         BAD_REQUEST = 400,
         NOT_AUTHORIZED = 401,
         NOT_FOUND = 404,
-        SERVER_ERROR = 500
+        SERVER_ERROR = 500,
     }
 }
 

@@ -8,7 +8,7 @@ const Logger = require("../common/Logger");
 
 enum PlanetType {
     Planet = 1,
-    Moon = 2
+    Moon = 2,
 }
 
 class Planet implements IUnits {

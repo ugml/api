@@ -1,4 +1,3 @@
-
 export interface ICosts {
   metal: number;
   crystal: number;

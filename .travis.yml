@@ -1,0 +1,8 @@
+language: nodejs
+
+before_script:
+  - npm install
+  - gulp scripts
+
+script:
+  - npm test

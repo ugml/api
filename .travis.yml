@@ -3,7 +3,7 @@ node_js:
   - "0.12"
 
 env:
-  - NODE_ENV=TEST
+  - NODE_ENV=development
 
 before_script:
   - npm config set -g production false

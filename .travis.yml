@@ -1,6 +1,6 @@
 language: nodejs
 node_js:
-  - "0.12"
+  - "node"
 
 env:
   - NODE_ENV=development

@@ -12,7 +12,6 @@ services:
   - redis-server
 
 before_script:
-  - npm install gulp-cli gulp-typescript
   - npm run-script build
 script:
   - npm run-script test

@@ -16,7 +16,7 @@
     "tslint-fix": "tslint --project . --fix",
     "tsc": "tsc --noEmit --project .",
     "build": "gulp scripts",
-    "watch": "gulp watch"
+    "watch": "gulp"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
@@ -38,8 +38,11 @@
     "eslint-config-prettier": "^5.0.0",
     "eslint-plugin-prettier": "^3.1.0",
     "gulp": "^4.0.0",
+    "gulp-file-cache": "0.0.1",
+    "gulp-nodemon": "^2.4.2",
     "gulp-typescript": "^5.0.1",
     "mocha": "^5.2.0",
+    "nodemon": "^1.19.1",
     "prettier": "^1.18.2",
     "ts-node": "^8.2.0",
     "tslint": "^5.16.0",

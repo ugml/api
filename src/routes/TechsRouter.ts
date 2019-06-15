@@ -5,6 +5,7 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { Units } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+import { ICosts } from "../interfaces/ICosts";
 
 const Logger = require("../common/Logger");
 

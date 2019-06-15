@@ -7,6 +7,17 @@
   "keywords": [],
   "author": "",
   "license": "AGPL",
+  "scripts": {
+    "start": "node dist/index.js",
+    "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
+    "lint": "eslint src/**/*.ts",
+    "lint-fix": "eslint src/**/*.ts --fix",
+    "tslint": "tslint --project .",
+    "tslint-fix": "tslint --project . --fix",
+    "tsc": "tsc --noEmit --project .",
+    "build": "gulp scripts",
+    "watch": "gulp watch"
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "0.0.33",
@@ -51,15 +62,5 @@
     "redis": "^2.8.0",
     "squel": "^5.12.2",
     "winston": "^3.1.0"
-  },
-  "scripts": {
-    "start": "node dist/index.js",
-    "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
-    "lint": "eslint src/**/*.ts",
-    "lint-fix": "eslint src/**/*.ts --fix",
-    "tslint": "tslint --project .",
-    "tslint-fix": "tslint --project . --fix",
-    "tsc": "tsc --noEmit --project .",
-    "build": "gulp scripts"
   }
 }

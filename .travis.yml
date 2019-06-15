@@ -1,4 +1,4 @@
-language: nodejs
+language: node_js
 
 node_js:
   - "6"
@@ -9,7 +9,7 @@ env:
   - NODE_ENV=development
 
 before_script:
-  #- npm install gulp-cli gulp-typescript
+  - npm install gulp-cli gulp-typescript
   - npm run-script build
 script:
   - npm run-script test

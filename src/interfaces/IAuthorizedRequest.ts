@@ -1,5 +1,5 @@
-import { Request } from "express"
+import { Request } from "express";
 
 export interface IAuthorizedRequest extends Request {
-    userID: string // or any other type
+  userID: string;
 }

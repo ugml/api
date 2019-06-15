@@ -1,36 +1,33 @@
 class Units {
+  private _data;
 
-    private _data;
+  public constructor() {
+    this._data = require("../config/units.json");
+  }
 
-    public constructor()
-    {
-        this._data = require("../config/units.json");
-    }
+  public getBuildings() {
+    return this._data.units.buildings;
+  }
 
-    public getBuildings() {
-        return this._data.units.buildings;
-    }
+  public getShips() {
+    return this._data.units.ships;
+  }
 
-    public getShips() {
-        return this._data.units.ships;
-    }
+  public getDefenses() {
+    return this._data.units.defenses;
+  }
 
-    public getDefenses() {
-        return this._data.units.defenses;
-    }
+  public getTechnologies() {
+    return this._data.units.technologies;
+  }
 
-    public getTechnologies() {
-        return this._data.units.technologies;
-    }
+  public getRequirements() {
+    return this._data.requirements;
+  }
 
-    public getRequirements() {
-        return this._data.requirements;
-    }
-
-    public getMappings() {
-        return this._data.mappings;
-    }
+  public getMappings() {
+    return this._data.mappings;
+  }
 }
 
-
-export { Units }
+export { Units };

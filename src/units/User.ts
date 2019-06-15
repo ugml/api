@@ -1,69 +1,110 @@
-import { Database } from '../common/Database';
-import {IUnits} from "../interfaces/IUnits";
-const squel = require("squel");
-const Logger = require('../common/Logger');
+import squel = require("squel");
+import { Database } from "../common/Database";
+import { Logger } from "../common/Logger";
+import { IUnits } from "../interfaces/IUnits";
 
-
+/***
+ * @class
+ * @classdesc Represents a user
+ *
+ */
 class User implements IUnits {
+  /**
+   * The ID of the user
+   * @type {number}
+   */
+  public userID: number;
 
-    userID : number;
-    username : string;
-    password : string;
-    email : string;
-    onlinetime : number = 0;
-    currentplanet : number;
+  /**
+   * The name of the user
+   * @type {string}
+   */
+  public username: string;
 
+  /**
+   * The encrypted password of the user
+   * @type {string}
+   */
+  public password: string;
 
-    public save() : Promise<{}> {
-        return new Promise((resolve, reject) => {
+  /**
+   * The e-mail address of the user
+   * @type {string}
+   */
+  public email: string;
 
-            let query = squel.update()
-                .table("users")
-                .set("username", this.username)
-                .set("password", this.password)
-                .set("email", this.email)
-                .set("onlinetime", this.onlinetime)
-                .set("currentplanet", this.currentplanet)
-                .where("userID = ?", this.userID)
-                .toString();
+  /**
+   * The unix-timestamp of the last time the user was online
+   * @type {number}
+   */
+  public onlinetime: number = 0;
 
-            Database.query(query).then(() => {
-                return resolve(this);
-            }).catch(error => {
-                Logger.error(error);
-                return reject(error);
-            });
+  /**
+   * The current planet of the user
+   * @type {number}
+   */
+  public currentplanet: number;
 
+  /***
+   * Updates the current object in the database
+   */
+  public save(): Promise<{}> {
+    return new Promise((resolve, reject) => {
+      const query: string = squel
+        .update()
+        .table("users")
+        .set("username", this.username)
+        .set("password", this.password)
+        .set("email", this.email)
+        .set("onlinetime", this.onlinetime)
+        .set("currentplanet", this.currentplanet)
+        .where("userID = ?", this.userID)
+        .toString();
+
+      Database.query(query)
+        .then(() => {
+          return resolve(this);
+        })
+        .catch((error: string) => {
+          Logger.error(error);
+          return reject(error);
         });
-    }
+    });
+  }
 
-    public create() : Promise<{}> {
-        return new Promise((resolve, reject) => {
+  /***
+   * Stores the current object in the database
+   */
+  public create(): Promise<{}> {
+    return new Promise((resolve, reject) => {
+      const query: string = squel
+        .insert()
+        .into("users")
+        .set("userID", this.userID)
+        .set("username", this.username)
+        .set("password", this.password)
+        .set("email", this.email)
+        .set("onlinetime", this.onlinetime)
+        .set("currentplanet", this.currentplanet)
+        .toString();
 
-            let query = squel.insert()
-                .into("users")
-                .set("userID", this.userID)
-                .set("username", this.username)
-                .set("password", this.password)
-                .set("email", this.email)
-                .set("onlinetime", this.onlinetime)
-                .set("currentplanet", this.currentplanet)
-                .toString();
-
-            Database.query(query).then(() => {
-                return resolve(this);
-            }).catch(error => {
-                Logger.error(error);
-                return reject(error);
-            });
-
+      Database.query(query)
+        .then(() => {
+          return resolve(this);
+        })
+        .catch((error: string) => {
+          Logger.error(error);
+          return reject(error);
         });
-    }
+    });
+  }
 
-    isValid() : boolean {
-        return false;
-    }
-
+  /**
+   * Checks, if the object holds valid data
+   */
+  public isValid(): boolean {
+    return false;
+  }
 }
 
-export { User }
+export { User };

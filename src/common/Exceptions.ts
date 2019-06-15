@@ -1,19 +1,27 @@
+/***
+ * Helper class to distinguish errors.
+ * This error is thrown when a record already exists in the database.
+ */
 class DuplicateRecordError extends Error {
-    constructor(m: string) {
-        super(m);
+  public constructor(m: string) {
+    super(m);
 
-        // Set the prototype explicitly.
-        Object.setPrototypeOf(this, DuplicateRecordError.prototype);
-    }
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, DuplicateRecordError.prototype);
+  }
 }
 
+/***
+ * Helper class to distinguish errors.
+ * This error is thrown when a parameter is invalid.
+ */
 class InvalidParameter extends Error {
-    constructor(m: string) {
-        super(m);
+  public constructor(m: string) {
+    super(m);
 
-        // Set the prototype explicitly.
-        Object.setPrototypeOf(this, InvalidParameter.prototype);
-    }
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, InvalidParameter.prototype);
+  }
 }
 
-export { DuplicateRecordError, InvalidParameter }
+export { DuplicateRecordError, InvalidParameter };

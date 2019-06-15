@@ -1,10 +1,13 @@
+/***
+ * Helper-class to get the current game-configuration
+ */
 class Config {
-
-    static get Get() {
-        return require("../config/game.json");
-    }
-
+  /***
+   * Returns the current game-configuration
+   */
+  public static get Get() /*: IGameConfig*/ {
+    return require("../config/game.json");
+  }
 }
 
-
-export { Config }
+export { Config };

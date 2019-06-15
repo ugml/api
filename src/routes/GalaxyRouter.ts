@@ -1,108 +1,107 @@
-import {Router, Request, Response, NextFunction} from 'express';
-import { Database } from '../common/Database';
+import { NextFunction, Response, Router } from "express";
+import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest"
-import {Globals} from "../common/Globals";
-const Logger = require('../common/Logger');
+import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+
+const Logger = require("../common/Logger");
 
 const squel = require("squel");
 
 export class GalaxyRouter {
-    router: Router;
+  public router: Router;
 
-    /**
-     * Initialize the Router
-     */
-    constructor() {
-        this.router = Router();
-        this.init();
+  /**
+   * Initialize the Router
+   */
+  public constructor() {
+    this.router = Router();
+    this.init();
+  }
+
+  /**
+   * GET planet by ID
+   */
+  public getGalaxyInformation(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    // validate parameters
+    if (
+      !InputValidator.isSet(request.params.galaxy) ||
+      !InputValidator.isValidInt(request.params.galaxy) ||
+      !InputValidator.isSet(request.params.system) ||
+      !InputValidator.isValidInt(request.params.system)
+    ) {
+      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+        status: Globals.Statuscode.NOT_AUTHORIZED,
+        message: "Invalid parameter",
+        data: {},
+      });
+
+      return;
     }
 
-    /**
-     * GET planet by ID
-     */
-    public getGalaxyInformation(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    const query: string = squel
+      .select()
+      .field("p.planetID")
+      .field("p.ownerID")
+      .field("u.username")
+      .field("p.name")
+      .field("p.galaxy")
+      .field("p.`system`")
+      .field("p.planet")
+      .field("p.last_update")
+      .field("p.planet_type")
+      .field("p.image")
+      .field("g.debris_metal")
+      .field("g.debris_crystal")
+      .field("p.destroyed")
+      .from("galaxy", "g")
+      .left_join("planets", "p", "g.planetID = p.planetID")
+      .left_join("users", "u", "u.userID = p.ownerID")
+      .where("pos_galaxy = ?", request.params.galaxy)
+      .where("`pos_system` = ?", request.params.system)
+      .toString();
 
-        // validate parameters
-        if(!InputValidator.isSet(request.params.galaxy) ||
-            !InputValidator.isValidInt(request.params.galaxy) ||
-            !InputValidator.isSet(request.params.system) ||
-            !InputValidator.isValidInt(request.params.system)) {
+    console.log(query);
 
-            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
-                data: {}
-            });
+    // execute the query
+    Database.query(query)
+      .then(result => {
+        let data;
 
-            return;
-
+        if (!InputValidator.isSet(result)) {
+          data = {};
+        } else {
+          data = Object.assign({}, result);
         }
 
-        let query : string = squel.select()
-            .field("p.planetID")
-            .field("p.ownerID")
-            .field("u.username")
-            .field("p.name")
-            .field("p.galaxy")
-            .field("p.`system`")
-            .field("p.planet")
-            .field("p.last_update")
-            .field("p.planet_type")
-            .field("p.image")
-            .field("g.debris_metal")
-            .field("g.debris_crystal")
-            .field("p.destroyed")
-            .from("galaxy", "g")
-            .left_join("planets", "p", "g.planetID = p.planetID")
-            .left_join("users", "u", "u.userID = p.ownerID")
-            .where("pos_galaxy = ?", request.params.galaxy)
-            .where("`pos_system` = ?", request.params.system)
-            .toString();
-
-        console.log(query);
-
-        // execute the query
-        Database.query(query).then(result => {
-
-            let data;
-
-            if(!InputValidator.isSet(result)) {
-                data = {};
-            } else {
-                data = Object.assign({}, result);
-            }
-
-            // return the result
-            response.status(Globals.Statuscode.SUCCESS).json({
-                status: Globals.Statuscode.SUCCESS,
-                message: "Success",
-                data: data
-            });
-            return;
-
-        }).catch(error => {
-            Logger.error(error);
-
-            response.status(Globals.Statuscode.SERVER_ERROR).json({
-                status: Globals.Statuscode.SERVER_ERROR,
-                message: "There was an error while handling the request.",
-                data: {}
-            });
-
-            return;
+        // return the result
+        response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "Success",
+          data,
         });
-    }
+        return;
+      })
+      .catch(error => {
+        Logger.error(error);
 
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
-     */
-    init() {
+        response.status(Globals.Statuscode.SERVER_ERROR).json({
+          status: Globals.Statuscode.SERVER_ERROR,
+          message: "There was an error while handling the request.",
+          data: {},
+        });
 
-        this.router.get('/:galaxy/:system', this.getGalaxyInformation);
-    }
+        return;
+      });
+  }
 
+  /**
+   * Take each handler, and attach to one of the Express.Router's
+   * endpoints.
+   */
+  public init() {
+    this.router.get("/:galaxy/:system", this.getGalaxyInformation);
+  }
 }
 
 const galaxyRouter = new GalaxyRouter();

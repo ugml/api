@@ -1,19 +1,30 @@
 {
-  "name": "api",
+  "name": "ugamela-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "typings/",
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "repository": {
     "type": "git",
     "url": "git://github.com/ugml/api"
+  "license": "AGPL",
+  "scripts": {
+    "start": "node dist/index.js",
+    "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
+    "test-watch": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint-fix": "eslint src/**/*.ts --fix",
+    "tslint": "tslint --project .",
+    "tslint-fix": "tslint --project . --fix",
+    "tsc": "tsc --noEmit --project .",
+    "build": "gulp scripts",
+    "watch": "gulp"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "0.0.33",
-    "@types/chai": "^3.4.34",
     "@types/debug": "0.0.29",
     "@types/express": "^4.16.1",
     "@types/jwt-simple": "^0.5.33",
@@ -23,15 +34,26 @@
     "@types/passport": "^0.4.7",
     "@types/passport-jwt": "^3.0.1",
     "@types/superagent": "^3.8.4",
+    "@typescript-eslint/eslint-plugin": "^1.10.2",
+    "@typescript-eslint/parser": "^1.10.2",
     "chai": "^3.5.0",
     "chai-http": "^4.3.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^5.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "gulp": "^4.0.0",
+    "gulp-file-cache": "0.0.1",
+    "gulp-nodemon": "^2.4.2",
     "gulp-typescript": "^5.0.1",
     "mocha": "^5.2.0",
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2",
     "ts-node": "^8.2.0",
+    "tslint": "^5.16.0",
     "typescript": "^3.4.5"
   },
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "debug": "^4.1.0",
@@ -47,10 +69,5 @@
     "redis": "^2.8.0",
     "squel": "^5.12.2",
     "winston": "^3.1.0"
-  },
-  "scripts": {
-    "start": "node dist/index.js",
-    "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
-    "build": "gulp scripts"
   }
 }

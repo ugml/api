@@ -1,18 +1,16 @@
 class Message {
+  public messageID: number;
+  public senderID: number;
+  public receiverID: string;
+  public sendtime: number;
+  public type: number;
+  public subject: string;
+  public body: string;
+  public deleted: boolean;
 
-    messageID : number;
-    senderID : number;
-    receiverID : string;
-    sendtime : number;
-    type : number;
-    subject : string;
-    body : string;
-    deleted : boolean;
-
-    isValid() : boolean {
-        return false;
-    }
-
+  public isValid(): boolean {
+    return false;
+  }
 }
 
-export { Message }
+export { Message };

@@ -12,7 +12,7 @@ describe("Player Routes", () => {
 
   it("should create a player", async () => {
     const user = {
-      username: "Test",
+      username: "Test2",
       password: "test",
       email: "test",
     };

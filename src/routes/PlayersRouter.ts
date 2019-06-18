@@ -7,8 +7,8 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet, PlanetType } from "../units/Planet";
 import { User } from "../units/User";
 import { PlanetsRouter } from "./PlanetsRouter";
+import { Logger } from "../common/Logger";
 
-const Logger = require("../common/Logger");
 const bcrypt = require("bcryptjs");
 import squel = require("squel");
 

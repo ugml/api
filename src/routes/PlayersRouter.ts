@@ -20,7 +20,29 @@ export class PlayersRouter {
    */
   public constructor() {
     this.router = Router();
-    this.init();
+
+    // Take each handler, and attach to one of the Express.Router's endpoints.
+
+    // /user
+    this.router.get("/", this.getPlayerSelf);
+
+    // /user/create/
+    this.router.post("/create", this.createPlayer);
+
+    // /users/:playerID
+    this.router.get("/:playerID", this.getPlayerByID);
+
+    // /user/update
+    this.router.post("/update", this.updatePlayer);
+
+    // /user/planet/:planetID
+    this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
+
+    // /user/planets/
+    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfPlayer);
+
+    // /user/currentplanet/set/:planetID
+    this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
   }
 
   public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -459,36 +481,8 @@ export class PlayersRouter {
         return;
       });
   }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    // /user/planet/:planetID
-    this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
-
-    // /user/planets/
-    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfPlayer);
-
-    // /user/currentplanet/set/:planetID
-    this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
-
-    // /user/create/
-    this.router.post("/create", this.createPlayer);
-
-    // /user
-    this.router.get("/", this.getPlayerSelf);
-
-    // /users/:playerID
-    this.router.get("/:playerID", this.getPlayerByID);
-
-    // /user/update
-    this.router.post("/update", this.updatePlayer);
-  }
 }
 
 const playerRoutes = new PlayersRouter();
-playerRoutes.init();
 
 export default playerRoutes.router;

@@ -71,7 +71,6 @@ class App {
 
     this.express.use("/*", (request, response, next) => {
       try {
-        // console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
 
         // if the user tries to authenticate, we don't have a token yet
         if (
@@ -82,6 +81,7 @@ class App {
           const authString = request.header("authorization");
 
           const payload: string = jwt.validateToken(authString);
+
 
           if (InputValidator.isSet(payload)) {
             self.userID = eval(payload).userID;

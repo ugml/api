@@ -8,8 +8,10 @@ node_js:
 env:
   - NODE_ENV=development
 
+addons:
+  mariadb: '10.4'
+
 services:
-  - mariadb
   - redis-server
 
 before_script:

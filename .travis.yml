@@ -13,6 +13,7 @@ services:
   - mariadb
 
 before_install:
+  - sudo systemctl start mariadb
   - mysql -u root --password="" < ci.sql
 
 before_script:

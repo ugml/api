@@ -10,13 +10,13 @@ env:
 
 services:
   - redis-server
-  - mariadb
 
-before_install:
-  - sudo systemctl start mariadb
-  - mysql -u root --password="" < ci.sql
+addons:
+  mariadb: '10.0'
 
 before_script:
+  - sudo systemctl start mariadb
+    - mysql -u root --password="" < ci.sql
   - npm run-script lint
   - npm run-script build
 

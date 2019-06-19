@@ -18,7 +18,9 @@ import PlayerRouter from "./routes/PlayersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
 
-require("dotenv-safe").config();
+require("dotenv-safe").config({
+  example: process.env.CI ? ".env.ci.example" : ".env.example",
+});
 
 const jwt = new JwtHelper();
 const expressip = require("express-ip");
@@ -71,8 +73,6 @@ class App {
 
     this.express.use("/*", (request, response, next) => {
       try {
-        // console.log("---\r\nRequest from " + request.connection.remoteAddress.split(`:`).pop());
-
         // if the user tries to authenticate, we don't have a token yet
         if (
           !request.originalUrl.toString().includes("/auth/") &&
@@ -136,13 +136,13 @@ class App {
         maxsize: 10,
         msg:
           "{" +
-          "\"ip\": \"{{req.connection.remoteAddress}}\", " +
-          "\"userID\": \"{{req.userID}}\", " +
-          "\"method\": \"{{req.method}}\", " +
-          "\"url\": \"{{req.url}}\", " +
-          "\"params\": { " +
-          "\"query:\": {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
-          "\"body\": {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
+          "'ip': '{{req.connection.remoteAddress}}', " +
+          "'userID': '{{req.userID}}', " +
+          "'method': '{{req.method}}', " +
+          "'url': '{{req.url}}', " +
+          "'params': { " +
+          "'query:': {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
+          "'body': {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
           "}" +
           "}",
       }),

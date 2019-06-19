@@ -266,7 +266,7 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Creating entry in buildings-table");
 
-          query = `INSERT INTO buildings (\`planetID\`, \`metal_mine\`, \`crystal_mine\`, \`deuterium_synthesizer\`, \`solar_plant\`, \`fusion_reactor\`, \`robotic_factory\`, \`nanite_factory\`, \`shipyard\`, \`metal_storage\`, \`crystal_storage\`, \`deuterium_storage\`, \`research_lab\`, \`terraformer\`, \`alliance_depot\`, \`missile_silo\`) VALUES (${data.planet.planetID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+          query = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
 
           return Database.query(query).then(() => {
             return data;
@@ -275,7 +275,7 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Creating entry in defenses-table");
 
-          query = `INSERT INTO defenses (\`planetID\`, \`rocket_launcher\`, \`light_laser\`, \`heavy_laser\`, \`ion_cannon\`, \`gauss_cannon\`, \`plasma_turret\`, \`small_shield_dome\`, \`large_shield_dome\`, \`anti_ballistic_missile\`, \`interplanetary_missile\`) VALUES (${data.planet.planetID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+          query = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
 
           return Database.query(query).then(() => {
             return data;
@@ -284,7 +284,7 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Creating entry in defenses-table");
 
-          query = `INSERT INTO fleet (\`planetID\`, \`small_cargo_ship\`, \`large_cargo_ship\`, \`light_fighter\`, \`heavy_fighter\`, \`cruiser\`, \`battleship\`, \`colony_ship\`, \`recycler\`, \`espionage_probe\`, \`bomber\`, \`solar_satellite\`, \`destroyer\`, \`battlecruiser\`, \`deathstar\`) VALUES (${data.planet.planetID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+          query = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
 
           return Database.query(query).then(() => {
             return data;
@@ -293,7 +293,20 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Creating entry in galaxy-table");
 
-          query = `INSERT INTO galaxy (\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`, \`debris_metal\`, \`debris_crystal\`) VALUES (${data.planet.planetID}, ${data.planet.galaxy}, ${data.planet.system}, ${data.planet.planet}, 0, 0);`;
+          query = `INSERT INTO galaxy
+                        (
+                           \`planetID\`,
+                           \`pos_galaxy\`,
+                           \`pos_system\`,
+                           \`pos_planet\`
+                         )
+                   VALUES
+                        (
+                           ${data.planet.planetID},
+                           ${data.planet.galaxy},
+                           ${data.planet.system},
+                           ${data.planet.planet}
+                        );`;
 
           return Database.query(query).then(() => {
             return data;
@@ -302,7 +315,7 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Creating entry in techs-table");
 
-          query = `INSERT INTO techs (\`userID\`, \`espionage_tech\`, \`computer_tech\`, \`weapon_tech\`, \`armour_tech\`, \`shielding_tech\`, \`energy_tech\`, \`hyperspace_tech\`, \`combustion_drive_tech\`, \`impulse_drive_tech\`, \`hyperspace_drive_tech\`, \`laser_tech\`, \`ion_tech\`, \`plasma_tech\`, \`intergalactic_research_tech\`, \`graviton_tech\`) VALUES (${data.player.userID}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);`;
+          query = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
 
           return Database.query(query);
         })

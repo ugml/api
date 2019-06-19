@@ -1,8 +1,10 @@
 language: node_js
 
+sudo: required
+
 node_js:
-  - "6"
-  - "8"
+  # - "6"
+  # - "8"
   - "10"
 
 env:
@@ -11,7 +13,15 @@ env:
 services:
   - redis-server
 
+addons:
+  mariadb: '10.4'
+
 before_script:
+  - sudo systemctl start mariadb
+  - sudo mysql -u root < ci.sql
+  #- sudo mysql -u root < sptest.sql
+  - npm run-script lint
   - npm run-script build
+
 script:
   - npm run-script test

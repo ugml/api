@@ -1,5 +1,8 @@
 language: node_js
 
+sudo: required
+dist: xenial
+
 node_js:
   - "6"
   - "8"
@@ -8,20 +11,23 @@ node_js:
 env:
   - NODE_ENV=development
 
-addons:
-  mariadb: '10.4'
-
 services:
   - redis-server
+  - mariadb
 
-before_install:
-  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-  - sudo mysql_upgrade -u root -p root
-  - sudo service mysql restart
+addons:
+  apt:
+    sources:
+      - mariadb-10.4-xenial
+    packages:
+      - mariadb-server
 
 before_script:
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('$DB_PASS') where User='$DB_USER'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade
+  - sudo service mysql restart
   - npm run-script lint
   - npm run-script build
+  - mysql -u $DB_USER -p $DB_PASS < ci.sql
 script:
-  - mysql -u root -p root < ci.sql
   - npm run-script test

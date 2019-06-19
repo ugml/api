@@ -1,5 +1,4 @@
 language: node_js
-dist: xenial
 
 node_js:
   - "6"
@@ -13,22 +12,12 @@ services:
   - redis-server
   - mariadb
 
-addons:
-  apt:
-    sources:
-      - mariadb-10.4-xenial
-    packages:
-      - mariadb-server
-
 before_install:
-  - mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-  - mysql_upgrade -u "root" -p "root"
-  - service mysql restart
+  - mysql -u root --password="" < ci.sql
 
 before_script:
   - npm run-script lint
   - npm run-script build
-  - mysql -u "root" -p "root" < ci.sql
 
 script:
   - npm run-script test

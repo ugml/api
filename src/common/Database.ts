@@ -1,7 +1,9 @@
 import mysql = require("mysql2");
 import { Logger } from "./Logger";
 
-require("dotenv-safe").config();
+require("dotenv-safe").config({
+  example: process.env.CI ? ".env.ci.example" : ".env.example",
+});
 
 /***
  * Manages the connection to the (mysql/mariaDB)-database

@@ -29,6 +29,7 @@ function onError(error: NodeJS.ErrnoException): void {
     throw error;
   }
   const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+
   switch (error.code) {
     case "EACCES":
       console.error(`${bind} requires elevated privileges`);

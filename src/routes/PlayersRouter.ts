@@ -293,18 +293,18 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Creating entry in galaxy-table");
 
-          query = `INSERT INTO galaxy 
+          query = `INSERT INTO galaxy
                         (
-                           \`planetID\`, 
-                           \`pos_galaxy\`, 
-                           \`pos_system\`, 
+                           \`planetID\`,
+                           \`pos_galaxy\`,
+                           \`pos_system\`,
                            \`pos_planet\`
                          )
-                   VALUES 
+                   VALUES
                         (
-                           ${data.planet.planetID}, 
-                           ${data.planet.galaxy}, 
-                           ${data.planet.system}, 
+                           ${data.planet.planetID},
+                           ${data.planet.galaxy},
+                           ${data.planet.system},
                            ${data.planet.planet}
                         );`;
 

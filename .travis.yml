@@ -19,7 +19,7 @@ addons:
 before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < ci.sql
-  - sudo mysql -u root < sptest.sql
+  #- sudo mysql -u root < sptest.sql
   - npm run-script lint
   - npm run-script build
 

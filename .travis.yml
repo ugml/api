@@ -21,14 +21,14 @@ addons:
       - mariadb-server
 
 before_install:
-  - mysql -e "use mysql; update user set authentication_string=PASSWORD('$DB_PASS') where User='$DB_USER'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-  - mysql_upgrade -u '$DB_USER' -p '$DB_PASS'
+  - mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - mysql_upgrade -u "root" -p "root"
   - service mysql restart
 
 before_script:
   - npm run-script lint
   - npm run-script build
-  - mysql -u '$DB_USER' -p '$DB_PASS' < ci.sql
+  - mysql -u "root" -p "root" < ci.sql
 
 script:
   - npm run-script test

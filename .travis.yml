@@ -16,7 +16,7 @@ addons:
 
 before_script:
   - sudo systemctl start mariadb
-  - mysql -u root --password="" < ci.sql
+  - mysql -u root < ci.sql
   - npm run-script lint
   - npm run-script build
 

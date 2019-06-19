@@ -1,5 +1,7 @@
 language: node_js
 
+sudo: required
+
 node_js:
   - "6"
   - "8"
@@ -16,7 +18,7 @@ addons:
 
 before_script:
   - sudo systemctl start mariadb
-  - mysql -u root < ci.sql
+  - sudo mysql -u root < ci.sql
   - npm run-script lint
   - npm run-script build
 

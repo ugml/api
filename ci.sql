@@ -1,5 +1,5 @@
 CREATE USER 'dev'@'127.0.0.1' IDENTIFIED BY 'dev';
-GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP ON *.* TO 'dev'@'localhost';
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP ON *.* TO 'dev'@'127.0.0.1';
 
 create schema ugamela collate latin1_swedish_ci;
 

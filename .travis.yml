@@ -18,5 +18,5 @@ before_script:
   - npm run-script lint
   - npm run-script build
 script:
-  - mysql -u $DB_USER --password=$DB_PASS < ci.sql
+  - mysql -u root < ci.sql
   - npm run-script test

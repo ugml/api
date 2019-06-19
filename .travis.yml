@@ -15,7 +15,7 @@ services:
   - redis-server
 
 before_install:
-  - mysql -u root -e "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY 'root';"
+  - mysql -e "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY 'root';"
 
 before_script:
   - npm run-script lint

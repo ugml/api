@@ -3,6 +3,8 @@ GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP ON *.* TO 'dev'@'127.0.0.1';
 
 create schema ugamela collate latin1_swedish_ci;
 
+USE ugamela;
+
 create table errors
 (
 	id int auto_increment

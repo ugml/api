@@ -302,7 +302,6 @@ export class BuildingsRouter {
 
           for (const reqID in requirements) {
             if (requirements.hasOwnProperty(reqID)) {
-
               const reqLevel = requirements[reqID];
               const key = units.getMappings()[request.body.buildingID];
 

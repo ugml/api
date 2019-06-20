@@ -9,9 +9,9 @@ import { IShipUnits } from "../interfaces/IShipUnits";
 
 const JSONValidator = require("jsonschema").Validator;
 const jsonValidator = new JSONValidator();
-const squel = require("squel");
+import squel = require("squel");
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
 const eventSchema = require("../schemas/fleetevent.schema.json");
 

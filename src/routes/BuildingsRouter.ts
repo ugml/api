@@ -9,9 +9,9 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 const units = new Units();
 

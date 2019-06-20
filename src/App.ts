@@ -33,7 +33,7 @@ const expressWinston = require("express-winston");
 const { format } = winston;
 const { combine, printf } = format;
 
-const Logger = require("./common/Logger");
+import { Logger } from "./common/Logger";
 
 const logFormat = printf(({ message, timestamp }) => {
   return `${timestamp} [REQUEST] ${message}`;

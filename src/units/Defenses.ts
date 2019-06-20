@@ -1,8 +1,8 @@
 import { Database } from "../common/Database";
 import { IUnits } from "../interfaces/IUnits";
 
-const squel = require("squel");
-const Logger = require("../common/Logger");
+import squel = require("squel");
+import { Logger } from "../common/Logger";
 
 class Defenses implements IUnits {
   public planetID: number;

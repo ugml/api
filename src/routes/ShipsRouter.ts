@@ -7,10 +7,10 @@ import { Units } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 
-const squel = require("squel");
+import squel = require("squel");
 
 const units = new Units();
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
 export class ShipsRouter {
   // TODO: relocate to Validator-class

@@ -8,9 +8,9 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 
 const units = new Units();
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 export class DefenseRouter {
   private static getCosts(buildingID: number): ICosts {

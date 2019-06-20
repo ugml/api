@@ -6,10 +6,9 @@ import { InputValidator } from "../common/InputValidator";
 import { Units } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
+import { Logger } from "../common/Logger";
+import squel = require("squel");
 
-const Logger = require("../common/Logger");
-
-const squel = require("squel");
 const units = new Units();
 
 export class TechsRouter {

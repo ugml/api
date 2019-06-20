@@ -4,7 +4,7 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
 import squel = require("squel");
 

@@ -311,7 +311,7 @@ export class PlayersRouter {
                                   ${data.planet.planet}
                                 );`
         .split("\n")
-        .join("");
+        .join("").replace("  ", " ");
       // ^^^ temporary so that the query takes up one line instead of 14 in the log
 
       await Database.query(queryGalaxy);

@@ -30,8 +30,8 @@ export class DefenseRouter {
       if (
         !InputValidator.isValidInt(order) ||
         !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order) < Globals.MIN_DEFENSE_ID ||
-        parseInt(order) > Globals.MAX_DEFENSE_ID ||
+        parseInt(order, 10) < Globals.MIN_DEFENSE_ID ||
+        parseInt(order, 10) > Globals.MAX_DEFENSE_ID ||
         buildOrders[order] < 0
       ) {
         return false;
@@ -298,7 +298,7 @@ export class DefenseRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(query).then(result => {
+        Database.query(query).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Success",

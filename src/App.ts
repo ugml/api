@@ -30,7 +30,7 @@ const winston = require("winston");
 const expressWinston = require("express-winston");
 
 const { format } = winston;
-const { combine, timestamp, printf } = format;
+const { combine, printf } = format;
 
 const Logger = require("./common/Logger");
 
@@ -87,7 +87,7 @@ class App {
             self.userID = eval(payload).userID;
 
             // check if userID is a valid integer
-            if (isNaN(parseInt(self.userID))) {
+            if (isNaN(parseInt(self.userID, 10))) {
               response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",

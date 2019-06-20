@@ -81,7 +81,7 @@ export class EventRouter {
       return;
     }
 
-    const planetQuery: string = squel
+    let planetQuery: string = squel
       .select()
       .from("planets")
       .where("galaxy = ?", eventData.data.origin.galaxy)
@@ -108,7 +108,7 @@ export class EventRouter {
         }
 
         // get the destination-planet
-        const planetQuery: string = squel
+        planetQuery = squel
           .select()
           .from("planets")
           .where("galaxy = ?", eventData.data.destination.galaxy)
@@ -180,7 +180,7 @@ export class EventRouter {
               // add event to redis-queue
               Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
 
-              eventData.eventID = parseInt(result.insertId);
+              eventData.eventID = parseInt(result.insertId, 10);
 
               // all done
               response.status(Globals.Statuscode.SUCCESS).json({

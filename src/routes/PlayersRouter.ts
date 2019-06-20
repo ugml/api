@@ -184,7 +184,7 @@ export class PlayersRouter {
         .then(data => {
           Logger.info("Getting a new planetID");
 
-          const query = "CALL getNewPlanetId();";
+          query = "CALL getNewPlanetId();";
 
           return Database.query(query).then(row => {
             data.player.currentplanet = row[0][0].planetID;
@@ -197,7 +197,7 @@ export class PlayersRouter {
           Logger.info("Finding free position for new planet");
 
           // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
-          const query = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
+          query = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
 
           return Database.query(query).then(row => {
             data.planet.galaxy = row[0][0].posGalaxy;

@@ -149,7 +149,7 @@ export class BuildingsRouter {
             .toString();
 
           return Database.query(query)
-            .then(result => {
+            .then(() => {
               planet.b_building_id = 0;
               planet.b_building_endtime = 0;
               planet.metal = planet.metal + cost.metal;

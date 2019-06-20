@@ -135,8 +135,13 @@ CREATE TABLE `flights` (
 DROP TABLE IF EXISTS `galaxy`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+
+
 CREATE TABLE `galaxy` (
                           `planetID` int(11) NOT NULL DEFAULT '0',
+                          `pos_galaxy` int(2) not null,
+                          `pos_system` int(3) not null,
+                          `pos_planet` int(2) not null,
                           `debris_metal` int(11) NOT NULL DEFAULT '0',
                           `debris_crystal` int(11) NOT NULL DEFAULT '0',
                           UNIQUE KEY `planetid_UNIQUE` (`planetID`),

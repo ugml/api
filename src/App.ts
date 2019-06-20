@@ -5,6 +5,7 @@ import { JwtHelper } from "./common/JwtHelper";
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest";
 
 import { Globals } from "./common/Globals";
+import { IJwt } from "./interfaces/IJwt";
 import { InputValidator } from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -82,10 +83,12 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-          const payload: string = jwt.validateToken(authString);
+          let payload: IJwt = jwt.validateToken(authString);
 
           if (InputValidator.isSet(payload)) {
-            self.userID = eval(payload).userID;
+            self.userID = payload.userID.toString(10);
+
+            console.log(self.userID);
 
             // check if userID is a valid integer
             if (isNaN(parseInt(self.userID, 10))) {
@@ -112,6 +115,9 @@ class App {
           next();
         }
       } catch (e) {
+
+        Logger.error(e);
+
         response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: "Internal server error",

@@ -1,6 +1,6 @@
 const winston = require("winston");
 const { createLogger, format } = winston;
-const { combine, timestamp, printf } = format;
+const { combine, printf } = format;
 
 const myFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}] ${message}`;

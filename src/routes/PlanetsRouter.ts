@@ -5,9 +5,9 @@ import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
 const mysql = require("mysql2");
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 export class PlanetsRouter {
   public router: Router;

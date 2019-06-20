@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Database } from "../common/Database";
-import { DuplicateRecordException } from "../Exceptions/DuplicateRecordException";
+import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";

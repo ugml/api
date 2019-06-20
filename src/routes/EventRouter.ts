@@ -254,7 +254,7 @@ export class EventRouter {
 
         const updateQuery: string = squel
           .update()
-        .table("flights")
+          .table("flights")
           .set("start_id", event.end_id)
           .set("start_type", event.end_type)
           .set("start_time", Math.round(+new Date() / 1000))

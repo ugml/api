@@ -140,7 +140,7 @@ export class MessagesRouter {
 
     const query: string = squel
       .update()
-        .table("messages")
+      .table("messages")
       .set("deleted", 1)
       .where("messageID = ?", request.body.messageID)
       .where("receiverID = ?", request.userID)

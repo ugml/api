@@ -17,8 +17,9 @@ import PlanetRouter from "./routes/PlanetsRouter";
 import PlayerRouter from "./routes/PlayersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
+import dotenv = require("dotenv-safe");
 
-require("dotenv-safe").config({
+dotenv.config({
   example: process.env.CI ? ".env.ci.example" : ".env.example",
 });
 

@@ -61,7 +61,7 @@ export class AuthRouter {
           return;
         }
 
-        bcrypt.compare(password, users[0].password).then(function(isValidPassword) {
+        bcrypt.compare(password, users[0].password).then(function(isValidPassword : boolean) {
           if (!isValidPassword) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,

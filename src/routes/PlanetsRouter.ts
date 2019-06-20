@@ -55,7 +55,7 @@ export class PlanetsRouter {
         // TODO: check for unique-constraint violation
         const query: string = squel
           .update()
-          .table("users")
+        .table("users")
           .set("currentplanet = ?", request.body.planetID)
           .where("userID = ?", request.userID)
           .toString();
@@ -353,7 +353,7 @@ export class PlanetsRouter {
     // check if it is the last planet of the user
     const query: string = squel
       .update()
-      .table("planets")
+        .table("planets")
       .set("name", newName)
       .where("planetID = ?", request.body.planetID)
       .where("ownerID = ?", request.userID)

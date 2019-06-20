@@ -257,7 +257,7 @@ export class ShipsRouter {
         // update planet
         query = squel
           .update()
-          .table("planets")
+        .table("planets")
           .set("b_hangar_id", b_hangar_id_new)
           .set("b_hangar_start_time", b_hangar_start_time_new)
           .set("metal", metal)

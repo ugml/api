@@ -60,7 +60,7 @@ class Techs implements IUnits {
     return new Promise((resolve, reject) => {
       const query = squel
         .insert()
-        .table("techs")
+        .into("techs")
         .set("userID", this.userID)
         .set("espionage_tech", this.espionage_tech)
         .set("computer_tech", this.computer_tech)

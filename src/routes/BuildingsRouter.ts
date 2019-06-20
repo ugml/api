@@ -139,7 +139,7 @@ export class BuildingsRouter {
 
           const query: string = squel
             .update()
-            .table("planets")
+        .table("planets")
             .set("b_building_id", 0)
             .set("b_building_endtime", 0)
             .set("metal", planet.metal + cost.metal)
@@ -357,7 +357,7 @@ export class BuildingsRouter {
 
         const query: string = squel
           .update()
-          .table("planets")
+        .table("planets")
           .set("metal", planet.metal)
           .set("crystal", planet.crystal)
           .set("deuterium", planet.deuterium)

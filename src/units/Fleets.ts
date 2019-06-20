@@ -58,7 +58,7 @@ class Fleets implements IUnits {
     return new Promise((resolve, reject) => {
       const query = squel
         .insert()
-        .table("fleets")
+        .into("fleets")
         .set("planetID", this.planetID)
         .set("small_cargo_ship", this.small_cargo_ship)
         .set("large_cargo_ship", this.large_cargo_ship)

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Database } from "../common/Database";
-import { DuplicateRecordError } from "../common/Exceptions";
+import { DuplicateRecordException } from "../Exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
@@ -180,11 +180,11 @@ export class PlayersRouter {
       const rows = await Database.query(query);
 
       if (rows[0].username_taken === 1) {
-        throw new DuplicateRecordError("Username is already taken");
+        throw new DuplicateRecordException("Username is already taken");
       }
 
       if (rows[0].email_taken === 1) {
-        throw new DuplicateRecordError("Email is already taken");
+        throw new DuplicateRecordException("Email is already taken");
       }
 
       Logger.info("Getting a new userID");
@@ -328,7 +328,7 @@ export class PlayersRouter {
         Logger.info("Rolled back transaction");
       });
 
-      if (error instanceof DuplicateRecordError || error.message.includes("Duplicate entry")) {
+      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: `There was an error while handling the request: ${error.message}`,
@@ -423,7 +423,7 @@ export class PlayersRouter {
       .catch(err => {
         Logger.error(err);
 
-        if (err instanceof DuplicateRecordError || err.message.includes("Duplicate entry")) {
+        if (err instanceof DuplicateRecordException || err.message.includes("Duplicate entry")) {
           // return the result
           response.status(Globals.Statuscode.BAD_REQUEST).json({
             status: Globals.Statuscode.BAD_REQUEST,

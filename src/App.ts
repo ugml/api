@@ -113,7 +113,6 @@ class App {
           next();
         }
       } catch (e) {
-
         Logger.error(e);
 
         response.status(Globals.Statuscode.SERVER_ERROR).json({

@@ -1,8 +1,8 @@
 import { Database } from "../common/Database";
 import { IUnits } from "../interfaces/IUnits";
 
-const squel = require("squel");
-const Logger = require("../common/Logger");
+import squel = require("squel");
+import { Logger } from "../common/Logger";
 
 class Defenses implements IUnits {
   public planetID: number;
@@ -50,7 +50,7 @@ class Defenses implements IUnits {
     return new Promise((resolve, reject) => {
       const query = squel
         .insert()
-        .table("defenses")
+        .into("defenses")
         .set("planetID", this.planetID)
         .set("rocket_launcher", this.rocket_launcher)
         .set("light_laser", this.light_laser)

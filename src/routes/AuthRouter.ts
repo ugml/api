@@ -5,11 +5,11 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
 
-const squel = require("squel");
+import squel = require("squel");
 const jwt = new JwtHelper();
 const bcrypt = require("bcryptjs");
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
 export class AuthRouter {
   public router: Router;
@@ -61,7 +61,7 @@ export class AuthRouter {
           return;
         }
 
-        bcrypt.compare(password, users[0].password).then(function(isValidPassword) {
+        bcrypt.compare(password, users[0].password).then(function(isValidPassword: boolean) {
           if (!isValidPassword) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,

@@ -1,7 +1,9 @@
 import mysql = require("mysql2");
 import { Logger } from "./Logger";
 
-require("dotenv-safe").config({
+import dotenv = require("dotenv-safe");
+
+dotenv.config({
   example: process.env.CI ? ".env.ci.example" : ".env.example",
 });
 

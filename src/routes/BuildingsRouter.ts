@@ -9,9 +9,9 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 const units = new Units();
 
@@ -149,7 +149,7 @@ export class BuildingsRouter {
             .toString();
 
           return Database.query(query)
-            .then(result => {
+            .then(() => {
               planet.b_building_id = 0;
               planet.b_building_endtime = 0;
               planet.metal = planet.metal + cost.metal;

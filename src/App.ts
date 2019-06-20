@@ -17,8 +17,9 @@ import PlanetRouter from "./routes/PlanetsRouter";
 import PlayerRouter from "./routes/PlayersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
+import dotenv = require("dotenv-safe");
 
-require("dotenv-safe").config({
+dotenv.config({
   example: process.env.CI ? ".env.ci.example" : ".env.example",
 });
 
@@ -30,9 +31,9 @@ const winston = require("winston");
 const expressWinston = require("express-winston");
 
 const { format } = winston;
-const { combine, timestamp, printf } = format;
+const { combine, printf } = format;
 
-const Logger = require("./common/Logger");
+import { Logger } from "./common/Logger";
 
 const logFormat = printf(({ message, timestamp }) => {
   return `${timestamp} [REQUEST] ${message}`;
@@ -87,7 +88,7 @@ class App {
             self.userID = eval(payload).userID;
 
             // check if userID is a valid integer
-            if (isNaN(parseInt(self.userID))) {
+            if (isNaN(parseInt(self.userID, 10))) {
               response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",

@@ -1,15 +1,10 @@
 class QueueItem {
-  private planetID: number;
-  private lastUpdateTime: number;
-  private timeRemaining: number;
-  private queue: object;
+  private planetID: number = -1;
+  private lastUpdateTime: number = 0;
+  private timeRemaining: number = 0;
+  private queue: object = {};
 
-  public constructor() {
-    this.planetID = -1;
-    this.lastUpdateTime = 0;
-    this.timeRemaining = 0;
-    this.queue = {};
-  }
+  public constructor() {}
 
   public setPlanetID(planetID: number) {
     this.planetID = planetID;

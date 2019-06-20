@@ -83,12 +83,10 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-          let payload: IJwt = jwt.validateToken(authString);
+          const payload: IJwt = jwt.validateToken(authString);
 
           if (InputValidator.isSet(payload)) {
             self.userID = payload.userID.toString(10);
-
-            console.log(self.userID);
 
             // check if userID is a valid integer
             if (isNaN(parseInt(self.userID, 10))) {

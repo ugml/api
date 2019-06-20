@@ -189,82 +189,84 @@ export class DefenseRouter {
           result[0].missile_silo * 10 - result[0].anti_ballistic_missile - result[0].interplanetary_missile * 2;
 
         for (const item in buildOrders) {
-          if (!buildOrders.hasOwnProperty(item)) {
-            continue;
-          }
-          let count: number = buildOrders[item];
-          const cost: ICosts = DefenseRouter.getCosts(parseInt(item, 10));
+          if (buildOrders.hasOwnProperty(item)) {
+            let count: number = buildOrders[item];
+            const cost: ICosts = DefenseRouter.getCosts(parseInt(item, 10));
 
-          // if the user has not enough ressources to fullfill the complete build-order
-          if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-            let tempCount: number;
+            // if the user has not enough ressources to fullfill the complete build-order
+            if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+              let tempCount: number;
 
-            if (cost.metal > 0) {
-              tempCount = metal / cost.metal;
+              if (cost.metal > 0) {
+                tempCount = metal / cost.metal;
 
-              if (tempCount < count) {
-                count = tempCount;
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              if (cost.crystal > 0) {
+                tempCount = crystal / cost.crystal;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              if (cost.deuterium > 0) {
+                tempCount = deuterium / cost.deuterium;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              // no need to further process the queue
+              stopProcessing = true;
+            }
+
+            // check free slots in silo
+            if (item === "309") {
+              // can't build any more rockets
+              if (freeSiloSlots === 0) {
+                buildOrders[item] = 0;
+              } else {
+                buildOrders[item] = Math.min(freeSiloSlots, buildOrders[item]);
+                freeSiloSlots -= buildOrders[item];
               }
             }
 
-            if (cost.crystal > 0) {
-              tempCount = crystal / cost.crystal;
-
-              if (tempCount < count) {
-                count = tempCount;
+            if (item === "310") {
+              // can't build any more rockets
+              if (freeSiloSlots === 0) {
+                buildOrders[item] = 0;
+              } else {
+                buildOrders[item] = Math.floor(freeSiloSlots / 2) * buildOrders[item];
+                freeSiloSlots -= buildOrders[item];
               }
             }
 
-            if (cost.deuterium > 0) {
-              tempCount = deuterium / cost.deuterium;
+            // build time in seconds
+            buildTime +=
+              DefenseRouter.getBuildTimeInSeconds(
+                cost.metal,
+                cost.crystal,
+                result[0].shipyard,
+                result[0].nanite_factory,
+              ) * Math.floor(count);
 
-              if (tempCount < count) {
-                count = tempCount;
-              }
+            queueItem.addToQueue(item, Math.floor(count));
+
+            metal -= cost.metal * count;
+            crystal -= cost.crystal * count;
+            deuterium -= cost.deuterium * count;
+
+            if (stopProcessing) {
+              break;
             }
-
-            // no need to further process the queue
-            stopProcessing = true;
-          }
-
-          // check free slots in silo
-          if (item === "309") {
-            // can't build any more rockets
-            if (freeSiloSlots === 0) {
-              buildOrders[item] = 0;
-            } else {
-              buildOrders[item] = Math.min(freeSiloSlots, buildOrders[item]);
-              freeSiloSlots -= buildOrders[item];
-            }
-          }
-
-          if (item === "310") {
-            // can't build any more rockets
-            if (freeSiloSlots === 0) {
-              buildOrders[item] = 0;
-            } else {
-              buildOrders[item] = Math.floor(freeSiloSlots / 2) * buildOrders[item];
-              freeSiloSlots -= buildOrders[item];
-            }
-          }
-
-          // build time in seconds
-          buildTime +=
-            DefenseRouter.getBuildTimeInSeconds(
-              cost.metal,
-              cost.crystal,
-              result[0].shipyard,
-              result[0].nanite_factory,
-            ) * Math.floor(count);
-
-          queueItem.addToQueue(item, Math.floor(count));
-
-          metal -= cost.metal * count;
-          crystal -= cost.crystal * count;
-          deuterium -= cost.deuterium * count;
-
-          if (stopProcessing) {
-            break;
+          } else {
+            // TODO: throw a meaningful error
+            throw Error();
           }
         }
 
@@ -287,7 +289,7 @@ export class DefenseRouter {
         }
 
         // update planet
-        const query: string = squel
+        const updatePlanetQuery: string = squel
           .update()
           .table("planets")
           .set("b_hangar_id", b_hangar_id_new)
@@ -298,7 +300,7 @@ export class DefenseRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(query).then(() => {
+        Database.query(updatePlanetQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Success",

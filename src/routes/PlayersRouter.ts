@@ -233,7 +233,7 @@ export class PlayersRouter {
       Logger.info("Creating a new planet");
 
       data.planet.name = gameConfig.startplanet_name;
-      data.planet.last_update = (Date.now() / 1000) | 0;
+      data.planet.last_update = Math.floor(Date.now() / 1000);
       data.planet.diameter = gameConfig.startplanet_diameter;
       data.planet.fields_max = gameConfig.startplanet_maxfields;
       data.planet.metal = gameConfig.metal_start;
@@ -388,12 +388,12 @@ export class PlayersRouter {
       queryBuilder.set("email", email);
     }
 
-    const query: string = queryBuilder.where("userID = ?", request.userID).toString();
+    const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
     // execute the update
-    Database.query(query)
+    Database.query(updatePlayerQuery)
       .then(() => {
-        const query: string = squel
+        const getNewDataQuery: string = squel
           .select()
           .field("userID")
           .field("username")
@@ -405,7 +405,7 @@ export class PlayersRouter {
           .toString();
 
         // return the updated userdata
-        return Database.query(query).then(result => {
+        return Database.query(getNewDataQuery).then(result => {
           let data: {};
 
           if (InputValidator.isSet(result)) {

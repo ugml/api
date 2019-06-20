@@ -8,7 +8,9 @@ class SerializationHelper {
       obj.fromJSON(jsonObj);
     } else {
       for (const propName in jsonObj) {
-        obj[propName] = jsonObj[propName];
+        if (propName !== "") {
+          obj[propName] = jsonObj[propName];
+        }
       }
     }
 

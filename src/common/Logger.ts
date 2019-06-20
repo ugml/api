@@ -6,7 +6,9 @@ const myFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}] ${message}`;
 });
 
+/* tslint:disable: variable-name */
 const Logger = createLogger({
+  /* tslint:enable */
   format: combine(
     format.timestamp({
       format: "YYYY-MM-DD HH:mm:ss",

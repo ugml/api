@@ -14,7 +14,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "test": "mocha --reporter spec -r ts-node/register test/**/*.spec.ts --exit",
-    "test-coverage": "nyc mocha",
+    "test-coverage": "nyc --reporter=lcov mocha",
     "test-watch": "mocha --reporter spec --require ts-node/register test/**/*.spec.ts --watch",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",
@@ -41,8 +41,7 @@
       "ts-node/register"
     ],
     "reporter": [
-      "text-summary",
-      "html"
+      "text-lcov"
     ],
     "sourceMap": true,
     "instrument": true,
@@ -79,7 +78,6 @@
     "nodemon": "^1.19.1",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
-    "source-map-support": "^0.5.12",
     "ts-node": "^8.2.0",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5"

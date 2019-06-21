@@ -14,6 +14,14 @@ describe("InputValidator", function() {
     assert.equal(InputValidator.isValidInt("12a"), false);
   });
 
+  it("Valid Float", function() {
+    assert.equal(InputValidator.isValidInt("1.23"), true);
+  });
+
+  it("Invalid Float", function() {
+    assert.equal(InputValidator.isValidInt("12.11a"), false);
+  });
+
   it("Valid JSON", function() {
     assert.equal(InputValidator.isValidJson("{ \"test\" : 12}"), true);
   });

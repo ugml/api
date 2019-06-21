@@ -3,7 +3,7 @@ import * as chai from "chai";
 import { QueueItem } from "./QueueItem";
 
 let assert = chai.assert;
-let expect = chai.expect
+let expect = chai.expect;
 
 describe("QueueItem", function() {
   it("PlanetID should be -1", function() {

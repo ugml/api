@@ -23,6 +23,7 @@ describe("InputValidator", function() {
   });
 
   it("Valid JSON", function() {
+    // eslint-disable-next-line prettier/prettier
     assert.equal(InputValidator.isValidJson("{ \"test\" : 12}"), true);
   });
 

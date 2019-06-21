@@ -6,7 +6,6 @@ import { InputValidator } from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
 
 import squel = require("squel");
-const jwt = new JwtHelper();
 const bcrypt = require("bcryptjs");
 
 import { Logger } from "../common/Logger";
@@ -75,7 +74,7 @@ export class AuthRouter {
             status: Globals.Statuscode.SUCCESS,
             message: "Success",
             data: {
-              token: jwt.generateToken(users[0].userID),
+              token: JwtHelper.generateToken(users[0].userID),
             },
           });
           return;

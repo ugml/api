@@ -3,7 +3,7 @@ import { IJwt } from "../interfaces/IJwt";
 const jwt = require("jsonwebtoken");
 
 class JwtHelper {
-  public generateToken(userID: number): string {
+  public static generateToken(userID: number): string {
     return jwt.sign(
       {
         userID,
@@ -15,18 +15,12 @@ class JwtHelper {
     );
   }
 
-  public validateToken(authString: string): IJwt {
-    if (authString !== undefined) {
-      if (authString.startsWith("Bearer ")) {
-        const token: string = authString.split(" ")[1];
-
-        return jwt.verify(token, process.env.JWT_SECRET, function(error: any, decoded: any) {
-          return decoded;
-        });
-      }
+  public static validateToken(token: string): IJwt {
+    if (token !== undefined) {
+      return jwt.verify(token, process.env.JWT_SECRET, function(error: any, decoded: any) {
+        return decoded;
+      });
     }
-
-    return null;
   }
 }
 

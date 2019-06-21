@@ -30,10 +30,22 @@
     "functions": 0,
     "statements": 0,
     "watermarks": {
-      "lines": [80, 95],
-      "functions": [80, 95],
-      "branches": [80, 95],
-      "statements": [80, 95]
+      "lines": [
+        80,
+        95
+      ],
+      "functions": [
+        80,
+        95
+      ],
+      "branches": [
+        80,
+        95
+      ],
+      "statements": [
+        80,
+        95
+      ]
     },
     "extends": "@istanbuljs/nyc-config-typescript",
     "all": true,
@@ -60,6 +72,7 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "0.0.33",
     "@types/chai": "^4.1.7",
+    "@types/chai-as-promised": "^7.1.0",
     "@types/debug": "0.0.29",
     "@types/express": "^4.16.1",
     "@types/jwt-simple": "^0.5.33",
@@ -74,6 +87,7 @@
     "source-map-support": "^0.5.12",
     "chai": "^3.5.0",
     "chai-http": "^4.3.0",
+    "chai-as-promised": "^7.1.1",
     "codecov": "^3.5.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^5.0.0",

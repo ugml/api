@@ -24,7 +24,6 @@ dotenv.config({
   example: process.env.CI ? ".env.ci.example" : ".env.example",
 });
 
-const jwt = new JwtHelper();
 const expressip = require("express-ip");
 const helmet = require("helmet");
 
@@ -83,7 +82,14 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-          const payload: IJwt = jwt.validateToken(authString);
+
+          if (!authString.startsWith("Bearer ")) {
+            return;
+          }
+
+          const token: string = authString.split(" ")[1];
+
+          const payload: IJwt = JwtHelper.validateToken(token);
 
           if (InputValidator.isSet(payload)) {
             self.userID = payload.userID.toString(10);

@@ -23,13 +23,13 @@ class Database {
    * @param sql
    * @param args
    */
-  public static query(sql: string, args: object = null): Promise<any> {
+  public static async query(sql: string, args: object = null): Promise<any> {
     Logger.info(sql);
 
     return new Promise((resolve: any, reject: any): any => {
       return this.connection.query(sql, args, (err: any, rows: any) => {
         if (err) {
-          return reject(err);
+          return Promise.reject(err);
         }
         resolve(rows);
       });

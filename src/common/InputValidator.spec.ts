@@ -15,11 +15,11 @@ describe("InputValidator", function() {
   });
 
   it("Valid Float", function() {
-    assert.equal(InputValidator.isValidInt("1.23"), true);
+    assert.equal(InputValidator.isValidFloat("1.23"), true);
   });
 
   it("Invalid Float", function() {
-    assert.equal(InputValidator.isValidInt("12.11a"), false);
+    assert.equal(InputValidator.isValidFloat("12klafjsd.11a"), false);
   });
 
   it("Valid JSON", function() {

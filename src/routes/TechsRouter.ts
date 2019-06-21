@@ -1,4 +1,5 @@
 import { NextFunction, Response, Router } from "express";
+import { Validator } from "jsonschema";
 import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
@@ -120,7 +121,7 @@ export class TechsRouter {
 
           const cost: ICosts = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
 
-          const query: string = squel
+          const updatePlanetQuery: string = squel
             .update()
             .table("planets")
             .set("b_tech_id", 0)
@@ -132,8 +133,8 @@ export class TechsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-          return Database.query(query)
-            .then(result => {
+          return Database.query(updatePlanetQuery)
+            .then(() => {
               planet.b_tech_id = 0;
               planet.b_tech_endtime = 0;
               planet.metal = planet.metal + cost.metal;
@@ -269,12 +270,17 @@ export class TechsRouter {
           let requirementsMet = true;
 
           for (const reqID in requirements) {
-            const reqLevel = requirements[reqID];
-            const key = units.getMappings()[reqID];
+            if (requirements.hasOwnProperty(reqID)) {
+              const reqLevel = requirements[reqID];
+              const key = units.getMappings()[reqID];
 
-            if (planet[key] < reqLevel) {
-              requirementsMet = false;
-              break;
+              if (planet[key] < reqLevel) {
+                requirementsMet = false;
+                break;
+              }
+            } else {
+              // TODO: throw a meaningful error
+              throw Error();
             }
           }
 
@@ -321,7 +327,7 @@ export class TechsRouter {
         planet.b_tech_id = request.body.techID;
         planet.b_tech_endtime = endTime;
 
-        const query: string = squel
+        const updatePlanetQuery: string = squel
           .update()
           .table("planets")
           .set("metal", planet.metal)
@@ -332,8 +338,8 @@ export class TechsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(query)
-          .then(result => {
+        Database.query(updatePlanetQuery)
+          .then(() => {
             response.status(Globals.Statuscode.SUCCESS).json({
               status: Globals.Statuscode.SUCCESS,
               message: "Job started",

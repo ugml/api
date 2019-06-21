@@ -61,8 +61,6 @@ export class GalaxyRouter {
       .where("`pos_system` = ?", request.params.system)
       .toString();
 
-    console.log(query);
-
     // execute the query
     Database.query(query)
       .then(result => {

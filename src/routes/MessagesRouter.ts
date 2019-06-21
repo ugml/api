@@ -205,7 +205,7 @@ export class MessagesRouter {
           return;
         }
 
-        const query: string = squel
+        const insertNewMessageQuery: string = squel
           .insert()
           .into("messages")
           .set("senderID", request.userID)
@@ -216,7 +216,7 @@ export class MessagesRouter {
           .set("body", InputValidator.sanitizeString(request.body.body))
           .toString();
 
-        Database.query(query).then(() => {
+        Database.query(insertNewMessageQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Message sent.",

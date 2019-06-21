@@ -4,8 +4,6 @@ class QueueItem {
   private timeRemaining: number = 0;
   private queue: object = {};
 
-  public constructor() {}
-
   public setPlanetID(planetID: number) {
     this.planetID = planetID;
   }

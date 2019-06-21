@@ -53,14 +53,14 @@ export class PlanetsRouter {
         }
 
         // TODO: check for unique-constraint violation
-        const query: string = squel
+        const updateCurrentPlanetQuery: string = squel
           .update()
           .table("users")
           .set("currentplanet = ?", request.body.planetID)
           .where("userID = ?", request.userID)
           .toString();
 
-        return Database.query(query).then(result => {
+        return Database.query(updateCurrentPlanetQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Success",
@@ -266,14 +266,14 @@ export class PlanetsRouter {
         Database.getConnection().beginTransaction(() => {
           Logger.info("Transaction started");
 
-          const query: string = squel
+          const deletePlanetQuery: string = squel
             .delete()
             .from("planets")
             .where("planetID = ?", request.body.planetID)
             .where("ownerID = ?", request.userID)
             .toString();
 
-          Database.query(query)
+          Database.query(deletePlanetQuery)
             .then(() => {
               Database.getConnection().commit(function(err) {
                 if (err) {

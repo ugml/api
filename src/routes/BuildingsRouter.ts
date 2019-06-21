@@ -97,7 +97,7 @@ export class BuildingsRouter {
     }
 
     // get the planet, on which the building should be canceled
-    const query: string = squel
+    const getPlanetQuery: string = squel
       .select()
       .from("planets", "p")
       .join("buildings", "b", "p.planetID = b.planetID")
@@ -105,7 +105,7 @@ export class BuildingsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -137,7 +137,7 @@ export class BuildingsRouter {
 
           const cost: ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
 
-          const query: string = squel
+          const updateResourcesQuery: string = squel
             .update()
             .table("planets")
             .set("b_building_id", 0)
@@ -148,7 +148,7 @@ export class BuildingsRouter {
             .where("planetID = ?", planet.planetID)
             .toString();
 
-          return Database.query(query)
+          return Database.query(updateResourcesQuery)
             .then(() => {
               planet.b_building_id = 0;
               planet.b_building_endtime = 0;
@@ -222,7 +222,7 @@ export class BuildingsRouter {
     }
 
     // get the planet, on which the building should be built
-    const query: string = squel
+    const getPlanetQuery: string = squel
       .select()
       .from("planets", "p")
       .join("buildings", "b", "p.planetID = b.planetID")
@@ -230,7 +230,7 @@ export class BuildingsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -301,12 +301,17 @@ export class BuildingsRouter {
           let requirementsMet = true;
 
           for (const reqID in requirements) {
-            const reqLevel = requirements[reqID];
-            const key = units.getMappings()[request.body.buildingID];
+            if (requirements.hasOwnProperty(reqID)) {
+              const reqLevel = requirements[reqID];
+              const key = units.getMappings()[request.body.buildingID];
 
-            if (planet[key] < reqLevel) {
-              requirementsMet = false;
-              break;
+              if (planet[key] < reqLevel) {
+                requirementsMet = false;
+                break;
+              }
+            } else {
+              // TODO: throw a meaningful error
+              throw Error();
             }
           }
 
@@ -355,7 +360,7 @@ export class BuildingsRouter {
         planet.b_building_id = request.body.buildingID;
         planet.b_building_endtime = endTime;
 
-        const query: string = squel
+        const updateResourcesQuery: string = squel
           .update()
           .table("planets")
           .set("metal", planet.metal)
@@ -366,7 +371,7 @@ export class BuildingsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        return Database.query(query).then(result => {
+        return Database.query(updateResourcesQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Job started",

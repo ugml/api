@@ -20,6 +20,7 @@ before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < ci.sql
   - npm run-script lint
+  - npm run-script tslint
   - npm run-script build
 
 script:

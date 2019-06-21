@@ -7,8 +7,8 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICoordinates } from "../interfaces/ICoordinates";
 import { IShipUnits } from "../interfaces/IShipUnits";
 
-const JSONValidator = require("jsonschema").Validator;
-const jsonValidator = new JSONValidator();
+const validator = require("jsonschema").Validator;
+const jsonValidator = new validator();
 import squel = require("squel");
 
 import { Logger } from "../common/Logger";
@@ -93,8 +93,8 @@ export class EventRouter {
 
     // check if origin-planet exists and the user owns it
     Database.query(planetQuery)
-      .then(results => {
-        const startPlanet = results[0];
+      .then(planet => {
+        const startPlanet = planet[0];
 
         // planet does not exist or player does not own it
         if (!InputValidator.isSet(startPlanet)) {
@@ -140,8 +140,6 @@ export class EventRouter {
 
             const slowestShipSpeed = eventRouter.getSlowestShipSpeed(eventData.data.ships);
 
-            console.log(slowestShipSpeed);
-
             // calculate duration of flight
             const timeOfFlight = eventRouter.calculateTimeOfFlight(
               gameConfig.speed,
@@ -149,8 +147,6 @@ export class EventRouter {
               distance,
               slowestShipSpeed,
             );
-
-            console.log(timeOfFlight);
 
             // set start-time
             eventData.starttime = Math.round(+new Date() / 1000);
@@ -267,7 +263,7 @@ export class EventRouter {
           .where("ownerID = ?", request.userID)
           .toString();
 
-        Database.query(updateQuery).then(result => {
+        Database.query(updateQuery).then(() => {
           // remove the event from the redis-queue
           Redis.getConnection().zremrangebyscore("eventQueue", request.body.eventID, request.body.eventID);
 

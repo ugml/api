@@ -1,3 +1,5 @@
+import { IJwt } from "../interfaces/IJwt";
+
 const jwt = require("jsonwebtoken");
 
 class JwtHelper {
@@ -13,7 +15,7 @@ class JwtHelper {
     );
   }
 
-  public validateToken(authString: string): string {
+  public validateToken(authString: string): IJwt {
     if (authString !== undefined) {
       if (authString.startsWith("Bearer ")) {
         const token: string = authString.split(" ")[1];
@@ -24,7 +26,7 @@ class JwtHelper {
       }
     }
 
-    return "";
+    return null;
   }
 }
 

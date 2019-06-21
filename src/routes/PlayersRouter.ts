@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Database } from "../common/Database";
-import { DuplicateRecordError } from "../common/Exceptions";
+import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
@@ -180,11 +180,11 @@ export class PlayersRouter {
       const rows = await Database.query(query);
 
       if (rows[0].username_taken === 1) {
-        throw new DuplicateRecordError("Username is already taken");
+        throw new DuplicateRecordException("Username is already taken");
       }
 
       if (rows[0].email_taken === 1) {
-        throw new DuplicateRecordError("Email is already taken");
+        throw new DuplicateRecordException("Email is already taken");
       }
 
       Logger.info("Getting a new userID");
@@ -233,7 +233,7 @@ export class PlayersRouter {
       Logger.info("Creating a new planet");
 
       data.planet.name = gameConfig.startplanet_name;
-      data.planet.last_update = (Date.now() / 1000) | 0;
+      data.planet.last_update = Math.floor(Date.now() / 1000);
       data.planet.diameter = gameConfig.startplanet_diameter;
       data.planet.fields_max = gameConfig.startplanet_maxfields;
       data.planet.metal = gameConfig.metal_start;
@@ -309,7 +309,11 @@ export class PlayersRouter {
                                   ${data.planet.galaxy},
                                   ${data.planet.system},
                                   ${data.planet.planet}
-                                );`;
+                                );`
+        .split("\n")
+        .join("")
+        .replace("  ", " ");
+      // ^^^ temporary so that the query takes up one line instead of 14 in the log
 
       await Database.query(queryGalaxy);
 
@@ -328,7 +332,7 @@ export class PlayersRouter {
         Logger.info("Rolled back transaction");
       });
 
-      if (error instanceof DuplicateRecordError || error.message.includes("Duplicate entry")) {
+      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: `There was an error while handling the request: ${error.message}`,
@@ -388,12 +392,12 @@ export class PlayersRouter {
       queryBuilder.set("email", email);
     }
 
-    const query: string = queryBuilder.where("userID = ?", request.userID).toString();
+    const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
     // execute the update
-    Database.query(query)
+    Database.query(updatePlayerQuery)
       .then(() => {
-        const query: string = squel
+        const getNewDataQuery: string = squel
           .select()
           .field("userID")
           .field("username")
@@ -405,7 +409,7 @@ export class PlayersRouter {
           .toString();
 
         // return the updated userdata
-        return Database.query(query).then(result => {
+        return Database.query(getNewDataQuery).then(result => {
           let data: {};
 
           if (InputValidator.isSet(result)) {
@@ -423,7 +427,7 @@ export class PlayersRouter {
       .catch(err => {
         Logger.error(err);
 
-        if (err instanceof DuplicateRecordError || err.message.includes("Duplicate entry")) {
+        if (err instanceof DuplicateRecordException || err.message.includes("Duplicate entry")) {
           // return the result
           response.status(Globals.Statuscode.BAD_REQUEST).json({
             status: Globals.Statuscode.BAD_REQUEST,

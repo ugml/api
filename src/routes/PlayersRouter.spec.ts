@@ -24,11 +24,4 @@ describe("Player Routes", () => {
         expect(res.status).to.eql(200);
       });
   });
-
-  it.skip("should have a message prop", () => {
-    return request.get("/v1/").then(res => {
-      console.log(res.body.message);
-      expect(res.body.message).to.eql("Hello World!");
-    });
-  });
 });

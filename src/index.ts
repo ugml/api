@@ -7,7 +7,7 @@ import { Logger } from "./common/Logger";
 
 debug("ts-express:server");
 
-let port = normalizePort(process.env.PORT || 3000);
+const port = normalizePort(process.env.PORT || 3000);
 
 App.set("port", port);
 
@@ -17,7 +17,7 @@ server.on("error", onError);
 server.on("listening", onListening);
 
 function normalizePort(val: number | string): number | string | boolean {
-  let tempPort = typeof val === "string" ? parseInt(val, 10) : val;
+  const tempPort = typeof val === "string" ? parseInt(val, 10) : val;
   if (isNaN(tempPort)) {
     return val;
   } else if (tempPort >= 0) {

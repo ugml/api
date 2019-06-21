@@ -19,8 +19,8 @@ export class ShipsRouter {
       if (
         !InputValidator.isValidInt(order) ||
         !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order) < Globals.MIN_SHIP_ID ||
-        parseInt(order) > Globals.MAX_SHIP_ID ||
+        parseInt(order, 10) < Globals.MIN_SHIP_ID ||
+        parseInt(order, 10) > Globals.MAX_SHIP_ID ||
         buildOrders[order] < 0
       ) {
         return false;
@@ -185,54 +185,63 @@ export class ShipsRouter {
         let buildTime = 0;
 
         for (const item in buildOrders) {
-          let count: number = buildOrders[item];
-          const cost: ICosts = ShipsRouter.getCosts(parseInt(item, 10));
+          if (buildOrders.hasOwnProperty(item)) {
+            let count: number = buildOrders[item];
+            const cost: ICosts = ShipsRouter.getCosts(parseInt(item, 10));
 
-          // if the user has not enough ressources to fullfill the complete build-order
-          if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-            let tempCount: number;
+            // if the user has not enough ressources to fullfill the complete build-order
+            if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+              let tempCount: number;
 
-            if (cost.metal > 0) {
-              tempCount = metal / cost.metal;
+              if (cost.metal > 0) {
+                tempCount = metal / cost.metal;
 
-              if (tempCount < count) {
-                count = tempCount;
+                if (tempCount < count) {
+                  count = tempCount;
+                }
               }
+
+              if (cost.crystal > 0) {
+                tempCount = crystal / cost.crystal;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              if (cost.deuterium > 0) {
+                tempCount = deuterium / cost.deuterium;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              // no need to further process the queue
+              stopProcessing = true;
             }
 
-            if (cost.crystal > 0) {
-              tempCount = crystal / cost.crystal;
+            // build time in seconds
+            buildTime +=
+              ShipsRouter.getBuildTimeInSeconds(
+                cost.metal,
+                cost.crystal,
+                result[0].shipyard,
+                result[0].nanite_factory,
+              ) * Math.floor(count);
 
-              if (tempCount < count) {
-                count = tempCount;
-              }
+            queueItem.addToQueue(item, Math.floor(count));
+
+            metal -= cost.metal * count;
+            crystal -= cost.crystal * count;
+            deuterium -= cost.deuterium * count;
+
+            if (stopProcessing) {
+              break;
             }
-
-            if (cost.deuterium > 0) {
-              tempCount = deuterium / cost.deuterium;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            // no need to further process the queue
-            stopProcessing = true;
-          }
-
-          // build time in seconds
-          buildTime +=
-            ShipsRouter.getBuildTimeInSeconds(cost.metal, cost.crystal, result[0].shipyard, result[0].nanite_factory) *
-            Math.floor(count);
-
-          queueItem.addToQueue(item, Math.floor(count));
-
-          metal -= cost.metal * count;
-          crystal -= cost.crystal * count;
-          deuterium -= cost.deuterium * count;
-
-          if (stopProcessing) {
-            break;
+          } else {
+            // TODO: throw a meaningful error
+            throw Error();
           }
         }
 

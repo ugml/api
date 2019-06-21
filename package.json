@@ -14,7 +14,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "test": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --exit",
-    "test-coverage": "nyc --reporter=lcov mocha --require ts-node/register src/**/*.spec.ts --exit",
+    "test-coverage": "nyc --reporter=lcov --reporter=text mocha --require ts-node/register src/**/*.spec.ts --exit",
     "test-watch": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --watch",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",

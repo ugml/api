@@ -4,7 +4,7 @@ class InputValidator {
       return false;
     }
 
-    if (isNaN(parseInt(input, 10))) {
+    if (!input.match(/^-{0,1}\d+$/)) {
       return false;
     }
 

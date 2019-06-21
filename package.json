@@ -25,6 +25,10 @@
     "watch": "gulp"
   },
   "nyc": {
+    "branches": 0,
+    "lines": 0,
+    "functions": 0,
+    "statements": 0,
     "extends": "@istanbuljs/nyc-config-typescript",
     "all": true,
     "check-coverage": true,

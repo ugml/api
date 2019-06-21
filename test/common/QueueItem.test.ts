@@ -1,6 +1,6 @@
 import * as mocha from "mocha";
 import * as chai from "chai";
-import { QueueItem } from "../src/common/QueueItem";
+import { QueueItem } from "../../src/common/QueueItem";
 
 let assert = chai.assert;
 let expect = chai.expect;

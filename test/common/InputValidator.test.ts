@@ -1,6 +1,6 @@
 import * as mocha from "mocha";
 import * as chai from "chai";
-import { InputValidator } from "../src/common/InputValidator";
+import { InputValidator } from "../../src/common/InputValidator";
 
 let assert = chai.assert;
 let expect = chai.expect;

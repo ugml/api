@@ -26,6 +26,7 @@ before_script:
 
 script:
   - npm run-script test
+  - npm run-script test-coverage
 
 after_success:
   - codecov

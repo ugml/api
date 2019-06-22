@@ -17,6 +17,6 @@ describe("Database", function() {
   });
 
   it("Get connection", function() {
-    expect(Database.getConnection()).not.to.be.null;
+    expect(Database.getConnectionPool()).not.to.be.null;
   });
 });

@@ -172,7 +172,7 @@ export class PlayersRouter {
       `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
       `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
 
-    const connection = Database.getConnection().promise();
+    const connection = Database.getConnectionPool().promise();
     try {
       // BEGIN TRANSACTION
       await connection.beginTransaction();

@@ -14,8 +14,8 @@ class Database {
   /***
    * Returns the current connection to the mysql-database
    */
-  public static getConnection(): any {
-    return this.connection;
+  public static getConnectionPool(): any {
+    return this.pool;
   }
 
   /***
@@ -27,7 +27,7 @@ class Database {
     Logger.info(sql);
 
     return new Promise((resolve: any, reject: any): any => {
-      return this.connection.query(sql, args, (err: any, rows: any) => {
+      return this.pool.query(sql, args, (err: any, rows: any) => {
         if (err) {
           return Promise.reject(err);
         }
@@ -39,13 +39,16 @@ class Database {
     });
   }
 
-  private static connection = mysql
-    .createConnection({
+  private static pool = mysql
+    .createPool({
       host: process.env.DB_HOST || "localhost",
       user: process.env.DB_USER || "root",
       database: process.env.DB_NAME || "ugamela",
       password: process.env.DB_PASS || "",
       port: process.env.DB_PORT || 3306,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
     })
     .on("error", function(err) {
       Logger.error(err);

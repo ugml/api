@@ -263,7 +263,7 @@ export class PlanetsRouter {
         }
 
         // destroy the planet
-        Database.getConnection().beginTransaction(() => {
+        Database.getConnectionPool().beginTransaction(() => {
           Logger.info("Transaction started");
 
           const deletePlanetQuery: string = squel
@@ -275,9 +275,9 @@ export class PlanetsRouter {
 
           Database.query(deletePlanetQuery)
             .then(() => {
-              Database.getConnection().commit(function(err) {
+              Database.getConnectionPool().commit(function(err) {
                 if (err) {
-                  Database.getConnection().rollback(function() {
+                  Database.getConnectionPool().rollback(function() {
                     Logger.error(err);
                     throw err;
                   });

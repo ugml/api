@@ -82,12 +82,16 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-
-          if (!authString.startsWith("Bearer ")) {
+          if (!InputValidator.isSet(authString) || !authString.match("([\\w]+\\.[\\w]+.[\\w]+)")) {
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+              status: Globals.Statuscode.NOT_AUTHORIZED,
+              message: "Authentication failed",
+              data: {},
+            });
             return;
           }
 
-          const token: string = authString.split(" ")[1];
+          const token: string = authString.match("([\\w]+\\.[\\w]+.[\\w]+)")[0];
 
           const payload: IJwt = JwtHelper.validateToken(token);
 

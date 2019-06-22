@@ -11,8 +11,8 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("buildingsRoute", () => {
-  before(async () => {
-    await request
+  before(() => {
+    request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {

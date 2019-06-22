@@ -21,7 +21,7 @@
     "tslint": "tslint --project .",
     "tslint-fix": "tslint --project . --fix",
     "tsc": "tsc --noEmit --project .",
-    "build": "gulp compile",
+    "build": "gulp build",
     "watch": "gulp"
   },
   "nyc": {
@@ -79,7 +79,6 @@
     "eslint-config-prettier": "^5.0.0",
     "eslint-plugin-prettier": "^3.1.0",
     "gulp": "^4.0.0",
-    "gulp-file-cache": "0.0.1",
     "gulp-nodemon": "^2.4.2",
     "gulp-typescript": "^5.0.1",
     "mocha": "^5.2.0",

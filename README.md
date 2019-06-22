@@ -8,7 +8,7 @@
 
 # ugamela API
 
-This repository contains the official API which can be usedto create a client for the browsergame ugamela.
+This repository contains the official API which can be used to create a client for the browsergame ugamela.
 The official API can be found at https://api.ugamela.org/v1/
 
 # Disclaimer
@@ -19,23 +19,28 @@ This open-source project is still in an alpha-state, **please do not use this in
 
 1. Clone the repository
 
-2. Install gulp and all required packages (if not already installed)
+2. Install all required packages
 
 ```
-npm install gulp
 npm install
 ```
 
-3. Run the predefined gulp-task to compile all typescript files
+3. Run the gulp-task to compile all typescript files and copy assets
 
 ```
-gulp scripts
+npm run build
 ```
 
 4.  Run the api
 
 ```
 npm start
+```
+
+5. Or start the server in watch-mode, recompiling and restarting on changes
+
+```
+npm run watch
 ```
 
 # Routes

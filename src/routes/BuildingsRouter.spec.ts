@@ -12,7 +12,7 @@ let request = chai.request(app);
 
 describe("buildingsRoute", () => {
   before(() => {
-    request
+    return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
@@ -22,9 +22,21 @@ describe("buildingsRoute", () => {
 
   beforeEach(function() {
     request = chai.request(app);
+    return;
   });
 
-  it("should return a list of buildings", async () => {
+  it("should return a list of buildings", () => {
+    let planetID = 167546850;
+
+    return request
+      .get(`/v1/buildings/${planetID}`)
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.data.planetID).equals(planetID);
+      });
+  });
+
+  it("should return a list of buildings 2", () => {
     let planetID = 167546850;
 
     return request

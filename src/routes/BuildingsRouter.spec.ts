@@ -25,7 +25,7 @@ describe("buildingsRoute", () => {
   });
 
   it("should return a list of buildings", async () => {
-    let planetID = 48328;
+    let planetID = 167546850;
 
     return request
       .get(`/v1/buildings/${planetID}`)

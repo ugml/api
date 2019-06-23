@@ -8,7 +8,6 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 describe("Player Routes", () => {
-
   let request = chai.request(app);
 
   beforeEach(function() {

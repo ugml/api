@@ -32,18 +32,7 @@ describe("buildingsRoute", () => {
       .get(`/v1/buildings/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.data.planetID).equals(planetID);
-      });
-  });
-
-  it("should return a list of buildings 2", () => {
-    let planetID = 167546850;
-
-    return request
-      .get(`/v1/buildings/${planetID}`)
-      .set("Authorization", authToken)
-      .then(res => {
-        expect(res.body.data.planetID).equals(planetID);
+        expect(res.body.data[0].planetID).equals(planetID);
       });
   });
 });

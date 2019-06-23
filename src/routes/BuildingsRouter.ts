@@ -54,7 +54,8 @@ export class BuildingsRouter {
       .toString();
 
     // execute the query
-    Database.getConnectionPool().query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -105,7 +106,8 @@ export class BuildingsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool().query(getPlanetQuery)
+    Database.getConnectionPool()
+      .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -148,7 +150,8 @@ export class BuildingsRouter {
             .where("planetID = ?", planet.planetID)
             .toString();
 
-          return Database.getConnectionPool().query(updateResourcesQuery)
+          return Database.getConnectionPool()
+            .query(updateResourcesQuery)
             .then(() => {
               planet.b_building_id = 0;
               planet.b_building_endtime = 0;
@@ -230,7 +233,8 @@ export class BuildingsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool().query(getPlanetQuery)
+    Database.getConnectionPool()
+      .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -371,15 +375,17 @@ export class BuildingsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        return Database.getConnectionPool().query(updateResourcesQuery).then(() => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Job started",
-            data: { planet },
-          });
+        return Database.getConnectionPool()
+          .query(updateResourcesQuery)
+          .then(() => {
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Job started",
+              data: { planet },
+            });
 
-          return;
-        });
+            return;
+          });
       })
       .catch(error => {
         Logger.error(error);

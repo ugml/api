@@ -58,7 +58,8 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.getConnectionPool().query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data: {};
 
@@ -112,7 +113,8 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.getConnectionPool().query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data = {};
 
@@ -401,7 +403,8 @@ export class PlayersRouter {
     const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
     // execute the update
-    Database.getConnectionPool().query(updatePlayerQuery)
+    Database.getConnectionPool()
+      .query(updatePlayerQuery)
       .then(() => {
         const getNewDataQuery: string = squel
           .select()
@@ -415,20 +418,22 @@ export class PlayersRouter {
           .toString();
 
         // return the updated userdata
-        return Database.getConnectionPool().query(getNewDataQuery).then(result => {
-          let data: {};
+        return Database.getConnectionPool()
+          .query(getNewDataQuery)
+          .then(result => {
+            let data: {};
 
-          if (InputValidator.isSet(result)) {
-            data = result[0];
-          }
+            if (InputValidator.isSet(result)) {
+              data = result[0];
+            }
 
-          // return the result
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data,
+            // return the result
+            return response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Success",
+              data,
+            });
           });
-        });
       })
       .catch(err => {
         Logger.error(err);

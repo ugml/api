@@ -35,7 +35,8 @@ class Defenses implements IUnits {
         .where("planetID = ?", this.planetID)
         .toString();
 
-      Database.getConnectionPool().query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })
@@ -64,7 +65,8 @@ class Defenses implements IUnits {
         .set("interplanetary_missile", this.interplanetary_missile)
         .toString();
 
-      Database.getConnectionPool().query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })

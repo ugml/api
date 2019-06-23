@@ -78,7 +78,8 @@ class Planet implements IUnits {
         .where("planetID = ?", this.planetID)
         .toString();
 
-      Database.getConnectionPool().query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })

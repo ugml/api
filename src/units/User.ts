@@ -61,7 +61,8 @@ class User implements IUnits {
         .where("userID = ?", this.userID)
         .toString();
 
-      Database.getConnectionPool().query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })

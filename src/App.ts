@@ -82,9 +82,10 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-          console.log(authString);
-
-          if (!InputValidator.isSet(authString) || !authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")) {
+          if (
+            !InputValidator.isSet(authString) ||
+            !authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")
+          ) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,
               message: "Authentication failed",

@@ -20,7 +20,7 @@ describe("Player Routes", () => {
       .send(user)
       .then(res => {
         expect(res.type).to.eql("application/json");
-        console.log("player creation response", res.body);
+        // console.log("player creation response", res.body);
         expect(res.status).to.eql(200);
       });
   });

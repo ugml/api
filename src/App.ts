@@ -24,7 +24,6 @@ dotenv.config({
   example: process.env.CI ? ".env.ci.example" : ".env.example",
 });
 
-const jwt = new JwtHelper();
 const expressip = require("express-ip");
 const helmet = require("helmet");
 
@@ -83,7 +82,21 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-          const payload: IJwt = jwt.validateToken(authString);
+          if (
+            !InputValidator.isSet(authString) ||
+            !authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")
+          ) {
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+              status: Globals.Statuscode.NOT_AUTHORIZED,
+              message: "Authentication failed",
+              data: {},
+            });
+            return;
+          }
+
+          const token: string = authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")[0];
+
+          const payload: IJwt = JwtHelper.validateToken(token);
 
           if (InputValidator.isSet(payload)) {
             self.userID = payload.userID.toString(10);

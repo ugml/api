@@ -6,16 +6,22 @@ import app from "../App";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
-const request = chai.request(app);
 
 describe("Player Routes", () => {
-  it("should create a player", async () => {
+  let request = chai.request(app);
+
+  beforeEach(function() {
+    request = chai.request(app);
+  });
+
+  it("should create a player", done => {
     const user = {
       username: "Test4",
       password: "test",
       email: "test",
     };
-    return request
+
+    request
       .post("/v1/users/create/")
       .send(user)
       .then(res => {
@@ -23,5 +29,7 @@ describe("Player Routes", () => {
         console.log("player creation response", res.body);
         expect(res.status).to.eql(200);
       });
+
+    done();
   });
 });

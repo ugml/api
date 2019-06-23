@@ -17,7 +17,7 @@ describe("authRoute", () => {
   });
 
   it("should return a token", async () => {
-    return request
+    return await request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {

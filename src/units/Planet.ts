@@ -78,7 +78,8 @@ class Planet implements IUnits {
         .where("planetID = ?", this.planetID)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })
@@ -89,55 +90,50 @@ class Planet implements IUnits {
     });
   }
 
-  public create(): Promise<{}> {
-    return new Promise((resolve, reject) => {
-      const query = squel
-        .insert()
-        .into("planets")
-        .set("planetID", this.planetID)
-        .set("ownerID", this.ownerID)
-        .set("name", this.name)
-        .set("galaxy", this.galaxy)
-        .set("system", this.system)
-        .set("planet", this.planet)
-        .set("last_update", this.last_update)
-        .set("planet_type", this.planet_type)
-        .set("image", this.image)
-        .set("diameter", this.diameter)
-        .set("fields_current", this.fields_current)
-        .set("fields_max", this.fields_max)
-        .set("temp_min", this.temp_min)
-        .set("temp_max", this.temp_max)
-        .set("metal", this.metal)
-        .set("crystal", this.crystal)
-        .set("deuterium", this.deuterium)
-        .set("energy_used", this.energy_used)
-        .set("energy_max", this.energy_max)
-        .set("metal_mine_percent", this.metal_mine_percent)
-        .set("crystal_mine_percent", this.crystal_mine_percent)
-        .set("deuterium_synthesizer_percent", this.deuterium_synthesizer_percent)
-        .set("solar_plant_percent", this.solar_plant_percent)
-        .set("fusion_reactor_percent", this.fusion_reactor_percent)
-        .set("solar_satellite_percent", this.solar_satellite_percent)
-        .set("b_building_id", this.b_building_id)
-        .set("b_building_endtime", this.b_building_endtime)
-        .set("b_tech_id", this.b_tech_id)
-        .set("b_tech_endtime", this.b_tech_endtime)
-        .set("b_hangar_id", this.b_hangar_id)
-        .set("b_hangar_start_time", this.b_hangar_start_time)
-        .set("b_hangar_plus", this.b_hangar_plus)
-        .set("destroyed", this.destroyed)
-        .toString();
+  public async create(connection = null): Promise<{}> {
+    const query = squel
+      .insert()
+      .into("planets")
+      .set("planetID", this.planetID)
+      .set("ownerID", this.ownerID)
+      .set("name", this.name)
+      .set("galaxy", this.galaxy)
+      .set("system", this.system)
+      .set("planet", this.planet)
+      .set("last_update", this.last_update)
+      .set("planet_type", this.planet_type)
+      .set("image", this.image)
+      .set("diameter", this.diameter)
+      .set("fields_current", this.fields_current)
+      .set("fields_max", this.fields_max)
+      .set("temp_min", this.temp_min)
+      .set("temp_max", this.temp_max)
+      .set("metal", this.metal)
+      .set("crystal", this.crystal)
+      .set("deuterium", this.deuterium)
+      .set("energy_used", this.energy_used)
+      .set("energy_max", this.energy_max)
+      .set("metal_mine_percent", this.metal_mine_percent)
+      .set("crystal_mine_percent", this.crystal_mine_percent)
+      .set("deuterium_synthesizer_percent", this.deuterium_synthesizer_percent)
+      .set("solar_plant_percent", this.solar_plant_percent)
+      .set("fusion_reactor_percent", this.fusion_reactor_percent)
+      .set("solar_satellite_percent", this.solar_satellite_percent)
+      .set("b_building_id", this.b_building_id)
+      .set("b_building_endtime", this.b_building_endtime)
+      .set("b_tech_id", this.b_tech_id)
+      .set("b_tech_endtime", this.b_tech_endtime)
+      .set("b_hangar_id", this.b_hangar_id)
+      .set("b_hangar_start_time", this.b_hangar_start_time)
+      .set("b_hangar_plus", this.b_hangar_plus)
+      .set("destroyed", this.destroyed)
+      .toString();
 
-      Database.query(query)
-        .then(() => {
-          return resolve(this);
-        })
-        .catch(error => {
-          Logger.error(error);
-          return reject(error);
-        });
-    });
+    if (connection === null) {
+      return await Database.getConnectionPool().query(query);
+    } else {
+      return await connection.query(query);
+    }
   }
 
   public isValid(): boolean {

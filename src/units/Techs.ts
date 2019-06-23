@@ -45,7 +45,8 @@ class Techs implements IUnits {
         .where("userID = ?", this.userID)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })
@@ -79,7 +80,8 @@ class Techs implements IUnits {
         .set("graviton_tech", this.graviton_tech)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })

@@ -4,7 +4,13 @@
     "target": "es6",
     "module": "commonjs",
     "outDir": "dist",
-    "typeRoots" : ["typings/"]
+    "types": [
+      // add node as an option
+      "node"
+    ],
+    "typeRoots" : [
+      "node_modules/@types"
+    ]
   },
   "compileOnSave": true,
   "include": [

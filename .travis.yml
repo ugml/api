@@ -18,7 +18,7 @@ addons:
 
 before_script:
   - sudo systemctl start mariadb
-  - sudo mysql -u root < ci.sql
+  - sudo mysql -u root < test/ci.sql
   - npm install codecov -g
   - npm run-script lint
   - npm run-script tslint

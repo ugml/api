@@ -58,7 +58,8 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data: {};
 
@@ -112,7 +113,8 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data = {};
 
@@ -165,19 +167,18 @@ export class PlayersRouter {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // TODO: use squel
+    const connection = await Database.getConnectionPool().getConnection();
 
-    // check, if the username or the email is already taken
-    const query =
-      `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
-      `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
-
-    const connection = Database.getConnection().promise();
     try {
-      // BEGIN TRANSACTION
       await connection.beginTransaction();
 
-      const rows = await Database.query(query);
+      // TODO: use squel
+      // check, if the username or the email is already taken
+      const query =
+        `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
+        `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
+
+      const rows = await connection.query(query);
 
       if (rows[0].username_taken === 1) {
         throw new DuplicateRecordException("Username is already taken");
@@ -197,8 +198,9 @@ export class PlayersRouter {
       newPlayer.username = username;
       newPlayer.email = email;
 
-      const data = await Database.query(queryUser).then(row => {
-        newPlayer.userID = row[0][0].userID;
+      const data = await connection.query(queryUser).then(row => {
+        // why the f*ck is the result three-dimensional?
+        newPlayer.userID = row[0][0][0].userID;
         newPlayer.password = hashedPassword;
         newPlanet.ownerID = newPlayer.userID;
         newPlanet.planet_type = PlanetType.Planet;
@@ -210,26 +212,32 @@ export class PlayersRouter {
 
       const queryPlanet = "CALL getNewPlanetId();";
 
-      await Database.query(queryPlanet).then(row => {
-        data.player.currentplanet = row[0][0].planetID;
-        data.planet.planetID = row[0][0].planetID;
+      await connection.query(queryPlanet).then(row => {
+        data.player.currentplanet = row[0][0][0].planetID;
+        data.planet.planetID = row[0][0][0].planetID;
       });
+
       Logger.info("Finding free position for new planet");
 
       // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
       const queryPosition = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
 
-      await Database.query(queryPosition).then(row => {
-        data.planet.galaxy = row[0][0].posGalaxy;
-        data.planet.system = row[0][0].posSystem;
-        data.planet.planet = row[0][0].posPlanet;
-      });
+      await connection
+        .query(queryPosition)
+        .then(row => {
+          data.planet.galaxy = row[0][0][0].posGalaxy;
+          data.planet.system = row[0][0][0].posSystem;
+          data.planet.planet = row[0][0][0].posPlanet;
+        })
+        .catch(error => {
+          Logger.error(error);
+        });
 
       Logger.info("Creating a new user");
 
-      await data.player.create();
+      await data.player.create(connection);
 
-      // TODO extract planet creation
+      // // TODO extract planet creation
       Logger.info("Creating a new planet");
 
       data.planet.name = gameConfig.startplanet_name;
@@ -274,25 +282,25 @@ export class PlayersRouter {
         }
       }
 
-      await data.planet.create();
+      await data.planet.create(connection);
 
       Logger.info("Creating entry in buildings-table");
 
       const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
 
-      await Database.query(queryBuildings);
+      await connection.query(queryBuildings);
 
       Logger.info("Creating entry in defenses-table");
 
       const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
 
-      await Database.query(queryDefenses);
+      await connection.query(queryDefenses);
 
       Logger.info("Creating entry in fleet-table");
 
       const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
 
-      await Database.query(queryFleet);
+      await connection.query(queryFleet);
 
       Logger.info("Creating entry in galaxy-table");
 
@@ -315,22 +323,22 @@ export class PlayersRouter {
         .replace("  ", " ");
       // ^^^ temporary so that the query takes up one line instead of 14 in the log
 
-      await Database.query(queryGalaxy);
+      await connection.query(queryGalaxy);
 
       Logger.info("Creating entry in techs-table");
 
       const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
 
-      await Database.query(queryTech);
+      await connection.query(queryTech);
 
-      await connection.commit();
+      connection.commit();
 
       Logger.info("Transaction complete");
+
+      await connection.commit();
     } catch (error) {
+      await connection.rollback();
       Logger.error(error);
-      await connection.rollback(function() {
-        Logger.info("Rolled back transaction");
-      });
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -345,9 +353,9 @@ export class PlayersRouter {
         message: "There was an error while handling the request.",
         data: {},
       });
+    } finally {
+      await connection.release();
     }
-
-    // return the result
 
     return response.status(Globals.Statuscode.SUCCESS).json({
       status: Globals.Statuscode.SUCCESS,
@@ -395,7 +403,8 @@ export class PlayersRouter {
     const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
     // execute the update
-    Database.query(updatePlayerQuery)
+    Database.getConnectionPool()
+      .query(updatePlayerQuery)
       .then(() => {
         const getNewDataQuery: string = squel
           .select()
@@ -409,20 +418,22 @@ export class PlayersRouter {
           .toString();
 
         // return the updated userdata
-        return Database.query(getNewDataQuery).then(result => {
-          let data: {};
+        return Database.getConnectionPool()
+          .query(getNewDataQuery)
+          .then(result => {
+            let data: {};
 
-          if (InputValidator.isSet(result)) {
-            data = result[0];
-          }
+            if (InputValidator.isSet(result)) {
+              data = result[0];
+            }
 
-          // return the result
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data,
+            // return the result
+            return response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Success",
+              data,
+            });
           });
-        });
       })
       .catch(err => {
         Logger.error(err);

@@ -21,7 +21,6 @@ describe("authRoute", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
-        console.log(res);
         expect(res.body.message).equals("Success");
       });
   });

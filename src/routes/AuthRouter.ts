@@ -52,7 +52,7 @@ export class AuthRouter {
     await Database.getConnectionPool()
       .query(query)
       .then(users => {
-        if (!InputValidator.isSet(users)) {
+        if (!InputValidator.isSet(users) || users[0][0] === undefined) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
             message: "Authentication failed",

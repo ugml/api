@@ -1,4 +1,4 @@
-import mysql = require("mysql2");
+import mysql = require("mysql2/promise");
 import { Logger } from "./Logger";
 
 import dotenv = require("dotenv-safe");
@@ -14,7 +14,7 @@ class Database {
   /***
    * Returns the current connection to the mysql-database
    */
-  public static getConnectionPool(): any {
+  public static getConnectionPool() {
     return this.pool;
   }
 
@@ -23,20 +23,9 @@ class Database {
    * @param sql
    * @param args
    */
-  public static async query(sql: string, args: object = null): Promise<any> {
+  public static query(sql: string, args: object = null): Promise<any> {
     Logger.info(sql);
-
-    return new Promise((resolve: any, reject: any): any => {
-      return this.pool.query(sql, args, (err: any, rows: any) => {
-        if (err) {
-          return Promise.reject(err);
-        }
-        resolve(rows);
-      });
-    }).catch((err: string) => {
-      // Logger.error(err);
-      return Promise.reject(err);
-    });
+    return this.pool.query(sql);
   }
 
   private static pool = mysql

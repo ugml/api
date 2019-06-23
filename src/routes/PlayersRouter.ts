@@ -165,196 +165,195 @@ export class PlayersRouter {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // TODO: use squel
+    const connection = await Database.getConnectionPool().getConnection();
 
-    // check, if the username or the email is already taken
-    const query =
-      `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
-      `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
+    try {
+      await connection.beginTransaction();
 
-    Database.getConnectionPool().getConnection(async function(err, connection) {
-      // BEGIN TRANSACTION
-      connection
-        .promise()
-        .beginTransaction(async function(error) {
-          if (error) {
-            connection.rollback(function() {
-              connection.release();
-            });
-          }
+      // TODO: use squel
+      // check, if the username or the email is already taken
+      const query =
+        `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
+        `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
 
-          const rows = await Database.query(query);
+      const rows = await connection.query(query);
 
-          if (rows[0].username_taken === 1) {
-            throw new DuplicateRecordException("Username is already taken");
-          }
+      if (rows[0].username_taken === 1) {
+        throw new DuplicateRecordException("Username is already taken");
+      }
 
-          if (rows[0].email_taken === 1) {
-            throw new DuplicateRecordException("Email is already taken");
-          }
+      if (rows[0].email_taken === 1) {
+        throw new DuplicateRecordException("Email is already taken");
+      }
 
-          Logger.info("Getting a new userID");
+      Logger.info("Getting a new userID");
 
-          const queryUser = "CALL getNewUserId();";
+      const queryUser = "CALL getNewUserId();";
 
-          const newPlayer: User = new User();
-          const newPlanet: Planet = new Planet();
+      const newPlayer: User = new User();
+      const newPlanet: Planet = new Planet();
 
-          newPlayer.username = username;
-          newPlayer.email = email;
+      newPlayer.username = username;
+      newPlayer.email = email;
 
-          const data = await Database.query(queryUser).then(row => {
-            newPlayer.userID = row[0][0].userID;
-            newPlayer.password = hashedPassword;
-            newPlanet.ownerID = newPlayer.userID;
-            newPlanet.planet_type = PlanetType.Planet;
+      const data = await connection.query(queryUser).then(row => {
+        // why the f*ck is the result three-dimensional?
+        newPlayer.userID = row[0][0][0].userID;
+        newPlayer.password = hashedPassword;
+        newPlanet.ownerID = newPlayer.userID;
+        newPlanet.planet_type = PlanetType.Planet;
 
-            return { player: newPlayer, planet: newPlanet };
-          });
+        return { player: newPlayer, planet: newPlanet };
+      });
 
-          Logger.info("Getting a new planetID");
+      Logger.info("Getting a new planetID");
 
-          const queryPlanet = "CALL getNewPlanetId();";
+      const queryPlanet = "CALL getNewPlanetId();";
 
-          await Database.query(queryPlanet).then(row => {
-            data.player.currentplanet = row[0][0].planetID;
-            data.planet.planetID = row[0][0].planetID;
-          });
-          Logger.info("Finding free position for new planet");
+      await connection.query(queryPlanet).then(row => {
+        data.player.currentplanet = row[0][0][0].planetID;
+        data.planet.planetID = row[0][0][0].planetID;
+      });
 
-          // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
-          const queryPosition = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
+      Logger.info("Finding free position for new planet");
 
-          await Database.query(queryPosition).then(row => {
-            data.planet.galaxy = row[0][0].posGalaxy;
-            data.planet.system = row[0][0].posSystem;
-            data.planet.planet = row[0][0].posPlanet;
-          });
+      // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
+      const queryPosition = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
 
-          Logger.info("Creating a new user");
-
-          await data.player.create();
-
-          // TODO extract planet creation
-          Logger.info("Creating a new planet");
-
-          data.planet.name = gameConfig.startplanet_name;
-          data.planet.last_update = Math.floor(Date.now() / 1000);
-          data.planet.diameter = gameConfig.startplanet_diameter;
-          data.planet.fields_max = gameConfig.startplanet_maxfields;
-          data.planet.metal = gameConfig.metal_start;
-          data.planet.crystal = gameConfig.crystal_start;
-          data.planet.deuterium = gameConfig.deuterium_start;
-
-          switch (true) {
-            case data.planet.planet <= 5: {
-              data.planet.temp_min = Math.random() * (130 - 40) + 40;
-              data.planet.temp_max = Math.random() * (150 - 240) + 240;
-
-              const images: string[] = ["desert", "dry"];
-
-              data.planet.image =
-                images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-
-              break;
-            }
-            case data.planet.planet <= 10: {
-              data.planet.temp_min = Math.random() * (130 - 40) + 40;
-              data.planet.temp_max = Math.random() * (150 - 240) + 240;
-
-              const images: string[] = ["normal", "jungle", "gas"];
-
-              data.planet.image =
-                images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-
-              break;
-            }
-            case data.planet.planet <= 15: {
-              data.planet.temp_min = Math.random() * (130 - 40) + 40;
-              data.planet.temp_max = Math.random() * (150 - 240) + 240;
-
-              const images: string[] = ["ice", "water"];
-
-              data.planet.image =
-                images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-            }
-          }
-
-          await data.planet.create();
-
-          Logger.info("Creating entry in buildings-table");
-
-          const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
-
-          await Database.query(queryBuildings);
-
-          Logger.info("Creating entry in defenses-table");
-
-          const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
-
-          await Database.query(queryDefenses);
-
-          Logger.info("Creating entry in fleet-table");
-
-          const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
-
-          await Database.query(queryFleet);
-
-          Logger.info("Creating entry in galaxy-table");
-
-          const queryGalaxy = `INSERT INTO galaxy
-                                  (
-                                    \`planetID\`,
-                                    \`pos_galaxy\`,
-                                    \`pos_system\`,
-                                    \`pos_planet\`
-                                  )
-                            VALUES
-                                  (
-                                    ${data.planet.planetID},
-                                    ${data.planet.galaxy},
-                                    ${data.planet.system},
-                                    ${data.planet.planet}
-                                  );`
-            .split("\n")
-            .join("")
-            .replace("  ", " ");
-          // ^^^ temporary so that the query takes up one line instead of 14 in the log
-
-          await Database.query(queryGalaxy);
-
-          Logger.info("Creating entry in techs-table");
-
-          const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
-
-          await Database.query(queryTech);
-
-          await connection.commit();
-
-          Logger.info("Transaction complete");
+      await connection
+        .query(queryPosition)
+        .then(row => {
+          data.planet.galaxy = row[0][0][0].posGalaxy;
+          data.planet.system = row[0][0][0].posSystem;
+          data.planet.planet = row[0][0][0].posPlanet;
         })
         .catch(error => {
           Logger.error(error);
-          connection.rollback(function() {
-            Logger.info("Rolled back transaction");
-            connection.release();
-          });
-
-          if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
-            return response.status(Globals.Statuscode.BAD_REQUEST).json({
-              status: Globals.Statuscode.BAD_REQUEST,
-              message: `There was an error while handling the request: ${error.message}`,
-              data: {},
-            });
-          }
-
-          return response.status(Globals.Statuscode.SERVER_ERROR).json({
-            status: Globals.Statuscode.SERVER_ERROR,
-            message: "There was an error while handling the request.",
-            data: {},
-          });
         });
-    });
+
+      Logger.info("Creating a new user");
+
+      await data.player.create(connection);
+
+      // // TODO extract planet creation
+      Logger.info("Creating a new planet");
+
+      data.planet.name = gameConfig.startplanet_name;
+      data.planet.last_update = Math.floor(Date.now() / 1000);
+      data.planet.diameter = gameConfig.startplanet_diameter;
+      data.planet.fields_max = gameConfig.startplanet_maxfields;
+      data.planet.metal = gameConfig.metal_start;
+      data.planet.crystal = gameConfig.crystal_start;
+      data.planet.deuterium = gameConfig.deuterium_start;
+
+      switch (true) {
+        case data.planet.planet <= 5: {
+          data.planet.temp_min = Math.random() * (130 - 40) + 40;
+          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["desert", "dry"];
+
+          data.planet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+          break;
+        }
+        case data.planet.planet <= 10: {
+          data.planet.temp_min = Math.random() * (130 - 40) + 40;
+          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["normal", "jungle", "gas"];
+
+          data.planet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+          break;
+        }
+        case data.planet.planet <= 15: {
+          data.planet.temp_min = Math.random() * (130 - 40) + 40;
+          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["ice", "water"];
+
+          data.planet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+        }
+      }
+
+      await data.planet.create(connection);
+
+      Logger.info("Creating entry in buildings-table");
+
+      const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
+
+      await connection.query(queryBuildings);
+
+      Logger.info("Creating entry in defenses-table");
+
+      const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
+
+      await connection.query(queryDefenses);
+
+      Logger.info("Creating entry in fleet-table");
+
+      const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
+
+      await connection.query(queryFleet);
+
+      Logger.info("Creating entry in galaxy-table");
+
+      const queryGalaxy = `INSERT INTO galaxy
+                                (
+                                  \`planetID\`,
+                                  \`pos_galaxy\`,
+                                  \`pos_system\`,
+                                  \`pos_planet\`
+                                )
+                          VALUES
+                                (
+                                  ${data.planet.planetID},
+                                  ${data.planet.galaxy},
+                                  ${data.planet.system},
+                                  ${data.planet.planet}
+                                );`
+        .split("\n")
+        .join("")
+        .replace("  ", " ");
+      // ^^^ temporary so that the query takes up one line instead of 14 in the log
+
+      await connection.query(queryGalaxy);
+
+      Logger.info("Creating entry in techs-table");
+
+      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
+
+      await connection.query(queryTech);
+
+      connection.commit();
+
+      Logger.info("Transaction complete");
+
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      Logger.error(error);
+
+      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: `There was an error while handling the request: ${error.message}`,
+          data: {},
+        });
+      }
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    } finally {
+      await connection.release();
+    }
 
     return response.status(Globals.Statuscode.SUCCESS).json({
       status: Globals.Statuscode.SUCCESS,

@@ -75,28 +75,23 @@ class User implements IUnits {
   /***
    * Stores the current object in the database
    */
-  public create(): Promise<{}> {
-    return new Promise((resolve, reject) => {
-      const query: string = squel
-        .insert()
-        .into("users")
-        .set("userID", this.userID)
-        .set("username", this.username)
-        .set("password", this.password)
-        .set("email", this.email)
-        .set("onlinetime", this.onlinetime)
-        .set("currentplanet", this.currentplanet)
-        .toString();
+  public async create(connection = null): Promise<{}> {
+    const query: string = squel
+      .insert({ autoQuoteFieldNames: true })
+      .into("users")
+      .set("userID", this.userID)
+      .set("username", this.username)
+      .set("password", this.password)
+      .set("email", this.email)
+      .set("onlinetime", this.onlinetime)
+      .set("currentplanet", this.currentplanet)
+      .toString();
 
-      Database.query(query)
-        .then(() => {
-          return resolve(this);
-        })
-        .catch((error: string) => {
-          Logger.error(error);
-          return reject(error);
-        });
-    });
+    if (connection === null) {
+      return await Database.query(query);
+    } else {
+      return await connection.query(query);
+    }
   }
 
   /**

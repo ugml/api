@@ -62,7 +62,7 @@ export class GalaxyRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 

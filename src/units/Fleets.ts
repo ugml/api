@@ -43,7 +43,7 @@ class Fleets implements IUnits {
         .where("planetID = ?", this.planetID)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool().query(query)
         .then(() => {
           return resolve(this);
         })
@@ -76,7 +76,7 @@ class Fleets implements IUnits {
         .set("deathstar", this.deathstar)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool().query(query)
         .then(() => {
           return resolve(this);
         })

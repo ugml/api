@@ -58,7 +58,7 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data: {};
 
@@ -112,7 +112,7 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data = {};
 
@@ -401,7 +401,7 @@ export class PlayersRouter {
     const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
     // execute the update
-    Database.query(updatePlayerQuery)
+    Database.getConnectionPool().query(updatePlayerQuery)
       .then(() => {
         const getNewDataQuery: string = squel
           .select()
@@ -415,7 +415,7 @@ export class PlayersRouter {
           .toString();
 
         // return the updated userdata
-        return Database.query(getNewDataQuery).then(result => {
+        return Database.getConnectionPool().query(getNewDataQuery).then(result => {
           let data: {};
 
           if (InputValidator.isSet(result)) {

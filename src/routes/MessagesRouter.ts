@@ -38,7 +38,7 @@ export class MessagesRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -96,7 +96,7 @@ export class MessagesRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -146,7 +146,7 @@ export class MessagesRouter {
       .where("receiverID = ?", request.userID)
       .toString();
 
-    return Database.query(query)
+    return Database.getConnectionPool().query(query)
       .then(() => {
         response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
@@ -192,7 +192,7 @@ export class MessagesRouter {
       .where("userID = ?", request.body.receiverID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         const numRows: number = Object.keys(result).length;
 
@@ -216,7 +216,7 @@ export class MessagesRouter {
           .set("body", InputValidator.sanitizeString(request.body.body))
           .toString();
 
-        Database.query(insertNewMessageQuery).then(() => {
+        Database.getConnectionPool().query(insertNewMessageQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Message sent.",

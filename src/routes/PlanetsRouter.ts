@@ -40,7 +40,7 @@ export class PlanetsRouter {
       .where("ownerID = ?", request.userID)
       .toString();
 
-    return Database.query(query)
+    return Database.getConnectionPool().query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -60,7 +60,7 @@ export class PlanetsRouter {
           .where("userID = ?", request.userID)
           .toString();
 
-        return Database.query(updateCurrentPlanetQuery).then(() => {
+        return Database.getConnectionPool().query(updateCurrentPlanetQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Success",
@@ -91,7 +91,7 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -142,7 +142,7 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -198,7 +198,7 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -249,7 +249,7 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         const numRows: number = Object.keys(result).length;
 
@@ -273,7 +273,7 @@ export class PlanetsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-          Database.query(deletePlanetQuery)
+          Database.getConnectionPool().query(deletePlanetQuery)
             .then(() => {
               Database.getConnectionPool().commit(function(err) {
                 if (err) {
@@ -359,7 +359,7 @@ export class PlanetsRouter {
       .where("ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(() => {
         // return the result
         response.status(Globals.Statuscode.SUCCESS).json({
@@ -414,7 +414,7 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 

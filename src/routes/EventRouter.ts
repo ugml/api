@@ -92,7 +92,7 @@ export class EventRouter {
       .toString();
 
     // check if origin-planet exists and the user owns it
-    Database.query(planetQuery)
+    Database.getConnectionPool().query(planetQuery)
       .then(planet => {
         const startPlanet = planet[0];
 
@@ -118,7 +118,7 @@ export class EventRouter {
           .toString();
 
         // gather data about destination
-        Database.query(planetQuery)
+        Database.getConnectionPool().query(planetQuery)
           .then(results => {
             const destinationPlanet = results[0];
 
@@ -172,7 +172,7 @@ export class EventRouter {
               .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
               .toString();
 
-            Database.query(eventQuery).then((result: any) => {
+            Database.getConnectionPool().query(eventQuery).then((result: any) => {
               // add event to redis-queue
               Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
 
@@ -230,7 +230,7 @@ export class EventRouter {
       .toString();
 
     // check if origin-planet exists and the user owns it
-    Database.query(planetQuery)
+    Database.getConnectionPool().query(planetQuery)
       .then(results => {
         const event = results[0];
 
@@ -263,7 +263,7 @@ export class EventRouter {
           .where("ownerID = ?", request.userID)
           .toString();
 
-        Database.query(updateQuery).then(() => {
+        Database.getConnectionPool().query(updateQuery).then(() => {
           // remove the event from the redis-queue
           Redis.getConnection().zremrangebyscore("eventQueue", request.body.eventID, request.body.eventID);
 

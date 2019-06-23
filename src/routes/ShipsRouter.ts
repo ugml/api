@@ -75,7 +75,7 @@ export class ShipsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -155,7 +155,7 @@ export class ShipsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    return Database.query(query)
+    return Database.getConnectionPool().query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0])) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -275,7 +275,7 @@ export class ShipsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        return Database.query(query).then(() => {
+        return Database.getConnectionPool().query(query).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Success",

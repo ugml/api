@@ -46,7 +46,7 @@ export class TechsRouter {
       .where("userID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         // return the result
         response.status(Globals.Statuscode.SUCCESS).json({
@@ -89,7 +89,7 @@ export class TechsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -133,7 +133,7 @@ export class TechsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-          return Database.query(updatePlanetQuery)
+          return Database.getConnectionPool().query(updatePlanetQuery)
             .then(() => {
               planet.b_tech_id = 0;
               planet.b_tech_endtime = 0;
@@ -216,7 +216,7 @@ export class TechsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -338,7 +338,7 @@ export class TechsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(updatePlanetQuery)
+        Database.getConnectionPool().query(updatePlanetQuery)
           .then(() => {
             response.status(Globals.Statuscode.SUCCESS).json({
               status: Globals.Statuscode.SUCCESS,

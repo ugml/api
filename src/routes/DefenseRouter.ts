@@ -74,7 +74,7 @@ export class DefenseRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         let data;
 
@@ -159,7 +159,7 @@ export class DefenseRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool().query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0])) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
@@ -300,7 +300,7 @@ export class DefenseRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(updatePlanetQuery).then(() => {
+        Database.getConnectionPool().query(updatePlanetQuery).then(() => {
           response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Success",

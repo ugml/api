@@ -49,7 +49,6 @@ describe("buildingsRoute", () => {
   });
 
   it("should fail (missing planetID-parameter)", () => {
-
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
@@ -86,7 +85,6 @@ describe("buildingsRoute", () => {
   });
 
   it("should fail (player does not own planet)", () => {
-
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)

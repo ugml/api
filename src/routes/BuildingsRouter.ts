@@ -200,7 +200,6 @@ export class BuildingsRouter {
   }
 
   public async startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-
     console.log(request.body);
 
     if (

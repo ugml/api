@@ -1,6 +1,5 @@
 class InputValidator {
   public static isValidInt(input: string): boolean {
-
     if (!this.isSet(input)) {
       return false;
     }

@@ -128,7 +128,7 @@ export class BuildingsRouter {
           return;
         }
 
-        const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
+        const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0][0]));
 
         // 1. check if there is already a build-job on the planet
         if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
@@ -199,7 +199,8 @@ export class BuildingsRouter {
       });
   }
 
-  public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public async startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+
     if (
       !InputValidator.isSet(request.body.planetID) ||
       !InputValidator.isValidInt(request.body.planetID) ||
@@ -233,7 +234,7 @@ export class BuildingsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool()
+    await Database.getConnectionPool()
       .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
@@ -245,7 +246,7 @@ export class BuildingsRouter {
           return;
         }
 
-        const planet = result[0];
+        const planet = result[0][0];
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {

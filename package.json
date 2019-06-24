@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git://github.com/ugml/api"
   },
-  "license": "AGPL",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "node dist/index.js",
     "test": "mocha --reporter spec -r ts-node/register test/**/*.spec.ts --exit",

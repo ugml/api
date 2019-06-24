@@ -36,6 +36,67 @@ describe("buildingsRoute", () => {
       });
   });
 
+  it("should fail (missing buildingID-parameter)", () => {
+    let planetID = 167546850;
+
+    return request
+      .post("/v1/buildings/build")
+      .set("Authorization", authToken)
+      .send({planetID: planetID})
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (missing planetID-parameter)", () => {
+
+    return request
+      .post("/v1/buildings/build")
+      .set("Authorization", authToken)
+      .send({buildingID: 1})
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (buildingID is negative)", () => {
+    let planetID = 167546850;
+
+    return request
+      .post("/v1/buildings/build")
+      .set("Authorization", authToken)
+      .send({planetID: planetID, buildingID: -1})
+      .then(res => {
+        console.log(res.body);
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (buildingID is higher than global maximum)", () => {
+    let planetID = 167546850;
+
+    return request
+      .post("/v1/buildings/build")
+      .set("Authorization", authToken)
+      .send({planetID: planetID, buildingID: 100})
+      .then(res => {
+        console.log(res.body);
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (player does not own planet)", () => {
+
+    return request
+      .post("/v1/buildings/build")
+      .set("Authorization", authToken)
+      .send({planetID: 1234, buildingID: 1})
+      .then(res => {
+        console.log(res.body);
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
   // TODO: check, if ressources are correctly subtracted/added after build-request and cancelation
   describe("build and cancel a build-order", () => {
     it("start a build-order", () => {

@@ -1,4 +1,3 @@
-import * as mocha from "mocha";
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
@@ -42,7 +41,7 @@ describe("buildingsRoute", () => {
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
-      .send({planetID: planetID})
+      .send({ planetID: planetID })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
       });
@@ -52,7 +51,7 @@ describe("buildingsRoute", () => {
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
-      .send({buildingID: 1})
+      .send({ buildingID: 1 })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
       });
@@ -64,7 +63,7 @@ describe("buildingsRoute", () => {
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
-      .send({planetID: planetID, buildingID: -1})
+      .send({ planetID: planetID, buildingID: -1 })
       .then(res => {
         console.log(res.body);
         expect(res.body.message).equals("Invalid parameter");
@@ -77,7 +76,7 @@ describe("buildingsRoute", () => {
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
-      .send({planetID: planetID, buildingID: 100})
+      .send({ planetID: planetID, buildingID: 100 })
       .then(res => {
         console.log(res.body);
         expect(res.body.message).equals("Invalid parameter");
@@ -88,7 +87,7 @@ describe("buildingsRoute", () => {
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
-      .send({planetID: 1234, buildingID: 1})
+      .send({ planetID: 1234, buildingID: 1 })
       .then(res => {
         console.log(res.body);
         expect(res.body.message).equals("Invalid parameter");

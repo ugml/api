@@ -137,7 +137,7 @@ export class BuildingsRouter {
           // give back the ressources
           const currentLevel = planet[buildingKey];
 
-          const cost: ICosts = this.getCosts(planet.b_building_id, currentLevel);
+          const cost: ICosts = BuildingsRouter.getCosts(planet.b_building_id, currentLevel);
 
           const updateResourcesQuery: string = squel
             .update()
@@ -200,7 +200,6 @@ export class BuildingsRouter {
   }
 
   public async startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    console.log(request.body);
 
     if (
       !InputValidator.isSet(request.body.planetID) ||
@@ -210,7 +209,7 @@ export class BuildingsRouter {
     ) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
-        message: "Invalid parameter",
+        message: "Invalid parameter1",
         data: {},
       });
       return;
@@ -219,7 +218,7 @@ export class BuildingsRouter {
     if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
-        message: "Invalid parameter",
+        message: "Invalid parameter2",
         data: {},
       });
 
@@ -241,7 +240,7 @@ export class BuildingsRouter {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Invalid parameter",
+            message: "Invalid parameter3",
             data: {},
           });
           return;
@@ -253,7 +252,7 @@ export class BuildingsRouter {
         if (!InputValidator.isSet(planet)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Invalid parameter",
+            message: "Invalid parameter4",
             data: {},
           });
           return;
@@ -336,7 +335,7 @@ export class BuildingsRouter {
         const buildingKey = units.getMappings()[request.body.buildingID];
         const currentLevel = planet[buildingKey];
 
-        const cost = this.getCosts(request.body.buildingID, currentLevel);
+        const cost = BuildingsRouter.getCosts(request.body.buildingID, currentLevel);
 
         if (
           planet.metal < cost.metal ||
@@ -412,7 +411,7 @@ export class BuildingsRouter {
     this.router.post("/cancel", this.cancelBuilding);
   }
 
-  private getCosts(buildingID: number, currentLevel: number): ICosts {
+  public static getCosts(buildingID: number, currentLevel: number): ICosts {
     const costs /*: IBuildings*/ = units.getBuildings()[buildingID];
 
     return {

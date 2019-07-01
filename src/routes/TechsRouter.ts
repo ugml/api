@@ -62,8 +62,8 @@ export class TechsRouter {
 
   public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -84,8 +84,8 @@ export class TechsRouter {
       .query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -96,8 +96,8 @@ export class TechsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -181,8 +181,8 @@ export class TechsRouter {
       !InputValidator.isSet(request.body.techID) ||
       !InputValidator.isValidInt(request.body.techID)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -190,8 +190,8 @@ export class TechsRouter {
     }
 
     if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -213,8 +213,8 @@ export class TechsRouter {
       .query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -225,8 +225,8 @@ export class TechsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -235,8 +235,8 @@ export class TechsRouter {
 
         // 1. check if there is already a build-job on the planet
         if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Planet already has a build-job",
             data: {},
           });

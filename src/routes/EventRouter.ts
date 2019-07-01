@@ -161,8 +161,8 @@ export class EventRouter {
     // TODO: check if planet has enough deuterium
 
     if (!InputValidator.isSet(request.body.event)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -174,8 +174,8 @@ export class EventRouter {
 
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid json",
         data: {},
       });
@@ -185,8 +185,8 @@ export class EventRouter {
 
     // check if sender of event == currently authenticated user
     if (request.userID !== eventData.ownerID) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Event-creator is not currently authenticated user",
         data: {},
       });
@@ -223,8 +223,8 @@ export class EventRouter {
 
         // planet does not exist or player does not own it
         if (!InputValidator.isSet(startPlanet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -250,8 +250,8 @@ export class EventRouter {
 
             // destination does not exist
             if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
-              response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
+              response.status(Globals.Statuscode.BAD_REQUEST).json({
+                status: Globals.Statuscode.BAD_REQUEST,
                 message: "Destination does not exist",
                 data: {},
               });
@@ -340,8 +340,8 @@ export class EventRouter {
 
   public cancelEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -365,8 +365,8 @@ export class EventRouter {
 
         // destination does not exist
         if (!InputValidator.isSet(event)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The event does not exist or can't be canceled",
             data: {},
           });

@@ -30,8 +30,8 @@ export class GalaxyRouter {
       !InputValidator.isSet(request.params.system) ||
       !InputValidator.isValidInt(request.params.system)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });

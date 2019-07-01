@@ -72,8 +72,8 @@ export class MessagesRouter {
 
   public getMessageByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -131,8 +131,8 @@ export class MessagesRouter {
 
   public deleteMessage(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -179,8 +179,8 @@ export class MessagesRouter {
       !InputValidator.isSet(request.body.subject) ||
       !InputValidator.isSet(request.body.body)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });

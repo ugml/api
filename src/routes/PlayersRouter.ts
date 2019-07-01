@@ -94,8 +94,8 @@ export class PlayersRouter {
   public getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.playerID) || !InputValidator.isValidInt(request.params.playerID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -149,8 +149,8 @@ export class PlayersRouter {
       !InputValidator.isSet(request.body.password) ||
       !InputValidator.isSet(request.body.email)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -371,8 +371,8 @@ export class PlayersRouter {
       !InputValidator.isSet(request.body.password) &&
       !InputValidator.isSet(request.body.email)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "No parameters were passed",
         data: {},
       });

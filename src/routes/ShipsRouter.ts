@@ -24,8 +24,8 @@ export class ShipsRouter {
 
   public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -83,8 +83,8 @@ export class ShipsRouter {
       !InputValidator.isSet(request.body.buildOrder) ||
       !InputValidator.isValidJson(request.body.buildOrder)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -99,8 +99,8 @@ export class ShipsRouter {
 
     // validate build-order
     if (!units.isValidBuildOrder(buildOrders, UnitType.SHIP)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -128,8 +128,8 @@ export class ShipsRouter {
       .query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0])) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The player does not own the planet",
             data: {},
           });
@@ -138,8 +138,8 @@ export class ShipsRouter {
         }
 
         if (result[0].b_hangar_plus === 1) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Shipyard is currently upgrading.",
             data: {},
           });

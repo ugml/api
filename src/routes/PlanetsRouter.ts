@@ -23,8 +23,8 @@ export class PlanetsRouter {
   public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -44,8 +44,8 @@ export class PlanetsRouter {
       .query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The player does not own the planet",
             data: {},
           });
@@ -129,8 +129,8 @@ export class PlanetsRouter {
   public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -181,8 +181,8 @@ export class PlanetsRouter {
   public getMovement(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -238,8 +238,8 @@ export class PlanetsRouter {
   public destroyPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -337,8 +337,8 @@ export class PlanetsRouter {
       !InputValidator.isValidInt(request.body.planetID) ||
       !InputValidator.isSet(request.body.name)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -349,8 +349,8 @@ export class PlanetsRouter {
     const newName: string = InputValidator.sanitizeString(request.body.name);
 
     if (newName.length <= 4) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "New name is too short. Minimum length is 4 characters.",
         data: {},
       });
@@ -397,8 +397,8 @@ export class PlanetsRouter {
   public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });

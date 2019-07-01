@@ -27,8 +27,8 @@ export class AuthRouter {
    */
   public async authenticate(req: Request, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });

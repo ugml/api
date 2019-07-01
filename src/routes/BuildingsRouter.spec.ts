@@ -32,6 +32,7 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.body.data[0].planetID).equals(planetID);
+        expect(res.status).to.eql(200);
       });
   });
 
@@ -44,6 +45,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: planetID })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.eql(400);
       });
   });
 
@@ -54,6 +56,7 @@ describe("buildingsRoute", () => {
       .send({ buildingID: 1 })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.eql(400);
       });
   });
 
@@ -66,6 +69,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: planetID, buildingID: -1 })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.eql(400);
       });
   });
 
@@ -78,6 +82,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: planetID, buildingID: 100 })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.eql(400);
       });
   });
 
@@ -88,6 +93,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: 1234, buildingID: 1 })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.eql(400);
       });
   });
 
@@ -102,6 +108,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: planetID, buildingID: 1 })
         .then(res => {
           expect(res.body.message).equals("Job started");
+          expect(res.status).to.eql(200);
         });
     });
 
@@ -114,6 +121,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.message).equals("Planet already has a build-job");
+          expect(res.body.status).equals(200);
         });
     });
     it("cancel the build-order", () => {
@@ -125,6 +133,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.message).equals("Building canceled");
+          expect(res.status).to.eql(200);
         });
     });
     it("try cancel the build-order again", () => {
@@ -136,6 +145,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.message).equals("Planet has no build-job");
+          expect(res.status).to.eql(200);
         });
     });
   });

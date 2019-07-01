@@ -34,8 +34,8 @@ export class BuildingsRouter {
    */
   public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -89,8 +89,8 @@ export class BuildingsRouter {
 
   public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -110,8 +110,8 @@ export class BuildingsRouter {
       .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -120,8 +120,8 @@ export class BuildingsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(result[0])) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -206,8 +206,8 @@ export class BuildingsRouter {
       !InputValidator.isSet(request.body.buildingID) ||
       !InputValidator.isValidInt(request.body.buildingID)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -215,8 +215,8 @@ export class BuildingsRouter {
     }
 
     if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -237,8 +237,8 @@ export class BuildingsRouter {
       .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -249,8 +249,8 @@ export class BuildingsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });

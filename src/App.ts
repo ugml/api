@@ -143,7 +143,10 @@ class App {
     // TODO: find better method to filter out passwords in requests
     this.express.use(
       expressWinston.logger({
-        transports: [new winston.transports.Console(), new winston.transports.File({ filename: "logs/access.log" })],
+        transports: [
+          new winston.transports.Console(),
+          new winston.transports.File({ filename: `${Logger.getPath()}access.log` }),
+        ],
         format: combine(
           format.timestamp({
             format: "YYYY-MM-DD HH:mm:ss",

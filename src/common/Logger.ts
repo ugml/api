@@ -6,6 +6,9 @@ const myFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}] ${message}`;
 });
 
+const date = new Date();
+const path = `logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
+
 /* tslint:disable: variable-name */
 const Logger = createLogger({
   /* tslint:enable */
@@ -18,8 +21,12 @@ const Logger = createLogger({
   transports: [
     new winston.transports.Console(),
     // TODO: split into different files by log-level - afaik, winston has huge problems doing that
-    new winston.transports.File({ filename: "logs/api.log" }),
+    new winston.transports.File({ filename: `${path}/api.log` }),
   ],
 });
+
+Logger.getPath = function() {
+  return path;
+};
 
 export { Logger };

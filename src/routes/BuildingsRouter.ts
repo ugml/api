@@ -137,7 +137,7 @@ export class BuildingsRouter {
           // give back the ressources
           const currentLevel = planet[buildingKey];
 
-          const cost: ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
+          const cost: ICosts = this.getCosts(planet.b_building_id, currentLevel);
 
           const updateResourcesQuery: string = squel
             .update()
@@ -336,7 +336,7 @@ export class BuildingsRouter {
         const buildingKey = units.getMappings()[request.body.buildingID];
         const currentLevel = planet[buildingKey];
 
-        const cost = buildingRoutes.getCosts(request.body.buildingID, currentLevel);
+        const cost = this.getCosts(request.body.buildingID, currentLevel);
 
         if (
           planet.metal < cost.metal ||

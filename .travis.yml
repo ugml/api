@@ -20,12 +20,23 @@ before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < test/ci.sql
   - npm install codecov -g
-  - npm run-script lint
-  - npm run-script tslint
-  - npm run-script build
 
-script:
-  - npm run-script test-coverage
+jobs:
+  include:
+    - stage: Build
+      name: "Build"
+      script:
+        - npm run-script build
+    - stage: Lint
+      name: "Lint"
+      script:
+        - npm run-script lint
+        - npm run-script tslint
+    - stage: Test
+      name: "Test"
+      script:
+        - npm run-script test-coverage
+
 
 after_success:
   - codecov

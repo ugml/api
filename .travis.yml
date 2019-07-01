@@ -2,11 +2,6 @@ language: node_js
 
 sudo: required
 
-node_js:
-  - "8"
-  - "10"
-  - "12"
-
 env:
   - NODE_ENV=development
 
@@ -29,6 +24,10 @@ before_script:
 jobs:
   include:
     - stage: Build
+      node_js:
+        - "8"
+        - "10"
+        - "12"
       script:
         - npm run-script build
     - stage: Lint

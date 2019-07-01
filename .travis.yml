@@ -2,11 +2,6 @@ language: node_js
 
 sudo: required
 
-node_js:
-  - "8"
-  - "10"
-  - "12"
-
 env:
   - NODE_ENV=development
 
@@ -24,19 +19,23 @@ before_script:
 jobs:
   include:
     - stage: Build
-      name: "Build"
+      node_js:
+        - "8"
+        - "10"
+        - "12"
       script:
         - npm run-script build
     - stage: Lint
-      name: "Lint"
       script:
         - npm run-script lint
         - npm run-script tslint
     - stage: Test
-      name: "Test"
+      node_js:
+        - "8"
+        - "10"
+        - "12"
       script:
         - npm run-script test-coverage
-
 
 after_success:
   - codecov

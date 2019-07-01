@@ -157,7 +157,7 @@ export class ShipsRouter {
         for (const item in buildOrders) {
           if (buildOrders.hasOwnProperty(item)) {
             let count: number = buildOrders[item];
-            const cost: ICosts = units.getCosts(parseInt(item, 10), 0, UnitType.SHIP);
+            const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.SHIP);
 
             // if the user has not enough ressources to fullfill the complete build-order
             if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {

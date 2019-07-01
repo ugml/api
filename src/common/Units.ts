@@ -1,4 +1,5 @@
 import { ICosts } from "../interfaces/ICosts";
+import { IPricelist } from "../interfaces/IPricelist";
 import { Globals } from "./Globals";
 import { InputValidator } from "./InputValidator";
 
@@ -41,7 +42,7 @@ class Units {
   }
 
   public getCosts(buildingID: number, currentLevel: number, unitType: UnitType): ICosts {
-    let costs;
+    let costs: IPricelist;
 
     switch (unitType) {
       case UnitType.BUILDING:

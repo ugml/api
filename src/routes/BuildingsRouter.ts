@@ -200,7 +200,6 @@ export class BuildingsRouter {
   }
 
   public async startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-
     if (
       !InputValidator.isSet(request.body.planetID) ||
       !InputValidator.isValidInt(request.body.planetID) ||

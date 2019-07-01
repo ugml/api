@@ -2,8 +2,8 @@ import * as mocha from "mocha";
 import * as chai from "chai";
 import { QueueItem } from "./QueueItem";
 
-let assert = chai.assert;
-let expect = chai.expect;
+const assert = chai.assert;
+const expect = chai.expect;
 
 describe("QueueItem", function() {
   it("PlanetID should be -1", function() {

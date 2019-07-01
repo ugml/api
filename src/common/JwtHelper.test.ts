@@ -3,8 +3,8 @@ import * as chai from "chai";
 import { IJwt } from "../interfaces/IJwt";
 import { JwtHelper } from "./JwtHelper";
 
-let assert = chai.assert;
-let expect = chai.expect;
+const assert = chai.assert;
+const expect = chai.expect;
 
 describe("JwtHelper", function() {
   it("Generate Token", function() {

@@ -2,8 +2,8 @@ import * as mocha from "mocha";
 import * as chai from "chai";
 import { InputValidator } from "./InputValidator";
 
-let assert = chai.assert;
-let expect = chai.expect;
+const assert = chai.assert;
+const expect = chai.expect;
 
 describe("InputValidator", function() {
   it("Valid Int", function() {
@@ -32,12 +32,12 @@ describe("InputValidator", function() {
   });
 
   it("Variable is set", function() {
-    let test = 12;
+    const test = 12;
     assert.equal(InputValidator.isSet(test), true);
   });
 
   it("Variable is not  set", function() {
-    let test;
+    const test = undefined;
     assert.equal(InputValidator.isSet(test), false);
   });
 });

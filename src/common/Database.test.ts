@@ -7,11 +7,11 @@ import chaiAsPromised = require("chai-as-promised");
 
 chai.use(chaiAsPromised);
 
-let expect = chai.expect;
+const expect = chai.expect;
 
 describe("Database", function() {
   it("Connect and query", async function() {
-    let result = await Database.getConnectionPool().query("SELECT 1 AS test;");
+    const result = await Database.getConnectionPool().query("SELECT 1 AS test;");
 
     expect(result[0][0].test).to.be.equals(1);
   });

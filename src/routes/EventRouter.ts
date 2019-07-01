@@ -136,14 +136,14 @@ export class EventRouter {
             }
 
             // calculate distance
-            const distance = eventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
+            const distance = EventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
 
             const gameConfig = require("../config/game.json");
 
-            const slowestShipSpeed = eventRouter.getSlowestShipSpeed(eventData.data.ships);
+            const slowestShipSpeed = EventRouter.getSlowestShipSpeed(eventData.data.ships);
 
             // calculate duration of flight
-            const timeOfFlight = eventRouter.calculateTimeOfFlight(
+            const timeOfFlight = EventRouter.calculateTimeOfFlight(
               gameConfig.speed,
               eventData.speed,
               distance,
@@ -161,13 +161,13 @@ export class EventRouter {
               .insert()
               .into("flights")
               .set("ownerID", eventData.ownerID)
-              .set("mission", eventRouter.getMissionTypeID(eventData.mission))
+              .set("mission", EventRouter.getMissionTypeID(eventData.mission))
               .set("fleetlist", JSON.stringify(eventData.data.ships))
               .set("start_id", startPlanet.planetID)
-              .set("start_type", eventRouter.getDestinationTypeID(eventData.data.origin.type))
+              .set("start_type", EventRouter.getDestinationTypeID(eventData.data.origin.type))
               .set("start_time", eventData.starttime)
               .set("end_id", destinationPlanet.planetID)
-              .set("end_type", eventRouter.getDestinationTypeID(eventData.data.destination.type))
+              .set("end_type", EventRouter.getDestinationTypeID(eventData.data.destination.type))
               .set("end_time", eventData.endtime)
               .set("loaded_metal", eventData.data.loadedRessources.metal)
               .set("loaded_crystal", eventData.data.loadedRessources.crystal)
@@ -314,7 +314,7 @@ export class EventRouter {
    * @param origin The first planet
    * @param destination The second planet
    */
-  private calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
+  private static calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
     const distances = [
       Math.abs(origin.galaxy - destination.galaxy),
       Math.abs(origin.system - destination.system),
@@ -343,7 +343,7 @@ export class EventRouter {
    * @param distance The distance between the start and the end
    * @param slowestShipSpeed The speed of the slowest ship in the fleet
    */
-  private calculateTimeOfFlight(
+  private static calculateTimeOfFlight(
     gameSpeed: number,
     missionSpeed: number,
     distance: number,
@@ -359,7 +359,7 @@ export class EventRouter {
    * Returns the speed of the slowest ship in the fleet
    * @param units The sent ship in this event
    */
-  private getSlowestShipSpeed(units: IShipUnits): number {
+  private static getSlowestShipSpeed(units: IShipUnits): number {
     const unitData = require("../config/units.json");
 
     let minimum: number = Number.MAX_VALUE;
@@ -377,7 +377,7 @@ export class EventRouter {
    * Returns the ID of the destination-type
    * @param type The type as a string (planet, moon or debris)
    */
-  private getDestinationTypeID(type: string): number {
+  private static getDestinationTypeID(type: string): number {
     let typeID: number;
     switch (type) {
       case "planet":
@@ -397,7 +397,7 @@ export class EventRouter {
    * Returns the ID of the mission-type
    * @param mission The type as a string (transport, attack, ...)
    */
-  private getMissionTypeID(mission: string): number {
+  private static getMissionTypeID(mission: string): number {
     let missionTypeID: number;
     switch (mission) {
       case "transport":

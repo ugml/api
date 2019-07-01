@@ -8,7 +8,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
 });
 
 const date = new Date();
-const path = `logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
+const path = `./logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
 
 // Folder setup
 if (!fs.existsSync(path)) {

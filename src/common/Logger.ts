@@ -1,6 +1,7 @@
 const winston = require("winston");
 const { createLogger, format } = winston;
 const { combine, printf } = format;
+const fs = require("fs");
 
 const myFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}] ${message}`;
@@ -8,6 +9,11 @@ const myFormat = printf(({ level, message, timestamp }) => {
 
 const date = new Date();
 const path = `logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
+
+// Folder setup
+if (!fs.existsSync(path)) {
+  fs.mkdirSync(path);
+}
 
 /* tslint:disable: variable-name */
 const Logger = createLogger({

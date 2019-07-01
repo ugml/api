@@ -4,7 +4,7 @@ import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
@@ -34,8 +34,8 @@ export class BuildingsRouter {
    */
   public getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -89,8 +89,8 @@ export class BuildingsRouter {
 
   public cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -110,8 +110,8 @@ export class BuildingsRouter {
       .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -120,15 +120,15 @@ export class BuildingsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(result[0])) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
           return;
         }
 
-        const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0]));
+        const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(result[0][0]));
 
         // 1. check if there is already a build-job on the planet
         if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
@@ -137,7 +137,7 @@ export class BuildingsRouter {
           // give back the ressources
           const currentLevel = planet[buildingKey];
 
-          const cost: ICosts = buildingRoutes.getCosts(planet.b_building_id, currentLevel);
+          const cost: ICosts = units.getCosts(planet.b_building_id, currentLevel, UnitType.BUILDING);
 
           const updateResourcesQuery: string = squel
             .update()
@@ -199,15 +199,15 @@ export class BuildingsRouter {
       });
   }
 
-  public startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public async startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (
       !InputValidator.isSet(request.body.planetID) ||
       !InputValidator.isValidInt(request.body.planetID) ||
       !InputValidator.isSet(request.body.buildingID) ||
       !InputValidator.isValidInt(request.body.buildingID)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -215,8 +215,8 @@ export class BuildingsRouter {
     }
 
     if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -233,24 +233,24 @@ export class BuildingsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool()
+    await Database.getConnectionPool()
       .query(getPlanetQuery)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
           return;
         }
 
-        const planet = result[0];
+        const planet = result[0][0];
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -334,7 +334,7 @@ export class BuildingsRouter {
         const buildingKey = units.getMappings()[request.body.buildingID];
         const currentLevel = planet[buildingKey];
 
-        const cost = buildingRoutes.getCosts(request.body.buildingID, currentLevel);
+        const cost = units.getCosts(request.body.buildingID, currentLevel, UnitType.BUILDING);
 
         if (
           planet.metal < cost.metal ||
@@ -408,17 +408,6 @@ export class BuildingsRouter {
     this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
     this.router.post("/build", this.startBuilding);
     this.router.post("/cancel", this.cancelBuilding);
-  }
-
-  private getCosts(buildingID: number, currentLevel: number): ICosts {
-    const costs /*: IBuildings*/ = units.getBuildings()[buildingID];
-
-    return {
-      metal: costs.metal * costs.factor ** currentLevel,
-      crystal: costs.crystal * costs.factor ** currentLevel,
-      deuterium: costs.deuterium * costs.factor ** currentLevel,
-      energy: costs.energy * costs.factor ** currentLevel,
-    };
   }
 }
 

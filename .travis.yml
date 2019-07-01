@@ -2,13 +2,15 @@ language: node_js
 
 sudo: required
 
+cache: npm
+
+env:
+  - NODE_ENV=development
+
 node_js:
   - "8"
   - "10"
   - "12"
-
-env:
-  - NODE_ENV=development
 
 services:
   - redis-server
@@ -16,16 +18,19 @@ services:
 addons:
   mariadb: '10.4'
 
+matrix:
+  fast_finish: true
+
 before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < test/ci.sql
   - npm install codecov -g
-  - npm run-script lint
-  - npm run-script tslint
-  - npm run-script build
 
 script:
-  - npm run-script test-coverage
+    - npm run-script build
+    - npm run-script lint
+    - npm run-script tslint
+    - npm run-script test-coverage
 
 after_success:
   - codecov

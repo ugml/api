@@ -2,7 +2,7 @@ import * as mocha from "mocha";
 import * as chai from "chai";
 import { Config } from "./Config";
 
-let expect = chai.expect;
+const expect = chai.expect;
 
 describe("Config", function() {
   it("Get config", function() {

@@ -24,6 +24,130 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
 export class EventRouter {
   public router: Router;
 
+  // TODO: relocate to own file with other game-related calculations
+  /**
+   * Calculates the distances between two planets
+   * Source: http://www.owiki.de/index.php?title=Entfernung
+   * @param origin The first planet
+   * @param destination The second planet
+   */
+  private static calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
+    const distances = [
+      Math.abs(origin.galaxy - destination.galaxy),
+      Math.abs(origin.system - destination.system),
+      Math.abs(origin.planet - destination.planet),
+    ];
+
+    const distance = 0;
+
+    if (distances[0] !== 0) {
+      return distances[0] * 20000;
+    }
+    if (distances[1] !== 0) {
+      return distances[1] * 95 + 2700;
+    }
+    if (distances[2] !== 0) {
+      return distances[2] * 5 + 1000;
+    }
+
+    return distance;
+  }
+
+  /**
+   * Calculates the time of flight in seconds
+   * @param gameSpeed The speed of the game (default: 3500)
+   * @param missionSpeed The speed of the whole mission (possible values: 0, 10, 20, ..., 100)
+   * @param distance The distance between the start and the end
+   * @param slowestShipSpeed The speed of the slowest ship in the fleet
+   */
+  private static calculateTimeOfFlight(
+    gameSpeed: number,
+    missionSpeed: number,
+    distance: number,
+    slowestShipSpeed: number,
+  ): number {
+    // source: http://owiki.de/index.php?title=Flugzeit
+    return Math.round(
+      Math.pow((3500 / (missionSpeed / 100)) * ((distance * 10) / slowestShipSpeed), 0.5) + 10 / gameSpeed,
+    );
+  }
+
+  /**
+   * Returns the speed of the slowest ship in the fleet
+   * @param units The sent ship in this event
+   */
+  private static getSlowestShipSpeed(units: IShipUnits): number {
+    const unitData = require("../config/units.json");
+
+    let minimum: number = Number.MAX_VALUE;
+
+    for (const ship in units) {
+      if (units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
+        minimum = unitData.units.ships[ship].speed;
+      }
+    }
+
+    return minimum;
+  }
+
+  /**
+   * Returns the ID of the destination-type
+   * @param type The type as a string (planet, moon or debris)
+   */
+  private static getDestinationTypeID(type: string): number {
+    let typeID: number;
+    switch (type) {
+      case "planet":
+        typeID = 1;
+        break;
+      case "moon":
+        typeID = 2;
+        break;
+      case "debris":
+        typeID = 3;
+    }
+
+    return typeID;
+  }
+
+  /**
+   * Returns the ID of the mission-type
+   * @param mission The type as a string (transport, attack, ...)
+   */
+  private static getMissionTypeID(mission: string): number {
+    let missionTypeID: number;
+    switch (mission) {
+      case "transport":
+        missionTypeID = 0;
+        break;
+      case "deploy":
+        missionTypeID = 1;
+        break;
+      case "attack":
+        missionTypeID = 2;
+        break;
+      case "acs":
+        missionTypeID = 3;
+        break;
+      case "hold":
+        missionTypeID = 4;
+        break;
+      case "colonize":
+        missionTypeID = 5;
+        break;
+      case "harvest":
+        missionTypeID = 6;
+        break;
+      case "espionage":
+        missionTypeID = 7;
+        break;
+      case "destroy":
+        missionTypeID = 8;
+    }
+
+    return missionTypeID;
+  }
+
   /**
    * Initialize the Router
    */
@@ -37,8 +161,8 @@ export class EventRouter {
     // TODO: check if planet has enough deuterium
 
     if (!InputValidator.isSet(request.body.event)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -50,8 +174,8 @@ export class EventRouter {
 
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid json",
         data: {},
       });
@@ -61,8 +185,8 @@ export class EventRouter {
 
     // check if sender of event == currently authenticated user
     if (request.userID !== eventData.ownerID) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Event-creator is not currently authenticated user",
         data: {},
       });
@@ -99,8 +223,8 @@ export class EventRouter {
 
         // planet does not exist or player does not own it
         if (!InputValidator.isSet(startPlanet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -126,8 +250,8 @@ export class EventRouter {
 
             // destination does not exist
             if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
-              response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
+              response.status(Globals.Statuscode.BAD_REQUEST).json({
+                status: Globals.Statuscode.BAD_REQUEST,
                 message: "Destination does not exist",
                 data: {},
               });
@@ -136,14 +260,14 @@ export class EventRouter {
             }
 
             // calculate distance
-            const distance = eventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
+            const distance = EventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
 
             const gameConfig = require("../config/game.json");
 
-            const slowestShipSpeed = eventRouter.getSlowestShipSpeed(eventData.data.ships);
+            const slowestShipSpeed = EventRouter.getSlowestShipSpeed(eventData.data.ships);
 
             // calculate duration of flight
-            const timeOfFlight = eventRouter.calculateTimeOfFlight(
+            const timeOfFlight = EventRouter.calculateTimeOfFlight(
               gameConfig.speed,
               eventData.speed,
               distance,
@@ -161,13 +285,13 @@ export class EventRouter {
               .insert()
               .into("flights")
               .set("ownerID", eventData.ownerID)
-              .set("mission", eventRouter.getMissionTypeID(eventData.mission))
+              .set("mission", EventRouter.getMissionTypeID(eventData.mission))
               .set("fleetlist", JSON.stringify(eventData.data.ships))
               .set("start_id", startPlanet.planetID)
-              .set("start_type", eventRouter.getDestinationTypeID(eventData.data.origin.type))
+              .set("start_type", EventRouter.getDestinationTypeID(eventData.data.origin.type))
               .set("start_time", eventData.starttime)
               .set("end_id", destinationPlanet.planetID)
-              .set("end_type", eventRouter.getDestinationTypeID(eventData.data.destination.type))
+              .set("end_type", EventRouter.getDestinationTypeID(eventData.data.destination.type))
               .set("end_time", eventData.endtime)
               .set("loaded_metal", eventData.data.loadedRessources.metal)
               .set("loaded_crystal", eventData.data.loadedRessources.crystal)
@@ -216,8 +340,8 @@ export class EventRouter {
 
   public cancelEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -241,8 +365,8 @@ export class EventRouter {
 
         // destination does not exist
         if (!InputValidator.isSet(event)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The event does not exist or can't be canceled",
             data: {},
           });
@@ -305,130 +429,6 @@ export class EventRouter {
   public init() {
     this.router.post("/create/", this.createEvent);
     this.router.post("/cancel/", this.cancelEvent);
-  }
-
-  // TODO: relocate to own file with other game-related calculations
-  /**
-   * Calculates the distances between two planets
-   * Source: http://www.owiki.de/index.php?title=Entfernung
-   * @param origin The first planet
-   * @param destination The second planet
-   */
-  private calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
-    const distances = [
-      Math.abs(origin.galaxy - destination.galaxy),
-      Math.abs(origin.system - destination.system),
-      Math.abs(origin.planet - destination.planet),
-    ];
-
-    const distance = 0;
-
-    if (distances[0] !== 0) {
-      return distances[0] * 20000;
-    }
-    if (distances[1] !== 0) {
-      return distances[1] * 95 + 2700;
-    }
-    if (distances[2] !== 0) {
-      return distances[2] * 5 + 1000;
-    }
-
-    return distance;
-  }
-
-  /**
-   * Calculates the time of flight in seconds
-   * @param gameSpeed The speed of the game (default: 3500)
-   * @param missionSpeed The speed of the whole mission (possible values: 0, 10, 20, ..., 100)
-   * @param distance The distance between the start and the end
-   * @param slowestShipSpeed The speed of the slowest ship in the fleet
-   */
-  private calculateTimeOfFlight(
-    gameSpeed: number,
-    missionSpeed: number,
-    distance: number,
-    slowestShipSpeed: number,
-  ): number {
-    // source: http://owiki.de/index.php?title=Flugzeit
-    return Math.round(
-      Math.pow((3500 / (missionSpeed / 100)) * ((distance * 10) / slowestShipSpeed), 0.5) + 10 / gameSpeed,
-    );
-  }
-
-  /**
-   * Returns the speed of the slowest ship in the fleet
-   * @param units The sent ship in this event
-   */
-  private getSlowestShipSpeed(units: IShipUnits): number {
-    const unitData = require("../config/units.json");
-
-    let minimum: number = Number.MAX_VALUE;
-
-    for (const ship in units) {
-      if (units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
-        minimum = unitData.units.ships[ship].speed;
-      }
-    }
-
-    return minimum;
-  }
-
-  /**
-   * Returns the ID of the destination-type
-   * @param type The type as a string (planet, moon or debris)
-   */
-  private getDestinationTypeID(type: string): number {
-    let typeID: number;
-    switch (type) {
-      case "planet":
-        typeID = 1;
-        break;
-      case "moon":
-        typeID = 2;
-        break;
-      case "debris":
-        typeID = 3;
-    }
-
-    return typeID;
-  }
-
-  /**
-   * Returns the ID of the mission-type
-   * @param mission The type as a string (transport, attack, ...)
-   */
-  private getMissionTypeID(mission: string): number {
-    let missionTypeID: number;
-    switch (mission) {
-      case "transport":
-        missionTypeID = 0;
-        break;
-      case "deploy":
-        missionTypeID = 1;
-        break;
-      case "attack":
-        missionTypeID = 2;
-        break;
-      case "acs":
-        missionTypeID = 3;
-        break;
-      case "hold":
-        missionTypeID = 4;
-        break;
-      case "colonize":
-        missionTypeID = 5;
-        break;
-      case "harvest":
-        missionTypeID = 6;
-        break;
-      case "espionage":
-        missionTypeID = 7;
-        break;
-      case "destroy":
-        missionTypeID = 8;
-    }
-
-    return missionTypeID;
   }
 }
 

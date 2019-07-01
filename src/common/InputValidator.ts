@@ -4,6 +4,10 @@ class InputValidator {
       return false;
     }
 
+    if (typeof input === "number") {
+      return true;
+    }
+
     if (!input.match(/^-{0,1}\d+$/)) {
       return false;
     }

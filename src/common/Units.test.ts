@@ -3,8 +3,8 @@ import * as chai from "chai";
 import { Config } from "./Config";
 import { Units } from "./Units";
 
-let expect = chai.expect;
-let assert = chai.assert;
+const expect = chai.expect;
+const assert = chai.assert;
 
 const units: Units = new Units();
 

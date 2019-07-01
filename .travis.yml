@@ -2,7 +2,6 @@ language: node_js
 
 sudo: required
 
-
 node_js:
   - "8"
   - "10"
@@ -16,6 +15,11 @@ services:
 
 addons:
   mariadb: '10.4'
+
+stages:
+  - Build
+  - Lint
+  - Test
 
 before_script:
   - sudo systemctl start mariadb

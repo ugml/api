@@ -209,7 +209,7 @@ export class BuildingsRouter {
     ) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
-        message: "Invalid parameter1",
+        message: "Invalid parameter",
         data: {},
       });
       return;
@@ -218,7 +218,7 @@ export class BuildingsRouter {
     if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
-        message: "Invalid parameter2",
+        message: "Invalid parameter",
         data: {},
       });
 
@@ -240,7 +240,7 @@ export class BuildingsRouter {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Invalid parameter3",
+            message: "Invalid parameter",
             data: {},
           });
           return;
@@ -252,7 +252,7 @@ export class BuildingsRouter {
         if (!InputValidator.isSet(planet)) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Invalid parameter4",
+            message: "Invalid parameter",
             data: {},
           });
           return;

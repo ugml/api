@@ -4,7 +4,7 @@ import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
@@ -137,7 +137,7 @@ export class BuildingsRouter {
           // give back the ressources
           const currentLevel = planet[buildingKey];
 
-          const cost: ICosts = BuildingsRouter.getCosts(planet.b_building_id, currentLevel);
+          const cost: ICosts = units.getCosts(planet.b_building_id, currentLevel, UnitType.BUILDING);
 
           const updateResourcesQuery: string = squel
             .update()
@@ -334,7 +334,7 @@ export class BuildingsRouter {
         const buildingKey = units.getMappings()[request.body.buildingID];
         const currentLevel = planet[buildingKey];
 
-        const cost = BuildingsRouter.getCosts(request.body.buildingID, currentLevel);
+        const cost = units.getCosts(request.body.buildingID, currentLevel, UnitType.BUILDING);
 
         if (
           planet.metal < cost.metal ||
@@ -408,17 +408,6 @@ export class BuildingsRouter {
     this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
     this.router.post("/build", this.startBuilding);
     this.router.post("/cancel", this.cancelBuilding);
-  }
-
-  public static getCosts(buildingID: number, currentLevel: number): ICosts {
-    const costs /*: IBuildings*/ = units.getBuildings()[buildingID];
-
-    return {
-      metal: costs.metal * costs.factor ** currentLevel,
-      crystal: costs.crystal * costs.factor ** currentLevel,
-      deuterium: costs.deuterium * costs.factor ** currentLevel,
-      energy: costs.energy * costs.factor ** currentLevel,
-    };
   }
 }
 

@@ -3,7 +3,7 @@ import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 
@@ -13,37 +13,8 @@ import { Logger } from "../common/Logger";
 import squel = require("squel");
 
 export class DefenseRouter {
-  private static getCosts(buildingID: number): ICosts {
-    const costs = units.getDefenses()[buildingID];
-
-    return {
-      metal: costs.metal,
-      crystal: costs.crystal,
-      deuterium: costs.deuterium,
-      energy: costs.energy,
-    };
-  }
-
   // TODO: relocate to Validator-class
-  private static isValidBuildOrder(buildOrders: object): boolean {
-    for (const order in buildOrders) {
-      if (
-        !InputValidator.isValidInt(order) ||
-        !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order, 10) < Globals.MIN_DEFENSE_ID ||
-        parseInt(order, 10) > Globals.MAX_DEFENSE_ID ||
-        buildOrders[order] < 0
-      ) {
-        return false;
-      }
-    }
 
-    return true;
-  }
-
-  private static getBuildTimeInSeconds(costMetal, costCrystal, shipyardLvl, naniteLvl) {
-    return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
-  }
   public router: Router;
 
   /**
@@ -129,7 +100,7 @@ export class DefenseRouter {
     queueItem.setPlanetID(request.body.planetID);
 
     // validate build-order
-    if (!DefenseRouter.isValidBuildOrder(buildOrders)) {
+    if (!units.isValidBuildOrder(buildOrders, UnitType.DEFENSE)) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
         message: "Invalid parameter",
@@ -193,7 +164,7 @@ export class DefenseRouter {
         for (const item in buildOrders) {
           if (buildOrders.hasOwnProperty(item)) {
             let count: number = buildOrders[item];
-            const cost: ICosts = DefenseRouter.getCosts(parseInt(item, 10));
+            const cost: ICosts = units.getCosts(parseInt(item, 10), 0, UnitType.DEFENSE);
 
             // if the user has not enough ressources to fullfill the complete build-order
             if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
@@ -250,12 +221,8 @@ export class DefenseRouter {
 
             // build time in seconds
             buildTime +=
-              DefenseRouter.getBuildTimeInSeconds(
-                cost.metal,
-                cost.crystal,
-                result[0].shipyard,
-                result[0].nanite_factory,
-              ) * Math.floor(count);
+              units.getBuildTimeInSeconds(cost.metal, cost.crystal, result[0].shipyard, result[0].nanite_factory) *
+              Math.floor(count);
 
             queueItem.addToQueue(item, Math.floor(count));
 

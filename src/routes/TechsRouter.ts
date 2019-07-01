@@ -4,7 +4,7 @@ import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
@@ -13,16 +13,6 @@ import squel = require("squel");
 const units = new Units();
 
 export class TechsRouter {
-  private static getCosts(buildingKey: string, currentLevel: number): ICosts {
-    const costs = units.getTechnologies()[buildingKey];
-
-    return {
-      metal: costs.metal * costs.factor ** currentLevel,
-      crystal: costs.crystal * costs.factor ** currentLevel,
-      deuterium: costs.deuterium * costs.factor ** currentLevel,
-      energy: costs.energy * costs.factor ** currentLevel,
-    };
-  }
   public router: Router;
 
   /**
@@ -121,7 +111,7 @@ export class TechsRouter {
           // give back the ressources
           const currentLevel = planet[buildingKey];
 
-          const cost: ICosts = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
+          const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
 
           const updatePlanetQuery: string = squel
             .update()
@@ -199,7 +189,7 @@ export class TechsRouter {
       return;
     }
 
-    if (request.body.techID < Globals.MIN_TECH_ID || request.body.techID > Globals.MAX_TECH_ID) {
+    if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
         message: "Invalid parameter",
@@ -304,7 +294,7 @@ export class TechsRouter {
 
         const currentLevel = planet[buildingKey];
 
-        const cost = TechsRouter.getCosts(request.body.techID, currentLevel);
+        const cost = units.getCosts(request.body.techID, currentLevel, UnitType.TECHNOLOGY);
 
         if (
           planet.metal < cost.metal ||

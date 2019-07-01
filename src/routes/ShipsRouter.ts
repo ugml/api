@@ -2,48 +2,16 @@ import { NextFunction, Response, Router } from "express";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
+import { Logger } from "../common/Logger";
 import { QueueItem } from "../common/QueueItem";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
-
 import squel = require("squel");
 
 const units = new Units();
-import { Logger } from "../common/Logger";
 
 export class ShipsRouter {
-  // TODO: relocate to Validator-class
-  private static isValidBuildOrder(buildOrders: object): boolean {
-    for (const order in buildOrders) {
-      if (
-        !InputValidator.isValidInt(order) ||
-        !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order, 10) < Globals.MIN_SHIP_ID ||
-        parseInt(order, 10) > Globals.MAX_SHIP_ID ||
-        buildOrders[order] < 0
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  private static getBuildTimeInSeconds(costMetal, costCrystal, shipyardLvl, naniteLvl) {
-    return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
-  }
-
-  private static getCosts(shipID: number): ICosts {
-    const costs = units.getShips()[shipID];
-
-    return {
-      metal: costs.metal,
-      crystal: costs.crystal,
-      deuterium: costs.deuterium,
-      energy: costs.energy,
-    };
-  }
   public router: Router;
 
   /**
@@ -130,7 +98,7 @@ export class ShipsRouter {
     queueItem.setPlanetID(request.body.planetID);
 
     // validate build-order
-    if (!ShipsRouter.isValidBuildOrder(buildOrders)) {
+    if (!units.isValidBuildOrder(buildOrders, UnitType.SHIP)) {
       response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
         status: Globals.Statuscode.NOT_AUTHORIZED,
         message: "Invalid parameter",
@@ -189,7 +157,7 @@ export class ShipsRouter {
         for (const item in buildOrders) {
           if (buildOrders.hasOwnProperty(item)) {
             let count: number = buildOrders[item];
-            const cost: ICosts = ShipsRouter.getCosts(parseInt(item, 10));
+            const cost: ICosts = units.getCosts(parseInt(item, 10), 0, UnitType.SHIP);
 
             // if the user has not enough ressources to fullfill the complete build-order
             if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
@@ -225,12 +193,8 @@ export class ShipsRouter {
 
             // build time in seconds
             buildTime +=
-              ShipsRouter.getBuildTimeInSeconds(
-                cost.metal,
-                cost.crystal,
-                result[0].shipyard,
-                result[0].nanite_factory,
-              ) * Math.floor(count);
+              units.getBuildTimeInSeconds(cost.metal, cost.crystal, result[0].shipyard, result[0].nanite_factory) *
+              Math.floor(count);
 
             queueItem.addToQueue(item, Math.floor(count));
 

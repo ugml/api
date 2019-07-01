@@ -20,6 +20,7 @@
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false,
-    "no-namespace": false
+    "no-namespace": false,
+    "static-before-instance": false
   }
 }

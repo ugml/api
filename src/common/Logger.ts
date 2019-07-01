@@ -12,8 +12,8 @@ const path = `./logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
 
 // Folder setup
 if (!fs.existsSync(path)) {
-  fs.mkdir("./logs/", { recursive: true }, err => {});
-  fs.mkdir(path, { recursive: true }, err => {});
+  fs.mkdir("./logs/");
+  fs.mkdir(path);
 }
 
 /* tslint:disable: variable-name */

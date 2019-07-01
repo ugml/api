@@ -25,7 +25,7 @@ describe("buildingsRoute", () => {
   });
 
   it("should return a list of buildings", () => {
-    let planetID = 167546850;
+    const planetID = 167546850;
 
     return request
       .get(`/v1/buildings/${planetID}`)
@@ -36,7 +36,7 @@ describe("buildingsRoute", () => {
   });
 
   it("should fail (missing buildingID-parameter)", () => {
-    let planetID = 167546850;
+    const planetID = 167546850;
 
     return request
       .post("/v1/buildings/build")
@@ -58,27 +58,25 @@ describe("buildingsRoute", () => {
   });
 
   it("should fail (buildingID is negative)", () => {
-    let planetID = 167546850;
+    const planetID = 167546850;
 
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
       .send({ planetID: planetID, buildingID: -1 })
       .then(res => {
-        console.log(res.body);
         expect(res.body.message).equals("Invalid parameter");
       });
   });
 
   it("should fail (buildingID is higher than global maximum)", () => {
-    let planetID = 167546850;
+    const planetID = 167546850;
 
     return request
       .post("/v1/buildings/build")
       .set("Authorization", authToken)
       .send({ planetID: planetID, buildingID: 100 })
       .then(res => {
-        console.log(res.body);
         expect(res.body.message).equals("Invalid parameter");
       });
   });
@@ -89,7 +87,6 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID: 1234, buildingID: 1 })
       .then(res => {
-        console.log(res.body);
         expect(res.body.message).equals("Invalid parameter");
       });
   });
@@ -97,7 +94,7 @@ describe("buildingsRoute", () => {
   // TODO: check, if ressources are correctly subtracted/added after build-request and cancelation
   describe("build and cancel a build-order", () => {
     it("start a build-order", () => {
-      let planetID = 167546850;
+      const planetID = 167546850;
 
       return request
         .post("/v1/buildings/build")
@@ -109,7 +106,7 @@ describe("buildingsRoute", () => {
     });
 
     it("try to start another build-order on the same planet", () => {
-      let planetID = 167546850;
+      const planetID = 167546850;
 
       return request
         .post("/v1/buildings/build")
@@ -120,7 +117,7 @@ describe("buildingsRoute", () => {
         });
     });
     it("cancel the build-order", () => {
-      let planetID = 167546850;
+      const planetID = 167546850;
 
       return request
         .post("/v1/buildings/cancel")
@@ -131,7 +128,7 @@ describe("buildingsRoute", () => {
         });
     });
     it("try cancel the build-order again", () => {
-      let planetID = 167546850;
+      const planetID = 167546850;
 
       return request
         .post("/v1/buildings/cancel")

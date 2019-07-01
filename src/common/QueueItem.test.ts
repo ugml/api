@@ -26,7 +26,7 @@ describe("QueueItem", function() {
 
   it("Queue should be empty", function() {
     const item: QueueItem = new QueueItem();
-
+    /* eslint-disable no-unused-expressions */
     expect(item.getQueue()).to.be.empty;
   });
 });

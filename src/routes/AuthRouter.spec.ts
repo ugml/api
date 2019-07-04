@@ -22,7 +22,7 @@ describe("authRoute", () => {
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         expect(res.body.message).equals("Success");
-        expect(res.status).to.eql(200);
+        expect(res.status).to.equals(200);
       });
   });
 
@@ -32,7 +32,7 @@ describe("authRoute", () => {
       .send({ email: "idonotexist@test.com", password: "idontexisteither" })
       .then(res => {
         expect(res.body.message).equals("Authentication failed");
-        expect(res.status).to.eql(401);
+        expect(res.status).to.equals(401);
       });
   });
 
@@ -42,7 +42,7 @@ describe("authRoute", () => {
       .send({ email: "user_1501005189510@test.com" })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.eql(400);
+        expect(res.status).to.equals(400);
       });
   });
 
@@ -52,14 +52,14 @@ describe("authRoute", () => {
       .send({ password: "admin" })
       .then(res => {
         expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.eql(400);
+        expect(res.status).to.equals(400);
       });
   });
 
   it("authentication should fail (nothing sent)", async () => {
     return request.post("/v1/auth/login").then(res => {
       expect(res.body.message).equals("Invalid parameter");
-      expect(res.status).to.eql(400);
+      expect(res.status).to.equals(400);
     });
   });
 });

@@ -26,7 +26,7 @@ describe("Player Routes", () => {
       .send(user)
       .then(res => {
         expect(res.type).to.eql("application/json");
-        expect(res.status).to.eql(200);
+        expect(res.status).to.equals(200);
       });
 
     done();

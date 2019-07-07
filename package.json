@@ -13,7 +13,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "node dist/index.js",
-    "test": "mocha --reporter spec -r ts-node/register test/**/*.spec.ts --exit",
+    "test": "mocha --reporter spec -r ts-node/register test/**/*.spec.ts",
     "test-coverage": "nyc --reporter=lcov mocha",
     "test-watch": "mocha --reporter spec --require ts-node/register test/**/*.spec.ts --watch",
     "lint": "eslint src/**/*.ts",

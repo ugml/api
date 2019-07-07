@@ -20,9 +20,11 @@ describe("Player Routes", () => {
       email: "test",
     };
 
-    const { type, status } = await request.post("/v1/users/create/").send(user);
+    const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.eql("application/json");
     expect(status).to.eql(200);
+    expect(body.data).to.have.keys("userID", "token");
+    expect(body.data.token.length).to.be.above(120);
   });
 });

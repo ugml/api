@@ -21,9 +21,7 @@ describe("Player Routes", () => {
       email: "test",
     };
 
-    const { type, status } = await request
-      .post("/v1/users/create/")
-      .send(user);
+    const { type, status } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.eql("application/json");
     expect(status).to.eql(200);

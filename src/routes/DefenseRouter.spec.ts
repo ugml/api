@@ -57,7 +57,7 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: JSON.stringify({ "301": 1 }) })
+      .send({ planetID, buildOrder: JSON.stringify({ 301: 1 }) })
       .then(res => {
         expect(res.body.status).to.be.equals(200);
         expect(res.type).to.eql("application/json");
@@ -69,7 +69,7 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ buildOrder: JSON.stringify({ "301": 1 }) })
+      .send({ buildOrder: JSON.stringify({ 301: 1 }) })
       .then(res => {
         expect(res.body.status).to.be.equals(400);
         expect(res.type).to.eql("application/json");
@@ -83,7 +83,7 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID })
+      .send({ planetID })
       .then(res => {
         expect(res.body.status).to.be.equals(400);
         expect(res.type).to.eql("application/json");
@@ -108,7 +108,7 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: "'{ \"xyz\": 1 }'" })
+      .send({ planetID, buildOrder: "'{ \"xyz\": 1 }'" })
       .then(res => {
         expect(res.body.status).to.be.equals(400);
         expect(res.type).to.eql("application/json");

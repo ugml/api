@@ -8,27 +8,24 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 describe("Player Routes", () => {
-  let request = chai.request(app);
+  let request;
 
   beforeEach(function() {
     request = chai.request(app);
   });
 
-  it("should create a player", done => {
+  it("should create a player", async () => {
     const user = {
       username: "Test4",
       password: "test",
       email: "test",
     };
 
-    request
+    const { type, status } = await request
       .post("/v1/users/create/")
-      .send(user)
-      .then(res => {
-        expect(res.type).to.eql("application/json");
-        expect(res.status).to.eql(200);
-      });
+      .send(user);
 
-    done();
+    expect(type).to.eql("application/json");
+    expect(status).to.eql(200);
   });
 });

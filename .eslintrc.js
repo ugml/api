@@ -19,6 +19,12 @@ module.exports =  {
     "comma-dangle": ["error", "always-multiline"],
     "quotes": ["error", "double"],
     "eqeqeq": ["error", "always"],
+    "space-before-function-paren": ["error", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "object-curly-spacing": ["error", "always"],
     //"arrow-parens": ["error", "always"], // prettier has a different opinion, maybe we really don't need these parens
     "max-len": ["warn", { "code": 120, "tabWidth": 2 }],
 

@@ -7,27 +7,13 @@ import { Logger } from "./common/Logger";
 
 debug("ts-express:server");
 
-const port = normalizePort(process.env.PORT || 3000);
+const port = process.env.PORT || 3000;
 
 App.set("port", port);
 
 const server = http.createServer(App);
-server.listen(port);
-server.on("error", onError);
-server.on("listening", onListening);
 
-function normalizePort(val: number | string): number | string | boolean {
-  const tempPort = typeof val === "string" ? parseInt(val, 10) : val;
-  if (isNaN(tempPort)) {
-    return val;
-  } else if (tempPort >= 0) {
-    return tempPort;
-  } else {
-    return false;
-  }
-}
-
-function onError(error: NodeJS.ErrnoException): void {
+server.on("error", function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== "listen") {
     throw error;
   }
@@ -45,11 +31,13 @@ function onError(error: NodeJS.ErrnoException): void {
     default:
       throw error;
   }
-}
+});
 
-function onListening(): void {
+server.on("listening", () => {
   const addr = server.address();
   const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
   Logger.info(`Listening on ${bind}`);
   debug(`Listening on ${bind}`);
-}
+});
+
+server.listen(port);

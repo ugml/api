@@ -1,4 +1,5 @@
 import { NextFunction, Response, Router } from "express";
+import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
@@ -29,6 +30,21 @@ export class GalaxyRouter {
       !InputValidator.isValidInt(request.params.galaxy) ||
       !InputValidator.isSet(request.params.system) ||
       !InputValidator.isValidInt(request.params.system)
+    ) {
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
+        message: "Invalid parameter",
+        data: {},
+      });
+
+      return;
+    }
+
+    if (
+      request.params.galaxy < 1 ||
+      request.params.galaxy > Config.Get["pos_galaxy_max"] ||
+      request.params.system < 1 ||
+      request.params.system > Config.Get["pos_system_max"]
     ) {
       response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,

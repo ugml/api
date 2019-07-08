@@ -11,6 +11,7 @@ import { Logger } from "../common/Logger";
 
 const bcrypt = require("bcryptjs");
 import squel = require("squel");
+import { JwtHelper } from "../common/JwtHelper";
 
 export class PlayersRouter {
   public router: Router;
@@ -169,6 +170,8 @@ export class PlayersRouter {
 
     const connection = await Database.getConnectionPool().getConnection();
 
+    let player;
+
     try {
       await connection.beginTransaction();
 
@@ -207,6 +210,7 @@ export class PlayersRouter {
 
         return { player: newPlayer, planet: newPlanet };
       });
+      player = data.player;
 
       Logger.info("Getting a new planetID");
 
@@ -360,7 +364,10 @@ export class PlayersRouter {
     return response.status(Globals.Statuscode.SUCCESS).json({
       status: Globals.Statuscode.SUCCESS,
       message: "Success",
-      data: {},
+      data: {
+        userID: player.userID,
+        token: JwtHelper.generateToken(player.userID),
+      },
     });
   }
 

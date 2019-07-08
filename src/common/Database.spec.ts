@@ -1,4 +1,3 @@
-import * as mocha from "mocha";
 import * as chai from "chai";
 import { Config } from "./Config";
 import { Database } from "./Database";

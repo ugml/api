@@ -16,15 +16,15 @@ describe("Player Routes", () => {
 
   it("should create a player", async () => {
     const user = {
-      username: "Test4",
+      username: "IDoNotExistYet",
       password: "test",
-      email: "test",
+      email: "iamnotareal@email.com",
     };
 
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
-    expect(type).to.eql("application/json");
-    expect(status).to.eql(Globals.Statuscode.SUCCESS);
+    expect(type).to.equals("application/json");
+    expect(status).to.equals(Globals.Statuscode.SUCCESS);
     expect(body.data).to.have.keys("userID", "token");
     expect(body.data.token.length).to.be.above(120);
   });

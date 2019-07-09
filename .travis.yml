@@ -24,14 +24,12 @@ matrix:
 before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < test/ci.sql
-  - npm install codecov -g
 
 script:
-    - npm run-script build
-    - npm run-script lint
-    - npm run-script tslint
-    - npm run-script test-coverage
+  - npm run-script build
+  - npm run-script lint
+  - npm run-script tslint
+  - npm run-script test-coverage
 
 after_success:
   - "cat ./coverage/lcov.info | codacy-coverage -p ."
-  - codecov

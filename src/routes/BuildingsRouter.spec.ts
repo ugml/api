@@ -33,7 +33,7 @@ describe("buildingsRoute", () => {
         .get(`/v1/buildings/${planetID}`)
         .set("Authorization", authToken)
         .then(res => {
-          expect(res.body.data[0].planetID).equals(planetID);
+          expect(res.body.data.planetID).equals(planetID);
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
         });
     });

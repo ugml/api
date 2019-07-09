@@ -83,10 +83,10 @@ export class GalaxyRouter {
       .then(result => {
         let data;
 
-        if (!InputValidator.isSet(result)) {
+        if (!InputValidator.isSet(result[0])) {
           data = {};
         } else {
-          data = Object.assign({}, result);
+          data = Object.assign({}, result[0]);
         }
 
         // return the result

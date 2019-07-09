@@ -49,10 +49,13 @@ describe("App", () => {
   });
 
   it("should fail (route does not exist)", () => {
-    return request.get("/v1/i/dont/exist").then(res => {
-      expect(res.status).to.equals(Globals.Statuscode.NOT_FOUND);
-      expect(res.body.data).to.be.empty;
-      expect(res.body.message).to.be.equals("The route does not exist");
-    });
+    return request
+      .get("/v1/idontexist")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.status).to.equals(Globals.Statuscode.NOT_FOUND);
+        expect(res.body.data).to.be.empty;
+        expect(res.body.message).to.be.equals("The route does not exist");
+      });
   });
 });

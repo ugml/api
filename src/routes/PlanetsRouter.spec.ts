@@ -112,6 +112,4 @@ describe("planetsRouter", () => {
   // destroyPlanet  /destroy/
   // renamePlanet   /rename/
   // getPlanetByID  /:planetID
-
-
 });

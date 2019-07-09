@@ -14,7 +14,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "test": "mocha --reporter spec -r ts-node/register src/**/*.spec.ts",
-    "test-coverage": "nyc --reporter=lcov mocha | codacy-coverage",
+    "test-coverage": "nyc --reporter=lcov mocha && cat ./coverage/lcov.info | codacy-coverage",
     "test-watch": "mocha --reporter spec --require ts-node/register src/**/*.spec.ts --watch --watch-extensions ts",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",

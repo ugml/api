@@ -255,16 +255,12 @@ export class MessagesRouter {
    * endpoints.
    */
   public init() {
-    // /user/planet/:planetID
     this.router.get("/get", this.getAllMessages);
 
-    // /user/planets/
     this.router.get("/get/:messageID", this.getMessageByID);
 
-    // /user/currentplanet/set/:planetID
     this.router.post("/delete", this.deleteMessage);
 
-    // /user/create/
     this.router.post("/send", this.sendMessage);
   }
 }

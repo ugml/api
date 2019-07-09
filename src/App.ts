@@ -98,7 +98,7 @@ class App {
 
           const payload: IJwt = JwtHelper.validateToken(token);
 
-          if (InputValidator.isSet(payload)) {
+          if (InputValidator.isSet(payload) && InputValidator.isSet(payload.userID)) {
             self.userID = payload.userID.toString(10);
 
             // check if userID is a valid integer

@@ -2,6 +2,7 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
 import app from "../App";
+import { Globals } from "../common/Globals";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -23,7 +24,7 @@ describe("Player Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.eql("application/json");
-    expect(status).to.eql(200);
+    expect(status).to.eql(Globals.Statuscode.SUCCESS);
     expect(body.data).to.have.keys("userID", "token");
     expect(body.data.token.length).to.be.above(120);
   });

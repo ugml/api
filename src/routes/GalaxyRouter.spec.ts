@@ -2,6 +2,7 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
 import app from "../App";
+import { Globals } from "../common/Globals";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -29,7 +30,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/4/13")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(200);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
       });
   });
@@ -39,7 +40,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/-1/4")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.empty;
       });
@@ -50,7 +51,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/9999/4")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.empty;
       });
@@ -61,7 +62,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/4/-1")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.empty;
       });
@@ -72,7 +73,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/4/9999")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.empty;
       });

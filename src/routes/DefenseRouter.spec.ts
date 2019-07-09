@@ -2,6 +2,7 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
 import app from "../App";
+import { Globals } from "../common/Globals";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -31,7 +32,7 @@ describe("defenseRoute", () => {
       .get(`/v1/defenses/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(200);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.planetID).equals(planetID);
       });
@@ -44,7 +45,7 @@ describe("defenseRoute", () => {
       .get(`/v1/defenses/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(200);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).equals(undefined);
       });
@@ -58,7 +59,7 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: JSON.stringify({ 301: 1 }) })
       .then(res => {
-        expect(res.body.status).to.be.equals(200);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).eql({});
       });
@@ -70,7 +71,7 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ buildOrder: JSON.stringify({ 301: 1 }) })
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).eql({});
       });
@@ -84,7 +85,7 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).eql({});
       });
@@ -95,7 +96,7 @@ describe("defenseRoute", () => {
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).eql({});
       });
@@ -109,7 +110,7 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: "'{ \"xyz\": 1 }'" })
       .then(res => {
-        expect(res.body.status).to.be.equals(400);
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).eql({});
       });

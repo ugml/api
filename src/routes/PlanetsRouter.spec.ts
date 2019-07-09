@@ -107,9 +107,34 @@ describe("planetsRouter", () => {
       });
   });
 
+  it("should return a list of movements on the planet", () => {
+    const planetID = 167546850;
+
+    return request
+      .get(`/v1/planets/movement/${planetID}`)
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        // TODO
+      });
+  });
+
+  it("should rename a planet", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/planets/rename")
+      .send({ planetID: planetID, name: "FancyNewName" })
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data[0].name).to.be.equals("FancyNewName");
+      });
+  });
+
   // TODO:
-  // getMovement    /movement/:planetID
   // destroyPlanet  /destroy/
-  // renamePlanet   /rename/
   // getPlanetByID  /:planetID
 });

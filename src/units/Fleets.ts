@@ -1,8 +1,8 @@
 import { Database } from "../common/Database";
 import { IUnits } from "../interfaces/IUnits";
 
-const squel = require("squel");
-const Logger = require("../common/Logger");
+import squel = require("squel");
+import { Logger } from "../common/Logger";
 
 class Fleets implements IUnits {
   public planetID: number;
@@ -43,7 +43,8 @@ class Fleets implements IUnits {
         .where("planetID = ?", this.planetID)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })
@@ -58,7 +59,7 @@ class Fleets implements IUnits {
     return new Promise((resolve, reject) => {
       const query = squel
         .insert()
-        .table("fleets")
+        .into("fleets")
         .set("planetID", this.planetID)
         .set("small_cargo_ship", this.small_cargo_ship)
         .set("large_cargo_ship", this.large_cargo_ship)
@@ -76,7 +77,8 @@ class Fleets implements IUnits {
         .set("deathstar", this.deathstar)
         .toString();
 
-      Database.query(query)
+      Database.getConnectionPool()
+        .query(query)
         .then(() => {
           return resolve(this);
         })

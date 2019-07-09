@@ -1,16 +1,17 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Database } from "../common/Database";
-import { DuplicateRecordError } from "../common/Exceptions";
+import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Planet, PlanetType } from "../units/Planet";
 import { User } from "../units/User";
 import { PlanetsRouter } from "./PlanetsRouter";
+import { Logger } from "../common/Logger";
 
-const Logger = require("../common/Logger");
 const bcrypt = require("bcryptjs");
 import squel = require("squel");
+import { JwtHelper } from "../common/JwtHelper";
 
 export class PlayersRouter {
   public router: Router;
@@ -20,7 +21,29 @@ export class PlayersRouter {
    */
   public constructor() {
     this.router = Router();
-    this.init();
+
+    // Take each handler, and attach to one of the Express.Router's endpoints.
+
+    // /user
+    this.router.get("/", this.getPlayerSelf);
+
+    // /user/create/
+    this.router.post("/create", this.createPlayer);
+
+    // /users/:playerID
+    this.router.get("/:playerID", this.getPlayerByID);
+
+    // /user/update
+    this.router.post("/update", this.updatePlayer);
+
+    // /user/planet/:planetID
+    this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
+
+    // /user/planets/
+    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfPlayer);
+
+    // /user/currentplanet/set/:planetID
+    this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
   }
 
   public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -36,7 +59,8 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data: {};
 
@@ -71,8 +95,8 @@ export class PlayersRouter {
   public getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.playerID) || !InputValidator.isValidInt(request.params.playerID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -90,7 +114,8 @@ export class PlayersRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data = {};
 
@@ -119,14 +144,14 @@ export class PlayersRouter {
       });
   }
 
-  public createPlayer(request: Request, response: Response, next: NextFunction) {
+  public async createPlayer(request: Request, response: Response, next: NextFunction) {
     if (
       !InputValidator.isSet(request.body.username) ||
       !InputValidator.isSet(request.body.password) ||
       !InputValidator.isSet(request.body.email)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -143,229 +168,206 @@ export class PlayersRouter {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // TODO: use squel
+    const connection = await Database.getConnectionPool().getConnection();
 
-    // check, if the username or the email is already taken
-    let query =
-      `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
-      `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
+    let player;
 
-    Database.getConnection().beginTransaction(() => {
-      Database.query(query)
-        .then(rows => {
-          if (rows[0].username_taken === 1) {
-            throw new DuplicateRecordError("Username is already taken");
-          }
+    try {
+      await connection.beginTransaction();
 
-          if (rows[0].email_taken === 1) {
-            throw new DuplicateRecordError("Email is already taken");
-          }
+      // TODO: use squel
+      // check, if the username or the email is already taken
+      const query =
+        `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
+        `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
+
+      const rows = await connection.query(query);
+
+      if (rows[0].username_taken === 1) {
+        throw new DuplicateRecordException("Username is already taken");
+      }
+
+      if (rows[0].email_taken === 1) {
+        throw new DuplicateRecordException("Email is already taken");
+      }
+
+      Logger.info("Getting a new userID");
+
+      const queryUser = "CALL getNewUserId();";
+
+      const newPlayer: User = new User();
+      const newPlanet: Planet = new Planet();
+
+      newPlayer.username = username;
+      newPlayer.email = email;
+
+      const data = await connection.query(queryUser).then(row => {
+        // why the f*ck is the result three-dimensional?
+        newPlayer.userID = row[0][0][0].userID;
+        newPlayer.password = hashedPassword;
+        newPlanet.ownerID = newPlayer.userID;
+        newPlanet.planet_type = PlanetType.Planet;
+
+        return { player: newPlayer, planet: newPlanet };
+      });
+      player = data.player;
+
+      Logger.info("Getting a new planetID");
+
+      const queryPlanet = "CALL getNewPlanetId();";
+
+      await connection.query(queryPlanet).then(row => {
+        data.player.currentplanet = row[0][0][0].planetID;
+        data.planet.planetID = row[0][0][0].planetID;
+      });
+
+      Logger.info("Finding free position for new planet");
+
+      // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
+      const queryPosition = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
+
+      await connection
+        .query(queryPosition)
+        .then(row => {
+          data.planet.galaxy = row[0][0][0].posGalaxy;
+          data.planet.system = row[0][0][0].posSystem;
+          data.planet.planet = row[0][0][0].posPlanet;
         })
-        .then(() => {
-          Logger.info("Getting a new userID");
-
-          const query = "CALL getNewUserId();";
-
-          const newPlayer: User = new User();
-          const newPlanet: Planet = new Planet();
-
-          newPlayer.username = username;
-          newPlayer.email = email;
-
-          return Database.query(query).then(row => {
-            newPlayer.userID = row[0][0].userID;
-            newPlayer.password = hashedPassword;
-            newPlanet.ownerID = newPlayer.userID;
-            newPlanet.planet_type = PlanetType.Planet;
-
-            return { player: newPlayer, planet: newPlanet };
-          });
-        })
-        .then(data => {
-          Logger.info("Getting a new planetID");
-
-          const query = "CALL getNewPlanetId();";
-
-          return Database.query(query).then(row => {
-            data.player.currentplanet = row[0][0].planetID;
-            data.planet.planetID = row[0][0].planetID;
-
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Finding free position for new planet");
-
-          // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
-          const query = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
-
-          return Database.query(query).then(row => {
-            data.planet.galaxy = row[0][0].posGalaxy;
-            data.planet.system = row[0][0].posSystem;
-            data.planet.planet = row[0][0].posPlanet;
-
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating a new user");
-
-          return data.player.create().then(() => {
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating a new planet");
-
-          data.planet.name = gameConfig.startplanet_name;
-          data.planet.last_update = (Date.now() / 1000) | 0;
-          data.planet.diameter = gameConfig.startplanet_diameter;
-          data.planet.fields_max = gameConfig.startplanet_maxfields;
-          data.planet.metal = gameConfig.metal_start;
-          data.planet.crystal = gameConfig.crystal_start;
-          data.planet.deuterium = gameConfig.deuterium_start;
-
-          switch (true) {
-            case data.planet.planet <= 5: {
-              data.planet.temp_min = Math.random() * (130 - 40) + 40;
-              data.planet.temp_max = Math.random() * (150 - 240) + 240;
-
-              const images: string[] = ["desert", "dry"];
-
-              data.planet.image =
-                images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-
-              break;
-            }
-            case data.planet.planet <= 10: {
-              data.planet.temp_min = Math.random() * (130 - 40) + 40;
-              data.planet.temp_max = Math.random() * (150 - 240) + 240;
-
-              const images: string[] = ["normal", "jungle", "gas"];
-
-              data.planet.image =
-                images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-
-              break;
-            }
-            case data.planet.planet <= 15: {
-              data.planet.temp_min = Math.random() * (130 - 40) + 40;
-              data.planet.temp_max = Math.random() * (150 - 240) + 240;
-
-              const images: string[] = ["ice", "water"];
-
-              data.planet.image =
-                images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-            }
-          }
-
-          return data.planet.create().then(() => {
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating entry in buildings-table");
-
-          query = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
-
-          return Database.query(query).then(() => {
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating entry in defenses-table");
-
-          query = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
-
-          return Database.query(query).then(() => {
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating entry in defenses-table");
-
-          query = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
-
-          return Database.query(query).then(() => {
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating entry in galaxy-table");
-
-          query = `INSERT INTO galaxy 
-                        (
-                           \`planetID\`, 
-                           \`pos_galaxy\`, 
-                           \`pos_system\`, 
-                           \`pos_planet\`
-                         )
-                   VALUES 
-                        (
-                           ${data.planet.planetID}, 
-                           ${data.planet.galaxy}, 
-                           ${data.planet.system}, 
-                           ${data.planet.planet}
-                        );`;
-
-          return Database.query(query).then(() => {
-            return data;
-          });
-        })
-        .then(data => {
-          Logger.info("Creating entry in techs-table");
-
-          query = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
-
-          return Database.query(query);
-        })
-        .then(() => {
-          Database.getConnection().commit(function(err) {
-            if (err) {
-              Database.getConnection().rollback(function() {
-                Logger.error(err);
-                throw err;
-              });
-            }
-          });
-
-          Logger.info("Transaction complete");
-
-          // return the result
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data: {},
-          });
-          return;
-        })
-        .catch(err => {
-          Logger.error(err);
-
-          if (err) {
-            Database.getConnection().rollback();
-          }
-
-          Logger.info("Rolled back transaction");
-
-          if (err instanceof DuplicateRecordError || err.message.includes("Duplicate entry")) {
-            // return the result
-            response.status(Globals.Statuscode.BAD_REQUEST).json({
-              status: Globals.Statuscode.BAD_REQUEST,
-              message: `There was an error while handling the request: ${err.message}`,
-              data: {},
-            });
-          } else {
-            // return the result
-            response.status(Globals.Statuscode.SERVER_ERROR).json({
-              status: Globals.Statuscode.SERVER_ERROR,
-              message: "There was an error while handling the request.",
-              data: {},
-            });
-          }
-
-          return;
+        .catch(error => {
+          Logger.error(error);
         });
+
+      Logger.info("Creating a new user");
+
+      await data.player.create(connection);
+
+      // // TODO extract planet creation
+      Logger.info("Creating a new planet");
+
+      data.planet.name = gameConfig.startplanet_name;
+      data.planet.last_update = Math.floor(Date.now() / 1000);
+      data.planet.diameter = gameConfig.startplanet_diameter;
+      data.planet.fields_max = gameConfig.startplanet_maxfields;
+      data.planet.metal = gameConfig.metal_start;
+      data.planet.crystal = gameConfig.crystal_start;
+      data.planet.deuterium = gameConfig.deuterium_start;
+
+      switch (true) {
+        case data.planet.planet <= 5: {
+          data.planet.temp_min = Math.random() * (130 - 40) + 40;
+          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["desert", "dry"];
+
+          data.planet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+          break;
+        }
+        case data.planet.planet <= 10: {
+          data.planet.temp_min = Math.random() * (130 - 40) + 40;
+          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["normal", "jungle", "gas"];
+
+          data.planet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+          break;
+        }
+        case data.planet.planet <= 15: {
+          data.planet.temp_min = Math.random() * (130 - 40) + 40;
+          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["ice", "water"];
+
+          data.planet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+        }
+      }
+
+      await data.planet.create(connection);
+
+      Logger.info("Creating entry in buildings-table");
+
+      const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
+
+      await connection.query(queryBuildings);
+
+      Logger.info("Creating entry in defenses-table");
+
+      const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
+
+      await connection.query(queryDefenses);
+
+      Logger.info("Creating entry in fleet-table");
+
+      const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
+
+      await connection.query(queryFleet);
+
+      Logger.info("Creating entry in galaxy-table");
+
+      const queryGalaxy = `INSERT INTO galaxy
+                                (
+                                  \`planetID\`,
+                                  \`pos_galaxy\`,
+                                  \`pos_system\`,
+                                  \`pos_planet\`
+                                )
+                          VALUES
+                                (
+                                  ${data.planet.planetID},
+                                  ${data.planet.galaxy},
+                                  ${data.planet.system},
+                                  ${data.planet.planet}
+                                );`
+        .split("\n")
+        .join("")
+        .replace("  ", " ");
+      // ^^^ temporary so that the query takes up one line instead of 14 in the log
+
+      await connection.query(queryGalaxy);
+
+      Logger.info("Creating entry in techs-table");
+
+      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
+
+      await connection.query(queryTech);
+
+      connection.commit();
+
+      Logger.info("Transaction complete");
+
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      Logger.error(error);
+
+      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: `There was an error while handling the request: ${error.message}`,
+          data: {},
+        });
+      }
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    } finally {
+      await connection.release();
+    }
+
+    return response.status(Globals.Statuscode.SUCCESS).json({
+      status: Globals.Statuscode.SUCCESS,
+      message: "Success",
+      data: {
+        userID: player.userID,
+        token: JwtHelper.generateToken(player.userID),
+      },
     });
   }
 
@@ -376,8 +378,8 @@ export class PlayersRouter {
       !InputValidator.isSet(request.body.password) &&
       !InputValidator.isSet(request.body.email)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "No parameters were passed",
         data: {},
       });
@@ -405,12 +407,13 @@ export class PlayersRouter {
       queryBuilder.set("email", email);
     }
 
-    const query: string = queryBuilder.where("userID = ?", request.userID).toString();
+    const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
     // execute the update
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(updatePlayerQuery)
       .then(() => {
-        const query: string = squel
+        const getNewDataQuery: string = squel
           .select()
           .field("userID")
           .field("username")
@@ -422,25 +425,27 @@ export class PlayersRouter {
           .toString();
 
         // return the updated userdata
-        return Database.query(query).then(result => {
-          let data: {};
+        return Database.getConnectionPool()
+          .query(getNewDataQuery)
+          .then(result => {
+            let data: {};
 
-          if (InputValidator.isSet(result)) {
-            data = result[0];
-          }
+            if (InputValidator.isSet(result)) {
+              data = result[0];
+            }
 
-          // return the result
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data,
+            // return the result
+            return response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Success",
+              data,
+            });
           });
-        });
       })
       .catch(err => {
         Logger.error(err);
 
-        if (err instanceof DuplicateRecordError || err.message.includes("Duplicate entry")) {
+        if (err instanceof DuplicateRecordException || err.message.includes("Duplicate entry")) {
           // return the result
           response.status(Globals.Statuscode.BAD_REQUEST).json({
             status: Globals.Statuscode.BAD_REQUEST,
@@ -459,36 +464,8 @@ export class PlayersRouter {
         return;
       });
   }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    // /user/planet/:planetID
-    this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
-
-    // /user/planets/
-    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfPlayer);
-
-    // /user/currentplanet/set/:planetID
-    this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
-
-    // /user/create/
-    this.router.post("/create", this.createPlayer);
-
-    // /user
-    this.router.get("/", this.getPlayerSelf);
-
-    // /users/:playerID
-    this.router.get("/:playerID", this.getPlayerByID);
-
-    // /user/update
-    this.router.post("/update", this.updatePlayer);
-  }
 }
 
 const playerRoutes = new PlayersRouter();
-playerRoutes.init();
 
 export default playerRoutes.router;

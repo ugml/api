@@ -1,10 +1,26 @@
 class InputValidator {
   public static isValidInt(input: string): boolean {
-    if (typeof input === undefined || input === "") {
+    if (!this.isSet(input)) {
       return false;
     }
 
-    if (isNaN(parseInt(input, 10))) {
+    if (typeof input === "number") {
+      return true;
+    }
+
+    if (!input.match(/^-{0,1}\d+$/)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public static isValidFloat(input: string): boolean {
+    if (!this.isSet(input)) {
+      return false;
+    }
+
+    if (!input.match(/^\d+\.\d+$/)) {
       return false;
     }
 

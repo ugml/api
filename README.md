@@ -1,12 +1,14 @@
 ![N|Solid](https://mamen.at/ugamela/images/logo.png)
 
 [![Travis-ci](https://travis-ci.org/ugml/api.svg?branch=master)](https://travis-ci.org/ugml/api)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ugml/api&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&utm_medium=referral&utm_content=ugml/api&utm_campaign=Badge_Coverage)
 [![Discord Server](https://discordapp.com/api/guilds/339129999082913794/embed.png)](https://discord.gg/YDUHM3k)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](./LICENSE)
 
 # ugamela API
 
-This repository contains the official API which can be usedto create a client for the browsergame ugamela.
+This repository contains the official API which can be used to create a client for the browsergame ugamela.
 The official API can be found at https://api.ugamela.org/v1/
 
 # Disclaimer
@@ -17,23 +19,28 @@ This open-source project is still in an alpha-state, **please do not use this in
 
 1. Clone the repository
 
-2. Install gulp and all required packages (if not already installed)
+2. Install all required packages
 
 ```
-npm install gulp
 npm install
 ```
 
-3. Run the predefined gulp-task to compile all typescript files
+3. Run the gulp-task to compile all typescript files and copy assets
 
 ```
-gulp scripts
+npm run build
 ```
 
 4.  Run the api
 
 ```
 npm start
+```
+
+5. Or start the server in watch-mode, recompiling and restarting on changes
+
+```
+npm run watch
 ```
 
 # Routes

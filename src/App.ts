@@ -5,6 +5,7 @@ import { JwtHelper } from "./common/JwtHelper";
 import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest";
 
 import { Globals } from "./common/Globals";
+import { IJwt } from "./interfaces/IJwt";
 import { InputValidator } from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -17,10 +18,12 @@ import PlanetRouter from "./routes/PlanetsRouter";
 import PlayerRouter from "./routes/PlayersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
+import dotenv = require("dotenv-safe");
 
-require("dotenv-safe").config();
+dotenv.config({
+  example: process.env.CI ? ".env.ci.example" : ".env.example",
+});
 
-const jwt = new JwtHelper();
 const expressip = require("express-ip");
 const helmet = require("helmet");
 
@@ -28,9 +31,9 @@ const winston = require("winston");
 const expressWinston = require("express-winston");
 
 const { format } = winston;
-const { combine, timestamp, printf } = format;
+const { combine, printf } = format;
 
-const Logger = require("./common/Logger");
+import { Logger } from "./common/Logger";
 
 const logFormat = printf(({ message, timestamp }) => {
   return `${timestamp} [REQUEST] ${message}`;
@@ -71,7 +74,6 @@ class App {
 
     this.express.use("/*", (request, response, next) => {
       try {
-
         // if the user tries to authenticate, we don't have a token yet
         if (
           !request.originalUrl.toString().includes("/auth/") &&
@@ -80,14 +82,27 @@ class App {
         ) {
           const authString = request.header("authorization");
 
-          const payload: string = jwt.validateToken(authString);
+          if (
+            !InputValidator.isSet(authString) ||
+            !authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")
+          ) {
+            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+              status: Globals.Statuscode.NOT_AUTHORIZED,
+              message: "Authentication failed",
+              data: {},
+            });
+            return;
+          }
 
+          const token: string = authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")[0];
 
-          if (InputValidator.isSet(payload)) {
-            self.userID = eval(payload).userID;
+          const payload: IJwt = JwtHelper.validateToken(token);
+
+          if (InputValidator.isSet(payload) && InputValidator.isSet(payload.userID)) {
+            self.userID = payload.userID.toString(10);
 
             // check if userID is a valid integer
-            if (isNaN(parseInt(self.userID))) {
+            if (isNaN(parseInt(self.userID, 10))) {
               response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter",
@@ -111,6 +126,8 @@ class App {
           next();
         }
       } catch (e) {
+        Logger.error(e);
+
         response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: "Internal server error",
@@ -126,7 +143,10 @@ class App {
     // TODO: find better method to filter out passwords in requests
     this.express.use(
       expressWinston.logger({
-        transports: [new winston.transports.Console(), new winston.transports.File({ filename: "logs/access.log" })],
+        transports: [
+          new winston.transports.Console(),
+          new winston.transports.File({ filename: `${Logger.getPath()}access.log` }),
+        ],
         format: combine(
           format.timestamp({
             format: "YYYY-MM-DD HH:mm:ss",
@@ -136,13 +156,13 @@ class App {
         maxsize: 10,
         msg:
           "{" +
-          "\"ip\": \"{{req.connection.remoteAddress}}\", " +
-          "\"userID\": \"{{req.userID}}\", " +
-          "\"method\": \"{{req.method}}\", " +
-          "\"url\": \"{{req.url}}\", " +
-          "\"params\": { " +
-          "\"query:\": {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
-          "\"body\": {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
+          "'ip': '{{req.connection.remoteAddress}}', " +
+          "'userID': '{{req.userID}}', " +
+          "'method': '{{req.method}}', " +
+          "'url': '{{req.url}}', " +
+          "'params': { " +
+          "'query:': {{JSON.stringify(req.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }}, " +
+          "'body': {{JSON.stringify(req.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, '') }} " +
           "}" +
           "}",
       }),

@@ -19,17 +19,25 @@ module.exports =  {
     "comma-dangle": ["error", "always-multiline"],
     "quotes": ["error", "double"],
     "eqeqeq": ["error", "always"],
+    "space-before-function-paren": ["error", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
+    "object-curly-spacing": ["error", "always"],
     //"arrow-parens": ["error", "always"], // prettier has a different opinion, maybe we really don't need these parens
     "max-len": ["warn", { "code": 120, "tabWidth": 2 }],
-    // TODO turn these rules on again
-    "@typescript-eslint/interface-name-prefix": "off",
-    "@typescript-eslint/no-use-before-define": "off",
+
+    "@typescript-eslint/interface-name-prefix": "always",
+    "@typescript-eslint/no-use-before-define": "error",
     "@typescript-eslint/no-namespace": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "on",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
+    "camelcase": "off",
     "@typescript-eslint/camelcase": "off",
-    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-var-requires": "on",
   },
   settings:  {
     react:  {

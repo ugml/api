@@ -1,18 +1,35 @@
 language: node_js
 
-node_js:
-  - "6"
-  - "8"
-  - "10"
+sudo: required
+
+cache: npm
 
 env:
   - NODE_ENV=development
 
+node_js:
+  - "8"
+  - "10"
+  - "12"
+
 services:
   - redis-server
 
+addons:
+  mariadb: '10.4'
+
+matrix:
+  fast_finish: true
+
 before_script:
-  - npm run-script lint
-  - npm run-script build
+  - sudo systemctl start mariadb
+  - sudo mysql -u root < test/ci.sql
+
 script:
-  - npm run-script test
+  - npm run-script build
+  - npm run-script lint
+  - npm run-script tslint
+  - npm run-script test-coverage
+
+after_success:
+  - "cat ./coverage/lcov.info | codacy-coverage -p ."

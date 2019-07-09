@@ -1,0 +1,10 @@
+import * as chai from "chai";
+import { Config } from "./Config";
+
+const expect = chai.expect;
+
+describe("Config", function() {
+  it("Get config", function() {
+    expect(Config.Get).to.have.deep.property("metal_start", 500);
+  });
+});

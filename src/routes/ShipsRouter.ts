@@ -2,48 +2,16 @@ import { NextFunction, Response, Router } from "express";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
+import { Logger } from "../common/Logger";
 import { QueueItem } from "../common/QueueItem";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
-
-const squel = require("squel");
+import squel = require("squel");
 
 const units = new Units();
-const Logger = require("../common/Logger");
 
 export class ShipsRouter {
-  // TODO: relocate to Validator-class
-  private static isValidBuildOrder(buildOrders: object): boolean {
-    for (const order in buildOrders) {
-      if (
-        !InputValidator.isValidInt(order) ||
-        !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order) < Globals.MIN_SHIP_ID ||
-        parseInt(order) > Globals.MAX_SHIP_ID ||
-        buildOrders[order] < 0
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  private static getBuildTimeInSeconds(costMetal, costCrystal, shipyardLvl, naniteLvl) {
-    return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
-  }
-
-  private static getCosts(shipID: number): ICosts {
-    const costs = units.getShips()[shipID];
-
-    return {
-      metal: costs.metal,
-      crystal: costs.crystal,
-      deuterium: costs.deuterium,
-      energy: costs.energy,
-    };
-  }
   public router: Router;
 
   /**
@@ -56,8 +24,8 @@ export class ShipsRouter {
 
   public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -75,7 +43,8 @@ export class ShipsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -114,8 +83,8 @@ export class ShipsRouter {
       !InputValidator.isSet(request.body.buildOrder) ||
       !InputValidator.isValidJson(request.body.buildOrder)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -129,16 +98,16 @@ export class ShipsRouter {
     queueItem.setPlanetID(request.body.planetID);
 
     // validate build-order
-    if (!ShipsRouter.isValidBuildOrder(buildOrders)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+    if (!units.isValidBuildOrder(buildOrders, UnitType.SHIP)) {
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
       return;
     }
 
-    const query: string = squel
+    let query: string = squel
       .select()
       .field("metal")
       .field("crystal")
@@ -155,11 +124,12 @@ export class ShipsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    return Database.query(query)
+    return Database.getConnectionPool()
+      .query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0])) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The player does not own the planet",
             data: {},
           });
@@ -168,8 +138,8 @@ export class ShipsRouter {
         }
 
         if (result[0].b_hangar_plus === 1) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Shipyard is currently upgrading.",
             data: {},
           });
@@ -185,54 +155,59 @@ export class ShipsRouter {
         let buildTime = 0;
 
         for (const item in buildOrders) {
-          let count: number = buildOrders[item];
-          const cost: ICosts = ShipsRouter.getCosts(parseInt(item, 10));
+          if (buildOrders.hasOwnProperty(item)) {
+            let count: number = buildOrders[item];
+            const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.SHIP);
 
-          // if the user has not enough ressources to fullfill the complete build-order
-          if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-            let tempCount: number;
+            // if the user has not enough ressources to fullfill the complete build-order
+            if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+              let tempCount: number;
 
-            if (cost.metal > 0) {
-              tempCount = metal / cost.metal;
+              if (cost.metal > 0) {
+                tempCount = metal / cost.metal;
 
-              if (tempCount < count) {
-                count = tempCount;
+                if (tempCount < count) {
+                  count = tempCount;
+                }
               }
+
+              if (cost.crystal > 0) {
+                tempCount = crystal / cost.crystal;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              if (cost.deuterium > 0) {
+                tempCount = deuterium / cost.deuterium;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              // no need to further process the queue
+              stopProcessing = true;
             }
 
-            if (cost.crystal > 0) {
-              tempCount = crystal / cost.crystal;
+            // build time in seconds
+            buildTime +=
+              units.getBuildTimeInSeconds(cost.metal, cost.crystal, result[0].shipyard, result[0].nanite_factory) *
+              Math.floor(count);
 
-              if (tempCount < count) {
-                count = tempCount;
-              }
+            queueItem.addToQueue(item, Math.floor(count));
+
+            metal -= cost.metal * count;
+            crystal -= cost.crystal * count;
+            deuterium -= cost.deuterium * count;
+
+            if (stopProcessing) {
+              break;
             }
-
-            if (cost.deuterium > 0) {
-              tempCount = deuterium / cost.deuterium;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            // no need to further process the queue
-            stopProcessing = true;
-          }
-
-          // build time in seconds
-          buildTime +=
-            ShipsRouter.getBuildTimeInSeconds(cost.metal, cost.crystal, result[0].shipyard, result[0].nanite_factory) *
-            Math.floor(count);
-
-          queueItem.addToQueue(item, Math.floor(count));
-
-          metal -= cost.metal * count;
-          crystal -= cost.crystal * count;
-          deuterium -= cost.deuterium * count;
-
-          if (stopProcessing) {
-            break;
+          } else {
+            // TODO: throw a meaningful error
+            throw Error();
           }
         }
 
@@ -255,7 +230,7 @@ export class ShipsRouter {
         }
 
         // update planet
-        const query: string = squel
+        query = squel
           .update()
           .table("planets")
           .set("b_hangar_id", b_hangar_id_new)
@@ -266,15 +241,17 @@ export class ShipsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        return Database.query(query).then(() => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data: {},
-          });
+        return Database.getConnectionPool()
+          .query(query)
+          .then(() => {
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Success",
+              data: {},
+            });
 
-          return;
-        });
+            return;
+          });
       })
       .catch(error => {
         Logger.error(error);

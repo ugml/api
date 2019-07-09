@@ -5,11 +5,10 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
 
-const squel = require("squel");
-const jwt = new JwtHelper();
+import squel = require("squel");
 const bcrypt = require("bcryptjs");
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
 export class AuthRouter {
   public router: Router;
@@ -26,10 +25,10 @@ export class AuthRouter {
    * @param response
    * @param next
    */
-  public authenticate(req: Request, response: Response, next: NextFunction) {
+  public async authenticate(req: Request, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -50,9 +49,10 @@ export class AuthRouter {
       .where("email = ?", email)
       .toString();
 
-    Database.query(query)
+    await Database.getConnectionPool()
+      .query(query)
       .then(users => {
-        if (!InputValidator.isSet(users)) {
+        if (!InputValidator.isSet(users) || users[0][0] === undefined) {
           response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
             status: Globals.Statuscode.NOT_AUTHORIZED,
             message: "Authentication failed",
@@ -61,7 +61,7 @@ export class AuthRouter {
           return;
         }
 
-        bcrypt.compare(password, users[0].password).then(function(isValidPassword) {
+        bcrypt.compare(password, users[0][0].password).then(function(isValidPassword: boolean) {
           if (!isValidPassword) {
             response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,
@@ -75,7 +75,7 @@ export class AuthRouter {
             status: Globals.Statuscode.SUCCESS,
             message: "Success",
             data: {
-              token: jwt.generateToken(users[0].userID),
+              token: JwtHelper.generateToken(users[0][0].userID),
             },
           });
           return;

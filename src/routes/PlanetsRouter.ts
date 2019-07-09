@@ -5,9 +5,9 @@ import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
 const mysql = require("mysql2");
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 export class PlanetsRouter {
   public router: Router;
@@ -23,8 +23,8 @@ export class PlanetsRouter {
   public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -40,11 +40,12 @@ export class PlanetsRouter {
       .where("ownerID = ?", request.userID)
       .toString();
 
-    return Database.query(query)
+    return Database.getConnectionPool()
+      .query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The player does not own the planet",
             data: {},
           });
@@ -53,22 +54,24 @@ export class PlanetsRouter {
         }
 
         // TODO: check for unique-constraint violation
-        const query: string = squel
+        const updateCurrentPlanetQuery: string = squel
           .update()
           .table("users")
           .set("currentplanet = ?", request.body.planetID)
           .where("userID = ?", request.userID)
           .toString();
 
-        return Database.query(query).then(result => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data: {},
-          });
+        return Database.getConnectionPool()
+          .query(updateCurrentPlanetQuery)
+          .then(() => {
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Success",
+              data: {},
+            });
 
-          return;
-        });
+            return;
+          });
       })
       .catch(error => {
         Logger.error(error);
@@ -91,7 +94,8 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -125,8 +129,8 @@ export class PlanetsRouter {
   public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -142,7 +146,8 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -176,8 +181,8 @@ export class PlanetsRouter {
   public getMovement(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -198,7 +203,8 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -232,8 +238,8 @@ export class PlanetsRouter {
   public destroyPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -249,7 +255,8 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         const numRows: number = Object.keys(result).length;
 
@@ -263,21 +270,22 @@ export class PlanetsRouter {
         }
 
         // destroy the planet
-        Database.getConnection().beginTransaction(() => {
+        Database.getConnectionPool().beginTransaction(() => {
           Logger.info("Transaction started");
 
-          const query: string = squel
+          const deletePlanetQuery: string = squel
             .delete()
             .from("planets")
             .where("planetID = ?", request.body.planetID)
             .where("ownerID = ?", request.userID)
             .toString();
 
-          Database.query(query)
+          Database.getConnectionPool()
+            .query(deletePlanetQuery)
             .then(() => {
-              Database.getConnection().commit(function(err) {
+              Database.getConnectionPool().commit(function(err) {
                 if (err) {
-                  Database.getConnection().rollback(function() {
+                  Database.getConnectionPool().rollback(function() {
                     Logger.error(err);
                     throw err;
                   });
@@ -329,8 +337,8 @@ export class PlanetsRouter {
       !InputValidator.isValidInt(request.body.planetID) ||
       !InputValidator.isSet(request.body.name)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -341,8 +349,8 @@ export class PlanetsRouter {
     const newName: string = InputValidator.sanitizeString(request.body.name);
 
     if (newName.length <= 4) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "New name is too short. Minimum length is 4 characters.",
         data: {},
       });
@@ -359,7 +367,8 @@ export class PlanetsRouter {
       .where("ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(() => {
         // return the result
         response.status(Globals.Statuscode.SUCCESS).json({
@@ -388,8 +397,8 @@ export class PlanetsRouter {
   public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // validate parameters
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -414,7 +423,8 @@ export class PlanetsRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 

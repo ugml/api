@@ -1,26 +1,31 @@
 class QueueItem {
-  private planetID: number;
-  private lastUpdateTime: number;
-  private timeRemaining: number;
-  private queue: object;
-
-  public constructor() {
-    this.planetID = -1;
-    this.lastUpdateTime = 0;
-    this.timeRemaining = 0;
-    this.queue = {};
-  }
+  private planetID: number = -1;
+  private lastUpdateTime: number = 0;
+  private timeRemaining: number = 0;
+  private queue: object = {};
 
   public setPlanetID(planetID: number) {
     this.planetID = planetID;
+  }
+
+  public getPlanetID(): number {
+    return this.planetID;
   }
 
   public setLastUpdateTime(updateTime: number) {
     this.lastUpdateTime = updateTime;
   }
 
+  public getLastUpdateTime(): number {
+    return this.lastUpdateTime;
+  }
+
   public setTimeRemaining(timeRemaining: number) {
     this.timeRemaining = timeRemaining;
+  }
+
+  public getTimeRemaining(): number {
+    return this.timeRemaining;
   }
 
   public getQueue() {

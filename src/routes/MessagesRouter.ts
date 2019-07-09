@@ -4,11 +4,9 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
 import squel = require("squel");
-
-const bcrypt = require("bcrypt");
 
 export class MessagesRouter {
   public router: Router;
@@ -38,7 +36,8 @@ export class MessagesRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -71,8 +70,8 @@ export class MessagesRouter {
 
   public getMessageByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -96,7 +95,8 @@ export class MessagesRouter {
       .toString();
 
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
@@ -129,8 +129,8 @@ export class MessagesRouter {
 
   public deleteMessage(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -146,7 +146,8 @@ export class MessagesRouter {
       .where("receiverID = ?", request.userID)
       .toString();
 
-    return Database.query(query)
+    return Database.getConnectionPool()
+      .query(query)
       .then(() => {
         response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
@@ -176,8 +177,8 @@ export class MessagesRouter {
       !InputValidator.isSet(request.body.subject) ||
       !InputValidator.isSet(request.body.body)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -192,7 +193,8 @@ export class MessagesRouter {
       .where("userID = ?", request.body.receiverID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         const numRows: number = Object.keys(result).length;
 
@@ -205,25 +207,35 @@ export class MessagesRouter {
           return;
         }
 
-        const query: string = squel
+        const insertNewMessageQuery: string = squel
           .insert()
           .into("messages")
           .set("senderID", request.userID)
-          .set("receiverID", result[0].userID)
-          .set("sendtime", Math.floor(Date.now() / 1000))
+          .set("receiverID", request.body.receiverID)
+          .set(
+            "sendtime",
+            new Date()
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " "),
+          )
           .set("type", 1)
           .set("subject", InputValidator.sanitizeString(request.body.subject))
           .set("body", InputValidator.sanitizeString(request.body.body))
           .toString();
 
-        Database.query(query).then(() => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Message sent.",
-            data: {},
+        console.log(insertNewMessageQuery);
+
+        Database.getConnectionPool()
+          .query(insertNewMessageQuery)
+          .then(() => {
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Message sent",
+              data: {},
+            });
+            return;
           });
-          return;
-        });
       })
       .catch(error => {
         Logger.error(error);

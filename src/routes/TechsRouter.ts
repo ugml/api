@@ -1,28 +1,18 @@
 import { NextFunction, Response, Router } from "express";
+import { Validator } from "jsonschema";
 import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
+import { Logger } from "../common/Logger";
+import squel = require("squel");
 
-const Logger = require("../common/Logger");
-
-const squel = require("squel");
 const units = new Units();
 
 export class TechsRouter {
-  private static getCosts(buildingKey: string, currentLevel: number): ICosts {
-    const costs = units.getTechnologies()[buildingKey];
-
-    return {
-      metal: costs.metal * costs.factor ** currentLevel,
-      crystal: costs.crystal * costs.factor ** currentLevel,
-      deuterium: costs.deuterium * costs.factor ** currentLevel,
-      energy: costs.energy * costs.factor ** currentLevel,
-    };
-  }
   public router: Router;
 
   /**
@@ -46,7 +36,8 @@ export class TechsRouter {
       .where("userID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         // return the result
         response.status(Globals.Statuscode.SUCCESS).json({
@@ -71,8 +62,8 @@ export class TechsRouter {
 
   public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -89,11 +80,12 @@ export class TechsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -104,8 +96,8 @@ export class TechsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -119,9 +111,9 @@ export class TechsRouter {
           // give back the ressources
           const currentLevel = planet[buildingKey];
 
-          const cost: ICosts = TechsRouter.getCosts(planet.b_tech_id, currentLevel);
+          const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
 
-          const query: string = squel
+          const updatePlanetQuery: string = squel
             .update()
             .table("planets")
             .set("b_tech_id", 0)
@@ -133,8 +125,9 @@ export class TechsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-          return Database.query(query)
-            .then(result => {
+          return Database.getConnectionPool()
+            .query(updatePlanetQuery)
+            .then(() => {
               planet.b_tech_id = 0;
               planet.b_tech_endtime = 0;
               planet.metal = planet.metal + cost.metal;
@@ -188,17 +181,17 @@ export class TechsRouter {
       !InputValidator.isSet(request.body.techID) ||
       !InputValidator.isValidInt(request.body.techID)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
       return;
     }
 
-    if (request.body.techID < Globals.MIN_TECH_ID || request.body.techID > Globals.MAX_TECH_ID) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+    if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -216,11 +209,12 @@ export class TechsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -231,8 +225,8 @@ export class TechsRouter {
 
         // player does not own the planet
         if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
@@ -241,8 +235,8 @@ export class TechsRouter {
 
         // 1. check if there is already a build-job on the planet
         if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Planet already has a build-job",
             data: {},
           });
@@ -270,12 +264,17 @@ export class TechsRouter {
           let requirementsMet = true;
 
           for (const reqID in requirements) {
-            const reqLevel = requirements[reqID];
-            const key = units.getMappings()[reqID];
+            if (requirements.hasOwnProperty(reqID)) {
+              const reqLevel = requirements[reqID];
+              const key = units.getMappings()[reqID];
 
-            if (planet[key] < reqLevel) {
-              requirementsMet = false;
-              break;
+              if (planet[key] < reqLevel) {
+                requirementsMet = false;
+                break;
+              }
+            } else {
+              // TODO: throw a meaningful error
+              throw Error();
             }
           }
 
@@ -295,7 +294,7 @@ export class TechsRouter {
 
         const currentLevel = planet[buildingKey];
 
-        const cost = TechsRouter.getCosts(request.body.techID, currentLevel);
+        const cost = units.getCosts(request.body.techID, currentLevel, UnitType.TECHNOLOGY);
 
         if (
           planet.metal < cost.metal ||
@@ -322,7 +321,7 @@ export class TechsRouter {
         planet.b_tech_id = request.body.techID;
         planet.b_tech_endtime = endTime;
 
-        const query: string = squel
+        const updatePlanetQuery: string = squel
           .update()
           .table("planets")
           .set("metal", planet.metal)
@@ -333,8 +332,9 @@ export class TechsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(query)
-          .then(result => {
+        Database.getConnectionPool()
+          .query(updatePlanetQuery)
+          .then(() => {
             response.status(Globals.Statuscode.SUCCESS).json({
               status: Globals.Statuscode.SUCCESS,
               message: "Job started",

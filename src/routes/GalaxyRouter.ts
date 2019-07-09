@@ -1,12 +1,13 @@
 import { NextFunction, Response, Router } from "express";
+import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 export class GalaxyRouter {
   public router: Router;
@@ -30,8 +31,23 @@ export class GalaxyRouter {
       !InputValidator.isSet(request.params.system) ||
       !InputValidator.isValidInt(request.params.system)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
+        message: "Invalid parameter",
+        data: {},
+      });
+
+      return;
+    }
+
+    if (
+      request.params.galaxy < 1 ||
+      request.params.galaxy > Config.Get["pos_galaxy_max"] ||
+      request.params.system < 1 ||
+      request.params.system > Config.Get["pos_system_max"]
+    ) {
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -61,10 +77,9 @@ export class GalaxyRouter {
       .where("`pos_system` = ?", request.params.system)
       .toString();
 
-    console.log(query);
-
     // execute the query
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 

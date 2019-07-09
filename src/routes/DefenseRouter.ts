@@ -3,47 +3,18 @@ import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
-import { Units } from "../common/Units";
+import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 
 const units = new Units();
-const Logger = require("../common/Logger");
+import { Logger } from "../common/Logger";
 
-const squel = require("squel");
+import squel = require("squel");
 
 export class DefenseRouter {
-  private static getCosts(buildingID: number): ICosts {
-    const costs = units.getDefenses()[buildingID];
-
-    return {
-      metal: costs.metal,
-      crystal: costs.crystal,
-      deuterium: costs.deuterium,
-      energy: costs.energy,
-    };
-  }
-
   // TODO: relocate to Validator-class
-  private static isValidBuildOrder(buildOrders: object): boolean {
-    for (const order in buildOrders) {
-      if (
-        !InputValidator.isValidInt(order) ||
-        !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order) < Globals.MIN_DEFENSE_ID ||
-        parseInt(order) > Globals.MAX_DEFENSE_ID ||
-        buildOrders[order] < 0
-      ) {
-        return false;
-      }
-    }
 
-    return true;
-  }
-
-  private static getBuildTimeInSeconds(costMetal, costCrystal, shipyardLvl, naniteLvl) {
-    return 3600 * ((costMetal + costCrystal) / (2500 * (1 + shipyardLvl) * Math.pow(2, naniteLvl)));
-  }
   public router: Router;
 
   /**
@@ -56,8 +27,8 @@ export class DefenseRouter {
 
   public getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -74,14 +45,15 @@ export class DefenseRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
         let data;
 
         if (!InputValidator.isSet(result)) {
           data = {};
         } else {
-          data = result[0];
+          data = result[0][0];
         }
 
         // return the result
@@ -113,8 +85,8 @@ export class DefenseRouter {
       !InputValidator.isSet(request.body.buildOrder) ||
       !InputValidator.isValidJson(request.body.buildOrder)
     ) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -128,9 +100,9 @@ export class DefenseRouter {
     queueItem.setPlanetID(request.body.planetID);
 
     // validate build-order
-    if (!DefenseRouter.isValidBuildOrder(buildOrders)) {
-      response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-        status: Globals.Statuscode.NOT_AUTHORIZED,
+    if (!units.isValidBuildOrder(buildOrders, UnitType.DEFENSE)) {
+      response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
@@ -159,11 +131,12 @@ export class DefenseRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.query(query)
+    Database.getConnectionPool()
+      .query(query)
       .then(result => {
-        if (!InputValidator.isSet(result[0])) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+        if (!InputValidator.isSet(result[0][0])) {
+          response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "The player does not own the planet",
             data: {},
           });
@@ -171,107 +144,111 @@ export class DefenseRouter {
           return;
         }
 
-        if (result[0].b_hangar_plus === 1) {
-          return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
+        if (result[0][0].b_hangar_plus === 1) {
+          return response.status(Globals.Statuscode.BAD_REQUEST).json({
+            status: Globals.Statuscode.BAD_REQUEST,
             message: "Shipyard is currently upgrading.",
             data: {},
           });
         }
 
-        let metal = result[0].metal;
-        let crystal = result[0].crystal;
-        let deuterium = result[0].deuterium;
+        let metal = result[0][0].metal;
+        let crystal = result[0][0].crystal;
+        let deuterium = result[0][0].deuterium;
 
         let stopProcessing = false;
         let buildTime = 0;
         let freeSiloSlots: number =
-          result[0].missile_silo * 10 - result[0].anti_ballistic_missile - result[0].interplanetary_missile * 2;
+          result[0][0].missile_silo * 10 -
+          result[0][0].anti_ballistic_missile -
+          result[0][0].interplanetary_missile * 2;
 
         for (const item in buildOrders) {
-          if (!buildOrders.hasOwnProperty(item)) {
-            continue;
-          }
-          let count: number = buildOrders[item];
-          const cost: ICosts = DefenseRouter.getCosts(parseInt(item, 10));
+          if (buildOrders.hasOwnProperty(item)) {
+            let count: number = buildOrders[item];
+            const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.DEFENSE);
 
-          // if the user has not enough ressources to fullfill the complete build-order
-          if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-            let tempCount: number;
+            // if the user has not enough ressources to fullfill the complete build-order
+            if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+              let tempCount: number;
 
-            if (cost.metal > 0) {
-              tempCount = metal / cost.metal;
+              if (cost.metal > 0) {
+                tempCount = metal / cost.metal;
 
-              if (tempCount < count) {
-                count = tempCount;
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              if (cost.crystal > 0) {
+                tempCount = crystal / cost.crystal;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              if (cost.deuterium > 0) {
+                tempCount = deuterium / cost.deuterium;
+
+                if (tempCount < count) {
+                  count = tempCount;
+                }
+              }
+
+              // no need to further process the queue
+              stopProcessing = true;
+            }
+
+            // check free slots in silo
+            if (item === "309") {
+              // can't build any more rockets
+              if (freeSiloSlots === 0) {
+                buildOrders[item] = 0;
+              } else {
+                buildOrders[item] = Math.min(freeSiloSlots, buildOrders[item]);
+                freeSiloSlots -= buildOrders[item];
               }
             }
 
-            if (cost.crystal > 0) {
-              tempCount = crystal / cost.crystal;
-
-              if (tempCount < count) {
-                count = tempCount;
+            if (item === "310") {
+              // can't build any more rockets
+              if (freeSiloSlots === 0) {
+                buildOrders[item] = 0;
+              } else {
+                buildOrders[item] = Math.floor(freeSiloSlots / 2) * buildOrders[item];
+                freeSiloSlots -= buildOrders[item];
               }
             }
 
-            if (cost.deuterium > 0) {
-              tempCount = deuterium / cost.deuterium;
+            // build time in seconds
+            buildTime +=
+              units.getBuildTimeInSeconds(
+                cost.metal,
+                cost.crystal,
+                result[0][0].shipyard,
+                result[0][0].nanite_factory,
+              ) * Math.floor(count);
 
-              if (tempCount < count) {
-                count = tempCount;
-              }
+            queueItem.addToQueue(item, Math.floor(count));
+
+            metal -= cost.metal * count;
+            crystal -= cost.crystal * count;
+            deuterium -= cost.deuterium * count;
+
+            if (stopProcessing) {
+              break;
             }
-
-            // no need to further process the queue
-            stopProcessing = true;
-          }
-
-          // check free slots in silo
-          if (item === "309") {
-            // can't build any more rockets
-            if (freeSiloSlots === 0) {
-              buildOrders[item] = 0;
-            } else {
-              buildOrders[item] = Math.min(freeSiloSlots, buildOrders[item]);
-              freeSiloSlots -= buildOrders[item];
-            }
-          }
-
-          if (item === "310") {
-            // can't build any more rockets
-            if (freeSiloSlots === 0) {
-              buildOrders[item] = 0;
-            } else {
-              buildOrders[item] = Math.floor(freeSiloSlots / 2) * buildOrders[item];
-              freeSiloSlots -= buildOrders[item];
-            }
-          }
-
-          // build time in seconds
-          buildTime +=
-            DefenseRouter.getBuildTimeInSeconds(
-              cost.metal,
-              cost.crystal,
-              result[0].shipyard,
-              result[0].nanite_factory,
-            ) * Math.floor(count);
-
-          queueItem.addToQueue(item, Math.floor(count));
-
-          metal -= cost.metal * count;
-          crystal -= cost.crystal * count;
-          deuterium -= cost.deuterium * count;
-
-          if (stopProcessing) {
-            break;
+          } else {
+            // TODO: throw a meaningful error
+            throw Error();
           }
         }
 
         queueItem.setTimeRemaining(buildTime);
         queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
-        let b_hangar_id_new: string = result[0].b_hangar_id;
+        let b_hangar_id_new: string = result[0][0].b_hangar_id;
         let b_hangar_start_time_new: number;
 
         if (InputValidator.isSet(b_hangar_id_new)) {
@@ -280,14 +257,14 @@ export class DefenseRouter {
 
         b_hangar_id_new += JSON.stringify(queueItem);
 
-        b_hangar_start_time_new = result[0].b_hangar_start_time;
+        b_hangar_start_time_new = result[0][0].b_hangar_start_time;
 
-        if (result[0].b_hangar_start_time === 0) {
+        if (result[0][0].b_hangar_start_time === 0) {
           b_hangar_start_time_new = Math.floor(Date.now() / 1000);
         }
 
         // update planet
-        const query: string = squel
+        const updatePlanetQuery: string = squel
           .update()
           .table("planets")
           .set("b_hangar_id", b_hangar_id_new)
@@ -298,15 +275,17 @@ export class DefenseRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.query(query).then(result => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data: {},
-          });
+        Database.getConnectionPool()
+          .query(updatePlanetQuery)
+          .then(() => {
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Success",
+              data: {},
+            });
 
-          return;
-        });
+            return;
+          });
       })
       .catch(error => {
         Logger.error(error);

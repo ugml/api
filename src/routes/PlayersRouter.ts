@@ -39,7 +39,7 @@ export class PlayersRouter {
     // /user/planet/:planetID
     this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
 
-    // /user/planets/
+    // /user/planetlist/
     this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfPlayer);
 
     // /user/currentplanet/set/:planetID

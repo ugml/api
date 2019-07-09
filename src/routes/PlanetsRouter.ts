@@ -43,7 +43,7 @@ export class PlanetsRouter {
     return Database.getConnectionPool()
       .query(query)
       .then(result => {
-        if (!InputValidator.isSet(result)) {
+        if (!InputValidator.isSet(result[0])) {
           response.status(Globals.Statuscode.BAD_REQUEST).json({
             status: Globals.Statuscode.BAD_REQUEST,
             message: "The player does not own the planet",
@@ -461,10 +461,11 @@ export class PlanetsRouter {
    */
   public init() {
     // /planets/:planetID
-    this.router.get("/:planetID", this.getPlanetByID);
+    this.router.get("/planetlist/", this.getAllPlanetsOfPlayer);
     this.router.get("/movement/:planetID", this.getMovement);
     this.router.post("/destroy/", this.destroyPlanet);
     this.router.post("/rename/", this.renamePlanet);
+    this.router.get("/:planetID", this.getPlanetByID);
   }
 }
 

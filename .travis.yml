@@ -33,5 +33,5 @@ script:
     - npm run-script test-coverage
 
 after_success:
-  - "cat ./coverage/lcov.info | codacy-coverage"
+  - "cat ./coverage/lcov.info | codacy-coverage -p ."
   - codecov

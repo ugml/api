@@ -160,6 +160,7 @@ CREATE TABLE `messages` (
                             `type` tinyint(1) NOT NULL,
                             `subject` varchar(45) NOT NULL,
                             `body` text NOT NULL,
+                            `deleted` int(1) default 0 NOT NULL,
                             PRIMARY KEY (`messageID`),
                             UNIQUE KEY `messageID_UNIQUE` (`messageID`),
                             KEY `fk_messages_users1_idx` (`senderID`),

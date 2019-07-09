@@ -8,8 +8,6 @@ import { Logger } from "../common/Logger";
 
 import squel = require("squel");
 
-const bcrypt = require("bcrypt");
-
 export class MessagesRouter {
   public router: Router;
 
@@ -213,19 +211,27 @@ export class MessagesRouter {
           .insert()
           .into("messages")
           .set("senderID", request.userID)
-          .set("receiverID", result[0].userID)
-          .set("sendtime", Math.floor(Date.now() / 1000))
+          .set("receiverID", request.body.receiverID)
+          .set(
+            "sendtime",
+            new Date()
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " "),
+          )
           .set("type", 1)
           .set("subject", InputValidator.sanitizeString(request.body.subject))
           .set("body", InputValidator.sanitizeString(request.body.body))
           .toString();
+
+        console.log(insertNewMessageQuery);
 
         Database.getConnectionPool()
           .query(insertNewMessageQuery)
           .then(() => {
             response.status(Globals.Statuscode.SUCCESS).json({
               status: Globals.Statuscode.SUCCESS,
-              message: "Message sent.",
+              message: "Message sent",
               data: {},
             });
             return;

@@ -25,11 +25,17 @@ before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < test/ci.sql
 
-script:
-  - npm run-script build
-  - npm run-script lint
-  - npm run-script tslint
-  - npm run-script test-coverage
+jobs:
+  include:
+    - stage: build
+      script:
+        -npm run-script build
+    - stage: lint
+      script:
+        - npm run-script lint
+        - npm run-script tslint
+    - stage: testing & coverage
+        - npm run-script test-coverage
 
 after_success:
   - "cat ./coverage/lcov.info | codacy-coverage -p ."

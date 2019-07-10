@@ -13,7 +13,6 @@ import { Logger } from "../common/Logger";
 import squel = require("squel");
 
 export class DefenseRouter {
-
   public router: Router;
 
   /**

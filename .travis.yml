@@ -28,10 +28,6 @@ before_script:
 matrix:
   include:
     - name: Build
-      node_js:
-        - "8"
-        - "10"
-        - "12"
       script:
         -npm run-script build
     - name: Lint

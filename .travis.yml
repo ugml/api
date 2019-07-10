@@ -20,16 +20,16 @@ addons:
   mariadb: '10.4'
 
 stages:
+  - prepare
   - build
   - test
   - lint
-
-before_script:
-  - sudo systemctl start mariadb
-  - sudo mysql -u root < test/ci.sql
+  - deploy
 
 jobs:
   include:
+    - stage: prepare
+      script: sudo systemctl start mariadb && sudo mysql -u root < test/ci.sql
     - &build
       stage: build
       script: npm run-script build
@@ -42,6 +42,8 @@ jobs:
       script: npm run-script test-coverage
     - stage: lint
       script: npm run-script lint && npm run-script tslint
+    - stage: deploy
+      script: echo "TODO"
 
 
 after_success:

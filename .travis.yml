@@ -13,11 +13,10 @@ cache: npm
 env:
   - NODE_ENV=development
 
-addons:
-  mariadb: '10.4'
+#addons:
+#  mariadb: '10.4'
 
 stages:
-  - prepare
   - build
   - test
   - lint
@@ -25,11 +24,6 @@ stages:
 
 jobs:
   include:
-    - stage: prepare
-      script:
-        - sudo systemctl start mariadb                          # start mariadb
-        - sudo mysql -u root < test/ci.sql                      # import data-dump
-        - sudo redis-server /etc/redis/redis.conf --port 6379   # start redis
     - &build
       stage: build
       script: npm run-script build
@@ -40,6 +34,9 @@ jobs:
       node_js: '12'
     - stage: test
       script:
+        - sudo systemctl start mariadb                          # start mariadb
+        - sudo mysql -u root < test/ci.sql                      # import data-dump
+        - sudo redis-server /etc/redis/redis.conf --port 6379   # start redis
         - npm run-script test-coverage
         - "cat ./coverage/lcov.info | codacy-coverage -p ."
     - stage: lint

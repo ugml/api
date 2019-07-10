@@ -58,116 +58,116 @@ export class TechsRouter {
     }
   }
 
-  public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-      return;
-    }
-
-    // get the planet, on which the building should be canceled
-    const query: string = squel
-      .select()
-      .from("planets", "p")
-      .join("buildings", "b", "p.planetID = b.planetID")
-      .join("techs", "t", "t.userID = p.ownerID")
-      .where("p.planetID = ?", request.body.planetID)
-      .where("p.ownerID = ?", request.userID)
-      .toString();
-
-    Database.query(query)
-      .then(result => {
-        if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-          return;
-        }
-
-        const planet = result[0];
-
-        // player does not own the planet
-        if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-          return;
-        }
-
-        // 1. check if there is already a build-job on the planet
-        if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
-          const buildingKey = units.getMappings()[planet.b_tech_id];
-
-          // give back the ressources
-          const currentLevel = planet[buildingKey];
-
-          const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
-
-          const updatePlanetQuery: string = squel
-            .update()
-            .table("planets")
-            .set("b_tech_id", 0)
-            .set("b_tech_endtime", 0)
-            .set("metal", planet.metal + cost.metal)
-            .set("crystal", planet.crystal + cost.crystal)
-            .set("deuterium", planet.deuterium + cost.deuterium)
-            .where("planetID = ?", planet.planetID)
-            .where("ownerID = ?", request.userID)
-            .toString();
-
-          return Database.query(updatePlanetQuery)
-            .then(() => {
-              planet.b_tech_id = 0;
-              planet.b_tech_endtime = 0;
-              planet.metal = planet.metal + cost.metal;
-              planet.crystal = planet.crystal + cost.crystal;
-              planet.crystal = planet.crystal + cost.crystal;
-
-              response.status(Globals.Statuscode.SUCCESS).json({
-                status: Globals.Statuscode.SUCCESS,
-                message: "Building canceled",
-                data: { planet },
-              });
-              return;
-            })
-            .catch(error => {
-              Logger.error(error);
-
-              response.status(Globals.Statuscode.SERVER_ERROR).json({
-                status: Globals.Statuscode.SERVER_ERROR,
-                message: "There was an error while handling the request.",
-                data: {},
-              });
-
-              return;
-            });
-        } else {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Planet has no build-job",
-            data: {},
-          });
-          return;
-        }
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+  public async cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
           data: {},
         });
-
         return;
+      }
+
+      // get the planet, on which the building should be canceled
+      const query: string = squel
+        .select()
+        .from("planets", "p")
+        .join("buildings", "b", "p.planetID = b.planetID")
+        .join("techs", "t", "t.userID = p.ownerID")
+        .where("p.planetID = ?", request.body.planetID)
+        .where("p.ownerID = ?", request.userID)
+        .toString();
+
+      let [rows] = await Database.query(query);
+
+      if (!InputValidator.isSet(rows)) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+        return;
+      }
+
+      const planet = rows[0];
+
+      // player does not own the planet
+      if (!InputValidator.isSet(planet)) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+        return;
+      }
+
+      // 1. check if there is already a build-job on the planet
+      if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
+        const buildingKey = units.getMappings()[planet.b_tech_id];
+
+        // give back the ressources
+        const currentLevel = planet[buildingKey];
+
+        const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
+
+        const updatePlanetQuery: string = squel
+          .update()
+          .table("planets")
+          .set("b_tech_id", 0)
+          .set("b_tech_endtime", 0)
+          .set("metal", planet.metal + cost.metal)
+          .set("crystal", planet.crystal + cost.crystal)
+          .set("deuterium", planet.deuterium + cost.deuterium)
+          .where("planetID = ?", planet.planetID)
+          .where("ownerID = ?", request.userID)
+          .toString();
+
+        return Database.query(updatePlanetQuery)
+          .then(() => {
+            planet.b_tech_id = 0;
+            planet.b_tech_endtime = 0;
+            planet.metal = planet.metal + cost.metal;
+            planet.crystal = planet.crystal + cost.crystal;
+            planet.crystal = planet.crystal + cost.crystal;
+
+            response.status(Globals.Statuscode.SUCCESS).json({
+              status: Globals.Statuscode.SUCCESS,
+              message: "Building canceled",
+              data: { planet },
+            });
+            return;
+          })
+          .catch(error => {
+            Logger.error(error);
+
+            response.status(Globals.Statuscode.SERVER_ERROR).json({
+              status: Globals.Statuscode.SERVER_ERROR,
+              message: "There was an error while handling the request.",
+              data: {},
+            });
+
+            return;
+          });
+      } else {
+        response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "Planet has no build-job",
+          data: {},
+        });
+        return;
+      }
+    } catch (error) {
+      Logger.error(error);
+
+      response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
       });
+
+      return;
+    }
   }
 
   public buildTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {

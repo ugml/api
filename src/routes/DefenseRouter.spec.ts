@@ -47,7 +47,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).equals(undefined);
+        expect(res.body.data).to.be.empty;
       });
   });
 

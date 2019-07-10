@@ -46,6 +46,42 @@ describe("galaxyRouter", () => {
       });
   });
 
+  it("should fail (invalid galaxy)", () => {
+    return request
+      .get("/v1/galaxy/asdf/4")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (invalid system)", () => {
+    return request
+      .get("/v1/galaxy/1/asdf")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+        expect(res.body.message).equals("Invalid parameter");
+      });
+  });
+
+  it("should return empty result", () => {
+    return request
+      .get("/v1/galaxy/9/100")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+        expect(res.body.message).equals("Success");
+      });
+  });
+
   it("should fail (galaxy above upper bounds)", () => {
     return request
       .get("/v1/galaxy/9999/4")

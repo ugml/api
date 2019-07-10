@@ -46,15 +46,19 @@ class Units {
 
     switch (unitType) {
       case UnitType.BUILDING:
+        if (buildingID < Globals.MIN_BUILDING_ID || Globals.MAX_BUILDING_ID < buildingID) return null;
         costs = this.getBuildings()[buildingID];
         break;
       case UnitType.SHIP:
+        if (buildingID < Globals.MIN_SHIP_ID || Globals.MAX_SHIP_ID < buildingID) return null;
         costs = this.getShips()[buildingID];
         break;
       case UnitType.DEFENSE:
+        if (buildingID < Globals.MIN_DEFENSE_ID || Globals.MAX_DEFENSE_ID < buildingID) return null;
         costs = this.getDefenses()[buildingID];
         break;
       case UnitType.TECHNOLOGY:
+        if (buildingID < Globals.MIN_TECHNOLOGY_ID || Globals.MAX_TECHNOLOGY_ID < buildingID) return null;
         costs = this.getTechnologies()[buildingID];
         break;
     }
@@ -75,11 +79,9 @@ class Units {
     let minID = 0;
     let maxID = 0;
 
+    if (unitType === UnitType.BUILDING || unitType === UnitType.TECHNOLOGY) return null;
+
     switch (unitType) {
-      case UnitType.BUILDING:
-        minID = Globals.MIN_BUILDING_ID;
-        maxID = Globals.MAX_BUILDING_ID;
-        break;
       case UnitType.SHIP:
         minID = Globals.MIN_SHIP_ID;
         maxID = Globals.MAX_SHIP_ID;
@@ -87,10 +89,6 @@ class Units {
       case UnitType.DEFENSE:
         minID = Globals.MIN_DEFENSE_ID;
         maxID = Globals.MAX_DEFENSE_ID;
-        break;
-      case UnitType.TECHNOLOGY:
-        minID = Globals.MIN_TECHNOLOGY_ID;
-        maxID = Globals.MAX_TECHNOLOGY_ID;
         break;
     }
 

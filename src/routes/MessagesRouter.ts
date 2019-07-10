@@ -36,8 +36,7 @@ export class MessagesRouter {
       .toString();
 
     // execute the query
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         let data;
 
@@ -95,8 +94,7 @@ export class MessagesRouter {
       .toString();
 
     // execute the query
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         let data;
 
@@ -146,8 +144,7 @@ export class MessagesRouter {
       .where("receiverID = ?", request.userID)
       .toString();
 
-    return Database.getConnectionPool()
-      .query(query)
+    return Database.query(query)
       .then(() => {
         response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
@@ -193,8 +190,7 @@ export class MessagesRouter {
       .where("userID = ?", request.body.receiverID)
       .toString();
 
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         const numRows: number = Object.keys(result).length;
 
@@ -224,18 +220,14 @@ export class MessagesRouter {
           .set("body", InputValidator.sanitizeString(request.body.body))
           .toString();
 
-        console.log(insertNewMessageQuery);
-
-        Database.getConnectionPool()
-          .query(insertNewMessageQuery)
-          .then(() => {
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Message sent",
-              data: {},
-            });
-            return;
+        Database.query(insertNewMessageQuery).then(() => {
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Message sent",
+            data: {},
           });
+          return;
+        });
       })
       .catch(error => {
         Logger.error(error);
@@ -255,16 +247,12 @@ export class MessagesRouter {
    * endpoints.
    */
   public init() {
-    // /user/planet/:planetID
     this.router.get("/get", this.getAllMessages);
 
-    // /user/planets/
     this.router.get("/get/:messageID", this.getMessageByID);
 
-    // /user/currentplanet/set/:planetID
     this.router.post("/delete", this.deleteMessage);
 
-    // /user/create/
     this.router.post("/send", this.sendMessage);
   }
 }

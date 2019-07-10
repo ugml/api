@@ -78,15 +78,14 @@ export class GalaxyRouter {
       .toString();
 
     // execute the query
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         let data;
 
-        if (!InputValidator.isSet(result)) {
+        if (!InputValidator.isSet(result[0])) {
           data = {};
         } else {
-          data = Object.assign({}, result);
+          data = Object.assign({}, result[0]);
         }
 
         // return the result

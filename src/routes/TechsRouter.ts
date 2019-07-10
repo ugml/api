@@ -29,35 +29,33 @@ export class TechsRouter {
    * @param response
    * @param next
    */
-  public getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    const query: string = squel
-      .select()
-      .from("techs")
-      .where("userID = ?", request.userID)
-      .toString();
+  public async getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      const query: string = squel
+        .select()
+        .from("techs")
+        .where("userID = ?", request.userID)
+        .toString();
 
-    Database.getConnectionPool()
-      .query(query)
-      .then(result => {
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data: result,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
+      let [rows] = await Database.query(query);
 
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
+      response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: rows[0],
       });
+      return;
+    } catch (error) {
+      Logger.error(error);
+
+      response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+
+      return;
+    }
   }
 
   public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -80,8 +78,7 @@ export class TechsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -125,8 +122,7 @@ export class TechsRouter {
             .where("ownerID = ?", request.userID)
             .toString();
 
-          return Database.getConnectionPool()
-            .query(updatePlanetQuery)
+          return Database.query(updatePlanetQuery)
             .then(() => {
               planet.b_tech_id = 0;
               planet.b_tech_endtime = 0;
@@ -209,8 +205,7 @@ export class TechsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         if (!InputValidator.isSet(result)) {
           response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -332,8 +327,7 @@ export class TechsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.getConnectionPool()
-          .query(updatePlanetQuery)
+        Database.query(updatePlanetQuery)
           .then(() => {
             response.status(Globals.Statuscode.SUCCESS).json({
               status: Globals.Statuscode.SUCCESS,

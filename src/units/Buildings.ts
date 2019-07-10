@@ -45,8 +45,7 @@ class Buildings implements IUnits {
         .where("planetID = ?", this.planetID)
         .toString();
 
-      Database.getConnectionPool()
-        .query(query)
+      Database.query(query)
         .then(() => {
           return resolve(this);
         })
@@ -80,8 +79,7 @@ class Buildings implements IUnits {
         .set("missile_silo", this.missile_silo)
         .toString();
 
-      Database.getConnectionPool()
-        .query(query)
+      Database.query(query)
         .then(() => {
           return resolve(this);
         })

@@ -46,6 +46,17 @@ describe("messagesRouter", () => {
       });
   });
 
+  it("should fail (invalid message-id)", () => {
+    return request
+      .get("/v1/messages/get/asdf")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
   it("should return nothing (message does not exist)", () => {
     return request
       .get("/v1/messages/get/-1")
@@ -79,6 +90,29 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.empty;
+      });
+  });
+
+  it("should fail (message-id not set)", () => {
+    return request
+      .post("/v1/messages/delete")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (invalid message-id)", () => {
+    return request
+      .post("/v1/messages/delete")
+      .set("Authorization", authToken)
+      .send({ messageID: "asdf" })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
       });
   });
 });

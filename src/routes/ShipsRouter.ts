@@ -22,58 +22,57 @@ export class ShipsRouter {
     this.init();
   }
 
-  public getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-      return;
-    }
-
-    const query: string = squel
-      .select()
-      .field("p.ownerID")
-      .field("f.*")
-      .from("fleet", "f")
-      .left_join("planets", "p", "f.planetID = p.planetID")
-      .where("f.planetID = ?", request.params.planetID)
-      .where("p.ownerID = ?", request.userID)
-      .toString();
-
-    // execute the query
-    Database.getConnectionPool()
-      .query(query)
-      .then(result => {
-        let data;
-
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = result[0];
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+  public async getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
           data: {},
         });
-
         return;
+      }
+
+      const query: string = squel
+        .select()
+        .field("p.ownerID")
+        .field("f.*")
+        .from("fleet", "f")
+        .left_join("planets", "p", "f.planetID = p.planetID")
+        .where("f.planetID = ?", request.params.planetID)
+        .where("p.ownerID = ?", request.userID)
+        .toString();
+
+      // execute the query
+      let [rows] = await Database.query(query);
+
+      let data;
+
+      if (!InputValidator.isSet(rows)) {
+        data = {};
+      } else {
+        data = rows[0];
+      }
+
+      // return the result
+      response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data,
       });
+
+      return;
+    } catch (error) {
+      Logger.error(error);
+
+      response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+
+      return;
+    }
   }
 
   public buildShips(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -124,8 +123,7 @@ export class ShipsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    return Database.getConnectionPool()
-      .query(query)
+    return Database.query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0])) {
           response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -241,17 +239,15 @@ export class ShipsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        return Database.getConnectionPool()
-          .query(query)
-          .then(() => {
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Success",
-              data: {},
-            });
-
-            return;
+        return Database.query(query).then(() => {
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Success",
+            data: {},
           });
+
+          return;
+        });
       })
       .catch(error => {
         Logger.error(error);

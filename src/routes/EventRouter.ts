@@ -216,8 +216,7 @@ export class EventRouter {
       .toString();
 
     // check if origin-planet exists and the user owns it
-    Database.getConnectionPool()
-      .query(planetQuery)
+    Database.query(planetQuery)
       .then(planet => {
         const startPlanet = planet[0];
 
@@ -243,8 +242,7 @@ export class EventRouter {
           .toString();
 
         // gather data about destination
-        Database.getConnectionPool()
-          .query(planetQuery)
+        Database.query(planetQuery)
           .then(results => {
             const destinationPlanet = results[0];
 
@@ -298,22 +296,20 @@ export class EventRouter {
               .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
               .toString();
 
-            Database.getConnectionPool()
-              .query(eventQuery)
-              .then((result: any) => {
-                // add event to redis-queue
-                Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
+            Database.query(eventQuery).then((result: any) => {
+              // add event to redis-queue
+              Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
 
-                eventData.eventID = parseInt(result.insertId, 10);
+              eventData.eventID = parseInt(result.insertId, 10);
 
-                // all done
-                response.status(Globals.Statuscode.SUCCESS).json({
-                  status: Globals.Statuscode.SUCCESS,
-                  message: "Event successfully created.",
-                  data: eventData,
-                });
-                return;
+              // all done
+              response.status(Globals.Statuscode.SUCCESS).json({
+                status: Globals.Statuscode.SUCCESS,
+                message: "Event successfully created.",
+                data: eventData,
               });
+              return;
+            });
           })
           .catch(error => {
             Logger.error(error);
@@ -358,8 +354,7 @@ export class EventRouter {
       .toString();
 
     // check if origin-planet exists and the user owns it
-    Database.getConnectionPool()
-      .query(planetQuery)
+    Database.query(planetQuery)
       .then(results => {
         const event = results[0];
 
@@ -392,23 +387,21 @@ export class EventRouter {
           .where("ownerID = ?", request.userID)
           .toString();
 
-        Database.getConnectionPool()
-          .query(updateQuery)
-          .then(() => {
-            // remove the event from the redis-queue
-            Redis.getConnection().zremrangebyscore("eventQueue", request.body.eventID, request.body.eventID);
+        Database.query(updateQuery).then(() => {
+          // remove the event from the redis-queue
+          Redis.getConnection().zremrangebyscore("eventQueue", request.body.eventID, request.body.eventID);
 
-            // add the event with the new endtime
-            Redis.getConnection().zadd("eventQueue", request.body.eventID, newEndTime);
+          // add the event with the new endtime
+          Redis.getConnection().zadd("eventQueue", request.body.eventID, newEndTime);
 
-            // all done
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Event successfully canceled.",
-              data: {},
-            });
-            return;
+          // all done
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Event successfully canceled.",
+            data: {},
           });
+          return;
+        });
       })
       .catch(error => {
         Logger.error(error);

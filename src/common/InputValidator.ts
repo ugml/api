@@ -20,6 +20,10 @@ class InputValidator {
       return false;
     }
 
+    if (typeof input === "number") {
+      return true;
+    }
+
     if (!input.match(/^\d+\.\d+$/)) {
       return false;
     }
@@ -47,7 +51,7 @@ class InputValidator {
   }
 
   public static sanitizeString(input: string): string {
-    return input.replace(/[^a-z0-9@áéíóúñü .,_-]/gim, "").trim();
+    return input.replace(/[^a-z0-9@ .,_-]/gim, "").trim();
   }
 }
 

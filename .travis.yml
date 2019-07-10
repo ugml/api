@@ -7,11 +7,6 @@ cache: npm
 git:
   quiet: true
 
-node_js:
-  - "8"
-  - "10"
-  - "12"
-
 env:
   - NODE_ENV=development
 
@@ -25,8 +20,6 @@ stages:
   - build
   - lint
   - test
-
-
 
 before_script:
   - sudo systemctl start mariadb

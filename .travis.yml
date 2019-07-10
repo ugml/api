@@ -27,15 +27,20 @@ before_script:
 
 jobs:
   include:
-    - stage: build
+    - stage: Build
       script:
         -npm run-script build
-    - stage: lint
+      node_js:
+        - "8"
+        - "10"
+        - "12"
+    - stage: Lint
       script:
         - npm run-script lint
         - npm run-script tslint
-script:
-  - npm run-script test-coverage
+    - stage: Test
+      script:
+        - npm run-script test-coverage
 
 after_success:
   - "cat ./coverage/lcov.info | codacy-coverage -p ."

@@ -21,8 +21,8 @@ addons:
 
 stages:
   - build
-  - lint
   - test
+  - lint
 
 before_script:
   - sudo systemctl start mariadb
@@ -38,10 +38,10 @@ jobs:
       node_js: '10'
     - <<: *build
       node_js: '12'
-    - stage: lint
-      script: npm run-script lint && npm run-script tslint
     - stage: test
       script: npm run-script test-coverage
+    - stage: lint
+      script: npm run-script lint && npm run-script tslint
 
 
 after_success:

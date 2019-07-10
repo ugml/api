@@ -35,10 +35,9 @@ jobs:
     - stage: test
       script:
         - sudo apt-get -qq update
-        - sudo apt-get -qq install mariadb-client mariadb-server
-        - sudo systemctl start mariadb                          # start mariadb
-        - sudo mysql -u root < test/ci.sql                      # import data-dump
-        - sudo redis-server /etc/redis/redis.conf --port 6379   # start redis
+        - sudo apt-get -qq install mariadb-client mariadb-server # install mariadb
+        - sudo mysql -u root < test/ci.sql                       # import data-dump
+        - sudo redis-server /etc/redis/redis.conf --port 6379    # start redis
         - npm run-script test-coverage
         - "cat ./coverage/lcov.info | codacy-coverage -p ."
     - stage: lint
@@ -46,4 +45,5 @@ jobs:
         - npm run-script lint
         - npm run-script tslint
     - stage: deploy
+      if: branch = master
       script: echo "TODO"

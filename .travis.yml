@@ -4,6 +4,11 @@ sudo: required
 
 cache: npm
 
+node_js:
+  - "8"
+  - "10"
+  - "12"
+
 env:
   - NODE_ENV=development
 
@@ -25,21 +30,12 @@ jobs:
     - stage: build
       script:
         -npm run-script build
-      node_js:
-        - "8"
-        - "10"
-        - "12"
     - stage: lint
       script:
         - npm run-script lint
         - npm run-script tslint
-    - stage: testing & coverage
-      script:
-        - npm run-script test-coverage
-      node_js:
-        - "8"
-        - "10"
-        - "12"
+script:
+  - npm run-script test-coverage
 
 after_success:
   - "cat ./coverage/lcov.info | codacy-coverage -p ."

@@ -4,6 +4,11 @@ sudo: required
 
 cache: npm
 
+node_js:
+  - "8"
+  - "10"
+  - "12"
+
 git:
   quiet: true
 
@@ -30,8 +35,6 @@ jobs:
     - &build
       stage: build
       script: npm run-script build
-    - <<: *build
-      node_js: '8'
     - <<: *build
       node_js: '10'
     - <<: *build

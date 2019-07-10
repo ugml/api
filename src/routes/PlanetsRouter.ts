@@ -375,9 +375,9 @@ export class PlanetsRouter {
         .where("ownerID = ?", request.userID)
         .toString();
 
-      await Database.getConnectionPool().query(query);
+      await Database.query(query);
 
-      let [rows] = await Database.getConnectionPool().query(getUpdatedPlanetQuery);
+      let [rows] = await Database.query(getUpdatedPlanetQuery);
 
       // return the result
       response.status(Globals.Statuscode.SUCCESS).json({

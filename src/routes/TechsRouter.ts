@@ -37,7 +37,7 @@ export class TechsRouter {
         .where("userID = ?", request.userID)
         .toString();
 
-      let [rows] = await Database.getConnectionPool().query(query);
+      let [rows] = await Database.query(query);
 
       response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

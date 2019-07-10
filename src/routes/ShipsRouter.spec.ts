@@ -31,7 +31,6 @@ describe("shipsRouter", () => {
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        console.log(res.body);
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.planetID).to.be.equals(167546850);
@@ -44,7 +43,6 @@ describe("shipsRouter", () => {
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        console.log(res.body);
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
       });

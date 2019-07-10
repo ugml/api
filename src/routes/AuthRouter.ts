@@ -50,7 +50,7 @@ export class AuthRouter {
         .where("email = ?", email)
         .toString();
 
-      let [rows] = await Database.getConnectionPool().query(query);
+      let [rows] = await Database.query(query);
 
       if (!InputValidator.isSet(rows) || rows[0] === undefined) {
         response.status(Globals.Statuscode.NOT_AUTHORIZED).json({

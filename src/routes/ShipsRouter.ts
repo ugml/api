@@ -44,7 +44,7 @@ export class ShipsRouter {
         .toString();
 
       // execute the query
-      let [rows] = await Database.getConnectionPool().query(query);
+      let [rows] = await Database.query(query);
 
       let data;
 

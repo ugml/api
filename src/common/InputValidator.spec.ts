@@ -9,8 +9,17 @@ describe("InputValidator", function() {
     assert.equal(InputValidator.isValidInt("12"), true);
   });
 
+  it("Valid Int", function() {
+    let num = 12;
+    assert.equal(InputValidator.isValidInt(`${12}`), true);
+  });
+
   it("Invalid Int", function() {
     assert.equal(InputValidator.isValidInt("12a"), false);
+  });
+
+  it("Invalid Int", function() {
+    assert.equal(InputValidator.isValidInt(""), false);
   });
 
   it("Valid Float", function() {
@@ -19,6 +28,10 @@ describe("InputValidator", function() {
 
   it("Invalid Float", function() {
     assert.equal(InputValidator.isValidFloat("12klafjsd.11a"), false);
+  });
+
+  it("Invalid Float", function() {
+    assert.equal(InputValidator.isValidFloat(""), false);
   });
 
   it("Valid JSON", function() {
@@ -35,8 +48,13 @@ describe("InputValidator", function() {
     assert.equal(InputValidator.isSet(test), true);
   });
 
-  it("Variable is not  set", function() {
+  it("Variable is not set", function() {
     const test = undefined;
     assert.equal(InputValidator.isSet(test), false);
+  });
+
+  it("Sanitize string", function() {
+    const test = undefined;
+    assert.equal(InputValidator.sanitizeString("häl/\+=\"'lü"), "hll");
   });
 });

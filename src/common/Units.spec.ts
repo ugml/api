@@ -1,7 +1,7 @@
 import * as mocha from "mocha";
 import * as chai from "chai";
 import { Config } from "./Config";
-import { Units } from "./Units";
+import { Units, UnitType } from "./Units";
 
 const expect = chai.expect;
 const assert = chai.assert;
@@ -71,5 +71,61 @@ describe("Units", function() {
     assert.equal(units.getTechnologies().hasOwnProperty("113"), true);
     assert.equal(units.getTechnologies().hasOwnProperty("114"), true);
     assert.equal(units.getTechnologies().hasOwnProperty("115"), true);
+  });
+
+  it("Should fail (ID is not a building)", function() {
+    assert.equal(units.getCosts(1000, 0, UnitType.BUILDING), null);
+  });
+
+  it("Should fail (ID is not a ship)", function() {
+    assert.equal(units.getCosts(1000, 0, UnitType.SHIP), null);
+  });
+
+  it("Should fail (ID is not a defense)", function() {
+    assert.equal(units.getCosts(1000, 0, UnitType.DEFENSE), null);
+  });
+
+  it("Should fail (ID is not a technology)", function() {
+    assert.equal(units.getCosts(1000, 0, UnitType.TECHNOLOGY), null);
+  });
+
+  it("Get costs of a building", function() {
+    assert.equal(units.getCosts(1, 0, UnitType.BUILDING).metal, 60);
+  });
+
+  it("Get costs of a ship", function() {
+    assert.equal(units.getCosts(201, 0, UnitType.SHIP).metal, 2000);
+  });
+
+  it("Get costs of a defense", function() {
+    assert.equal(units.getCosts(301, 0, UnitType.DEFENSE).metal, 2000);
+  });
+
+  it("Get costs of a technology", function() {
+    assert.equal(units.getCosts(101, 0, UnitType.TECHNOLOGY).metal, 200);
+  });
+
+  it("Valid build-order (building)", function() {
+    assert.equal(units.isValidBuildOrder({}, UnitType.BUILDING), null);
+  });
+
+  it("Valid build-order (technology)", function() {
+    assert.equal(units.isValidBuildOrder({}, UnitType.TECHNOLOGY), null);
+  });
+
+  it("Valid build-order (ship)", function() {
+    assert.equal(units.isValidBuildOrder({ 201: 1 }, UnitType.SHIP), true);
+  });
+
+  it("Valid build-order (ship)", function() {
+    assert.equal(units.isValidBuildOrder({ 301: 1 }, UnitType.SHIP), false);
+  });
+
+  it("Valid build-order (defense)", function() {
+    assert.equal(units.isValidBuildOrder({ 301: 1 }, UnitType.DEFENSE), true);
+  });
+
+  it("Valid build-order (defense)", function() {
+    assert.equal(units.isValidBuildOrder({ 401: 1 }, UnitType.DEFENSE), false);
   });
 });

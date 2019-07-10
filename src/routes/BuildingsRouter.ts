@@ -55,7 +55,7 @@ export class BuildingsRouter {
         .toString();
 
       // execute the query
-      let [rows] = await Database.getConnectionPool().query(query);
+      let [rows] = await Database.query(query);
 
       let data;
 
@@ -106,7 +106,7 @@ export class BuildingsRouter {
         .where("p.ownerID = ?", request.userID)
         .toString();
 
-      let [rows] = await Database.getConnectionPool().query(getPlanetQuery);
+      let [rows] = await Database.query(getPlanetQuery);
 
       if (!InputValidator.isSet(rows)) {
         response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -232,7 +232,7 @@ export class BuildingsRouter {
         .where("p.ownerID = ?", request.userID)
         .toString();
 
-      let [rows] = await Database.getConnectionPool().query(getPlanetQuery);
+      let [rows] = await Database.query(getPlanetQuery);
 
       if (!InputValidator.isSet(rows)) {
         response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -373,7 +373,7 @@ export class BuildingsRouter {
         .where("planetID = ?", request.body.planetID)
         .toString();
 
-      await Database.getConnectionPool().query(updateResourcesQuery);
+      await Database.query(updateResourcesQuery);
 
       response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -387,7 +387,7 @@ export class BuildingsRouter {
 
       response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
+        message: `There was an error while handling the request: ${error}`,
         data: {},
       });
 

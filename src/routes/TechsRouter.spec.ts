@@ -30,7 +30,6 @@ describe("techsRouter", () => {
       .get("/v1/techs/")
       .set("Authorization", authToken)
       .then(res => {
-        console.log(res.body);
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.userID).to.be.equals(1);

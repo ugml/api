@@ -156,7 +156,7 @@ class App {
         maxsize: 10,
         msg:
           "{" +
-          "'ip': '{{req.connection.remoteAddress}}', " +
+          "'ip': '{{(req.headers['x-real-ip'] || req.connection.remoteAddress)}}', " +
           "'userID': '{{req.userID}}', " +
           "'method': '{{req.method}}', " +
           "'url': '{{req.url}}', " +

@@ -224,8 +224,6 @@ export class MessagesRouter {
           .set("body", InputValidator.sanitizeString(request.body.body))
           .toString();
 
-        console.log(insertNewMessageQuery);
-
         Database.getConnectionPool()
           .query(insertNewMessageQuery)
           .then(() => {

@@ -89,7 +89,7 @@ class User implements IUnits {
       .toString();
 
     if (connection === null) {
-      return await Database.getConnectionPool().query(query);
+      return await Database.query(query);
     } else {
       return await connection.query(query);
     }

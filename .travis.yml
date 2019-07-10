@@ -7,11 +7,6 @@ cache: npm
 env:
   - NODE_ENV=development
 
-node_js:
-  - "8"
-  - "10"
-  - "12"
-
 services:
   - redis-server
 
@@ -30,12 +25,21 @@ jobs:
     - stage: build
       script:
         -npm run-script build
+      node_js:
+        - "8"
+        - "10"
+        - "12"
     - stage: lint
       script:
         - npm run-script lint
         - npm run-script tslint
     - stage: testing & coverage
+      script:
         - npm run-script test-coverage
+      node_js:
+        - "8"
+        - "10"
+        - "12"
 
 after_success:
   - "cat ./coverage/lcov.info | codacy-coverage -p ."

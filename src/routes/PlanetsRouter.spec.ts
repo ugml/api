@@ -130,7 +130,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data[0].name).to.be.equals("FancyNewName");
+        expect(res.body.data.name).to.be.equals("FancyNewName");
       });
   });
 

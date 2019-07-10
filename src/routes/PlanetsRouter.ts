@@ -330,65 +330,73 @@ export class PlanetsRouter {
       });
   }
 
-  public renamePlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (
-      !InputValidator.isSet(request.body.planetID) ||
-      !InputValidator.isValidInt(request.body.planetID) ||
-      !InputValidator.isSet(request.body.name)
-    ) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+  public async renamePlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      // validate parameters
+      if (
+        !InputValidator.isSet(request.body.planetID) ||
+        !InputValidator.isValidInt(request.body.planetID) ||
+        !InputValidator.isSet(request.body.name)
+      ) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+
+        return;
+      }
+
+      const newName: string = InputValidator.sanitizeString(request.body.name);
+
+      if (newName.length <= 4) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "New name is too short. Minimum length is 4 characters.",
+          data: {},
+        });
+
+        return;
+      }
+
+      // check if it is the last planet of the user
+      let query: string = squel
+        .update()
+        .table("planets")
+        .set("name", newName)
+        .where("planetID = ?", request.body.planetID)
+        .where("ownerID = ?", request.userID)
+        .toString();
+
+      let getUpdatedPlanetQuery: string = squel
+        .select()
+        .from("planets")
+        .where("planetID = ?", request.body.planetID)
+        .where("ownerID = ?", request.userID)
+        .toString();
+
+      await Database.getConnectionPool().query(query);
+
+      let [rows] = await Database.getConnectionPool().query(getUpdatedPlanetQuery);
+
+      // return the result
+      response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: rows[0],
+      });
+      return;
+    } catch (error) {
+      Logger.error(error);
+
+      response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
         data: {},
       });
 
       return;
     }
-
-    const newName: string = InputValidator.sanitizeString(request.body.name);
-
-    if (newName.length <= 4) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "New name is too short. Minimum length is 4 characters.",
-        data: {},
-      });
-
-      return;
-    }
-
-    // check if it is the last planet of the user
-    const query: string = squel
-      .update()
-      .table("planets")
-      .set("name", newName)
-      .where("planetID = ?", request.body.planetID)
-      .where("ownerID = ?", request.userID)
-      .toString();
-
-    Database.getConnectionPool()
-      .query(query)
-      .then(() => {
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data: {},
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
   }
 
   /**

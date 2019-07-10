@@ -4,6 +4,9 @@ sudo: required
 
 cache: npm
 
+git:
+  quiet: true
+
 node_js:
   - "8"
   - "10"
@@ -18,27 +21,24 @@ services:
 addons:
   mariadb: '10.4'
 
-matrix:
-  fast_finish: true
-
 before_script:
   - sudo systemctl start mariadb
   - sudo mysql -u root < test/ci.sql
 
-jobs:
+matrix:
   include:
-    - stage: Build
-      script:
-        -npm run-script build
+    - name: Build
       node_js:
         - "8"
         - "10"
         - "12"
-    - stage: Lint
+      script:
+        -npm run-script build
+    - name: Lint
       script:
         - npm run-script lint
         - npm run-script tslint
-    - stage: Test
+    - name: Test
       script:
         - npm run-script test-coverage
 

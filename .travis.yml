@@ -1,20 +1,17 @@
 language: node_js
 
-sudo: required
-
-cache: npm
-
 node_js:
   - "12"
+
+sudo: required
 
 git:
   quiet: true
 
+cache: npm
+
 env:
   - NODE_ENV=development
-
-services:
-  - redis-server
 
 addons:
   mariadb: '10.4'
@@ -29,7 +26,10 @@ stages:
 jobs:
   include:
     - stage: prepare
-      script: sudo systemctl start mariadb && sudo mysql -u root < test/ci.sql
+      script:
+        - sudo systemctl start mariadb                          # start mariadb
+        - sudo mysql -u root < test/ci.sql                      # import data-dump
+        - sudo redis-server /etc/redis/redis.conf --port 6379   # start redis
     - &build
       stage: build
       script: npm run-script build
@@ -39,12 +39,12 @@ jobs:
     - <<: *build
       node_js: '12'
     - stage: test
-      script: npm run-script test-coverage
+      script:
+        - npm run-script test-coverage
+        - "cat ./coverage/lcov.info | codacy-coverage -p ."
     - stage: lint
-      script: npm run-script lint && npm run-script tslint
+      script:
+        - npm run-script lint
+        - npm run-script tslint
     - stage: deploy
       script: echo "TODO"
-
-
-after_success:
-  - "cat ./coverage/lcov.info | codacy-coverage -p ."

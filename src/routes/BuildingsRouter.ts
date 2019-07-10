@@ -149,8 +149,7 @@ export class BuildingsRouter {
           .where("planetID = ?", planet.planetID)
           .toString();
 
-        return Database.getConnectionPool()
-          .query(updateResourcesQuery)
+        return Database.query(updateResourcesQuery)
           .then(() => {
             planet.b_building_id = 0;
             planet.b_building_endtime = 0;

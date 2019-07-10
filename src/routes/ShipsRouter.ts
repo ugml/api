@@ -123,8 +123,7 @@ export class ShipsRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    return Database.getConnectionPool()
-      .query(query)
+    return Database.query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0])) {
           response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -240,17 +239,15 @@ export class ShipsRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        return Database.getConnectionPool()
-          .query(query)
-          .then(() => {
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Success",
-              data: {},
-            });
-
-            return;
+        return Database.query(query).then(() => {
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Success",
+            data: {},
           });
+
+          return;
+        });
       })
       .catch(error => {
         Logger.error(error);

@@ -55,6 +55,6 @@ describe("InputValidator", function() {
 
   it("Sanitize string", function() {
     const test = undefined;
-    assert.equal(InputValidator.sanitizeString("häl/\+=\"'lü"), "hll");
+    assert.equal(InputValidator.sanitizeString("häl/+=\"'lü"), "hll");
   });
 });

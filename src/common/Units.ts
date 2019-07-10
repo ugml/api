@@ -79,8 +79,7 @@ class Units {
     let minID = 0;
     let maxID = 0;
 
-    if (unitType === UnitType.BUILDING || unitType === UnitType.TECHNOLOGY)
-      return null;
+    if (unitType === UnitType.BUILDING || unitType === UnitType.TECHNOLOGY) return null;
 
     switch (unitType) {
       case UnitType.SHIP:

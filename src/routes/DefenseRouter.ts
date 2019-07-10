@@ -43,8 +43,7 @@ export class DefenseRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         let data;
 
@@ -129,8 +128,7 @@ export class DefenseRouter {
       .where("p.ownerID = ?", request.userID)
       .toString();
 
-    Database.getConnectionPool()
-      .query(query)
+    Database.query(query)
       .then(result => {
         if (!InputValidator.isSet(result[0][0])) {
           response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -273,17 +271,15 @@ export class DefenseRouter {
           .where("planetID = ?", request.body.planetID)
           .toString();
 
-        Database.getConnectionPool()
-          .query(updatePlanetQuery)
-          .then(() => {
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Success",
-              data: {},
-            });
-
-            return;
+        Database.query(updatePlanetQuery).then(() => {
+          response.status(Globals.Statuscode.SUCCESS).json({
+            status: Globals.Statuscode.SUCCESS,
+            message: "Success",
+            data: {},
           });
+
+          return;
+        });
       })
       .catch(error => {
         Logger.error(error);

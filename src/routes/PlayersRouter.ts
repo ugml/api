@@ -46,100 +46,99 @@ export class PlayersRouter {
     this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
   }
 
-  public getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    const query: string = squel
-      .select()
-      .field("userID")
-      .field("username")
-      .field("email")
-      .field("onlinetime")
-      .field("currentplanet")
-      .from("users")
-      .where("userID = ?", request.userID)
-      .toString();
+  public async getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      const query: string = squel
+        .select()
+        .field("userID")
+        .field("username")
+        .field("email")
+        .field("onlinetime")
+        .field("currentplanet")
+        .from("users")
+        .where("userID = ?", request.userID)
+        .toString();
 
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data: {};
+      // execute the query
+      const [result] = await Database.query(query);
 
-        if (InputValidator.isSet(result)) {
-          data = result[0];
-        }
+      let data: {};
 
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
+      if (InputValidator.isSet(result)) {
+        data = result[0];
+      }
 
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
+      // return the result
+      response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data,
       });
-  }
+      return;
+    } catch (error) {
+      Logger.error(error);
 
-  /**
-   * GET player by ID
-   */
-  public getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (!InputValidator.isSet(request.params.playerID) || !InputValidator.isValidInt(request.params.playerID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+      response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
         data: {},
       });
 
       return;
     }
+  }
 
-    const query: string = squel
-      .select()
-      .distinct()
-      .field("userID")
-      .field("username")
-      .from("users")
-      .where("userID = ?", request.params.playerID)
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data = {};
-
-        if (InputValidator.isSet(result)) {
-          data = result[0];
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+  /**
+   * GET player by ID
+   */
+  public async getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.params.playerID) || !InputValidator.isValidInt(request.params.playerID)) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
           data: {},
         });
 
         return;
+      }
+
+      const query: string = squel
+        .select()
+        .distinct()
+        .field("userID")
+        .field("username")
+        .from("users")
+        .where("userID = ?", request.params.playerID)
+        .toString();
+
+      // execute the query
+      let [result] = await Database.query(query);
+      let data = {};
+
+      if (InputValidator.isSet(result)) {
+        data = result[0];
+      }
+
+      // return the result
+      response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: data,
       });
+      return;
+    } catch (error) {
+      Logger.error(error);
+
+      response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+
+      return;
+    }
   }
 
   public async createPlayer(request: Request, response: Response, next: NextFunction) {
@@ -168,7 +167,8 @@ export class PlayersRouter {
 
     const connection = await Database.getConnectionPool().getConnection();
 
-    let player;
+    let newPlayer: User = new User();
+    let newPlanet: Planet = new Planet();
 
     try {
       await connection.beginTransaction();
@@ -179,13 +179,13 @@ export class PlayersRouter {
         `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
         `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
 
-      const rows = await connection.query(query);
+      const [data] = await connection.query(query);
 
-      if (rows[0].username_taken === 1) {
+      if (data[0].username_taken === 1) {
         throw new DuplicateRecordException("Username is already taken");
       }
 
-      if (rows[0].email_taken === 1) {
+      if (data[0].email_taken === 1) {
         throw new DuplicateRecordException("Email is already taken");
       }
 
@@ -193,114 +193,101 @@ export class PlayersRouter {
 
       const queryUser = "CALL getNewUserId();";
 
-      const newPlayer: User = new User();
-      const newPlanet: Planet = new Planet();
-
       newPlayer.username = username;
       newPlayer.email = email;
 
-      const data = await connection.query(queryUser).then(row => {
-        // why the f*ck is the result three-dimensional?
-        newPlayer.userID = row[0][0][0].userID;
-        newPlayer.password = hashedPassword;
-        newPlanet.ownerID = newPlayer.userID;
-        newPlanet.planet_type = PlanetType.Planet;
+      let [[[playerData]]] = await connection.query(queryUser);
 
-        return { player: newPlayer, planet: newPlanet };
-      });
-      player = data.player;
+      newPlayer.userID = playerData.userID;
+      newPlayer.password = hashedPassword;
+      newPlanet.ownerID = newPlayer.userID;
+      newPlanet.planet_type = PlanetType.Planet;
 
       Logger.info("Getting a new planetID");
 
       const queryPlanet = "CALL getNewPlanetId();";
 
-      await connection.query(queryPlanet).then(row => {
-        data.player.currentplanet = row[0][0][0].planetID;
-        data.planet.planetID = row[0][0][0].planetID;
-      });
+      let [[[planetData]]] = await connection.query(queryPlanet);
+
+      newPlayer.currentplanet = planetData.planetID;
+      newPlanet.planetID = planetData.planetID;
 
       Logger.info("Finding free position for new planet");
 
-      // getFreePosition(IN maxGalaxy int, IN maxSystem int, IN minPlanet int, IN maxPlanet int)
       const queryPosition = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
 
-      await connection
-        .query(queryPosition)
-        .then(row => {
-          data.planet.galaxy = row[0][0][0].posGalaxy;
-          data.planet.system = row[0][0][0].posSystem;
-          data.planet.planet = row[0][0][0].posPlanet;
-        })
-        .catch(error => {
-          Logger.error(error);
-        });
+      let [[[galaxyData]]] = await connection.query(queryPosition);
+
+      newPlanet.galaxy = galaxyData.posGalaxy;
+      newPlanet.system = galaxyData.posSystem;
+      newPlanet.planet = galaxyData.posPlanet;
 
       Logger.info("Creating a new user");
 
-      await data.player.create(connection);
+      await newPlayer.create(connection);
 
-      // // TODO extract planet creation
+      // TODO extract planet creation
       Logger.info("Creating a new planet");
 
-      data.planet.name = gameConfig.startplanet_name;
-      data.planet.last_update = Math.floor(Date.now() / 1000);
-      data.planet.diameter = gameConfig.startplanet_diameter;
-      data.planet.fields_max = gameConfig.startplanet_maxfields;
-      data.planet.metal = gameConfig.metal_start;
-      data.planet.crystal = gameConfig.crystal_start;
-      data.planet.deuterium = gameConfig.deuterium_start;
+      newPlanet.name = gameConfig.startplanet_name;
+      newPlanet.last_update = Math.floor(Date.now() / 1000);
+      newPlanet.diameter = gameConfig.startplanet_diameter;
+      newPlanet.fields_max = gameConfig.startplanet_maxfields;
+      newPlanet.metal = gameConfig.metal_start;
+      newPlanet.crystal = gameConfig.crystal_start;
+      newPlanet.deuterium = gameConfig.deuterium_start;
 
       switch (true) {
-        case data.planet.planet <= 5: {
-          data.planet.temp_min = Math.random() * (130 - 40) + 40;
-          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.planet <= 5: {
+          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
+          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["desert", "dry"];
 
-          data.planet.image =
+          newPlanet.image =
             images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
 
           break;
         }
-        case data.planet.planet <= 10: {
-          data.planet.temp_min = Math.random() * (130 - 40) + 40;
-          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.planet <= 10: {
+          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
+          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["normal", "jungle", "gas"];
 
-          data.planet.image =
+          newPlanet.image =
             images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
 
           break;
         }
-        case data.planet.planet <= 15: {
-          data.planet.temp_min = Math.random() * (130 - 40) + 40;
-          data.planet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.planet <= 15: {
+          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
+          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["ice", "water"];
 
-          data.planet.image =
+          newPlanet.image =
             images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
         }
       }
 
-      await data.planet.create(connection);
+      await newPlanet.create(connection);
 
       Logger.info("Creating entry in buildings-table");
 
-      const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${data.planet.planetID});`;
+      const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${newPlanet.planetID});`;
 
       await connection.query(queryBuildings);
 
       Logger.info("Creating entry in defenses-table");
 
-      const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${data.planet.planetID});`;
+      const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${newPlanet.planetID});`;
 
       await connection.query(queryDefenses);
 
       Logger.info("Creating entry in fleet-table");
 
-      const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${data.planet.planetID});`;
+      const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${newPlanet.planetID});`;
 
       await connection.query(queryFleet);
 
@@ -315,10 +302,10 @@ export class PlayersRouter {
                                 )
                           VALUES
                                 (
-                                  ${data.planet.planetID},
-                                  ${data.planet.galaxy},
-                                  ${data.planet.system},
-                                  ${data.planet.planet}
+                                  ${newPlanet.planetID},
+                                  ${newPlanet.galaxy},
+                                  ${newPlanet.system},
+                                  ${newPlanet.planet}
                                 );`
         .split("\n")
         .join("")
@@ -329,7 +316,7 @@ export class PlayersRouter {
 
       Logger.info("Creating entry in techs-table");
 
-      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${data.player.userID});`;
+      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${newPlayer.userID});`;
 
       await connection.query(queryTech);
 
@@ -363,101 +350,101 @@ export class PlayersRouter {
       status: Globals.Statuscode.SUCCESS,
       message: "Success",
       data: {
-        userID: player.userID,
-        token: JwtHelper.generateToken(player.userID),
+        userID: newPlayer.userID,
+        token: JwtHelper.generateToken(newPlayer.userID),
       },
     });
   }
 
-  public updatePlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // if no parameters are set
-    if (
-      !InputValidator.isSet(request.body.username) &&
-      !InputValidator.isSet(request.body.password) &&
-      !InputValidator.isSet(request.body.email)
-    ) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "No parameters were passed",
-        data: {},
+  public async updatePlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      // if no parameters are set
+      if (
+        !InputValidator.isSet(request.body.username) &&
+        !InputValidator.isSet(request.body.password) &&
+        !InputValidator.isSet(request.body.email)
+      ) {
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "No parameters were passed",
+          data: {},
+        });
+
+        return;
+      }
+
+      const queryBuilder: squel.Update = squel.update().table("users");
+
+      if (InputValidator.isSet(request.body.username)) {
+        const username: string = InputValidator.sanitizeString(request.body.username);
+
+        queryBuilder.set("username", username);
+      }
+
+      if (InputValidator.isSet(request.body.password)) {
+        const password: string = InputValidator.sanitizeString(request.body.password);
+
+        queryBuilder.set("password", bcrypt.hashSync(password, 10));
+      }
+
+      if (InputValidator.isSet(request.body.email)) {
+        const email: string = InputValidator.sanitizeString(request.body.email);
+
+        queryBuilder.set("email", email);
+      }
+
+      const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
+
+      // execute the update
+      await Database.query(updatePlayerQuery);
+
+      const getNewDataQuery: string = squel
+        .select()
+        .field("userID")
+        .field("username")
+        .field("email")
+        .field("onlinetime")
+        .field("currentplanet")
+        .from("users")
+        .where("userID = ?", request.userID)
+        .toString();
+
+      // return the updated userdata
+      let [result] = await Database.query(getNewDataQuery);
+
+      let data: {};
+
+      if (InputValidator.isSet(result)) {
+        data = result[0];
+      }
+
+      // return the result
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: data,
       });
+    } catch (error) {
+      Logger.error(error);
+
+      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
+        // return the result
+        response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: `There was an error while handling the request: ${error.message}`,
+          data: {},
+        });
+      } else {
+        // return the result
+        response.status(Globals.Statuscode.SERVER_ERROR).json({
+          status: Globals.Statuscode.SERVER_ERROR,
+          message: "There was an error while handling the request.",
+          data: {},
+        });
+      }
 
       return;
     }
-
-    const queryBuilder: squel.Update = squel.update().table("users");
-
-    if (InputValidator.isSet(request.body.username)) {
-      const username: string = InputValidator.sanitizeString(request.body.username);
-
-      queryBuilder.set("username", username);
-    }
-
-    if (InputValidator.isSet(request.body.password)) {
-      const password: string = InputValidator.sanitizeString(request.body.password);
-
-      queryBuilder.set("password", bcrypt.hashSync(password, 10));
-    }
-
-    if (InputValidator.isSet(request.body.email)) {
-      const email: string = InputValidator.sanitizeString(request.body.email);
-
-      queryBuilder.set("email", email);
-    }
-
-    const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
-
-    // execute the update
-    Database.query(updatePlayerQuery)
-      .then(() => {
-        const getNewDataQuery: string = squel
-          .select()
-          .field("userID")
-          .field("username")
-          .field("email")
-          .field("onlinetime")
-          .field("currentplanet")
-          .from("users")
-          .where("userID = ?", request.userID)
-          .toString();
-
-        // return the updated userdata
-        return Database.query(getNewDataQuery).then(result => {
-          let data: {};
-
-          if (InputValidator.isSet(result)) {
-            data = result[0];
-          }
-
-          // return the result
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data,
-          });
-        });
-      })
-      .catch(err => {
-        Logger.error(err);
-
-        if (err instanceof DuplicateRecordException || err.message.includes("Duplicate entry")) {
-          // return the result
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: `There was an error while handling the request: ${err.message}`,
-            data: {},
-          });
-        } else {
-          // return the result
-          response.status(Globals.Statuscode.SERVER_ERROR).json({
-            status: Globals.Statuscode.SERVER_ERROR,
-            message: "There was an error while handling the request.",
-            data: {},
-          });
-        }
-
-        return;
-      });
   }
 }
 

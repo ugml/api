@@ -283,7 +283,7 @@ describe("Player Routes", () => {
     const user = {
       username: "testuser1234",
       password: "test",
-      email: "GM2@H05.test",
+      email: "L17@WEC.test",
     };
 
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
@@ -414,7 +414,7 @@ describe("Player Routes", () => {
 
   it("update should fail (username already taken)", async () => {
     const user = {
-      username: "CDSWETOF5M",
+      username: "LGY2Y37244",
     };
 
     const { type, status, body } = await request
@@ -429,7 +429,7 @@ describe("Player Routes", () => {
 
   it("update should fail (email already taken)", async () => {
     const user = {
-      email: "K1M@TML.test",
+      email: "L17@WEC.test",
     };
 
     const { type, status, body } = await request

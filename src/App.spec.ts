@@ -15,7 +15,7 @@ describe("App", () => {
   before(() => {
     return request
       .post("/v1/auth/login")
-      .send({ email: "user_1501005189510@test.com", password: "admin" })
+      .send({ email: "user_1501005189510@test.com ", password: "admin" })
       .then(res => {
         authToken = res.body.data.token;
       });

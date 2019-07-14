@@ -34,6 +34,41 @@ describe("UserService", () => {
     expect(result.currentplanet).to.be.undefined;
   });
 
+  it("should return nothing because the user does not exist", async () => {
+    const userID = -1;
+
+    const result = await UserService.GetUserById(userID);
+
+    expect(result).to.be.null;
+  });
+
+  it("should return all informations about a user", async () => {
+    const email = "user_1501005189510@test.com";
+    const userID = 1;
+
+    const result = await UserService.GetUserForAuthentication(email);
+
+    expect(result.userID).to.be.equals(userID);
+    expect(result.email).to.be.equals(email);
+    expect(result.password).to.be.not.null;
+  });
+
+  it("should return nothing because the user does not exist", async () => {
+    const email = "idontexist@test.com";
+
+    const result = await UserService.GetUserForAuthentication(email);
+
+    expect(result).to.be.null;
+  });
+
+  it("should return nothing because the user does not exist", async () => {
+    const userID = -1;
+
+    const result = await UserService.GetUserById(userID);
+
+    expect(result).to.be.null;
+  });
+
   it("should return username taken and email taken", async () => {
     const username = "admin";
     const email = "user_1501005189510@test.com";

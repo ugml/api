@@ -19,10 +19,6 @@ export class UserService {
 
     const [result] = await Database.query(query);
 
-    if (!InputValidator.isSet(result)) {
-      return null;
-    }
-
     return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
   }
 
@@ -34,6 +30,25 @@ export class UserService {
       .field("username")
       .from("users")
       .where("userID = ?", userID)
+      .toString();
+
+    const [result] = await Database.query(query);
+
+    if (!InputValidator.isSet(result)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
+  }
+
+  public static async GetUserForAuthentication(email: string): Promise<User> {
+    const query: string = squel
+      .select({ autoQuoteFieldNames: true })
+      .field("userID")
+      .field("email")
+      .field("password")
+      .from("users")
+      .where("email = ?", email)
       .toString();
 
     const [result] = await Database.query(query);

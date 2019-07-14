@@ -354,9 +354,6 @@ export class TechsRouter {
       });
   }
 
-  /***
-   * Initializes the routes
-   */
   public init() {
     this.router.get("/", this.getTechs);
     this.router.post("/build/", this.buildTech);

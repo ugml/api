@@ -7,7 +7,7 @@ import { Globals } from "../common/Globals";
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-describe("Player Routes", () => {
+describe("User Routes", () => {
   let authToken = "";
   let request = chai.request(app);
 
@@ -25,7 +25,7 @@ describe("Player Routes", () => {
     return;
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "IDoNotExistYet",
       password: "test",
@@ -40,7 +40,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser1",
       password: "test1",
@@ -55,7 +55,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser2",
       password: "test2",
@@ -70,7 +70,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser3",
       password: "test3",
@@ -85,7 +85,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser4",
       password: "test4",
@@ -100,7 +100,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser5",
       password: "test5",
@@ -115,7 +115,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser6",
       password: "test6",
@@ -130,7 +130,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser7",
       password: "test7",
@@ -145,7 +145,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser8",
       password: "test8",
@@ -160,7 +160,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser9",
       password: "test9",
@@ -175,7 +175,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser10",
       password: "test10",
@@ -190,7 +190,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser11",
       password: "test11",
@@ -205,7 +205,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser12",
       password: "test12",
@@ -220,7 +220,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser13",
       password: "test13",
@@ -235,7 +235,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser14",
       password: "test14",
@@ -250,7 +250,7 @@ describe("Player Routes", () => {
     expect(body.data.token.length).to.be.above(120);
   });
 
-  it("should create a player", async () => {
+  it("should create a user", async () => {
     const user = {
       username: "testuser15",
       password: "test15",
@@ -293,7 +293,7 @@ describe("Player Routes", () => {
     expect(body.message).to.be.equals("There was an error while handling the request: Email is already taken");
   });
 
-  it("player-creation should fail (invalid parameters)", async () => {
+  it("user-creation should fail (invalid parameters)", async () => {
     const user = {
       username: "IDoNotExistYet",
       password: "test",
@@ -306,7 +306,7 @@ describe("Player Routes", () => {
     expect(body.message).to.be.equals("Invalid parameter");
   });
 
-  it("player-creation should fail (invalid parameters)", async () => {
+  it("user-creation should fail (invalid parameters)", async () => {
     const user = {
       username: "IDoNotExistYet",
       email: "iamnotareal@email.com",
@@ -319,7 +319,7 @@ describe("Player Routes", () => {
     expect(body.message).to.be.equals("Invalid parameter");
   });
 
-  it("player-creation should fail (invalid parameters)", async () => {
+  it("user-creation should fail (invalid parameters)", async () => {
     const user = {
       password: "test",
       email: "iamnotareal@email.com",
@@ -332,7 +332,7 @@ describe("Player Routes", () => {
     expect(body.message).to.be.equals("Invalid parameter");
   });
 
-  it("player-creation should fail (no data sent)", async () => {
+  it("user-creation should fail (no data sent)", async () => {
     const { type, status, body } = await request.post("/v1/users/create/");
 
     expect(type).to.be.equals("application/json");
@@ -340,7 +340,7 @@ describe("Player Routes", () => {
     expect(body.message).to.be.equals("Invalid parameter");
   });
 
-  it("should return the player", async () => {
+  it("should return the user", async () => {
     const { type, status, body } = await request.get("/v1/user/").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
@@ -353,7 +353,7 @@ describe("Player Routes", () => {
     expect(body.data.currentplanet).to.not.be.null;
   });
 
-  it("should return a player", async () => {
+  it("should return a user", async () => {
     const { type, status, body } = await request.get("/v1/users/41").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
@@ -373,15 +373,15 @@ describe("Player Routes", () => {
     expect(body.message).to.be.equals("Invalid parameter");
   });
 
-  it("should return nothing (player does not exist)", async () => {
+  it("should return nothing (user does not exist)", async () => {
     const { type, status, body } = await request.get("/v1/users/2").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data).to.be.empty;
+    expect(body.data).to.be.null;
   });
 
-  it("should update the player", async () => {
+  it("should update the user", async () => {
     const user = {
       username: "testuser1234",
     };

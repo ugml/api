@@ -83,7 +83,7 @@ export class PlanetsRouter {
       });
   }
 
-  public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllPlanetsOfUser(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     const query: string = squel
       .select()
       .from("planets")
@@ -460,7 +460,7 @@ export class PlanetsRouter {
    */
   public init() {
     // /planets/:planetID
-    this.router.get("/planetlist/", this.getAllPlanetsOfPlayer);
+    this.router.get("/planetlist/", this.getAllPlanetsOfUser);
     this.router.get("/movement/:planetID", this.getMovement);
     this.router.post("/destroy/", this.destroyPlanet);
     this.router.post("/rename/", this.renamePlanet);

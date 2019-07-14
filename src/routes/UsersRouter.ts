@@ -1,9 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
+import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+import { IGameConfig } from "../interfaces/IGameConfig";
+import { UserService } from "../services/UserService";
 import { Planet, PlanetType } from "../units/Planet";
 import { User } from "../units/User";
 import { PlanetsRouter } from "./PlanetsRouter";
@@ -13,135 +16,93 @@ const bcrypt = require("bcryptjs");
 import squel = require("squel");
 import { JwtHelper } from "../common/JwtHelper";
 
-export class PlayersRouter {
+export class UsersRouter {
   public router: Router;
 
-  /**
-   * Initialize the Router
-   */
   public constructor() {
     this.router = Router();
 
-    // Take each handler, and attach to one of the Express.Router's endpoints.
-
     // /user
-    this.router.get("/", this.getPlayerSelf);
+    this.router.get("/", this.getUserSelf);
 
     // /user/create/
-    this.router.post("/create", this.createPlayer);
+    this.router.post("/create", this.createUser);
 
-    // /users/:playerID
-    this.router.get("/:playerID", this.getPlayerByID);
+    // /users/:userID
+    this.router.get("/:userID", this.getUserByID);
 
     // /user/update
-    this.router.post("/update", this.updatePlayer);
+    this.router.post("/update", this.updateUser);
 
     // /user/planet/:planetID
     this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
 
     // /user/planetlist/
-    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfPlayer);
+    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfUser);
 
     // /user/currentplanet/set/:planetID
     this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
   }
 
-  public async getPlayerSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    try {
-      const query: string = squel
-        .select()
-        .field("userID")
-        .field("username")
-        .field("email")
-        .field("onlinetime")
-        .field("currentplanet")
-        .from("users")
-        .where("userID = ?", request.userID)
-        .toString();
-
-      // execute the query
-      const [result] = await Database.query(query);
-
-      let data: {};
-
-      if (InputValidator.isSet(result)) {
-        data = result[0];
-      }
-
-      // return the result
-      response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data,
-      });
-      return;
-    } catch (error) {
-      Logger.error(error);
-
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
-      });
-
-      return;
-    }
-  }
-
-  /**
-   * GET player by ID
-   */
-  public async getPlayerByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public async getUserSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
       // validate parameters
-      if (!InputValidator.isSet(request.params.playerID) || !InputValidator.isValidInt(request.params.playerID)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+      if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-
-        return;
       }
 
-      const query: string = squel
-        .select()
-        .distinct()
-        .field("userID")
-        .field("username")
-        .from("users")
-        .where("userID = ?", request.params.playerID)
-        .toString();
+      const data = await UserService.GetAuthenticatedUser(parseInt(request.userID, 10));
 
-      // execute the query
-      let [result] = await Database.query(query);
-      let data = {};
-
-      if (InputValidator.isSet(result)) {
-        data = result[0];
-      }
-
-      // return the result
-      response.status(Globals.Statuscode.SUCCESS).json({
+      return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: data,
+        data,
       });
-      return;
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
   }
 
-  public async createPlayer(request: Request, response: Response, next: NextFunction) {
+  public async getUserByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const data = await UserService.GetUserById(request.params.userID);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: data,
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  }
+
+  public async createUser(request: Request, response: Response, next: NextFunction) {
     if (
       !InputValidator.isSet(request.body.username) ||
       !InputValidator.isSet(request.body.password) ||
@@ -156,8 +117,7 @@ export class PlayersRouter {
       return;
     }
 
-    // TODO: use the config-class
-    const gameConfig = require("../config/game.json");
+    const gameConfig: IGameConfig = Config.Get;
 
     const username: string = InputValidator.sanitizeString(request.body.username);
     const password: string = InputValidator.sanitizeString(request.body.password);
@@ -167,40 +127,32 @@ export class PlayersRouter {
 
     const connection = await Database.getConnectionPool().getConnection();
 
-    let newPlayer: User = new User();
+    let newUser: User = new User();
     let newPlanet: Planet = new Planet();
 
     try {
       await connection.beginTransaction();
 
-      // TODO: use squel
-      // check, if the username or the email is already taken
-      const query =
-        `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
-        `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
+      const data = await UserService.CheckIfNameOrMailIsTaken(username, email);
 
-      const [data] = await connection.query(query);
-
-      if (data[0].username_taken === 1) {
+      if (data.username_taken === 1) {
         throw new DuplicateRecordException("Username is already taken");
       }
 
-      if (data[0].email_taken === 1) {
+      if (data.email_taken === 1) {
         throw new DuplicateRecordException("Email is already taken");
       }
 
       Logger.info("Getting a new userID");
 
-      const queryUser = "CALL getNewUserId();";
+      newUser.username = username;
+      newUser.email = email;
 
-      newPlayer.username = username;
-      newPlayer.email = email;
+      const userID = await UserService.GetNewId();
 
-      let [[[playerData]]] = await connection.query(queryUser);
-
-      newPlayer.userID = playerData.userID;
-      newPlayer.password = hashedPassword;
-      newPlanet.ownerID = newPlayer.userID;
+      newUser.userID = userID;
+      newPlanet.ownerID = userID;
+      newUser.password = hashedPassword;
       newPlanet.planet_type = PlanetType.Planet;
 
       Logger.info("Getting a new planetID");
@@ -209,7 +161,7 @@ export class PlayersRouter {
 
       let [[[planetData]]] = await connection.query(queryPlanet);
 
-      newPlayer.currentplanet = planetData.planetID;
+      newUser.currentplanet = planetData.planetID;
       newPlanet.planetID = planetData.planetID;
 
       Logger.info("Finding free position for new planet");
@@ -224,7 +176,7 @@ export class PlayersRouter {
 
       Logger.info("Creating a new user");
 
-      await newPlayer.create(connection);
+      await newUser.create(connection);
 
       // TODO extract planet creation
       Logger.info("Creating a new planet");
@@ -316,7 +268,7 @@ export class PlayersRouter {
 
       Logger.info("Creating entry in techs-table");
 
-      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${newPlayer.userID});`;
+      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${newUser.userID});`;
 
       await connection.query(queryTech);
 
@@ -350,13 +302,13 @@ export class PlayersRouter {
       status: Globals.Statuscode.SUCCESS,
       message: "Success",
       data: {
-        userID: newPlayer.userID,
-        token: JwtHelper.generateToken(newPlayer.userID),
+        userID: newUser.userID,
+        token: JwtHelper.generateToken(newUser.userID),
       },
     });
   }
 
-  public async updatePlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public async updateUser(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
       // if no parameters are set
       if (
@@ -393,10 +345,10 @@ export class PlayersRouter {
         queryBuilder.set("email", email);
       }
 
-      const updatePlayerQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
+      const updateUserQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
 
       // execute the update
-      await Database.query(updatePlayerQuery);
+      await Database.query(updateUserQuery);
 
       const getNewDataQuery: string = squel
         .select()
@@ -448,6 +400,6 @@ export class PlayersRouter {
   }
 }
 
-const playerRoutes = new PlayersRouter();
+const usersRouter = new UsersRouter();
 
-export default playerRoutes.router;
+export default usersRouter.router;

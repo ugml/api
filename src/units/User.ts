@@ -37,7 +37,7 @@ class User implements IUnits {
    * The unix-timestamp of the last time the user was online
    * @type {number}
    */
-  public onlinetime: number = 0;
+  public onlinetime: number;
 
   /**
    * The current planet of the user

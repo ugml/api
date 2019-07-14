@@ -15,7 +15,7 @@ import EventRouter from "./routes/EventRouter";
 import GalaxyRouter from "./routes/GalaxyRouter";
 import MessagesRouter from "./routes/MessagesRouter";
 import PlanetRouter from "./routes/PlanetsRouter";
-import PlayerRouter from "./routes/PlayersRouter";
+import UsersRouter from "./routes/UsersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
 import dotenv = require("dotenv-safe");
@@ -172,9 +172,9 @@ class App {
 
     this.register("/v1/auth", AuthRouter);
 
-    this.register("/v1/user", PlayerRouter);
+    this.register("/v1/user", UsersRouter);
 
-    this.register("/v1/users", PlayerRouter);
+    this.register("/v1/users", UsersRouter);
 
     this.register("/v1/planet", PlanetRouter);
 

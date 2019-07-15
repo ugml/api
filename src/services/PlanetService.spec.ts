@@ -1,7 +1,6 @@
 import * as chai from "chai";
 import { Planet } from "../units/Planet";
 import { PlanetService } from "./PlanetService";
-import { UserService } from "./UserService";
 
 const expect = chai.expect;
 

@@ -16,4 +16,16 @@ export class TechService {
 
     return await connection.query(query);
   }
+
+  public static async getTechs(userID: number) {
+    const query: string = squel
+      .select()
+      .from("techs")
+      .where("userID = ?", userID)
+      .toString();
+
+    const [[rows]] = await Database.query(query);
+
+    return rows;
+  }
 }

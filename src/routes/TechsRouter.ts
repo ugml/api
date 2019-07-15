@@ -8,6 +8,8 @@ import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
+import { TechService } from "../services/TechService";
+import { Techs } from "../units/Techs";
 import squel = require("squel");
 
 const units = new Units();
@@ -31,30 +33,23 @@ export class TechsRouter {
    */
   public async getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
-      const query: string = squel
-        .select()
-        .from("techs")
-        .where("userID = ?", request.userID)
-        .toString();
+      const userID = parseInt(request.userID, 10);
 
-      let [rows] = await Database.query(query);
+      const techs: Techs = await TechService.getTechs(userID);
 
-      response.status(Globals.Statuscode.SUCCESS).json({
+      return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: rows[0],
+        data: techs,
       });
-      return;
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
   }
 

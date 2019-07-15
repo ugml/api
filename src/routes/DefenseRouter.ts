@@ -29,12 +29,11 @@ export class DefenseRouter {
   public async getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-        return;
       }
 
       const planetID = parseInt(request.params.planetID);

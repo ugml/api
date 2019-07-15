@@ -128,20 +128,34 @@ export class UserService {
    * @param connection An open database-connection, if the query should be run within a transaction
    */
   public static async updateUserData(user: User, connection = null) {
-    // TODO: check which fields are set and only update those
-    const query: string = squel
-      .update()
-      .table("users")
-      .set("username", user.username)
-      .set("password", user.password)
-      .set("email", user.email)
-      .where("userID = ?", user.userID)
-      .toString();
+    let query = squel.update().table("users");
+
+    if (typeof user.username !== "undefined") {
+      query = query.set("username", user.username);
+    }
+
+    if (typeof user.password !== "undefined") {
+      query = query.set("password", user.password);
+    }
+
+    if (typeof user.email !== "undefined") {
+      query = query.set("email", user.email);
+    }
+
+    if (typeof user.onlinetime !== "undefined") {
+      query = query.set("currentplanet", user.onlinetime);
+    }
+
+    if (typeof user.currentplanet !== "undefined") {
+      query = query.set("currentplanet", user.currentplanet);
+    }
+
+    query = query.where("userID = ?", user.userID);
 
     if (connection === null) {
-      return await Database.query(query);
+      return await Database.query(query.toString());
     } else {
-      return await connection.query(query);
+      return await connection.query(query.toString());
     }
   }
 }

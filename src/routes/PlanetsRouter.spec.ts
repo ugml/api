@@ -61,7 +61,18 @@ describe("planetsRouter", () => {
 
   it("should return a list of planets", () => {
     return request
-      .get("/v1/planets/planetlist/")
+      .get("/v1/user/planetlist/")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data[0].planetID).to.not.be.null;
+      });
+  });
+
+  it("should return a list of planets of an other user", () => {
+    return request
+      .get("/v1/user/planetlist/35")
       .set("Authorization", authToken)
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
@@ -77,7 +88,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.null;
       });
   });
 
@@ -90,7 +101,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data[0].planetID).to.be.equals(planetID);
+        expect(res.body.data.planetID).to.be.equals(planetID);
       });
   });
 

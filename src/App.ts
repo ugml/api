@@ -105,7 +105,7 @@ class App {
             if (isNaN(parseInt(self.userID, 10))) {
               response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
+                message: "Invalid parameter2",
                 data: {},
               });
 

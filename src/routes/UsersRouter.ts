@@ -8,7 +8,7 @@ import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { IGameConfig } from "../interfaces/IGameConfig";
 import { BuildingService } from "../services/BuildingService";
 import { DefenseService } from "../services/DefenseService";
-import { FleetService } from "../services/FleetService";
+import { ShipService } from "../services/ShipService";
 import { GalaxyService } from "../services/GalaxyService";
 import { PlanetService } from "../services/PlanetService";
 import { TechService } from "../services/TechService";
@@ -19,7 +19,6 @@ import { PlanetsRouter } from "./PlanetsRouter";
 import { Logger } from "../common/Logger";
 
 const bcrypt = require("bcryptjs");
-import squel = require("squel");
 import { JwtHelper } from "../common/JwtHelper";
 
 export class UsersRouter {
@@ -28,14 +27,8 @@ export class UsersRouter {
   public constructor() {
     this.router = Router();
 
-    // /user
-    this.router.get("/", this.getUserSelf);
-
     // /user/create/
     this.router.post("/create", this.createUser);
-
-    // /users/:userID
-    this.router.get("/:userID", this.getUserByID);
 
     // /user/update
     this.router.post("/update", this.updateUser);
@@ -44,10 +37,19 @@ export class UsersRouter {
     this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
 
     // /user/planetlist/
-    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanetsOfUser);
+    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanets);
+
+    // /user/planetlist/:userID
+    this.router.get("/planetlist/:userID", new PlanetsRouter().getAllPlanetsOfUser);
 
     // /user/currentplanet/set/:planetID
-    this.router.post("/currentplanet/set", new PlanetsRouter().setCurrentPlanet);
+    this.router.post("/currentplanet/set", this.setCurrentPlanet);
+
+    // /users/:userID
+    this.router.get("/:userID", this.getUserByID);
+
+    // /user
+    this.router.get("/", this.getUserSelf);
   }
 
   public async getUserSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
@@ -239,9 +241,9 @@ export class UsersRouter {
 
       await DefenseService.createDefenseRow(newPlanet.planetID, connection);
 
-      Logger.info("Creating entry in fleet-table");
+      Logger.info("Creating entry in ships-table");
 
-      await FleetService.createFleetRow(newPlanet.planetID, connection);
+      await ShipService.createShipsRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in galaxy-table");
 
@@ -354,6 +356,52 @@ export class UsersRouter {
       }
 
       return;
+    }
+  }
+
+  public async setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+
+      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+
+      if (!InputValidator.isSet(planet)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "The player does not own the planet",
+          data: {},
+        });
+      }
+
+      const user: User = await UserService.getUserById(userID);
+
+      user.currentplanet = planetID;
+
+      await UserService.updateUserData(user);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: {},
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
     }
   }
 }

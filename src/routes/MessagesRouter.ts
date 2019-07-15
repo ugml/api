@@ -1,15 +1,10 @@
 import { NextFunction, Response, Router } from "express";
-import { message } from "gulp-typescript/release/utils";
-import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-
 import { Logger } from "../common/Logger";
 import { MessageService } from "../services/MessageService";
 import { UserService } from "../services/UserService";
-
-import squel = require("squel");
 
 export class MessagesRouter {
   public router: Router;
@@ -48,13 +43,11 @@ export class MessagesRouter {
   public async getMessageByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-
-        return;
       }
 
       const userID = parseInt(request.userID, 10);

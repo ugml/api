@@ -8,16 +8,27 @@ import { User } from "../units/User";
 import squel = require("squel");
 
 export class PlanetService {
-  public static async getPlanet(userID: number, planetID: number): Promise<Planet> {
-    const query: string = squel
+  public static async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {
+    let query = squel
       .select()
       .from("planets", "p")
       .where("p.planetID = ?", planetID)
-      .where("p.ownerID = ?", userID)
-      .toString();
+      .where("p.ownerID = ?", userID);
+
+    if (!fullInfo) {
+      query = query
+        .field("planetID")
+        .field("ownerID")
+        .field("name")
+        .field("galaxy")
+        .field("system")
+        .field("planet")
+        .field("planet_type")
+        .field("image");
+    }
 
     // execute the query
-    let [rows] = await Database.query(query);
+    let [rows] = await Database.query(query.toString());
 
     if (!InputValidator.isSet(rows)) {
       return null;
@@ -105,5 +116,65 @@ export class PlanetService {
     } else {
       return await connection.query(query);
     }
+  }
+
+  public static async getAllPlanetsOfUser(userID: number, fullInfo: boolean = false) {
+    let query = squel
+      .select()
+      .from("planets")
+      .where("ownerID = ?", userID);
+
+    if (!fullInfo) {
+      query = query
+        .field("planetID")
+        .field("ownerID")
+        .field("name")
+        .field("galaxy")
+        .field("system")
+        .field("planet")
+        .field("planet_type")
+        .field("image");
+    }
+
+    let [rows] = await Database.query(query.toString());
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return rows;
+  }
+
+  public static async getMovementOnPlanet(userID: number, planetID: number) {
+    const query: string = squel
+      .select()
+      .from("flights")
+      .where("ownerID = ?", userID)
+      .where(
+        squel
+          .expr()
+          .or(`start_id = ${planetID}`)
+          .or(`end_id = ${planetID}`),
+      )
+      .toString();
+
+    let [rows] = await Database.query(query);
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return rows;
+  }
+
+  public static async deletePlanet(userID: number, planetID: number) {
+    const query: string = squel
+      .delete()
+      .from("planets")
+      .where("planetID = ?", planetID)
+      .where("ownerID = ?", userID)
+      .toString();
+
+    await Database.query(query);
   }
 }

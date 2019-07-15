@@ -42,12 +42,11 @@ export class AuthRouter {
       const data = await UserService.getUserForAuthentication(email);
 
       if (!InputValidator.isSet(data)) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
           status: Globals.Statuscode.NOT_AUTHORIZED,
           message: "Authentication failed",
           data: {},
         });
-        return;
       }
 
       const isValidPassword = await bcrypt.compare(password, data.password);

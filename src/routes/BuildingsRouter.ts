@@ -33,13 +33,11 @@ export class BuildingsRouter {
   public async getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-
-        return;
       }
 
       // TODO: check if user owns the planet
@@ -54,40 +52,36 @@ export class BuildingsRouter {
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
   }
 
   public async cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-        return;
       }
 
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      let planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      let planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
       let buildings: Buildings = await BuildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-        return;
       }
 
       // 1. check if there is already a build-job on the planet
@@ -157,7 +151,7 @@ export class BuildingsRouter {
         });
       }
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await BuildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {

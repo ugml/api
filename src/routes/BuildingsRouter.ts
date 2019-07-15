@@ -1,9 +1,7 @@
 import { NextFunction, Response, Router } from "express";
 import { Config } from "../common/Config";
-import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
-import { SerializationHelper } from "../common/SerializationHelper";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { BuildingService } from "../services/BuildingService";
@@ -11,11 +9,7 @@ import { PlanetService } from "../services/PlanetService";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
-
 import { Logger } from "../common/Logger";
-import { PlanetsRouter } from "./PlanetsRouter";
-
-import squel = require("squel");
 
 const units = new Units();
 
@@ -81,18 +75,13 @@ export class BuildingsRouter {
         return;
       }
 
-      // get the planet, on which the building should be canceled
-      const getPlanetQuery: string = squel
-        .select()
-        .from("planets", "p")
-        .join("buildings", "b", "p.planetID = b.planetID")
-        .where("p.planetID = ?", request.body.planetID)
-        .where("p.ownerID = ?", request.userID)
-        .toString();
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
 
-      let [rows] = await Database.query(getPlanetQuery);
+      let planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      let buildings: Buildings = await BuildingService.getBuildings(planetID);
 
-      if (!InputValidator.isSet(rows)) {
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
@@ -100,83 +89,44 @@ export class BuildingsRouter {
         });
         return;
       }
-
-      // player does not own the planet
-      if (!InputValidator.isSet(rows[0])) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
-        });
-        return;
-      }
-
-      const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(rows[0]));
 
       // 1. check if there is already a build-job on the planet
       if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
         const buildingKey = units.getMappings()[planet.b_building_id];
 
         // give back the ressources
-        const currentLevel = planet[buildingKey];
+        const currentLevel = buildings[buildingKey];
 
         const cost: ICosts = units.getCosts(planet.b_building_id, currentLevel, UnitType.BUILDING);
 
-        const updateResourcesQuery: string = squel
-          .update()
-          .table("planets")
-          .set("b_building_id", 0)
-          .set("b_building_endtime", 0)
-          .set("metal", planet.metal + cost.metal)
-          .set("crystal", planet.crystal + cost.crystal)
-          .set("deuterium", planet.deuterium + cost.deuterium)
-          .where("planetID = ?", planet.planetID)
-          .toString();
+        planet.b_building_id = 0;
+        planet.b_building_endtime = 0;
+        planet.metal = planet.metal + cost.metal;
+        planet.crystal = planet.crystal + cost.crystal;
+        planet.crystal = planet.crystal + cost.crystal;
 
-        return Database.query(updateResourcesQuery)
-          .then(() => {
-            planet.b_building_id = 0;
-            planet.b_building_endtime = 0;
-            planet.metal = planet.metal + cost.metal;
-            planet.crystal = planet.crystal + cost.crystal;
-            planet.crystal = planet.crystal + cost.crystal;
+        await PlanetService.updatePlanet(planet);
 
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Building canceled",
-              data: { planet },
-            });
-            return;
-          })
-          .catch(error => {
-            Logger.error(error);
-
-            response.status(Globals.Statuscode.SERVER_ERROR).json({
-              status: Globals.Statuscode.SERVER_ERROR,
-              message: "There was an error while handling the request.",
-              data: {},
-            });
-
-            return;
-          });
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "Building canceled",
+          data: { planet },
+        });
       } else {
-        response.status(Globals.Statuscode.SUCCESS).json({
+        return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Planet has no build-job",
           data: {},
         });
-        return;
       }
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
   }
 
@@ -232,7 +182,7 @@ export class BuildingsRouter {
         (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
           buildingID === Globals.Buildings.NANITE_FACTORY ||
           buildingID === Globals.Buildings.SHIPYARD) &&
-        (planet.b_hangar_id > 0 || planet.b_hangar_start_time > 0)
+        (planet.b_hangar_id.length > 0 || planet.b_hangar_start_time > 0)
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,

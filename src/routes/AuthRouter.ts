@@ -3,11 +3,10 @@ import { NextFunction, Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
-
-const bcrypt = require("bcryptjs");
-
 import { Logger } from "../common/Logger";
 import { UserService } from "../services/UserService";
+
+const bcrypt = require("bcryptjs");
 
 export class AuthRouter {
   public router: Router;

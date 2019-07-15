@@ -1,16 +1,19 @@
 import { NextFunction, Response, Router } from "express";
-import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
+import { Logger } from "../common/Logger";
+import { BuildingService } from "../services/BuildingService";
+import { DefenseService } from "../services/DefenseService";
+import { PlanetService } from "../services/PlanetService";
+import { Buildings } from "../units/Buildings";
+import { Defenses } from "../units/Defenses";
+import { Planet } from "../units/Planet";
 
 const units = new Units();
-import { Logger } from "../common/Logger";
-
-import squel = require("squel");
 
 export class DefenseRouter {
   public router: Router;
@@ -34,44 +37,25 @@ export class DefenseRouter {
         return;
       }
 
-      const query: string = squel
-        .select()
-        .field("p.ownerID", "ownerID")
-        .field("d.*")
-        .from("defenses", "d")
-        .left_join("planets", "p", "d.planetID = p.planetID")
-        .where("d.planetID = ?", request.params.planetID)
-        .where("p.ownerID = ?", request.userID)
-        .toString();
+      const planetID = parseInt(request.params.planetID);
+      const userID = parseInt(request.userID, 10);
 
-      let [rows] = await Database.query(query);
-
-      let data;
-
-      if (!InputValidator.isSet(rows)) {
-        data = {};
-      } else {
-        data = rows[0];
-      }
+      let defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
 
       // return the result
-      response.status(Globals.Statuscode.SUCCESS).json({
+      return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data,
+        data: defenses,
       });
-
-      return;
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
   }
 
@@ -83,65 +67,44 @@ export class DefenseRouter {
         !InputValidator.isSet(request.body.buildOrder) ||
         !InputValidator.isValidJson(request.body.buildOrder)
       ) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-        return;
       }
+
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
 
       const buildOrders = JSON.parse(request.body.buildOrder);
 
       const queueItem: QueueItem = new QueueItem();
 
-      queueItem.setPlanetID(request.body.planetID);
+      queueItem.setPlanetID(planetID);
 
       // validate build-order
       if (!units.isValidBuildOrder(buildOrders, UnitType.DEFENSE)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-        return;
       }
 
-      const query: string = squel
-        .select()
-        .field("metal")
-        .field("crystal")
-        .field("deuterium")
-        .field("shipyard")
-        .field("nanite_factory")
-        .field("b_hangar_plus")
-        .field("b_hangar_id")
-        .field("b_hangar_start_time")
-        .field("ownerID")
-        .field("missile_silo")
-        .field("anti_ballistic_missile")
-        .field("interplanetary_missile")
-        .field("missile_silo")
-        .from("planets", "p")
-        .left_join("buildings", "b", "b.planetID = p.planetID")
-        .left_join("defenses", "d", "d.planetID = p.planetID")
-        .where("p.planetID = ?", request.body.planetID)
-        .where("p.ownerID = ?", request.userID)
-        .toString();
+      const buildings: Buildings = await BuildingService.getBuildings(planetID);
+      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      const defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
 
-      let [rows] = await Database.query(query);
-
-      if (!InputValidator.isSet(rows)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+      if (!InputValidator.isSet(buildings) || !InputValidator.isSet(planet)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "The player does not own the planet",
           data: {},
         });
-
-        return;
       }
 
-      if (rows[0].b_hangar_plus === 1) {
+      if (planet.b_hangar_plus) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Shipyard is currently upgrading.",
@@ -149,14 +112,14 @@ export class DefenseRouter {
         });
       }
 
-      let metal = rows[0].metal;
-      let crystal = rows[0].crystal;
-      let deuterium = rows[0].deuterium;
+      let metal = planet.metal;
+      let crystal = planet.crystal;
+      let deuterium = planet.deuterium;
 
       let stopProcessing = false;
       let buildTime = 0;
       let freeSiloSlots: number =
-        rows[0].missile_silo * 10 - rows[0].anti_ballistic_missile - rows[0].interplanetary_missile * 2;
+        buildings.missile_silo * 10 - defenses.anti_ballistic_missile - defenses.interplanetary_missile * 2;
 
       for (const item in buildOrders) {
         if (buildOrders.hasOwnProperty(item)) {
@@ -218,7 +181,7 @@ export class DefenseRouter {
 
           // build time in seconds
           buildTime +=
-            units.getBuildTimeInSeconds(cost.metal, cost.crystal, rows[0].shipyard, rows[0].nanite_factory) *
+            units.getBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
             Math.floor(count);
 
           queueItem.addToQueue(item, Math.floor(count));
@@ -239,52 +202,32 @@ export class DefenseRouter {
       queueItem.setTimeRemaining(buildTime);
       queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
-      let b_hangar_id_new: string = rows[0].b_hangar_id;
-      let b_hangar_start_time_new: number;
-
-      if (InputValidator.isSet(b_hangar_id_new)) {
-        b_hangar_id_new += ", ";
+      if (InputValidator.isSet(planet.b_hangar_id)) {
+        planet.b_hangar_id += ", ";
       }
 
-      b_hangar_id_new += JSON.stringify(queueItem);
+      planet.b_hangar_id += JSON.stringify(queueItem);
 
-      b_hangar_start_time_new = rows[0].b_hangar_start_time;
-
-      if (rows[0].b_hangar_start_time === 0) {
-        b_hangar_start_time_new = Math.floor(Date.now() / 1000);
+      if (planet.b_hangar_start_time === 0) {
+        planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
       }
 
       // update planet
-      const updatePlanetQuery: string = squel
-        .update()
-        .table("planets")
-        .set("b_hangar_id", b_hangar_id_new)
-        .set("b_hangar_start_time", b_hangar_start_time_new)
-        .set("metal", metal)
-        .set("crystal", crystal)
-        .set("deuterium", deuterium)
-        .where("planetID = ?", request.body.planetID)
-        .toString();
+      await PlanetService.updatePlanet(planet);
 
-      await Database.query(updatePlanetQuery);
-
-      response.status(Globals.Statuscode.SUCCESS).json({
+      return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
         data: {},
       });
-
-      return;
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
   }
 

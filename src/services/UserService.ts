@@ -1,11 +1,14 @@
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
-import { Logger } from "../common/Logger";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { User } from "../units/User";
 import squel = require("squel");
 
 export class UserService {
+  /**
+   * Returns all information about an authenticated user.
+   * @param userID The ID of the currently authenticated user
+   */
   public static async getAuthenticatedUser(userID: number): Promise<User> {
     const query: string = squel
       .select()
@@ -23,6 +26,12 @@ export class UserService {
     return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
   }
 
+  /**
+   * Returns information about a user.
+   * This information does not contain sensible data (like email or passwords).
+   * @param userID The ID of the user
+   * @returns A user-object
+   */
   public static async getUserById(userID: number): Promise<User> {
     const query: string = squel
       .select()
@@ -42,6 +51,12 @@ export class UserService {
     return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
   }
 
+  /**
+   * Returns informations about a user.
+   * This information does contain sensible data which is needed for authentication (like email or passwords).
+   * @param email The email of the user
+   * @returns A user-object
+   */
   public static async getUserForAuthentication(email: string): Promise<User> {
     const query: string = squel
       .select({ autoQuoteFieldNames: true })
@@ -71,6 +86,10 @@ export class UserService {
     return data;
   }
 
+  /**
+   * Returns a new userID
+   * @returns The new ID
+   */
   public static async getNewId(): Promise<number> {
     const queryUser = "CALL getNewUserId();";
 
@@ -79,8 +98,10 @@ export class UserService {
     return result.userID;
   }
 
-  /***
+  /**
    * Stores the current object in the database
+   * @param user A user-object
+   * @param connection An open database-connection, if the query should be run within a transaction
    */
   public static async createNewUser(user: User, connection) {
     const query: string = squel
@@ -101,6 +122,11 @@ export class UserService {
     }
   }
 
+  /**
+   * Updates the userdata in the database
+   * @param user A user-object
+   * @param connection An open database-connection, if the query should be run within a transaction
+   */
   public static async updateUserData(user: User, connection = null) {
     // TODO: check which fields are set and only update those
     const query: string = squel

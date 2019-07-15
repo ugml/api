@@ -27,10 +27,12 @@ describe("galaxyRouter", () => {
 
   it("should return a list of galaxy-entries", () => {
     return request
-      .get("/v1/galaxy/4/13")
+      .get("/v1/galaxy/7/5")
       .set("Authorization", authToken)
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.data).to.have.lengthOf(2);
+        console.log(res.body);
         expect(res.type).to.eql("application/json");
       });
   });

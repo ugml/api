@@ -1,8 +1,4 @@
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
-import { Logger } from "../common/Logger";
-import { SerializationHelper } from "../common/SerializationHelper";
-import { Buildings } from "../units/Buildings";
 
 import squel = require("squel");
 
@@ -15,5 +11,21 @@ export class DefenseService {
     }
 
     return await connection.query(query);
+  }
+
+  public static async getDefenses(userID: number, planetID: number) {
+    const query: string = squel
+      .select()
+      .field("p.ownerID", "ownerID")
+      .field("d.*")
+      .from("defenses", "d")
+      .left_join("planets", "p", "d.planetID = p.planetID")
+      .where("d.planetID = ?", planetID)
+      .where("p.ownerID = ?", userID)
+      .toString();
+
+    let [[rows]] = await Database.query(query);
+
+    return rows;
   }
 }

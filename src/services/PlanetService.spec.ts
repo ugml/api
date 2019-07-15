@@ -17,7 +17,6 @@ describe("PlanetService", () => {
   });
 
   it("should update a planet", async () => {
-
     const planet: Planet = Object.assign(new Planet(), {
       planetID: 167546850,
       ownerID: 1,

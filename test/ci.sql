@@ -84,12 +84,12 @@ CREATE TABLE `errors` (
 
 
 --
--- Table structure for table `fleet`
+-- Table structure for table `ships`
 --
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `fleet` (
+CREATE TABLE `ships` (
   `planetID` int(11) NOT NULL,
   `small_cargo_ship` int(11) NOT NULL DEFAULT 0,
   `large_cargo_ship` int(11) NOT NULL DEFAULT 0,
@@ -106,7 +106,7 @@ CREATE TABLE `fleet` (
   `battlecruiser` int(11) NOT NULL DEFAULT 0,
   `deathstar` int(11) NOT NULL DEFAULT 0,
   UNIQUE KEY `planetid_UNIQUE` (`planetID`),
-  CONSTRAINT `fk_fleet_planetid` FOREIGN KEY (`planetID`) REFERENCES `planets` (`planetID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_ships_planetid` FOREIGN KEY (`planetID`) REFERENCES `planets` (`planetID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

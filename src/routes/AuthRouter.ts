@@ -40,7 +40,7 @@ export class AuthRouter {
 
       const password: string = InputValidator.sanitizeString(req.body.password);
 
-      const data = await UserService.GetUserForAuthentication(email);
+      const data = await UserService.getUserForAuthentication(email);
 
       if (!InputValidator.isSet(data)) {
         response.status(Globals.Statuscode.NOT_AUTHORIZED).json({

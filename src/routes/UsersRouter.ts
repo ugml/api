@@ -6,6 +6,12 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { IGameConfig } from "../interfaces/IGameConfig";
+import { BuildingService } from "../services/BuildingService";
+import { DefenseService } from "../services/DefenseService";
+import { FleetService } from "../services/FleetService";
+import { GalaxyService } from "../services/GalaxyService";
+import { PlanetService } from "../services/PlanetService";
+import { TechService } from "../services/TechService";
 import { UserService } from "../services/UserService";
 import { Planet, PlanetType } from "../units/Planet";
 import { User } from "../units/User";
@@ -55,7 +61,7 @@ export class UsersRouter {
         });
       }
 
-      const data = await UserService.GetAuthenticatedUser(parseInt(request.userID, 10));
+      const data = await UserService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -84,7 +90,7 @@ export class UsersRouter {
         });
       }
 
-      const data = await UserService.GetUserById(request.params.userID);
+      const data = await UserService.getUserById(request.params.userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -133,7 +139,7 @@ export class UsersRouter {
     try {
       await connection.beginTransaction();
 
-      const data = await UserService.CheckIfNameOrMailIsTaken(username, email);
+      const data = await UserService.checkIfNameOrMailIsTaken(username, email);
 
       if (data.username_taken === 1) {
         throw new DuplicateRecordException("Username is already taken");
@@ -148,7 +154,7 @@ export class UsersRouter {
       newUser.username = username;
       newUser.email = email;
 
-      const userID = await UserService.GetNewId();
+      const userID = await UserService.getNewId();
 
       newUser.userID = userID;
       newPlanet.ownerID = userID;
@@ -157,28 +163,28 @@ export class UsersRouter {
 
       Logger.info("Getting a new planetID");
 
-      const queryPlanet = "CALL getNewPlanetId();";
+      const planetID = await PlanetService.getNewId();
 
-      let [[[planetData]]] = await connection.query(queryPlanet);
-
-      newUser.currentplanet = planetData.planetID;
-      newPlanet.planetID = planetData.planetID;
+      newUser.currentplanet = planetID;
+      newPlanet.planetID = planetID;
 
       Logger.info("Finding free position for new planet");
 
-      const queryPosition = `CALL getFreePosition(${gameConfig.pos_galaxy_max}, ${gameConfig.pos_system_max}, 4, 12);`;
+      const galaxyData = await GalaxyService.getFreePosition(
+        gameConfig.pos_galaxy_max,
+        gameConfig.pos_system_max,
+        4,
+        12,
+      );
 
-      let [[[galaxyData]]] = await connection.query(queryPosition);
-
-      newPlanet.galaxy = galaxyData.posGalaxy;
-      newPlanet.system = galaxyData.posSystem;
-      newPlanet.planet = galaxyData.posPlanet;
+      newPlanet.galaxy = galaxyData.galaxy;
+      newPlanet.system = galaxyData.system;
+      newPlanet.planet = galaxyData.planet;
 
       Logger.info("Creating a new user");
 
-      await newUser.create(connection);
+      await UserService.createNewUser(newUser, connection);
 
-      // TODO extract planet creation
       Logger.info("Creating a new planet");
 
       newPlanet.name = gameConfig.startplanet_name;
@@ -223,54 +229,33 @@ export class UsersRouter {
         }
       }
 
-      await newPlanet.create(connection);
+      await PlanetService.createNewPlanet(newPlanet, connection);
 
       Logger.info("Creating entry in buildings-table");
 
-      const queryBuildings = `INSERT INTO buildings (\`planetID\`) VALUES (${newPlanet.planetID});`;
-
-      await connection.query(queryBuildings);
+      await BuildingService.createBuildingsRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in defenses-table");
 
-      const queryDefenses = `INSERT INTO defenses (\`planetID\`) VALUES (${newPlanet.planetID});`;
-
-      await connection.query(queryDefenses);
+      await DefenseService.createDefenseRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in fleet-table");
 
-      const queryFleet = `INSERT INTO fleet (\`planetID\`) VALUES (${newPlanet.planetID});`;
-
-      await connection.query(queryFleet);
+      await FleetService.createFleetRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in galaxy-table");
 
-      const queryGalaxy = `INSERT INTO galaxy
-                                (
-                                  \`planetID\`,
-                                  \`pos_galaxy\`,
-                                  \`pos_system\`,
-                                  \`pos_planet\`
-                                )
-                          VALUES
-                                (
-                                  ${newPlanet.planetID},
-                                  ${newPlanet.galaxy},
-                                  ${newPlanet.system},
-                                  ${newPlanet.planet}
-                                );`
-        .split("\n")
-        .join("")
-        .replace("  ", " ");
-      // ^^^ temporary so that the query takes up one line instead of 14 in the log
-
-      await connection.query(queryGalaxy);
+      await GalaxyService.createGalaxyRow(
+        newPlanet.planetID,
+        newPlanet.galaxy,
+        newPlanet.system,
+        newPlanet.planet,
+        connection,
+      );
 
       Logger.info("Creating entry in techs-table");
 
-      const queryTech = `INSERT INTO techs (\`userID\`) VALUES (${newUser.userID});`;
-
-      await connection.query(queryTech);
+      await TechService.createTechRow(newUser.userID, connection);
 
       connection.commit();
 
@@ -325,56 +310,29 @@ export class UsersRouter {
         return;
       }
 
-      const queryBuilder: squel.Update = squel.update().table("users");
+      let user: User = await UserService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
-        const username: string = InputValidator.sanitizeString(request.body.username);
-
-        queryBuilder.set("username", username);
+        user.username = InputValidator.sanitizeString(request.body.username);
       }
 
       if (InputValidator.isSet(request.body.password)) {
-        const password: string = InputValidator.sanitizeString(request.body.password);
+        const password = InputValidator.sanitizeString(request.body.password);
 
-        queryBuilder.set("password", bcrypt.hashSync(password, 10));
+        user.password = bcrypt.hashSync(password, 10);
       }
 
       if (InputValidator.isSet(request.body.email)) {
-        const email: string = InputValidator.sanitizeString(request.body.email);
-
-        queryBuilder.set("email", email);
+        user.email = InputValidator.sanitizeString(request.body.email);
       }
 
-      const updateUserQuery: string = queryBuilder.where("userID = ?", request.userID).toString();
-
-      // execute the update
-      await Database.query(updateUserQuery);
-
-      const getNewDataQuery: string = squel
-        .select()
-        .field("userID")
-        .field("username")
-        .field("email")
-        .field("onlinetime")
-        .field("currentplanet")
-        .from("users")
-        .where("userID = ?", request.userID)
-        .toString();
-
-      // return the updated userdata
-      let [result] = await Database.query(getNewDataQuery);
-
-      let data: {};
-
-      if (InputValidator.isSet(result)) {
-        data = result[0];
-      }
+      await UserService.updateUserData(user);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: data,
+        data: user,
       });
     } catch (error) {
       Logger.error(error);

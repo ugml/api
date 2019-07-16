@@ -231,7 +231,6 @@ export class DefenseRouter {
       });
     } catch (error) {
       Logger.error(error);
-      console.log(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,

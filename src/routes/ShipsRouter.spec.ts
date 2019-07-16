@@ -3,6 +3,8 @@ import chaiHttp = require("chai-http");
 
 import app from "../App";
 import { Globals } from "../common/Globals";
+import { PlanetService } from "../services/PlanetService";
+import { Planet } from "../units/Planet";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -11,13 +13,20 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("shipsRouter", () => {
-  before(() => {
+  let planetBeforeTests: Planet;
+
+  before(async () => {
+    planetBeforeTests = await PlanetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.data.token;
       });
+  });
+
+  after(async () => {
+    await PlanetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -107,7 +116,7 @@ describe("shipsRouter", () => {
         expect(res.type).to.eql("application/json");
         expect(res.body.data.planetID).to.be.equals(167546850);
         const buildOrders = JSON.parse(res.body.data.b_hangar_id);
-        expect(buildOrders.length).to.be.greaterThan(1);
+        expect(buildOrders.length).to.be.equals(1);
         expect(buildOrders[0].planetID).to.be.equals(167546850);
       });
   });

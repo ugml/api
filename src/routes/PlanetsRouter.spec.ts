@@ -3,6 +3,10 @@ import chaiHttp = require("chai-http");
 
 import app from "../App";
 import { Globals } from "../common/Globals";
+import { PlanetService } from "../services/PlanetService";
+import { UserService } from "../services/UserService";
+import { Planet } from "../units/Planet";
+import { User } from "../units/User";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -11,13 +15,23 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("planetsRouter", () => {
-  before(() => {
+  let authUserBeforeTests: User;
+  let planetBeforeTests: Planet;
+
+  before(async () => {
+    authUserBeforeTests = await UserService.getAuthenticatedUser(1);
+    planetBeforeTests = await PlanetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.data.token;
       });
+  });
+
+  after(async () => {
+    await UserService.updateUserData(authUserBeforeTests);
+    await PlanetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {

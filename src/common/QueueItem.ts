@@ -37,7 +37,7 @@ class QueueItem {
       return;
     }
 
-    if (this.queue[key] === undefined) {
+    if (typeof this.queue[key] === "undefined") {
       this.queue[key] = value;
     }
   }

@@ -6,7 +6,8 @@
     "outDir": "dist",
     "types": [
       // add node as an option
-      "node"
+      "node",
+      "mocha"
     ],
     "typeRoots" : [
       "node_modules/@types"

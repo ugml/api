@@ -15,17 +15,13 @@ export class ConfigRouter {
   public getGameConfig(req: Request, response: Response, next: NextFunction) {
     const data = require("../config/game.json");
 
-    response.status(Globals.Statuscode.SUCCESS).json(data);
-
-    return;
+    return response.status(Globals.Statuscode.SUCCESS).json(data);
   }
 
   public getUnitsConfig(req: Request, response: Response, next: NextFunction) {
     const data = require("../config/units.json");
 
-    response.status(Globals.Statuscode.SUCCESS).json(data);
-
-    return;
+    return response.status(Globals.Statuscode.SUCCESS).json(data);
   }
 
   /**

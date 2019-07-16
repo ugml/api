@@ -32,6 +32,12 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
+        expect(res.body.data[0].messageID).to.be.equals(5);
+        expect(res.body.data[0].senderID).to.be.equals(1);
+        expect(res.body.data[0].receiverID).to.be.equals(1);
+        expect(res.body.data[0].type).to.be.equals(1);
+        expect(res.body.data[0].subject).to.be.equals("test");
+        expect(res.body.data[0].body).to.be.equals("asdf");
       });
   });
 
@@ -42,7 +48,12 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).not.to.be.empty;
+        expect(res.body.data.messageID).to.be.equals(5);
+        expect(res.body.data.senderID).to.be.equals(1);
+        expect(res.body.data.receiverID).to.be.equals(1);
+        expect(res.body.data.type).to.be.equals(1);
+        expect(res.body.data.subject).to.be.equals("test");
+        expect(res.body.data.body).to.be.equals("asdf");
       });
   });
 
@@ -54,6 +65,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -101,6 +113,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -113,6 +126,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.empty;
       });
   });
 });

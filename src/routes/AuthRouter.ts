@@ -1,14 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
 
-import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
-
-import squel = require("squel");
-const bcrypt = require("bcryptjs");
-
 import { Logger } from "../common/Logger";
+import { UserService } from "../services/UserService";
+
+const bcrypt = require("bcryptjs");
 
 export class AuthRouter {
   public router: Router;
@@ -41,62 +39,45 @@ export class AuthRouter {
 
       const password: string = InputValidator.sanitizeString(req.body.password);
 
-      const query: string = squel
-        .select({ autoQuoteFieldNames: true })
-        .field("userID")
-        .field("email")
-        .field("password")
-        .from("users")
-        .where("email = ?", email)
-        .toString();
+      const data = await UserService.getUserForAuthentication(email);
 
-      let [rows] = await Database.query(query);
-
-      if (!InputValidator.isSet(rows) || rows[0] === undefined) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+      if (!InputValidator.isSet(data)) {
+        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
           status: Globals.Statuscode.NOT_AUTHORIZED,
           message: "Authentication failed",
           data: {},
         });
-        return;
       }
 
-      bcrypt.compare(password, rows[0].password).then(function(isValidPassword: boolean) {
-        if (!isValidPassword) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Authentication failed",
-            data: {},
-          });
-          return;
-        }
+      const isValidPassword = await bcrypt.compare(password, data.password);
 
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data: {
-            token: JwtHelper.generateToken(rows[0].userID),
-          },
+      if (!isValidPassword) {
+        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+          status: Globals.Statuscode.NOT_AUTHORIZED,
+          message: "Authentication failed",
+          data: {},
         });
-        return;
+      }
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: {
+          token: JwtHelper.generateToken(data.userID),
+        },
       });
     } catch (err) {
       Logger.error(err);
 
       // return the result
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: `There was an error: ${err.message}`,
         data: {},
       });
-
-      return;
     }
   }
 
-  /***
-   * Initializes the routes
-   */
   public init() {
     this.router.post("/login", this.authenticate);
   }

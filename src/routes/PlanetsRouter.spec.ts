@@ -3,6 +3,10 @@ import chaiHttp = require("chai-http");
 
 import app from "../App";
 import { Globals } from "../common/Globals";
+import { PlanetService } from "../services/PlanetService";
+import { UserService } from "../services/UserService";
+import { Planet } from "../units/Planet";
+import { User } from "../units/User";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -11,13 +15,23 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("planetsRouter", () => {
-  before(() => {
+  let authUserBeforeTests: User;
+  let planetBeforeTests: Planet;
+
+  before(async () => {
+    authUserBeforeTests = await UserService.getAuthenticatedUser(1);
+    planetBeforeTests = await PlanetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.data.token;
       });
+  });
+
+  after(async () => {
+    await UserService.updateUserData(authUserBeforeTests);
+    await PlanetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -33,6 +47,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -44,6 +59,7 @@ describe("planetsRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("Invalid parameter");
         expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -56,17 +72,43 @@ describe("planetsRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("The player does not own the planet");
         expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
       });
   });
 
   it("should return a list of planets", () => {
     return request
-      .get("/v1/planets/planetlist/")
+      .get("/v1/user/planetlist/")
       .set("Authorization", authToken)
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data[0][0].planetID).to.not.be.null;
+        expect(res.body.data[0].planetID).to.be.equals(167546850);
+        expect(res.body.data[0].ownerID).to.be.equals(1);
+        expect(res.body.data[0].galaxy).to.be.equals(9);
+        expect(res.body.data[0].system).to.be.equals(54);
+        expect(res.body.data[0].planet).to.be.equals(1);
+        expect(res.body.data[0].metal).to.be.greaterThan(0);
+        expect(res.body.data[0].crystal).to.be.greaterThan(0);
+        expect(res.body.data[0].deuterium).to.be.greaterThan(0);
+      });
+  });
+
+  it("should return a list of planets of an other user", () => {
+    return request
+      .get("/v1/user/planetlist/35")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data[0].planetID).to.be.equals(93133);
+        expect(res.body.data[0].ownerID).to.be.equals(35);
+        expect(res.body.data[0].galaxy).to.be.equals(4);
+        expect(res.body.data[0].system).to.be.equals(71);
+        expect(res.body.data[0].planet).to.be.equals(2);
+        expect(res.body.data[0].metal).to.be.undefined;
+        expect(res.body.data[0].crystal).to.be.undefined;
+        expect(res.body.data[0].deuterium).to.be.undefined;
       });
   });
 
@@ -77,7 +119,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.null;
       });
   });
 
@@ -90,7 +132,14 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data[0].planetID).to.be.equals(planetID);
+        expect(res.body.data.planetID).to.be.equals(planetID);
+        expect(res.body.data.ownerID).to.be.equals(1);
+        expect(res.body.data.galaxy).to.be.equals(9);
+        expect(res.body.data.system).to.be.equals(54);
+        expect(res.body.data.planet).to.be.equals(1);
+        expect(res.body.data.metal).to.be.greaterThan(0);
+        expect(res.body.data.crystal).to.be.greaterThan(0);
+        expect(res.body.data.deuterium).to.be.greaterThan(0);
       });
   });
 
@@ -104,6 +153,7 @@ describe("planetsRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.empty;
       });
   });
 

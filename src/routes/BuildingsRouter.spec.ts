@@ -3,6 +3,8 @@ import chaiHttp = require("chai-http");
 
 import app from "../App";
 import { Globals } from "../common/Globals";
+import { PlanetService } from "../services/PlanetService";
+import { Planet } from "../units/Planet";
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -11,13 +13,20 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("buildingsRoute", () => {
-  before(() => {
+  let planetBeforeTests: Planet;
+
+  before(async () => {
+    planetBeforeTests = await PlanetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.data.token;
       });
+  });
+
+  after(async () => {
+    await PlanetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -45,6 +54,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Success");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.null;
         });
     });
 
@@ -55,6 +65,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
   });
@@ -70,6 +81,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -81,6 +93,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -94,6 +107,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -107,6 +121,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -118,6 +133,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -133,6 +149,7 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.body.message).equals("Job started");
             expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.body.data.planet.planetID).to.be.equals(planetID);
           });
       });
 
@@ -146,6 +163,7 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.body.message).equals("Planet already has a build-job");
             expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+            expect(res.body.data).to.be.empty;
           });
       });
       it("cancel the build-order", () => {
@@ -158,6 +176,7 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.body.message).equals("Building canceled");
             expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.body.data.planet.planetID).to.be.equals(planetID);
           });
       });
       it("try cancel the build-order again", () => {
@@ -170,74 +189,77 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.body.message).equals("Planet has no build-job");
             expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.body.data).to.be.empty;
           });
       });
     });
-  });
 
-  it("should fail (missing buildingID-parameter)", () => {
-    const planetID = 167546850;
+    it("should fail (missing buildingID-parameter)", () => {
+      const planetID = 167546850;
 
-    return request
-      .post("/v1/buildings/build")
-      .set("Authorization", authToken)
-      .send({ planetID })
-      .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-      });
-  });
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID })
+        .then(res => {
+          expect(res.body.message).equals("Invalid parameter");
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
+        });
+    });
 
-  it("should fail (missing planetID-parameter)", () => {
-    return request
-      .post("/v1/buildings/build")
-      .set("Authorization", authToken)
-      .send({ buildingID: 1 })
-      .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-      });
-  });
+    it("should fail (missing planetID-parameter)", () => {
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ buildingID: 1 })
+        .then(res => {
+          expect(res.body.message).equals("Invalid parameter");
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
+        });
+    });
 
-  it("should fail (buildingID is negative)", () => {
-    const planetID = 167546850;
+    it("should fail (buildingID is negative)", () => {
+      const planetID = 167546850;
 
-    return request
-      .post("/v1/buildings/build")
-      .set("Authorization", authToken)
-      .send({ planetID, buildingID: -1 })
-      .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-      });
-  });
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID, buildingID: -1 })
+        .then(res => {
+          expect(res.body.message).equals("Invalid parameter");
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
+        });
+    });
 
-  it("should fail (buildingID is higher than global maximum)", () => {
-    const planetID = 167546850;
+    it("should fail (buildingID is higher than global maximum)", () => {
+      const planetID = 167546850;
 
-    return request
-      .post("/v1/buildings/build")
-      .set("Authorization", authToken)
-      .send({ planetID, buildingID: 100 })
-      .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-      });
-  });
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID, buildingID: 100 })
+        .then(res => {
+          expect(res.body.message).equals("Invalid parameter");
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
+        });
+    });
 
-  it("should fail (player does not own planet)", () => {
-    return request
-      .post("/v1/buildings/build")
-      .set("Authorization", authToken)
-      .send({ planetID: 1234, buildingID: 1 })
-      .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-      });
-  });
+    it("should fail (player does not own planet)", () => {
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID: 1234, buildingID: 1 })
+        .then(res => {
+          expect(res.body.message).equals("Invalid parameter");
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
+        });
+    });
 
-  // TODO: check, if ressources are correctly subtracted/added after build-request and cancelation
-  describe("build and cancel a build-order", () => {
     it("should fail (player does not own the planet)", () => {
       const planetID = 12;
 
@@ -248,6 +270,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -261,6 +284,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Job started");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data.planet.planetID).to.be.equals(planetID);
         });
     });
 
@@ -274,6 +298,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Planet already has a build-job");
           expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -287,6 +312,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.data).to.be.empty;
         });
     });
 
@@ -312,6 +338,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Planet has no build-job");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.empty;
         });
     });
   });

@@ -23,6 +23,7 @@ describe("authRoute", () => {
       .then(res => {
         expect(res.body.message).equals("Success");
         expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.data.token).to.not.be.null;
       });
   });
 

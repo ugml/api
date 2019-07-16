@@ -41,13 +41,7 @@ class InputValidator {
   }
 
   public static isSet(input: any): boolean {
-    return !(
-      input === undefined ||
-      input === "" ||
-      typeof input === "undefined" ||
-      input === null ||
-      input.length === 0
-    );
+    return !(input === "" || typeof input === "undefined" || input === null || input.length === 0);
   }
 
   public static sanitizeString(input: string): string {

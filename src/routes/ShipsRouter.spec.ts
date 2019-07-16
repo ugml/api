@@ -35,7 +35,7 @@ describe("shipsRouter", () => {
   });
 
   it("should return a list of ships on the planet", () => {
-    let planetID = 167546850;
+    const planetID = 167546850;
     return request
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
@@ -47,7 +47,7 @@ describe("shipsRouter", () => {
   });
 
   it("should fail (planetID invalid)", () => {
-    let planetID = "asdf";
+    const planetID = "asdf";
     return request
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)

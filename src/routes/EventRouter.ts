@@ -22,7 +22,6 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
 //  loaded resources > storage?
 
 export class EventRouter {
-  public router: Router;
 
   // TODO: relocate to own file with other game-related calculations
   /**
@@ -147,6 +146,7 @@ export class EventRouter {
 
     return missionTypeID;
   }
+  public router: Router;
 
   /**
    * Initialize the Router

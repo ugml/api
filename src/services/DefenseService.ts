@@ -24,7 +24,7 @@ export class DefenseService {
       .where("p.ownerID = ?", userID)
       .toString();
 
-    let [[rows]] = await Database.query(query);
+    const [[rows]] = await Database.query(query);
 
     return rows;
   }

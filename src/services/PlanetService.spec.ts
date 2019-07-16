@@ -16,7 +16,7 @@ describe("PlanetService", () => {
   });
 
   it("should update a planet", async () => {
-    let planet: Planet = await PlanetService.getPlanet(1, 167546850, true);
+    const planet: Planet = await PlanetService.getPlanet(1, 167546850, true);
 
     planet.name = "SomethingElse";
 

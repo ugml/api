@@ -39,7 +39,7 @@ export class DefenseRouter {
       const planetID = parseInt(request.params.planetID);
       const userID = parseInt(request.userID, 10);
 
-      let defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
+      const defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({

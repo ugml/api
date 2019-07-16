@@ -40,7 +40,7 @@ export class GalaxyRouter {
       const galaxy = parseInt(request.params.galaxy, 10);
       const system = parseInt(request.params.system, 10);
 
-      if (galaxy < 1 || galaxy > Config.Get["pos_galaxy_max"] || system < 1 || system > Config.Get["pos_system_max"]) {
+      if (galaxy < 1 || galaxy > Config.Get.pos_galaxy_max || system < 1 || system > Config.Get.pos_system_max) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",

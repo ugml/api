@@ -28,7 +28,7 @@ export class ShipService {
       .where("p.ownerID = ?", userID)
       .toString();
 
-    let [[rows]] = await Database.query(query.toString());
+    const [[rows]] = await Database.query(query.toString());
 
     if (!InputValidator.isSet(rows)) {
       return null;

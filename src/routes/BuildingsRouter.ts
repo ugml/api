@@ -73,8 +73,8 @@ export class BuildingsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      let planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
-      let buildings: Buildings = await BuildingService.getBuildings(planetID);
+      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await BuildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({

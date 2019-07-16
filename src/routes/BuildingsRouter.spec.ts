@@ -77,7 +77,7 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID: planetID })
+        .send({ planetID })
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
@@ -103,7 +103,7 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID: planetID, buildingID: -1 })
+        .send({ planetID, buildingID: -1 })
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
@@ -117,7 +117,7 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID: planetID, buildingID: 100 })
+        .send({ planetID, buildingID: 100 })
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
@@ -145,7 +145,7 @@ describe("buildingsRoute", () => {
         return request
           .post("/v1/buildings/build")
           .set("Authorization", authToken)
-          .send({ planetID: planetID, buildingID: 1 })
+          .send({ planetID, buildingID: 1 })
           .then(res => {
             expect(res.body.message).equals("Job started");
             expect(res.status).to.equals(Globals.Statuscode.SUCCESS);

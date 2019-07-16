@@ -175,7 +175,7 @@ describe("planetsRouter", () => {
 
     return request
       .post("/v1/planets/rename")
-      .send({ planetID: planetID, name: "FancyNewName" })
+      .send({ planetID, name: "FancyNewName" })
       .set("Authorization", authToken)
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);

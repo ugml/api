@@ -16,7 +16,7 @@ export class BuildingService {
         .toString();
 
       // execute the query
-      let [rows] = await Database.query(query);
+      const [rows] = await Database.query(query);
 
       if (!InputValidator.isSet(rows)) {
         return null;

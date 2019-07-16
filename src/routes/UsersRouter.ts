@@ -135,8 +135,8 @@ export class UsersRouter {
 
     const connection = await Database.getConnectionPool().getConnection();
 
-    let newUser: User = new User();
-    let newPlanet: Planet = new Planet();
+    const newUser: User = new User();
+    const newPlanet: Planet = new Planet();
 
     try {
       await connection.beginTransaction();
@@ -312,7 +312,7 @@ export class UsersRouter {
         return;
       }
 
-      let user: User = await UserService.getAuthenticatedUser(parseInt(request.userID, 10));
+      const user: User = await UserService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
         user.username = InputValidator.sanitizeString(request.body.username);

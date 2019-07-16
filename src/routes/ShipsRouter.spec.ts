@@ -49,6 +49,69 @@ describe("shipsRouter", () => {
       });
   });
 
+  it("should fail (planetID invalid)", () => {
+    return request
+      .post("/v1/ships/build")
+      .set("Authorization", authToken)
+      .send({ planetID: "sadf", buildOrder: { 201: 3 } })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+      });
+  });
+
+  it("should fail (invalid build-order, wrong unit-key)", () => {
+    return request
+      .post("/v1/ships/build")
+      .set("Authorization", authToken)
+      .send({ planetID: 167546850, buildOrder: { hallo: 3 } })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+      });
+  });
+
+  it("should fail (invalid build-order, wrong amount)", () => {
+    return request
+      .post("/v1/ships/build")
+      .set("Authorization", authToken)
+      .send({ planetID: 167546850, buildOrder: { 201: "asdf" } })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+      });
+  });
+
+  it("should fail (invalid build-order, not a ship)", () => {
+    return request
+      .post("/v1/ships/build")
+      .set("Authorization", authToken)
+      .send({ planetID: 167546850, buildOrder: "{ \"305\": 3 }" })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data).to.be.empty;
+      });
+  });
+
+  it("should add a new build-order", () => {
+    return request
+      .post("/v1/ships/build")
+      .set("Authorization", authToken)
+      .send({ planetID: 167546850, buildOrder: "{ \"201\": 3 }" })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data.planetID).to.be.equals(167546850);
+        const buildOrders = JSON.parse(res.body.data.b_hangar_id);
+        expect(buildOrders.length).to.be.greaterThan(1);
+        expect(buildOrders[0].planetID).to.be.equals(167546850);
+      });
+  });
+
   // TODO:
   // /v1/ships/build/
 });

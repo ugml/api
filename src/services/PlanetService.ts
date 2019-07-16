@@ -37,7 +37,7 @@ export class PlanetService {
     return SerializationHelper.toInstance(new Planet(), JSON.stringify(rows[0]));
   }
 
-  public static async updatePlanet(planet: Planet): Promise<boolean> {
+  public static async updatePlanet(planet: Planet): Promise<Planet> {
     try {
       let query = squel.update().table("planets");
 
@@ -137,11 +137,11 @@ export class PlanetService {
 
       await Database.query(query.toString());
 
-      return true;
+      return planet;
     } catch (error) {
       Logger.error(error);
 
-      return false;
+      return null;
     }
   }
 

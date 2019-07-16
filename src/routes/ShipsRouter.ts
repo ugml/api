@@ -72,14 +72,7 @@ export class ShipsRouter {
         });
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
       const buildOrders = JSON.parse(request.body.buildOrder);
-
-      const queueItem: QueueItem = new QueueItem();
-
-      queueItem.setPlanetID(request.body.planetID);
 
       // validate build-order
       if (!units.isValidBuildOrder(buildOrders, UnitType.SHIP)) {
@@ -89,6 +82,13 @@ export class ShipsRouter {
           data: {},
         });
       }
+
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+
+      const queueItem: QueueItem = new QueueItem();
+
+      queueItem.setPlanetID(planetID);
 
       const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await BuildingService.getBuildings(planetID);
@@ -176,11 +176,18 @@ export class ShipsRouter {
       queueItem.setTimeRemaining(buildTime);
       queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
-      if (InputValidator.isSet(planet.b_hangar_id)) {
-        planet.b_hangar_id += ", ";
+      let oldBuildOrder;
+
+      if (!InputValidator.isSet(planet.b_hangar_id)) {
+        planet.b_hangar_id = JSON.parse("[]");
+        oldBuildOrder = planet.b_hangar_id;
+      } else {
+        oldBuildOrder = JSON.parse(planet.b_hangar_id);
       }
 
-      planet.b_hangar_id += JSON.stringify(queueItem);
+      oldBuildOrder.push(queueItem);
+
+      planet.b_hangar_id = JSON.stringify(oldBuildOrder);
 
       if (planet.b_hangar_start_time === 0) {
         planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
@@ -190,10 +197,12 @@ export class ShipsRouter {
       planet.crystal = crystal;
       planet.deuterium = deuterium;
 
+      await PlanetService.updatePlanet(planet);
+
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: {},
+        data: planet,
       });
     } catch (error) {
       Logger.error(error);

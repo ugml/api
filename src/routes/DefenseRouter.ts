@@ -92,7 +92,7 @@ export class DefenseRouter {
       }
 
       const buildings: Buildings = await BuildingService.getBuildings(planetID);
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
       const defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
 
       if (!InputValidator.isSet(buildings) || !InputValidator.isSet(planet)) {
@@ -201,17 +201,27 @@ export class DefenseRouter {
       queueItem.setTimeRemaining(buildTime);
       queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
-      if (InputValidator.isSet(planet.b_hangar_id)) {
-        planet.b_hangar_id += ", ";
+      let oldBuildOrder;
+
+      if (!InputValidator.isSet(planet.b_hangar_id)) {
+        planet.b_hangar_id = JSON.parse("[]");
+        oldBuildOrder = planet.b_hangar_id;
+      } else {
+        oldBuildOrder = JSON.parse(planet.b_hangar_id);
       }
 
-      planet.b_hangar_id += JSON.stringify(queueItem);
+      oldBuildOrder.push(queueItem);
+
+      planet.b_hangar_id = JSON.stringify(oldBuildOrder);
 
       if (planet.b_hangar_start_time === 0) {
         planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
       }
 
-      // update planet
+      planet.metal = metal;
+      planet.crystal = crystal;
+      planet.deuterium = deuterium;
+
       await PlanetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({

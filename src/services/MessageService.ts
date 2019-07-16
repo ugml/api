@@ -32,7 +32,7 @@ export class MessageService {
     return rows;
   }
 
-  public static async getMessageById(userID: number, messageID: number) : Promise<Message> {
+  public static async getMessageById(userID: number, messageID: number): Promise<Message> {
     const query: string = squel
       .select()
       .from("messages")

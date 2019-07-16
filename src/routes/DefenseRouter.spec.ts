@@ -61,7 +61,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data.planetID).equals(planetID);
       });
   });
 
@@ -73,7 +73,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -87,7 +87,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -98,7 +98,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.empty;
       });
   });
 
@@ -112,7 +112,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.empty;
       });
   });
 });

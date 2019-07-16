@@ -217,7 +217,7 @@ export class DefenseRouter {
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: {},
+        data: planet,
       });
     } catch (error) {
       Logger.error(error);

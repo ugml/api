@@ -58,7 +58,7 @@ export class MessagesRouter {
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: message,
+        data: message || {},
       });
     } catch (error) {
       Logger.error(error);

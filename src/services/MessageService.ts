@@ -1,5 +1,7 @@
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
+import { SerializationHelper } from "../common/SerializationHelper";
+import { Message } from "../units/Message";
 
 import squel = require("squel");
 
@@ -30,7 +32,7 @@ export class MessageService {
     return rows;
   }
 
-  public static async getMessageById(userID: number, messageID: number) {
+  public static async getMessageById(userID: number, messageID: number) : Promise<Message> {
     const query: string = squel
       .select()
       .from("messages")
@@ -47,13 +49,13 @@ export class MessageService {
       .toString();
 
     // execute the query
-    let [rows] = await Database.query(query);
+    let [rows] = await Database.query(query.toString());
 
     if (!InputValidator.isSet(rows)) {
-      return {};
+      return null;
     }
 
-    return rows;
+    return SerializationHelper.toInstance(new Message(), JSON.stringify(rows[0]));
   }
 
   public static async deleteMessage(userID: number, messageID: number) {

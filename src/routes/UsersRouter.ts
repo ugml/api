@@ -92,12 +92,12 @@ export class UsersRouter {
         });
       }
 
-      const data = await UserService.getUserById(request.params.userID);
+      const user = await UserService.getUserById(request.params.userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: data,
+        data: user || {},
       });
     } catch (error) {
       Logger.error(error);

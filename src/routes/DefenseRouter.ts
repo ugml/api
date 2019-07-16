@@ -36,7 +36,7 @@ export class DefenseRouter {
         });
       }
 
-      const planetID = parseInt(request.params.planetID);
+      const planetID = parseInt(request.params.planetID, 10);
       const userID = parseInt(request.userID, 10);
 
       const defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
@@ -45,7 +45,7 @@ export class DefenseRouter {
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: defenses,
+        data: defenses || {},
       });
     } catch (error) {
       Logger.error(error);

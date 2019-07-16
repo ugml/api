@@ -106,9 +106,9 @@ describe("planetsRouter", () => {
         expect(res.body.data[0].galaxy).to.be.equals(4);
         expect(res.body.data[0].system).to.be.equals(71);
         expect(res.body.data[0].planet).to.be.equals(2);
-        expect(res.body.data[0].metal).to.be.undefined;
-        expect(res.body.data[0].crystal).to.be.undefined;
-        expect(res.body.data[0].deuterium).to.be.undefined;
+        expect(res.body.data[0].metal).to.be.equals(undefined);
+        expect(res.body.data[0].crystal).to.be.equals(undefined);
+        expect(res.body.data[0].deuterium).to.be.equals(undefined);
       });
   });
 

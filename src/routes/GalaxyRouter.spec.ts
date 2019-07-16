@@ -85,7 +85,7 @@ describe("galaxyRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).equals("Success");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.data).to.be.eql([]);
       });
   });
 

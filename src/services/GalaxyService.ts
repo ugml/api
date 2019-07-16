@@ -31,8 +31,10 @@ export class GalaxyService {
     planet: number,
     connection = null,
   ) {
+    /* tslint:disable:max-line-length*/
     // eslint-disable-next-line max-len
     const query = `INSERT INTO galaxy(\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`) VALUES (${planetID}, ${galaxy}, ${system}, ${planet});`;
+    /* tslint:enable:max-line-length*/
 
     if (connection === null) {
       return await Database.query(query);

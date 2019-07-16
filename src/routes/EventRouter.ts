@@ -22,7 +22,6 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
 //  loaded resources > storage?
 
 export class EventRouter {
-
   // TODO: relocate to own file with other game-related calculations
   /**
    * Calculates the distances between two planets

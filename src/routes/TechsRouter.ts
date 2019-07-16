@@ -1,4 +1,4 @@
-import { NextFunction, response, Response, Router } from "express";
+import { NextFunction, Response, Router } from "express";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";

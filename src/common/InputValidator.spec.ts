@@ -10,7 +10,7 @@ describe("InputValidator", function() {
   });
 
   it("Valid Int", function() {
-    let num = 12;
+    const num = 12;
     assert.equal(InputValidator.isValidInt(`${12}`), true);
   });
 

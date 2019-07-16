@@ -31,7 +31,7 @@ describe("App", () => {
 
     return request.get(`/v1/buildings/${planetID}`).then(res => {
       expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
-      expect(res.body.data).to.be.empty;
+      expect(res.body.data).to.be.eql({});
       expect(res.body.message).to.be.equals("Authentication failed");
     });
   });
@@ -43,7 +43,7 @@ describe("App", () => {
       .set("Authorization", JwtHelper.generateToken(parseInt("iAmNotAValidUserId", 10)))
       .then(res => {
         expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
         expect(res.body.message).to.be.equals("Authentication failed");
       });
   });
@@ -54,7 +54,7 @@ describe("App", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.equals(Globals.Statuscode.NOT_FOUND);
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
         expect(res.body.message).to.be.equals("The route does not exist");
       });
   });

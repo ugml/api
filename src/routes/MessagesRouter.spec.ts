@@ -65,7 +65,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -76,7 +76,7 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -89,7 +89,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Message sent");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -101,7 +101,7 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -113,7 +113,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -126,7 +126,7 @@ describe("messagesRouter", () => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 });

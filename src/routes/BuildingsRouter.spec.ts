@@ -54,7 +54,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Success");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-          expect(res.body.data).to.be.null;
+          expect(res.body.data).to.be.equals(null);
         });
     });
 
@@ -65,7 +65,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
   });
@@ -81,7 +81,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -93,7 +93,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -107,7 +107,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -121,7 +121,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -133,7 +133,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -163,7 +163,7 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.body.message).equals("Planet already has a build-job");
             expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
-            expect(res.body.data).to.be.empty;
+            expect(res.body.data).to.be.eql({});
           });
       });
       it("cancel the build-order", () => {
@@ -189,7 +189,7 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.body.message).equals("Planet has no build-job");
             expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-            expect(res.body.data).to.be.empty;
+            expect(res.body.data).to.be.eql({});
           });
       });
     });
@@ -204,7 +204,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -216,7 +216,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -230,7 +230,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -244,7 +244,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -256,7 +256,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -270,7 +270,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -298,7 +298,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Planet already has a build-job");
           expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -312,7 +312,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
 
@@ -338,7 +338,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Planet has no build-job");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-          expect(res.body.data).to.be.empty;
+          expect(res.body.data).to.be.eql({});
         });
     });
   });

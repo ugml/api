@@ -176,7 +176,7 @@ export class BuildingsRouter {
         (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
           buildingID === Globals.Buildings.NANITE_FACTORY ||
           buildingID === Globals.Buildings.SHIPYARD) &&
-        (planet.b_hangar_id.length > 0 || planet.b_hangar_start_time > 0)
+        (planet.b_hangar_queue.length > 0 || planet.b_hangar_start_time > 0)
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,

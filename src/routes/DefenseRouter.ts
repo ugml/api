@@ -203,16 +203,16 @@ export class DefenseRouter {
 
       let oldBuildOrder;
 
-      if (!InputValidator.isSet(planet.b_hangar_id)) {
-        planet.b_hangar_id = JSON.parse("[]");
-        oldBuildOrder = planet.b_hangar_id;
+      if (!InputValidator.isSet(planet.b_hangar_queue)) {
+        planet.b_hangar_queue = JSON.parse("[]");
+        oldBuildOrder = planet.b_hangar_queue;
       } else {
-        oldBuildOrder = JSON.parse(planet.b_hangar_id);
+        oldBuildOrder = JSON.parse(planet.b_hangar_queue);
       }
 
       oldBuildOrder.push(queueItem);
 
-      planet.b_hangar_id = JSON.stringify(oldBuildOrder);
+      planet.b_hangar_queue = JSON.stringify(oldBuildOrder);
 
       if (planet.b_hangar_start_time === 0) {
         planet.b_hangar_start_time = Math.floor(Date.now() / 1000);

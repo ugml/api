@@ -203,7 +203,7 @@ CREATE TABLE `planets` (
                            `b_building_endtime` int(10) DEFAULT NULL,
                            `b_tech_id` int(3) DEFAULT NULL,
                            `b_tech_endtime` int(10) DEFAULT NULL,
-                           `b_hangar_id` text,
+                           `b_hangar_queue` text,
                            `b_hangar_start_time` int(11) NOT NULL DEFAULT '0',
                            `b_hangar_plus` tinyint(1) NOT NULL DEFAULT '0',
                            `destroyed` tinyint(1) NOT NULL DEFAULT '0',

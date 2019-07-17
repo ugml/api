@@ -117,59 +117,59 @@ export class ShipsRouter {
       let buildTime = 0;
 
       for (const item in buildOrders) {
-        if (buildOrders.hasOwnProperty(item)) {
-          let count: number = buildOrders[item];
-          const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.SHIP);
-
-          // if the user has not enough ressources to fullfill the complete build-order
-          if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-            let tempCount: number;
-
-            if (cost.metal > 0) {
-              tempCount = metal / cost.metal;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            if (cost.crystal > 0) {
-              tempCount = crystal / cost.crystal;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            if (cost.deuterium > 0) {
-              tempCount = deuterium / cost.deuterium;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            // no need to further process the queue
-            stopProcessing = true;
-          }
-
-          // build time in seconds
-          buildTime +=
-            units.getBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
-            Math.floor(count);
-
-          queueItem.addToQueue(item, Math.floor(count));
-
-          metal -= cost.metal * count;
-          crystal -= cost.crystal * count;
-          deuterium -= cost.deuterium * count;
-
-          if (stopProcessing) {
-            break;
-          }
-        } else {
+        if (!buildOrders.hasOwnProperty(item)) {
           // TODO: throw a meaningful error
           throw Error();
+        }
+
+        let count: number = buildOrders[item];
+        const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.SHIP);
+
+        // if the user has not enough ressources to fullfill the complete build-order
+        if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+          let tempCount: number;
+
+          if (cost.metal > 0) {
+            tempCount = metal / cost.metal;
+
+            if (tempCount < count) {
+              count = tempCount;
+            }
+          }
+
+          if (cost.crystal > 0) {
+            tempCount = crystal / cost.crystal;
+
+            if (tempCount < count) {
+              count = tempCount;
+            }
+          }
+
+          if (cost.deuterium > 0) {
+            tempCount = deuterium / cost.deuterium;
+
+            if (tempCount < count) {
+              count = tempCount;
+            }
+          }
+
+          // no need to further process the queue
+          stopProcessing = true;
+        }
+
+        // build time in seconds
+        buildTime +=
+          units.getBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
+          Math.floor(count);
+
+        queueItem.addToQueue(item, Math.floor(count));
+
+        metal -= cost.metal * count;
+        crystal -= cost.crystal * count;
+        deuterium -= cost.deuterium * count;
+
+        if (stopProcessing) {
+          break;
         }
       }
 
@@ -178,16 +178,16 @@ export class ShipsRouter {
 
       let oldBuildOrder;
 
-      if (!InputValidator.isSet(planet.b_hangar_id)) {
-        planet.b_hangar_id = JSON.parse("[]");
-        oldBuildOrder = planet.b_hangar_id;
+      if (!InputValidator.isSet(planet.b_hangar_queue)) {
+        planet.b_hangar_queue = JSON.parse("[]");
+        oldBuildOrder = planet.b_hangar_queue;
       } else {
-        oldBuildOrder = JSON.parse(planet.b_hangar_id);
+        oldBuildOrder = JSON.parse(planet.b_hangar_queue);
       }
 
       oldBuildOrder.push(queueItem);
 
-      planet.b_hangar_id = JSON.stringify(oldBuildOrder);
+      planet.b_hangar_queue = JSON.stringify(oldBuildOrder);
 
       if (planet.b_hangar_start_time === 0) {
         planet.b_hangar_start_time = Math.floor(Date.now() / 1000);

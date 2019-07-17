@@ -117,8 +117,8 @@ export class PlanetService {
         query = query.set("b_tech_endtime", planet.b_tech_endtime);
       }
 
-      if (typeof planet.b_hangar_id !== "undefined") {
-        query = query.set("b_hangar_id", planet.b_hangar_id);
+      if (typeof planet.b_hangar_queue !== "undefined") {
+        query = query.set("b_hangar_queue", planet.b_hangar_queue);
       }
 
       if (typeof planet.b_hangar_start_time !== "undefined") {

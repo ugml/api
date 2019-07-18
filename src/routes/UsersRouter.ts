@@ -1,4 +1,6 @@
+import "reflect-metadata";
 import { NextFunction, Request, Response, Router } from "express";
+import { inject } from "inversify";
 import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
@@ -6,13 +8,7 @@ import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { IGameConfig } from "../interfaces/IGameConfig";
-import { BuildingService } from "../services/BuildingService";
-import { DefenseService } from "../services/DefenseService";
-import { ShipService } from "../services/ShipService";
-import { GalaxyService } from "../services/GalaxyService";
-import { PlanetService } from "../services/PlanetService";
-import { TechService } from "../services/TechService";
-import { UserService } from "../services/UserService";
+import { TYPES } from "../types";
 import { Planet, PlanetType } from "../units/Planet";
 import { User } from "../units/User";
 import { PlanetsRouter } from "./PlanetsRouter";
@@ -23,6 +19,14 @@ import { JwtHelper } from "../common/JwtHelper";
 
 export class UsersRouter {
   public router: Router;
+
+  @inject(TYPES.IUserService) private userService;
+  @inject(TYPES.IGalaxyService) private galaxyService;
+  @inject(TYPES.IPlanetService) private planetService;
+  @inject(TYPES.IBuildingService) private buildingService;
+  @inject(TYPES.IDefenseService) private defenseService;
+  @inject(TYPES.IShipService) private shipService;
+  @inject(TYPES.ITechService) private techService;
 
   public constructor() {
     this.router = Router();
@@ -63,7 +67,7 @@ export class UsersRouter {
         });
       }
 
-      const data = await UserService.getAuthenticatedUser(parseInt(request.userID, 10));
+      const data = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -92,7 +96,7 @@ export class UsersRouter {
         });
       }
 
-      const user = await UserService.getUserById(request.params.userID);
+      const user = await this.userService.getUserById(request.params.userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -141,7 +145,7 @@ export class UsersRouter {
     try {
       await connection.beginTransaction();
 
-      const data = await UserService.checkIfNameOrMailIsTaken(username, email);
+      const data = await this.userService.checkIfNameOrMailIsTaken(username, email);
 
       if (data.username_taken === 1) {
         throw new DuplicateRecordException("Username is already taken");
@@ -156,7 +160,7 @@ export class UsersRouter {
       newUser.username = username;
       newUser.email = email;
 
-      const userID = await UserService.getNewId();
+      const userID = await this.userService.getNewId();
 
       newUser.userID = userID;
       newPlanet.ownerID = userID;
@@ -165,14 +169,14 @@ export class UsersRouter {
 
       Logger.info("Getting a new planetID");
 
-      const planetID = await PlanetService.getNewId();
+      const planetID = await await this.planetService.getNewId();
 
       newUser.currentplanet = planetID;
       newPlanet.planetID = planetID;
 
       Logger.info("Finding free position for new planet");
 
-      const galaxyData = await GalaxyService.getFreePosition(
+      const galaxyData = await this.galaxyService.getFreePosition(
         gameConfig.pos_galaxy_max,
         gameConfig.pos_system_max,
         4,
@@ -185,7 +189,7 @@ export class UsersRouter {
 
       Logger.info("Creating a new user");
 
-      await UserService.createNewUser(newUser, connection);
+      await this.userService.createNewUser(newUser, connection);
 
       Logger.info("Creating a new planet");
 
@@ -231,23 +235,23 @@ export class UsersRouter {
         }
       }
 
-      await PlanetService.createNewPlanet(newPlanet, connection);
+      await await this.planetService.createNewPlanet(newPlanet, connection);
 
       Logger.info("Creating entry in buildings-table");
 
-      await BuildingService.createBuildingsRow(newPlanet.planetID, connection);
+      await this.buildingService.createBuildingsRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in defenses-table");
 
-      await DefenseService.createDefenseRow(newPlanet.planetID, connection);
+      await this.defenseService.createDefenseRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in ships-table");
 
-      await ShipService.createShipsRow(newPlanet.planetID, connection);
+      await this.shipService.createShipsRow(newPlanet.planetID, connection);
 
       Logger.info("Creating entry in galaxy-table");
 
-      await GalaxyService.createGalaxyRow(
+      await this.galaxyService.createGalaxyRow(
         newPlanet.planetID,
         newPlanet.galaxy,
         newPlanet.system,
@@ -257,7 +261,7 @@ export class UsersRouter {
 
       Logger.info("Creating entry in techs-table");
 
-      await TechService.createTechRow(newUser.userID, connection);
+      await this.techService.createTechRow(newUser.userID, connection);
 
       connection.commit();
 
@@ -312,7 +316,7 @@ export class UsersRouter {
         return;
       }
 
-      const user: User = await UserService.getAuthenticatedUser(parseInt(request.userID, 10));
+      const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
         user.username = InputValidator.sanitizeString(request.body.username);
@@ -328,7 +332,7 @@ export class UsersRouter {
         user.email = InputValidator.sanitizeString(request.body.email);
       }
 
-      await UserService.updateUserData(user);
+      await this.userService.updateUserData(user);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -373,7 +377,7 @@ export class UsersRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      const planet: Planet = await await this.planetService.getPlanet(userID, planetID);
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -383,11 +387,11 @@ export class UsersRouter {
         });
       }
 
-      const user: User = await UserService.getUserById(userID);
+      const user: User = await this.userService.getUserById(userID);
 
       user.currentplanet = planetID;
 
-      await UserService.updateUserData(user);
+      await this.userService.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

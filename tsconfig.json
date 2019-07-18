@@ -2,16 +2,21 @@
   "compilerOptions": {
     "watch": true,
     "target": "es6",
+    "lib": ["es6", "dom"],
     "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "dist",
     "types": [
       // add node as an option
       "node",
-      "mocha"
+      "mocha",
+      "reflect-metadata"
     ],
     "typeRoots" : [
       "node_modules/@types"
-    ]
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "compileOnSave": true,
   "include": [

@@ -1,19 +1,25 @@
+import "reflect-metadata";
 import { NextFunction, Request, Response, Router } from "express";
-
+import { inject, injectable } from "inversify";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
 import { Logger } from "../common/Logger";
-import { UserService } from "../services/UserService";
+import { IUserService } from "../interfaces/IUserService";
+import { myContainer } from "../inversify.config";
+import { TYPES } from "../types";
 
 const bcrypt = require("bcryptjs");
 
 export class AuthRouter {
   public router: Router;
+  private userService: IUserService;
 
   public constructor() {
     this.router = Router();
     this.init();
+
+    this.userService = myContainer.get<IUserService>(TYPES.IUserService);
   }
 
   /***
@@ -39,7 +45,7 @@ export class AuthRouter {
 
       const password: string = InputValidator.sanitizeString(req.body.password);
 
-      const data = await UserService.getUserForAuthentication(email);
+      const data = await this.userService.getUserForAuthentication(email);
 
       if (!InputValidator.isSet(data)) {
         return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({

@@ -1,4 +1,6 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
@@ -6,9 +8,7 @@ import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { BuildingService } from "../services/BuildingService";
-import { PlanetService } from "../services/PlanetService";
-import { TechService } from "../services/TechService";
+import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 import { Techs } from "../units/Techs";
@@ -17,6 +17,10 @@ const units = new Units();
 
 export class TechsRouter {
   public router: Router;
+
+  @inject(TYPES.IPlanetService) private planetService;
+  @inject(TYPES.IBuildingService) private buildingService;
+  @inject(TYPES.ITechService) private techService;
 
   /**
    * Initialize the Router
@@ -36,7 +40,7 @@ export class TechsRouter {
     try {
       const userID = parseInt(request.userID, 10);
 
-      const techs: Techs = await TechService.getTechs(userID);
+      const techs: Techs = await this.techService.getTechs(userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -67,8 +71,8 @@ export class TechsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
-      const techs: Techs = await TechService.getTechs(userID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+      const techs: Techs = await this.techService.getTechs(userID);
 
       // player does not own the planet
       if (!InputValidator.isSet(planet)) {
@@ -100,7 +104,7 @@ export class TechsRouter {
       planet.b_tech_id = 0;
       planet.b_tech_endtime = 0;
 
-      await PlanetService.updatePlanet(planet);
+      await this.planetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -145,9 +149,9 @@ export class TechsRouter {
       const planetID = parseInt(request.body.planetID, 10);
       const techID = parseInt(request.body.techID, 10);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await BuildingService.getBuildings(planetID);
-      const techs: Techs = await TechService.getTechs(userID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const techs: Techs = await this.techService.getTechs(userID);
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -241,7 +245,7 @@ export class TechsRouter {
       planet.b_tech_id = techID;
       planet.b_tech_endtime = endTime;
 
-      await PlanetService.updatePlanet(planet);
+      await this.planetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

@@ -1,15 +1,20 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
+import { IUserService } from "../interfaces/IUserService";
 import { User } from "../units/User";
 import squel = require("squel");
 
-export class UserService {
+@injectable()
+class UserService implements IUserService {
+  public constructor() {}
   /**
    * Returns all information about an authenticated user.
    * @param userID The ID of the currently authenticated user
    */
-  public static async getAuthenticatedUser(userID: number): Promise<User> {
+  public async getAuthenticatedUser(userID: number): Promise<User> {
     const query: string = squel
       .select()
       .field("userID")
@@ -32,7 +37,7 @@ export class UserService {
    * @param userID The ID of the user
    * @returns A user-object
    */
-  public static async getUserById(userID: number): Promise<User> {
+  public async getUserById(userID: number): Promise<User> {
     const query: string = squel
       .select()
       .distinct()
@@ -57,7 +62,7 @@ export class UserService {
    * @param email The email of the user
    * @returns A user-object
    */
-  public static async getUserForAuthentication(email: string): Promise<User> {
+  public async getUserForAuthentication(email: string): Promise<User> {
     const query: string = squel
       .select({ autoQuoteFieldNames: true })
       .field("userID")
@@ -76,7 +81,7 @@ export class UserService {
     return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
   }
 
-  public static async checkIfNameOrMailIsTaken(username: string, email: string) {
+  public async checkIfNameOrMailIsTaken(username: string, email: string) {
     const query =
       `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
       `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
@@ -90,7 +95,7 @@ export class UserService {
    * Returns a new userID
    * @returns The new ID
    */
-  public static async getNewId(): Promise<number> {
+  public async getNewId(): Promise<number> {
     const queryUser = "CALL getNewUserId();";
 
     const [[[result]]] = await Database.query(queryUser);
@@ -103,7 +108,7 @@ export class UserService {
    * @param user A user-object
    * @param connection An open database-connection, if the query should be run within a transaction
    */
-  public static async createNewUser(user: User, connection) {
+  public async createNewUser(user: User, connection) {
     const query: string = squel
       .insert({ autoQuoteFieldNames: true })
       .into("users")
@@ -127,7 +132,7 @@ export class UserService {
    * @param user A user-object
    * @param connection An open database-connection, if the query should be run within a transaction
    */
-  public static async updateUserData(user: User, connection = null) {
+  public async updateUserData(user: User, connection = null) {
     let query = squel.update().table("users");
 
     if (typeof user.username !== "undefined") {
@@ -159,3 +164,5 @@ export class UserService {
     }
   }
 }
+
+export { UserService };

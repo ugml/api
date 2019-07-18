@@ -1,11 +1,15 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { ICoordinates } from "../interfaces/ICoordinates";
+import { IGalaxyService } from "../interfaces/IGalaxyService";
 import { PlanetType } from "../units/Planet";
 
 import squel = require("squel");
 
-export class GalaxyService {
-  public static async getFreePosition(
+@injectable()
+export class GalaxyService implements IGalaxyService {
+  public async getFreePosition(
     maxGalaxy: number,
     maxSystem: number,
     minPlanet: number,
@@ -24,13 +28,7 @@ export class GalaxyService {
     };
   }
 
-  public static async createGalaxyRow(
-    planetID: number,
-    galaxy: number,
-    system: number,
-    planet: number,
-    connection = null,
-  ) {
+  public async createGalaxyRow(planetID: number, galaxy: number, system: number, planet: number, connection = null) {
     /* tslint:disable:max-line-length*/
     // eslint-disable-next-line max-len
     const query = `INSERT INTO galaxy(\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`) VALUES (${planetID}, ${galaxy}, ${system}, ${planet});`;
@@ -43,7 +41,7 @@ export class GalaxyService {
     return await connection.query(query);
   }
 
-  public static async getGalaxyInfo(galaxy: number, system: number) {
+  public async getGalaxyInfo(galaxy: number, system: number) {
     const query: string = squel
       .select()
       .field("p.planetID")

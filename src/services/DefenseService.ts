@@ -1,9 +1,13 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
+import { IDefenseService } from "../interfaces/IDefenseService";
 
 import squel = require("squel");
 
-export class DefenseService {
-  public static async createDefenseRow(planetID: number, connection = null) {
+@injectable()
+export class DefenseService implements IDefenseService {
+  public async createDefenseRow(planetID: number, connection = null) {
     const query = `INSERT INTO defenses (\`planetID\`) VALUES (${planetID});`;
 
     if (connection === null) {
@@ -13,7 +17,7 @@ export class DefenseService {
     return await connection.query(query);
   }
 
-  public static async getDefenses(userID: number, planetID: number) {
+  public async getDefenses(userID: number, planetID: number) {
     const query: string = squel
       .select()
       .field("p.ownerID", "ownerID")

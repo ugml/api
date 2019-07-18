@@ -1,11 +1,12 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { BuildingService } from "../services/BuildingService";
-import { PlanetService } from "../services/PlanetService";
+import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
@@ -15,6 +16,9 @@ const units = new Units();
 
 export class BuildingsRouter {
   public router: Router;
+
+  @inject(TYPES.IPlanetService) private planetService;
+  @inject(TYPES.IBuildingService) private buildingService;
 
   /**
    * Initialize the Router
@@ -41,7 +45,7 @@ export class BuildingsRouter {
       }
 
       // TODO: check if user owns the planet
-      const data = await BuildingService.getBuildings(request.params.planetID);
+      const data = await this.buildingService.getBuildings(request.params.planetID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -73,8 +77,8 @@ export class BuildingsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await BuildingService.getBuildings(planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -99,7 +103,7 @@ export class BuildingsRouter {
         planet.crystal = planet.crystal + cost.crystal;
         planet.crystal = planet.crystal + cost.crystal;
 
-        await PlanetService.updatePlanet(planet);
+        await this.planetService.updatePlanet(planet);
 
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
@@ -151,8 +155,8 @@ export class BuildingsRouter {
         });
       }
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await BuildingService.getBuildings(planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -258,7 +262,7 @@ export class BuildingsRouter {
       planet.b_building_id = buildingID;
       planet.b_building_endtime = endTime;
 
-      const updateSuccessful = await PlanetService.updatePlanet(planet);
+      const updateSuccessful = await this.planetService.updatePlanet(planet);
 
       if (!updateSuccessful) {
         // TODO: throw something more meaningful

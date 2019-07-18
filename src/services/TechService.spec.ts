@@ -6,7 +6,7 @@ const expect = chai.expect;
 describe("TechService", () => {
   it("should return a planet", async () => {
     try {
-      await TechService.createTechRow(1);
+      await this.techService.createTechRow(1);
     } catch (error) {
       expect(error.message).contains("Duplicate entry");
     }

@@ -16,7 +16,7 @@ describe("buildingsRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await PlanetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await this.planetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -26,7 +26,7 @@ describe("buildingsRoute", () => {
   });
 
   after(async () => {
-    await PlanetService.updatePlanet(planetBeforeTests);
+    await this.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {

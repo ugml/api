@@ -1,4 +1,6 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
@@ -6,9 +8,7 @@ import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { BuildingService } from "../services/BuildingService";
-import { DefenseService } from "../services/DefenseService";
-import { PlanetService } from "../services/PlanetService";
+import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Defenses } from "../units/Defenses";
 import { Planet } from "../units/Planet";
@@ -17,6 +17,10 @@ const units = new Units();
 
 export class DefenseRouter {
   public router: Router;
+
+  @inject(TYPES.IPlanetService) private planetService;
+  @inject(TYPES.IBuildingService) private buildingService;
+  @inject(TYPES.IDefenseService) private defenseService;
 
   /**
    * Initialize the Router
@@ -39,7 +43,7 @@ export class DefenseRouter {
       const planetID = parseInt(request.params.planetID, 10);
       const userID = parseInt(request.userID, 10);
 
-      const defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
+      const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -91,9 +95,9 @@ export class DefenseRouter {
         });
       }
 
-      const buildings: Buildings = await BuildingService.getBuildings(planetID);
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
-      const defenses: Defenses = await DefenseService.getDefenses(userID, planetID);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
 
       if (!InputValidator.isSet(buildings) || !InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -222,7 +226,7 @@ export class DefenseRouter {
       planet.crystal = crystal;
       planet.deuterium = deuterium;
 
-      await PlanetService.updatePlanet(planet);
+      await this.planetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

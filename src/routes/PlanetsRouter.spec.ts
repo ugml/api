@@ -19,8 +19,8 @@ describe("planetsRouter", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    authUserBeforeTests = await UserService.getAuthenticatedUser(1);
-    planetBeforeTests = await PlanetService.getPlanet(1, 167546850, true);
+    authUserBeforeTests = await this.userService.getAuthenticatedUser(1);
+    planetBeforeTests = await this.planetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -30,8 +30,8 @@ describe("planetsRouter", () => {
   });
 
   after(async () => {
-    await UserService.updateUserData(authUserBeforeTests);
-    await PlanetService.updatePlanet(planetBeforeTests);
+    await this.userService.updateUserData(authUserBeforeTests);
+    await this.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {

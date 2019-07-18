@@ -1,14 +1,18 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
 import { Logger } from "../common/Logger";
-import { GalaxyService } from "../services/GalaxyService";
+import { TYPES } from "../types";
 
 export class GalaxyRouter {
   public router: Router;
+
+  @inject(TYPES.IGalaxyService) private galaxyService;
 
   /**
    * Initialize the Router
@@ -48,7 +52,7 @@ export class GalaxyRouter {
         });
       }
 
-      const galaxyData = await GalaxyService.getGalaxyInfo(galaxy, system);
+      const galaxyData = await this.galaxyService.getGalaxyInfo(galaxy, system);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({

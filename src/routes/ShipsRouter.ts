@@ -1,4 +1,6 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { Logger } from "../common/Logger";
@@ -6,9 +8,7 @@ import { QueueItem } from "../common/QueueItem";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
-import { BuildingService } from "../services/BuildingService";
-import { PlanetService } from "../services/PlanetService";
-import { ShipService } from "../services/ShipService";
+import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 
@@ -16,6 +16,10 @@ const units = new Units();
 
 export class ShipsRouter {
   public router: Router;
+
+  @inject(TYPES.IPlanetService) private planetService;
+  @inject(TYPES.IBuildingService) private buildingService;
+  @inject(TYPES.IShipService) private shipService;
 
   /**
    * Initialize the Router
@@ -38,7 +42,7 @@ export class ShipsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.params.planetID, 10);
 
-      const ships = await ShipService.getShips(userID, planetID);
+      const ships = await this.shipService.getShips(userID, planetID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -90,8 +94,8 @@ export class ShipsRouter {
 
       queueItem.setPlanetID(planetID);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await BuildingService.getBuildings(planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (planet === null) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -197,7 +201,7 @@ export class ShipsRouter {
       planet.crystal = crystal;
       planet.deuterium = deuterium;
 
-      await PlanetService.updatePlanet(planet);
+      await this.planetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

@@ -9,18 +9,18 @@ describe("PlanetService", () => {
     const ownerID = 1;
     const planetID = 167546850;
 
-    const result = await PlanetService.getPlanet(ownerID, planetID);
+    const result = await this.planetService.getPlanet(ownerID, planetID);
 
     expect(result.ownerID).to.be.equals(ownerID);
     expect(result.planetID).to.be.equals(planetID);
   });
 
   it("should update a planet", async () => {
-    const planet: Planet = await PlanetService.getPlanet(1, 167546850, true);
+    const planet: Planet = await this.planetService.getPlanet(1, 167546850, true);
 
     planet.name = "SomethingElse";
 
-    const result = await PlanetService.updatePlanet(planet);
+    const result = await this.planetService.updatePlanet(planet);
 
     expect(result).to.be.equals(planet);
   });

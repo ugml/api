@@ -1,13 +1,17 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Logger } from "../common/Logger";
-import { MessageService } from "../services/MessageService";
-import { UserService } from "../services/UserService";
+import { TYPES } from "../types";
 
 export class MessagesRouter {
   public router: Router;
+
+  @inject(TYPES.IUserService) private userService;
+  @inject(TYPES.IMessageService) private messageService;
 
   /**
    * Initialize the Router
@@ -21,7 +25,7 @@ export class MessagesRouter {
     try {
       const userID = parseInt(request.userID, 10);
 
-      const messages = await MessageService.getAllMessages(userID);
+      const messages = await this.messageService.getAllMessages(userID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -52,7 +56,7 @@ export class MessagesRouter {
 
       const userID = parseInt(request.userID, 10);
       const messageID = parseInt(request.params.messageID, 10);
-      const message = await MessageService.getMessageById(userID, messageID);
+      const message = await this.messageService.getMessageById(userID, messageID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -84,7 +88,7 @@ export class MessagesRouter {
       const userID = parseInt(request.userID, 10);
       const messageID = parseInt(request.body.messageID, 10);
 
-      await MessageService.deleteMessage(userID, messageID);
+      await this.messageService.deleteMessage(userID, messageID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -122,7 +126,7 @@ export class MessagesRouter {
       const subject = InputValidator.sanitizeString(request.body.subject);
       const messageText = InputValidator.sanitizeString(request.body.body);
 
-      const receiver = await UserService.getUserById(receiverID);
+      const receiver = await this.userService.getUserById(receiverID);
 
       if (!InputValidator.isSet(receiver)) {
         return response.status(Globals.Statuscode.SUCCESS).json({
@@ -132,7 +136,7 @@ export class MessagesRouter {
         });
       }
 
-      await MessageService.sendMessage(userID, receiverID, subject, messageText);
+      await this.messageService.sendMessage(userID, receiverID, subject, messageText);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

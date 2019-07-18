@@ -1,12 +1,16 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
+import { IMessageService } from "../interfaces/IMessageService";
 import { Message } from "../units/Message";
 
 import squel = require("squel");
 
-export class MessageService {
-  public static async getAllMessages(userID: number) {
+@injectable()
+class MessageService implements IMessageService {
+  public async getAllMessages(userID: number) {
     const query: string = squel
       .select()
       .from("messages")
@@ -32,7 +36,7 @@ export class MessageService {
     return rows;
   }
 
-  public static async getMessageById(userID: number, messageID: number): Promise<Message> {
+  public async getMessageById(userID: number, messageID: number): Promise<Message> {
     const query: string = squel
       .select()
       .from("messages")
@@ -58,7 +62,7 @@ export class MessageService {
     return SerializationHelper.toInstance(new Message(), JSON.stringify(rows[0]));
   }
 
-  public static async deleteMessage(userID: number, messageID: number) {
+  public async deleteMessage(userID: number, messageID: number) {
     const query: string = squel
       .update()
       .table("messages")
@@ -77,7 +81,7 @@ export class MessageService {
     return rows;
   }
 
-  public static async sendMessage(senderID: number, receiverID: number, subject: string, messageText: string) {
+  public async sendMessage(senderID: number, receiverID: number, subject: string, messageText: string) {
     const query: string = squel
       .insert()
       .into("messages")
@@ -98,3 +102,5 @@ export class MessageService {
     await Database.query(query);
   }
 }
+
+export { MessageService };

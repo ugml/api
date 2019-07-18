@@ -1,14 +1,17 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { SerializationHelper } from "../common/SerializationHelper";
+import { IPlanetService } from "../interfaces/IPlanetService";
 import { Planet } from "../units/Planet";
-import { User } from "../units/User";
 
 import squel = require("squel");
 
-export class PlanetService {
-  public static async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {
+@injectable()
+export class PlanetService implements IPlanetService {
+  public async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {
     let query = squel
       .select()
       .from("planets", "p")
@@ -37,7 +40,7 @@ export class PlanetService {
     return SerializationHelper.toInstance(new Planet(), JSON.stringify(rows[0]));
   }
 
-  public static async updatePlanet(planet: Planet): Promise<Planet> {
+  public async updatePlanet(planet: Planet): Promise<Planet> {
     try {
       let query = squel.update().table("planets");
 
@@ -145,7 +148,7 @@ export class PlanetService {
     }
   }
 
-  public static async getNewId(): Promise<number> {
+  public async getNewId(): Promise<number> {
     const query = "CALL getNewPlanetId();";
 
     const [[[result]]] = await Database.query(query);
@@ -156,7 +159,7 @@ export class PlanetService {
   /***
    * Stores the current object in the database
    */
-  public static async createNewPlanet(planet: Planet, connection) {
+  public async createNewPlanet(planet: Planet, connection = null) {
     const query = squel
       .insert()
       .into("planets")
@@ -185,7 +188,7 @@ export class PlanetService {
     }
   }
 
-  public static async getAllPlanetsOfUser(userID: number, fullInfo: boolean = false) {
+  public async getAllPlanetsOfUser(userID: number, fullInfo: boolean = false) {
     let query = squel
       .select()
       .from("planets")
@@ -212,7 +215,7 @@ export class PlanetService {
     return rows;
   }
 
-  public static async getMovementOnPlanet(userID: number, planetID: number) {
+  public async getMovementOnPlanet(userID: number, planetID: number) {
     const query: string = squel
       .select()
       .from("flights")
@@ -234,7 +237,7 @@ export class PlanetService {
     return rows;
   }
 
-  public static async deletePlanet(userID: number, planetID: number) {
+  public async deletePlanet(userID: number, planetID: number) {
     const query: string = squel
       .delete()
       .from("planets")

@@ -1,13 +1,18 @@
+import "reflect-metadata";
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { SerializationHelper } from "../common/SerializationHelper";
+import { IBuildingService } from "../interfaces/IBuildingService";
 import { Buildings } from "../units/Buildings";
+
+import { injectable } from "inversify";
 
 import squel = require("squel");
 
-export class BuildingService {
-  public static async getBuildings(planetID: number): Promise<Buildings> {
+@injectable()
+export class BuildingService implements IBuildingService {
+  public async getBuildings(planetID: number): Promise<Buildings> {
     try {
       const query: string = squel
         .select()
@@ -29,7 +34,7 @@ export class BuildingService {
     }
   }
 
-  public static async createBuildingsRow(planetID: number, connection = null) {
+  public async createBuildingsRow(planetID: number, connection = null) {
     const query = `INSERT INTO buildings (\`planetID\`) VALUES (${planetID});`;
 
     if (connection === null) {

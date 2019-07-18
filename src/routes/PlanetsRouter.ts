@@ -1,13 +1,17 @@
+import "reflect-metadata";
 import { NextFunction, Response, Router } from "express";
+import { inject } from "inversify";
 import { Globals } from "../common/Globals";
 import { InputValidator } from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Logger } from "../common/Logger";
-import { PlanetService } from "../services/PlanetService";
+import { TYPES } from "../types";
 import { Planet } from "../units/Planet";
 
 export class PlanetsRouter {
   public router: Router;
+
+  @inject(TYPES.IPlanetService) private planetService;
 
   /**
    * Initialize the Router
@@ -21,7 +25,7 @@ export class PlanetsRouter {
     try {
       const userID = parseInt(request.userID, 10);
 
-      const planetList = await PlanetService.getAllPlanetsOfUser(userID, true);
+      const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -44,7 +48,7 @@ export class PlanetsRouter {
     try {
       const userID = parseInt(request.params.userID, 10);
 
-      const planetList = await PlanetService.getAllPlanetsOfUser(userID);
+      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -77,7 +81,7 @@ export class PlanetsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.params.planetID, 10);
 
-      const planet = await PlanetService.getPlanet(userID, planetID, true);
+      const planet = await this.planetService.getPlanet(userID, planetID, true);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -109,7 +113,7 @@ export class PlanetsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.params.planetID, 10);
 
-      const movement = await PlanetService.getMovementOnPlanet(userID, planetID);
+      const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -142,7 +146,7 @@ export class PlanetsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planetList = await PlanetService.getAllPlanetsOfUser(userID);
+      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
       if (planetList.length === 1) {
         return response.status(Globals.Statuscode.SUCCESS).json({
@@ -153,7 +157,7 @@ export class PlanetsRouter {
       }
 
       // TODO: if the deleted planet was the current planet -> set another one as current planet
-      await PlanetService.deletePlanet(userID, planetID);
+      await this.planetService.deletePlanet(userID, planetID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -200,11 +204,11 @@ export class PlanetsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
 
       planet.name = newName;
 
-      await PlanetService.updatePlanet(planet);
+      await this.planetService.updatePlanet(planet);
 
       // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
@@ -240,7 +244,7 @@ export class PlanetsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.params.planetID, 10);
 
-      const planet: Planet = await PlanetService.getPlanet(userID, planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

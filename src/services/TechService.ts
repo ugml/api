@@ -1,13 +1,13 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
-import { Logger } from "../common/Logger";
-import { SerializationHelper } from "../common/SerializationHelper";
-import { Buildings } from "../units/Buildings";
+import { ITechService } from "../interfaces/ITechService";
 
 import squel = require("squel");
 
-export class TechService {
-  public static async createTechRow(userID: number, connection = null) {
+@injectable()
+export class TechService implements ITechService {
+  public async createTechRow(userID: number, connection = null) {
     const query = `INSERT INTO techs (\`userID\`) VALUES (${userID});`;
 
     if (connection === null) {
@@ -17,7 +17,7 @@ export class TechService {
     return await connection.query(query);
   }
 
-  public static async getTechs(userID: number) {
+  public async getTechs(userID: number) {
     const query: string = squel
       .select()
       .from("techs")

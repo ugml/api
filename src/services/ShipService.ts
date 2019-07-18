@@ -1,13 +1,14 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { InputValidator } from "../common/InputValidator";
-import { Logger } from "../common/Logger";
-import { SerializationHelper } from "../common/SerializationHelper";
-import { Buildings } from "../units/Buildings";
+import { IShipService } from "../interfaces/IShipService";
 
 import squel = require("squel");
 
-export class ShipService {
-  public static async createShipsRow(planetID: number, connection = null) {
+@injectable()
+export class ShipService implements IShipService{
+  public async createShipsRow(planetID: number, connection = null) {
     const query = `INSERT INTO ships (\`planetID\`) VALUES (${planetID});`;
 
     if (connection === null) {
@@ -17,7 +18,7 @@ export class ShipService {
     return await connection.query(query);
   }
 
-  public static async getShips(userID: number, planetID: number) {
+  public async getShips(userID: number, planetID: number) {
     const query: string = squel
       .select()
       .field("p.ownerID")

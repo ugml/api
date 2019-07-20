@@ -88,12 +88,11 @@ export default class App {
             !InputValidator.isSet(authString) ||
             !authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")
           ) {
-            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+            return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,
               message: "Authentication failed",
               data: {},
             });
-            return;
           }
 
           const token: string = authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")[0];
@@ -105,24 +104,20 @@ export default class App {
 
             // check if userID is a valid integer
             if (isNaN(parseInt(self.userID, 10))) {
-              response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+              return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
                 message: "Invalid parameter2",
                 data: {},
               });
-
-              return;
             } else {
               next();
             }
           } else {
-            response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+            return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,
               message: "Authentication failed",
               data: {},
             });
-
-            return;
           }
         } else {
           next();
@@ -130,13 +125,11 @@ export default class App {
       } catch (e) {
         Logger.error(e);
 
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
+        return response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: "Internal server error",
           data: {},
         });
-
-        return;
       }
     });
 
@@ -197,13 +190,11 @@ export default class App {
     this.register("/v1/messages", new MessagesRouter(this.container).router);
 
     this.express.use(function(request, response) {
-      response.status(Globals.Statuscode.NOT_FOUND).json({
+      return response.status(Globals.Statuscode.NOT_FOUND).json({
         status: Globals.Statuscode.NOT_FOUND,
         message: "The route does not exist",
         data: {},
       });
-
-      return;
     });
   }
 

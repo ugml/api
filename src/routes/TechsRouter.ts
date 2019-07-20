@@ -1,26 +1,35 @@
-import { NextFunction, Response, Router } from "express";
-import { Validator } from "jsonschema";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Config } from "../common/Config";
-import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import squel = require("squel");
+import { Buildings } from "../units/Buildings";
+import { Planet } from "../units/Planet";
+import { Techs } from "../units/Techs";
 
 const units = new Units();
 
-export class TechsRouter {
-  public router: Router;
+export default class TechsRouter {
+  public router: IRouter<{}> = newRouter();
+
+  private planetService;
+  private buildingService;
+  private techService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.planetService = container.planetService;
+    this.buildingService = container.buildingService;
+    this.techService = container.techService;
+
+    this.router.get("/", this.getTechs);
+    this.router.post("/build/", this.buildTech);
+    this.router.post("/cancel/", this.cancelTech);
   }
 
   /**
@@ -29,342 +38,230 @@ export class TechsRouter {
    * @param response
    * @param next
    */
-  public async getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getTechs = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
-      const query: string = squel
-        .select()
-        .from("techs")
-        .where("userID = ?", request.userID)
-        .toString();
+      const userID = parseInt(request.userID, 10);
 
-      let [rows] = await Database.query(query);
+      const techs: Techs = await this.techService.getTechs(userID);
 
-      response.status(Globals.Statuscode.SUCCESS).json({
+      return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: rows[0],
+        data: techs,
       });
-      return;
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
-  }
+  };
 
-  public cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-      return;
-    }
-
-    // get the planet, on which the building should be canceled
-    const query: string = squel
-      .select()
-      .from("planets", "p")
-      .join("buildings", "b", "p.planetID = b.planetID")
-      .join("techs", "t", "t.userID = p.ownerID")
-      .where("p.planetID = ?", request.body.planetID)
-      .where("p.ownerID = ?", request.userID)
-      .toString();
-
-    Database.query(query)
-      .then(result => {
-        if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-          return;
-        }
-
-        const planet = result[0];
-
-        // player does not own the planet
-        if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-          return;
-        }
-
-        // 1. check if there is already a build-job on the planet
-        if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
-          const buildingKey = units.getMappings()[planet.b_tech_id];
-
-          // give back the ressources
-          const currentLevel = planet[buildingKey];
-
-          const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
-
-          const updatePlanetQuery: string = squel
-            .update()
-            .table("planets")
-            .set("b_tech_id", 0)
-            .set("b_tech_endtime", 0)
-            .set("metal", planet.metal + cost.metal)
-            .set("crystal", planet.crystal + cost.crystal)
-            .set("deuterium", planet.deuterium + cost.deuterium)
-            .where("planetID = ?", planet.planetID)
-            .where("ownerID = ?", request.userID)
-            .toString();
-
-          return Database.query(updatePlanetQuery)
-            .then(() => {
-              planet.b_tech_id = 0;
-              planet.b_tech_endtime = 0;
-              planet.metal = planet.metal + cost.metal;
-              planet.crystal = planet.crystal + cost.crystal;
-              planet.crystal = planet.crystal + cost.crystal;
-
-              response.status(Globals.Statuscode.SUCCESS).json({
-                status: Globals.Statuscode.SUCCESS,
-                message: "Building canceled",
-                data: { planet },
-              });
-              return;
-            })
-            .catch(error => {
-              Logger.error(error);
-
-              response.status(Globals.Statuscode.SERVER_ERROR).json({
-                status: Globals.Statuscode.SERVER_ERROR,
-                message: "There was an error while handling the request.",
-                data: {},
-              });
-
-              return;
-            });
-        } else {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Planet has no build-job",
-            data: {},
-          });
-          return;
-        }
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+  public cancelTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
           data: {},
         });
+      }
 
-        return;
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+      const techs: Techs = await this.techService.getTechs(userID);
+
+      // player does not own the planet
+      if (!InputValidator.isSet(planet)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      // 1. check if there is already a build-job on the planet
+      if (planet.b_tech_id === 0 && planet.b_tech_endtime === 0) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "Planet has no build-job",
+          data: {},
+        });
+      }
+
+      const techKey = units.getMappings()[planet.b_tech_id];
+
+      const currentLevel = techs[techKey];
+
+      const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
+
+      planet.metal += cost.metal;
+      planet.crystal += cost.crystal;
+      planet.deuterium += cost.deuterium;
+      planet.b_tech_id = 0;
+      planet.b_tech_endtime = 0;
+
+      await this.planetService.updatePlanet(planet);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Tech canceled",
+        data: { planet },
       });
-  }
+    } catch (error) {
+      Logger.error(error);
 
-  public buildTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (
-      !InputValidator.isSet(request.body.planetID) ||
-      !InputValidator.isValidInt(request.body.planetID) ||
-      !InputValidator.isSet(request.body.techID) ||
-      !InputValidator.isValidInt(request.body.techID)
-    ) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
         data: {},
       });
-      return;
     }
+  };
 
-    if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
+  public buildTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (
+        !InputValidator.isSet(request.body.planetID) ||
+        !InputValidator.isValidInt(request.body.planetID) ||
+        !InputValidator.isSet(request.body.techID) ||
+        !InputValidator.isValidInt(request.body.techID)
+      ) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
 
-      return;
-    }
+      if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
 
-    // get the planet, on which the building should be built
-    const query: string = squel
-      .select()
-      .from("planets", "p")
-      .left_join("buildings", "b", "b.planetID = p.planetID")
-      .left_join("techs", "t", "t.userID = p.ownerID")
-      .where("p.planetID = ?", request.body.planetID)
-      .where("p.ownerID = ?", request.userID)
-      .toString();
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+      const techID = parseInt(request.body.techID, 10);
 
-    Database.query(query)
-      .then(result => {
-        if (!InputValidator.isSet(result)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-          return;
-        }
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const techs: Techs = await this.techService.getTechs(userID);
 
-        const planet = result[0];
+      if (!InputValidator.isSet(planet)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
 
-        // player does not own the planet
-        if (!InputValidator.isSet(planet)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-          return;
-        }
+      // 1. check if there is already a build-job on the planet
+      if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Planet already has a build-job",
+          data: {},
+        });
+      }
 
-        // 1. check if there is already a build-job on the planet
-        if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Planet already has a build-job",
-            data: {},
-          });
-          return;
-        }
+      // can't build research lab while they are researching... poor scientists :(
+      // if(request.body.techID === Globals.Buildings.RESEARCH_LAB &&
+      //     (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
+      //
+      //     response.status(Globals.Statuscode.SUCCESS).json({
+      //         status: Globals.Statuscode.SUCCESS,
+      //         message: "Can't build this building while it is in use",
+      //         data: {}
+      //     });
+      //
+      //     return;
+      // }
 
-        // can't build research lab while they are researching... poor scientists :(
-        // if(request.body.techID === Globals.Buildings.RESEARCH_LAB &&
-        //     (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
-        //
-        //     response.status(Globals.Statuscode.SUCCESS).json({
-        //         status: Globals.Statuscode.SUCCESS,
-        //         message: "Can't build this building while it is in use",
-        //         data: {}
-        //     });
-        //
-        //     return;
-        // }
+      // 2. check, if requirements are met
+      const requirements = units.getRequirements()[techID];
 
-        // 2. check, if requirements are met
-        const requirements = units.getRequirements()[request.body.techID];
+      // building has requirements
+      if (requirements !== undefined) {
+        let requirementsMet = true;
 
-        // building has requirements
-        if (requirements !== undefined) {
-          let requirementsMet = true;
+        for (const reqID in requirements) {
+          if (requirements.hasOwnProperty(reqID)) {
+            const reqLevel = requirements[reqID];
+            const key = units.getMappings()[reqID];
 
-          for (const reqID in requirements) {
-            if (requirements.hasOwnProperty(reqID)) {
-              const reqLevel = requirements[reqID];
-              const key = units.getMappings()[reqID];
-
-              if (planet[key] < reqLevel) {
-                requirementsMet = false;
-                break;
-              }
-            } else {
-              // TODO: throw a meaningful error
-              throw Error();
+            if (techs[key] < reqLevel) {
+              requirementsMet = false;
+              break;
             }
-          }
-
-          if (!requirementsMet) {
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Requirements are not met",
-              data: planet.planetID,
-            });
-
-            return;
+          } else {
+            // TODO: throw a meaningful error
+            throw Error();
           }
         }
 
-        // 3. check if there are enough resources on the planet for the building to be built
-        const buildingKey = units.getMappings()[request.body.techID];
-
-        const currentLevel = planet[buildingKey];
-
-        const cost = units.getCosts(request.body.techID, currentLevel, UnitType.TECHNOLOGY);
-
-        if (
-          planet.metal < cost.metal ||
-          planet.crystal < cost.crystal ||
-          planet.deuterium < cost.deuterium ||
-          planet.energy_max < cost.energy
-        ) {
-          response.status(Globals.Statuscode.SUCCESS).json({
+        if (!requirementsMet) {
+          return response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
-            message: "Not enough resources",
-            data: {},
+            message: "Requirements are not met",
+            data: planet.planetID,
           });
-          return;
         }
+      }
 
-        // 4. start the build-job
-        const buildTime = Math.round((cost.metal + cost.crystal) / (Config.Get.speed * 1000 * result[0].research_lab));
+      // 3. check if there are enough resources on the planet for the building to be built
+      const buildingKey = units.getMappings()[techID];
 
-        const endTime = Math.round(+new Date() / 1000) + buildTime;
+      const currentLevel = techs[buildingKey];
 
-        planet.metal = planet.metal - cost.metal;
-        planet.crystal = planet.crystal - cost.crystal;
-        planet.deuterium = planet.deuterium - cost.deuterium;
-        planet.b_tech_id = request.body.techID;
-        planet.b_tech_endtime = endTime;
+      const cost = units.getCosts(techID, currentLevel, UnitType.TECHNOLOGY);
 
-        const updatePlanetQuery: string = squel
-          .update()
-          .table("planets")
-          .set("metal", planet.metal)
-          .set("crystal", planet.crystal)
-          .set("deuterium", planet.deuterium)
-          .set("b_tech_id", planet.b_tech_id)
-          .set("b_tech_endtime", planet.b_tech_endtime)
-          .where("planetID = ?", request.body.planetID)
-          .toString();
-
-        Database.query(updatePlanetQuery)
-          .then(() => {
-            response.status(Globals.Statuscode.SUCCESS).json({
-              status: Globals.Statuscode.SUCCESS,
-              message: "Job started",
-              data: { planet },
-            });
-
-            return;
-          })
-          .catch(error => {
-            throw error;
-          });
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+      if (
+        planet.metal < cost.metal ||
+        planet.crystal < cost.crystal ||
+        planet.deuterium < cost.deuterium ||
+        planet.energy_max < cost.energy
+      ) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "Not enough resources",
           data: {},
         });
+      }
 
-        return;
+      // 4. start the build-job
+      const buildTime = Math.round((cost.metal + cost.crystal) / (Config.Get.speed * 1000 * buildings.research_lab));
+
+      const endTime = Math.round(+new Date() / 1000) + buildTime;
+
+      planet.metal = planet.metal - cost.metal;
+      planet.crystal = planet.crystal - cost.crystal;
+      planet.deuterium = planet.deuterium - cost.deuterium;
+      planet.b_tech_id = techID;
+      planet.b_tech_endtime = endTime;
+
+      await this.planetService.updatePlanet(planet);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Job started",
+        data: { planet },
       });
-  }
+    } catch (error) {
+      Logger.error(error);
 
-  /***
-   * Initializes the routes
-   */
-  public init() {
-    this.router.get("/", this.getTechs);
-    this.router.post("/build/", this.buildTech);
-    this.router.post("/cancel/", this.cancelTech);
-  }
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
 }
-
-const techsRouter = new TechsRouter();
-techsRouter.init();
-
-export default techsRouter.router;

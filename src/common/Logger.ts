@@ -10,11 +10,13 @@ const myFormat = printf(({ level, message, timestamp }) => {
 const date = new Date();
 const path = `./logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
 
+/* tslint:disable:no-empty*/
 // Folder setup
 if (!fs.existsSync(path)) {
   fs.mkdir("./logs/", err => {});
   fs.mkdir(path, err => {});
 }
+/* tslint:enable:no-empty*/
 
 /* tslint:disable: variable-name */
 const Logger = createLogger({

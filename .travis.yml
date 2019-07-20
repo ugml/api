@@ -1,35 +1,49 @@
 language: node_js
 
+node_js:
+  - "12"
+
 sudo: required
+
+git:
+  quiet: true
 
 cache: npm
 
 env:
   - NODE_ENV=development
 
-node_js:
-  - "8"
-  - "10"
-  - "12"
+#addons:
+#  mariadb: '10.4'
 
-services:
-  - redis-server
+stages:
+  - build
+  - test
+  - lint
+  - deploy
 
-addons:
-  mariadb: '10.4'
-
-matrix:
-  fast_finish: true
-
-before_script:
-  - sudo systemctl start mariadb
-  - sudo mysql -u root < test/ci.sql
-
-script:
-  - npm run-script build
-  - npm run-script lint
-  - npm run-script tslint
-  - npm run-script test-coverage
-
-after_success:
-  - "cat ./coverage/lcov.info | codacy-coverage -p ."
+jobs:
+  include:
+    - &build
+      stage: build
+      script: npm run-script build
+      node_js: '8'
+    - <<: *build
+      node_js: '10'
+    - <<: *build
+      node_js: '12'
+    - stage: test
+      script:
+        - sudo apt-get -qq update
+        - sudo apt-get -qq install mariadb-client mariadb-server # install mariadb
+        - sudo mysql -u root < test/ci.sql                       # import data-dump
+        - sudo redis-server /etc/redis/redis.conf --port 6379    # start redis
+        - npm run-script test-coverage
+        - "cat ./coverage/lcov.info | codacy-coverage -p ."
+    - stage: lint
+      script:
+        - npm run-script lint
+        - npm run-script tslint
+    - stage: deploy
+      if: branch = master
+      script: echo "TODO"

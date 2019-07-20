@@ -10,9 +10,9 @@ const expect = chai.expect;
 
 describe("Database", function() {
   it("Connect and query", async function() {
-    const result = await Database.query("SELECT 1 AS test;");
+    const [rows] = await Database.query("SELECT 1 AS test;");
 
-    expect(result[0][0].test).to.be.equals(1);
+    expect(rows[0].test).to.be.equals(1);
   });
 
   it("Get connection", function() {

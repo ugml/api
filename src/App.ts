@@ -6,7 +6,7 @@ import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest";
 
 import { Globals } from "./common/Globals";
 import { IJwt } from "./interfaces/IJwt";
-import { InputValidator } from "./common/InputValidator";
+import InputValidator from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
 import ConfigRouter from "./routes/ConfigRouter";
@@ -15,7 +15,7 @@ import EventRouter from "./routes/EventRouter";
 import GalaxyRouter from "./routes/GalaxyRouter";
 import MessagesRouter from "./routes/MessagesRouter";
 import PlanetRouter from "./routes/PlanetsRouter";
-import PlayerRouter from "./routes/PlayersRouter";
+import UsersRouter from "./routes/UsersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
 import dotenv = require("dotenv-safe");
@@ -40,13 +40,15 @@ const logFormat = printf(({ message, timestamp }) => {
 });
 
 // Creates and configures an ExpressJS web server.
-class App {
+export default class App {
   // ref to Express instance
   public express: express.Application;
   public userID: string;
+  public container;
 
   // Run configuration methods on the Express instance.
-  public constructor() {
+  public constructor(container) {
+    this.container = container;
     this.express = express();
     this.middleware();
     this.routes();
@@ -105,7 +107,7 @@ class App {
             if (isNaN(parseInt(self.userID, 10))) {
               response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter",
+                message: "Invalid parameter2",
                 data: {},
               });
 
@@ -170,29 +172,29 @@ class App {
 
     this.register("/v1/config", ConfigRouter);
 
-    this.register("/v1/auth", AuthRouter);
+    this.register("/v1/auth", new AuthRouter(this.container).router);
 
-    this.register("/v1/user", PlayerRouter);
+    this.register("/v1/user", new UsersRouter(this.container).router);
 
-    this.register("/v1/users", PlayerRouter);
+    this.register("/v1/users", new UsersRouter(this.container).router);
 
-    this.register("/v1/planet", PlanetRouter);
+    this.register("/v1/planet", new PlanetRouter(this.container).router);
 
-    this.register("/v1/planets", PlanetRouter);
+    this.register("/v1/planets", new PlanetRouter(this.container).router);
 
-    this.register("/v1/buildings", BuildingRouter);
+    this.register("/v1/buildings", new BuildingRouter(this.container).router);
 
-    this.register("/v1/techs", TechsRouter);
+    this.register("/v1/techs", new TechsRouter(this.container).router);
 
-    this.register("/v1/ships", ShipsRouter);
+    this.register("/v1/ships", new ShipsRouter(this.container).router);
 
-    this.register("/v1/defenses", DefenseRouter);
+    this.register("/v1/defenses", new DefenseRouter(this.container).router);
 
     this.register("/v1/events", EventRouter);
 
-    this.register("/v1/galaxy", GalaxyRouter);
+    this.register("/v1/galaxy", new GalaxyRouter(this.container).router);
 
-    this.register("/v1/messages", MessagesRouter);
+    this.register("/v1/messages", new MessagesRouter(this.container).router);
 
     this.express.use(function(request, response) {
       response.status(Globals.Statuscode.NOT_FOUND).json({
@@ -218,5 +220,3 @@ class App {
     );
   }
 }
-
-export default new App().express;

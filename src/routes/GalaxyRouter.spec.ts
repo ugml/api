@@ -1,8 +1,14 @@
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
-import app from "../App";
+import App from "../App";
 import { Globals } from "../common/Globals";
+
+const createContainer = require("../ioc/createContainer");
+
+const container = createContainer();
+
+const app = new App(container).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -27,11 +33,18 @@ describe("galaxyRouter", () => {
 
   it("should return a list of galaxy-entries", () => {
     return request
-      .get("/v1/galaxy/4/13")
+      .get("/v1/galaxy/7/5")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.data).to.have.lengthOf(2);
+        expect(res.body.data[0].planetID).to.be.equals(61614);
+        expect(res.body.data[0].galaxy).to.be.equals(7);
+        expect(res.body.data[0].system).to.be.equals(5);
+        expect(res.body.data[1].planetID).to.be.equals(87851);
+        expect(res.body.data[1].galaxy).to.be.equals(7);
+        expect(res.body.data[1].system).to.be.equals(5);
       });
   });
 
@@ -42,7 +55,7 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -53,8 +66,8 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -65,8 +78,8 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
         expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -77,8 +90,8 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
         expect(res.body.message).equals("Success");
+        expect(res.body.data).to.be.eql([]);
       });
   });
 
@@ -89,7 +102,7 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -100,7 +113,7 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -111,7 +124,7 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.empty;
+        expect(res.body.data).to.be.eql({});
       });
   });
 });

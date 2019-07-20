@@ -1,7 +1,7 @@
 import { NextFunction, Response, Router } from "express";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Redis } from "../common/Redis";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICoordinates } from "../interfaces/ICoordinates";
@@ -22,8 +22,6 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
 //  loaded resources > storage?
 
 export class EventRouter {
-  public router: Router;
-
   // TODO: relocate to own file with other game-related calculations
   /**
    * Calculates the distances between two planets
@@ -147,6 +145,7 @@ export class EventRouter {
 
     return missionTypeID;
   }
+  public router: Router;
 
   /**
    * Initialize the Router

@@ -4,7 +4,7 @@ import { IUnits } from "../interfaces/IUnits";
 import squel = require("squel");
 import { Logger } from "../common/Logger";
 
-class Fleets implements IUnits {
+class Ships implements IUnits {
   public planetID: number;
   public small_cargo_ship: number;
   public large_cargo_ship: number;
@@ -25,7 +25,7 @@ class Fleets implements IUnits {
     return new Promise((resolve, reject) => {
       const query = squel
         .update()
-        .table("fleets")
+        .table("ships")
         .set("small_cargo_ship", this.small_cargo_ship)
         .set("large_cargo_ship", this.large_cargo_ship)
         .set("light_fighter", this.light_fighter)
@@ -58,7 +58,7 @@ class Fleets implements IUnits {
     return new Promise((resolve, reject) => {
       const query = squel
         .insert()
-        .into("fleets")
+        .into("ships")
         .set("planetID", this.planetID)
         .set("small_cargo_ship", this.small_cargo_ship)
         .set("large_cargo_ship", this.large_cargo_ship)
@@ -92,4 +92,4 @@ class Fleets implements IUnits {
   }
 }
 
-export { Fleets };
+export { Ships };

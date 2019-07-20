@@ -1,263 +1,157 @@
-import { NextFunction, Response, Router } from "express";
-import { Database } from "../common/Database";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-
 import { Logger } from "../common/Logger";
 
-import squel = require("squel");
+export default class MessagesRouter {
+  public router: IRouter<{}> = newRouter();
 
-export class MessagesRouter {
-  public router: Router;
+  private userService;
+  private messageService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
-  }
-
-  public getAllMessages(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    const query: string = squel
-      .select()
-      .from("messages")
-      .field("messageID")
-      .field("senderID")
-      .field("receiverID")
-      .field("sendtime")
-      .field("type")
-      .field("subject")
-      .field("body")
-      .where("receiverID = ?", request.userID)
-      .where("deleted = ?", 0)
-      .order("sendtime", false)
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data;
-
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = Object.assign({}, result);
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  public getMessageByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-
-      return;
-    }
-
-    const query: string = squel
-      .select()
-      .from("messages")
-      .field("messageID")
-      .field("senderID")
-      .field("receiverID")
-      .field("sendtime")
-      .field("type")
-      .field("subject")
-      .field("body")
-      .where("receiverID = ?", request.userID)
-      .where("messageID = ?", request.params.messageID)
-      .where("deleted = ?", 0)
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data;
-
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = result[0];
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  public deleteMessage(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-
-      return;
-    }
-
-    const query: string = squel
-      .update()
-      .table("messages")
-      .set("deleted", 1)
-      .where("messageID = ?", request.body.messageID)
-      .where("receiverID = ?", request.userID)
-      .toString();
-
-    return Database.query(query)
-      .then(() => {
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "The message was deleted.",
-          data: {},
-        });
-
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  public sendMessage(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    if (
-      !InputValidator.isSet(request.body.receiverID) ||
-      !InputValidator.isValidInt(request.body.receiverID) ||
-      !InputValidator.isSet(request.body.subject) ||
-      !InputValidator.isSet(request.body.body)
-    ) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-
-      return;
-    }
-
-    const query: string = squel
-      .select()
-      .from("users")
-      .field("userID")
-      .where("userID = ?", request.body.receiverID)
-      .toString();
-
-    Database.query(query)
-      .then(result => {
-        const numRows: number = Object.keys(result).length;
-
-        if (numRows === 0) {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "The receiver does not exist.",
-            data: {},
-          });
-          return;
-        }
-
-        const insertNewMessageQuery: string = squel
-          .insert()
-          .into("messages")
-          .set("senderID", request.userID)
-          .set("receiverID", request.body.receiverID)
-          .set(
-            "sendtime",
-            new Date()
-              .toISOString()
-              .slice(0, 19)
-              .replace("T", " "),
-          )
-          .set("type", 1)
-          .set("subject", InputValidator.sanitizeString(request.body.subject))
-          .set("body", InputValidator.sanitizeString(request.body.body))
-          .toString();
-
-        Database.query(insertNewMessageQuery).then(() => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Message sent",
-            data: {},
-          });
-          return;
-        });
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
+  public constructor(container) {
+    this.userService = container.userService;
+    this.messageService = container.messageService;
     this.router.get("/get", this.getAllMessages);
-
     this.router.get("/get/:messageID", this.getMessageByID);
-
     this.router.post("/delete", this.deleteMessage);
-
     this.router.post("/send", this.sendMessage);
   }
+
+  public getAllMessages = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      const userID = parseInt(request.userID, 10);
+
+      const messages = await this.messageService.getAllMessages(userID);
+
+      // return the result
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: messages,
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
+
+  public getMessageByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const messageID = parseInt(request.params.messageID, 10);
+      const message = await this.messageService.getMessageById(userID, messageID);
+
+      // return the result
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: message || {},
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
+
+  public deleteMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const messageID = parseInt(request.body.messageID, 10);
+
+      await this.messageService.deleteMessage(userID, messageID);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "The message was deleted.",
+        data: {},
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
+
+  public sendMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (
+        !InputValidator.isSet(request.body.receiverID) ||
+        !InputValidator.isValidInt(request.body.receiverID) ||
+        !InputValidator.isSet(request.body.subject) ||
+        !InputValidator.isSet(request.body.body)
+      ) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const receiverID = parseInt(request.body.receiverID, 10);
+      const subject = InputValidator.sanitizeString(request.body.subject);
+      const messageText = InputValidator.sanitizeString(request.body.body);
+
+      const receiver = await this.userService.getUserById(receiverID);
+
+      if (!InputValidator.isSet(receiver)) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "The receiver does not exist.",
+          data: {},
+        });
+      }
+
+      await this.messageService.sendMessage(userID, receiverID, subject, messageText);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Message sent",
+        data: {},
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
 }
-
-const messagesRouter = new MessagesRouter();
-messagesRouter.init();
-
-export default messagesRouter.router;

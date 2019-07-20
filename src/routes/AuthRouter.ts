@@ -1,21 +1,20 @@
-import { NextFunction, Request, Response, Router } from "express";
-
-import { Database } from "../common/Database";
+import { NextFunction, Response, Router as newRouter, IRouter, Request } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
+import { Logger } from "../common/Logger";
+import IRequest from "../interfaces/IRequest";
 
-import squel = require("squel");
 const bcrypt = require("bcryptjs");
 
-import { Logger } from "../common/Logger";
+export default class AuthRouter {
+  public router: IRouter<{}> = newRouter();
 
-export class AuthRouter {
-  public router: Router;
+  private userService;
 
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.userService = container.userService;
+    this.router.post("/login", this.authenticate);
   }
 
   /***
@@ -25,84 +24,56 @@ export class AuthRouter {
    * @param response
    * @param next
    */
-  public async authenticate(req: Request, response: Response, next: NextFunction) {
+  public authenticate = async (req: IRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-
-        return;
       }
 
       const email: string = InputValidator.sanitizeString(req.body.email);
 
       const password: string = InputValidator.sanitizeString(req.body.password);
 
-      const query: string = squel
-        .select({ autoQuoteFieldNames: true })
-        .field("userID")
-        .field("email")
-        .field("password")
-        .from("users")
-        .where("email = ?", email)
-        .toString();
+      const data = await this.userService.getUserForAuthentication(email);
 
-      let [rows] = await Database.query(query);
-
-      if (!InputValidator.isSet(rows) || rows[0] === undefined) {
-        response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+      if (!InputValidator.isSet(data)) {
+        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
           status: Globals.Statuscode.NOT_AUTHORIZED,
           message: "Authentication failed",
           data: {},
         });
-        return;
       }
 
-      bcrypt.compare(password, rows[0].password).then(function(isValidPassword: boolean) {
-        if (!isValidPassword) {
-          response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-            status: Globals.Statuscode.NOT_AUTHORIZED,
-            message: "Authentication failed",
-            data: {},
-          });
-          return;
-        }
+      const isValidPassword = await bcrypt.compare(password, data.password);
 
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data: {
-            token: JwtHelper.generateToken(rows[0].userID),
-          },
+      if (!isValidPassword) {
+        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+          status: Globals.Statuscode.NOT_AUTHORIZED,
+          message: "Authentication failed",
+          data: {},
         });
-        return;
+      }
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: {
+          token: JwtHelper.generateToken(data.userID),
+        },
       });
     } catch (err) {
       Logger.error(err);
 
       // return the result
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: `There was an error: ${err.message}`,
         data: {},
       });
-
-      return;
     }
-  }
-
-  /***
-   * Initializes the routes
-   */
-  public init() {
-    this.router.post("/login", this.authenticate);
-  }
+  };
 }
-
-const authRoutes = new AuthRouter();
-authRoutes.init();
-
-export default authRoutes.router;

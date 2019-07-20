@@ -1,8 +1,15 @@
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
-import app from "../App";
+import App from "../App";
 import { Globals } from "../common/Globals";
+import { Planet } from "../units/Planet";
+
+const createContainer = require("../ioc/createContainer");
+
+const container = createContainer();
+
+const app = new App(container).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -11,13 +18,20 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("defenseRoute", () => {
-  before(() => {
+  let planetBeforeTests: Planet;
+
+  before(async () => {
+    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.data.token;
       });
+  });
+
+  after(async () => {
+    await container.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -47,7 +61,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).equals(undefined);
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -61,7 +75,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data.planetID).equals(planetID);
       });
   });
 
@@ -73,7 +87,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -87,7 +101,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -98,7 +112,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -112,7 +126,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).eql({});
+        expect(res.body.data).to.be.eql({});
       });
   });
 });

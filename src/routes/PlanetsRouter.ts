@@ -1,328 +1,182 @@
-import { NextFunction, Response, Router } from "express";
-import { Database } from "../common/Database";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-
-const mysql = require("mysql2");
 import { Logger } from "../common/Logger";
+import { Planet } from "../units/Planet";
 
-import squel = require("squel");
+export default class PlanetsRouter {
+  public router: IRouter<{}> = newRouter();
 
-export class PlanetsRouter {
-  public router: Router;
+  private planetService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.planetService = container.planetService;
+
+    this.router.get("/movement/:planetID", this.getMovement);
+    this.router.post("/destroy/", this.destroyPlanet);
+    this.router.post("/rename/", this.renamePlanet);
+    this.router.get("/:planetID", this.getPlanetByID);
   }
 
-  public setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+  public getAllPlanets = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      const userID = parseInt(request.userID, 10);
+
+      const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
+
+      // return the result
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: planetList,
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
+  };
 
-    // check if user owns the planet
-    const query: string = squel
-      .select()
-      .from("planets")
-      .where("planetID = ?", request.body.planetID)
-      .where("ownerID = ?", request.userID)
-      .toString();
+  public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      const userID = parseInt(request.params.userID, 10);
 
-    return Database.query(query)
-      .then(result => {
-        if (!InputValidator.isSet(result[0])) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "The player does not own the planet",
-            data: {},
-          });
+      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
-          return;
-        }
+      // return the result
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: planetList,
+      });
+    } catch (error) {
+      Logger.error(error);
 
-        // TODO: check for unique-constraint violation
-        const updateCurrentPlanetQuery: string = squel
-          .update()
-          .table("users")
-          .set("currentplanet = ?", request.body.planetID)
-          .where("userID = ?", request.userID)
-          .toString();
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
 
-        return Database.query(updateCurrentPlanetQuery).then(() => {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Success",
-            data: {},
-          });
-
-          return;
-        });
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+  public getOwnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
           data: {},
         });
+      }
 
-        return;
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.params.planetID, 10);
+
+      const planet = await this.planetService.getPlanet(userID, planetID, true);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: planet,
       });
-  }
+    } catch (error) {
+      Logger.error(error);
 
-  public getAllPlanetsOfPlayer(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    const query: string = squel
-      .select()
-      .from("planets")
-      .where("ownerID = ?", request.userID)
-      .toString();
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
 
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data;
+  public getMovement = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
 
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = result;
-        }
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.params.planetID, 10);
 
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
+      const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
+
+      // return the result
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: movement,
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
+
+  public destroyPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+
+      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
+
+      if (planetList.length === 1) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+          message: "The last planet cannot be destroyed.",
           data: {},
         });
+      }
 
-        return;
-      });
-  }
+      // TODO: if the deleted planet was the current planet -> set another one as current planet
+      await this.planetService.deletePlanet(userID, planetID);
 
-  public getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "The planet was deleted.",
         data: {},
       });
+    } catch (error) {
+      Logger.error(error);
 
-      return;
-    }
-
-    const query: string = squel
-      .select()
-      .from("planets")
-      .where("planetID = ?", request.params.planetID)
-      .where("ownerID = ?", request.userID)
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data;
-
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = result[0];
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  public getMovement(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
+  };
 
-    const query: string = squel
-      .select()
-      .from("flights")
-      .where("ownerID = ?", request.userID)
-      .where(
-        squel
-          .expr()
-          .or(`start_id = ${request.params.planetID}`)
-          .or(`end_id = ${request.params.planetID}`),
-      )
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data;
-
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = Object.assign({}, result);
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  public destroyPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-
-      return;
-    }
-
-    // check if it is the last planet of the user
-    const query: string = squel
-      .select()
-      .from("planets")
-      .where("ownerID = ?", request.userID)
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        const numRows: number = Object.keys(result).length;
-
-        if (numRows <= 1) {
-          response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "The last planet cannot be destroyed.",
-            data: {},
-          });
-          return;
-        }
-
-        // destroy the planet
-        Database.getConnectionPool().beginTransaction(() => {
-          Logger.info("Transaction started");
-
-          const deletePlanetQuery: string = squel
-            .delete()
-            .from("planets")
-            .where("planetID = ?", request.body.planetID)
-            .where("ownerID = ?", request.userID)
-            .toString();
-
-          Database.query(deletePlanetQuery)
-            .then(() => {
-              Database.getConnectionPool().commit(function(err) {
-                if (err) {
-                  Database.getConnectionPool().rollback(function() {
-                    Logger.error(err);
-                    throw err;
-                  });
-                }
-              });
-
-              Logger.info("Transaction complete");
-
-              // TODO: if the deleted planet was the current planet -> set another one as current planet
-
-              response.status(Globals.Statuscode.SUCCESS).json({
-                status: Globals.Statuscode.SUCCESS,
-                message: "The planet was deleted.",
-                data: {},
-              });
-
-              return;
-            })
-            .catch(error => {
-              Logger.error(error);
-
-              response.status(Globals.Statuscode.SERVER_ERROR).json({
-                status: Globals.Statuscode.SERVER_ERROR,
-                message: "There was an error while handling the request.",
-                data: {},
-              });
-
-              return;
-            });
-        });
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
-        });
-
-        return;
-      });
-  }
-
-  public async renamePlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public renamePlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (
@@ -330,145 +184,82 @@ export class PlanetsRouter {
         !InputValidator.isValidInt(request.body.planetID) ||
         !InputValidator.isSet(request.body.name)
       ) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-
-        return;
       }
 
       const newName: string = InputValidator.sanitizeString(request.body.name);
 
+      // TODO: check max-length
       if (newName.length <= 4) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "New name is too short. Minimum length is 4 characters.",
           data: {},
         });
-
-        return;
       }
 
-      // check if it is the last planet of the user
-      let query: string = squel
-        .update()
-        .table("planets")
-        .set("name", newName)
-        .where("planetID = ?", request.body.planetID)
-        .where("ownerID = ?", request.userID)
-        .toString();
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
 
-      let getUpdatedPlanetQuery: string = squel
-        .select()
-        .from("planets")
-        .where("planetID = ?", request.body.planetID)
-        .where("ownerID = ?", request.userID)
-        .toString();
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
 
-      await Database.query(query);
+      planet.name = newName;
 
-      let [rows] = await Database.query(getUpdatedPlanetQuery);
+      await this.planetService.updatePlanet(planet);
 
       // return the result
-      response.status(Globals.Statuscode.SUCCESS).json({
+      return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
-        data: rows[0],
+        data: planet,
       });
-      return;
     } catch (error) {
       Logger.error(error);
 
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "There was an error while handling the request.",
         data: {},
       });
-
-      return;
     }
-  }
+  };
 
   /**
    * GET planet by ID
    */
-  public getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
-    // validate parameters
-    if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-
-      return;
-    }
-
-    const query: string = squel
-      .select()
-      .field("planetID")
-      .field("ownerID")
-      .field("name")
-      .field("galaxy")
-      .field("system")
-      .field("planet")
-      .field("last_update")
-      .field("planet_type")
-      .field("image")
-      .field("destroyed")
-      .from("planets")
-      .where("planetID = ?", request.params.planetID)
-      .toString();
-
-    // execute the query
-    Database.query(query)
-      .then(result => {
-        let data;
-
-        if (!InputValidator.isSet(result)) {
-          data = {};
-        } else {
-          data = result[0];
-        }
-
-        // return the result
-        response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Success",
-          data,
-        });
-        return;
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
+  public getPlanetByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
           data: {},
         });
+      }
 
-        return;
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.params.planetID, 10);
+
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Success",
+        data: planet,
       });
-  }
+    } catch (error) {
+      Logger.error(error);
 
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    // /planets/:planetID
-    this.router.get("/planetlist/", this.getAllPlanetsOfPlayer);
-    this.router.get("/movement/:planetID", this.getMovement);
-    this.router.post("/destroy/", this.destroyPlanet);
-    this.router.post("/rename/", this.renamePlanet);
-    this.router.get("/:planetID", this.getPlanetByID);
-  }
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: "There was an error while handling the request.",
+        data: {},
+      });
+    }
+  };
 }
-
-const playerRoutes = new PlanetsRouter();
-playerRoutes.init();
-
-export default playerRoutes.router;

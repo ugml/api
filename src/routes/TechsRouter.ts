@@ -1,4 +1,3 @@
-
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";

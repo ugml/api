@@ -1,4 +1,3 @@
-
 import { IRouter, NextFunction, Request, Response, Router as newRouter, Router } from "express";
 import { Config } from "../common/Config";
 import { Database } from "../common/Database";

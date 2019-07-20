@@ -1,4 +1,3 @@
-
 import { Database } from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";

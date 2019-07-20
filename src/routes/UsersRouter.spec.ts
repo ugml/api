@@ -38,6 +38,15 @@ describe("User Routes", () => {
       email: "iamnotareal@email.com",
     };
 
+    container.galaxyService.getFreePosition = function() {
+      return {
+        galaxy: 1,
+        system: 1,
+        planet: 1,
+        type: 1,
+      };
+    };
+
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");

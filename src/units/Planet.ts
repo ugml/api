@@ -1,15 +1,8 @@
-import { Database } from "../common/Database";
+import { Globals } from "../common/Globals";
 import { IUnits } from "../interfaces/IUnits";
+import PlanetType = Globals.PlanetType;
 
-import squel = require("squel");
-import { Logger } from "../common/Logger";
-
-enum PlanetType {
-  Planet = 1,
-  Moon = 2,
-}
-
-class Planet implements IUnits {
+export default class Planet implements IUnits {
   public planetID: number;
   public ownerID: number;
   public name: string;
@@ -49,5 +42,3 @@ class Planet implements IUnits {
     return false;
   }
 }
-
-export { Planet, PlanetType };

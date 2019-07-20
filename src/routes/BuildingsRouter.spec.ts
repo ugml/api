@@ -3,7 +3,7 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -331,20 +331,6 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.message).equals("Building canceled");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-        });
-    });
-
-    it("should fail (user does not own the planet)", () => {
-      const planetID = 1234;
-
-      return request
-        .post("/v1/buildings/cancel")
-        .set("Authorization", authToken)
-        .send({ planetID: `${planetID}`, buildingID: "1" })
-        .then(res => {
-          expect(res.body.message).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.data).to.be.eql({});
         });
     });
 

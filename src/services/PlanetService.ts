@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { IPlanetService } from "../interfaces/IPlanetService";
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 
 import squel = require("squel");
 

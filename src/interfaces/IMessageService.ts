@@ -1,4 +1,4 @@
-import { Message } from "../units/Message";
+import Message from "../units/Message";
 
 export interface IMessageService {
   getAllMessages(userID: number);

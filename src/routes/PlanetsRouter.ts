@@ -3,7 +3,7 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Logger } from "../common/Logger";
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 
 export default class PlanetsRouter {
   public router: IRouter<{}> = newRouter();
@@ -150,9 +150,9 @@ export default class PlanetsRouter {
       const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
       if (planetList.length === 1) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "The last planet cannot be destroyed.",
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "The last planet cannot be destroyed",
           data: {},
         });
       }
@@ -162,7 +162,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "The planet was deleted.",
+        message: "The planet was deleted",
         data: {},
       });
     } catch (error) {

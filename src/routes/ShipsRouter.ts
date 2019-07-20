@@ -6,8 +6,8 @@ import { QueueItem } from "../common/QueueItem";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
-import { Buildings } from "../units/Buildings";
-import { Planet } from "../units/Planet";
+import Buildings from "../units/Buildings";
+import Planet from "../units/Planet";
 
 const units = new Units();
 
@@ -109,7 +109,7 @@ export default class ShipsRouter {
       if (planet.b_hangar_plus) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
-          message: "Shipyard is currently upgrading.",
+          message: "Shipyard is currently upgrading",
           data: {},
         });
       }
@@ -121,6 +121,7 @@ export default class ShipsRouter {
       let stopProcessing = false;
       let buildTime = 0;
 
+      // TODO: put into seperate funciton (also reference this in defense-router)
       for (const item in buildOrders) {
         if (!buildOrders.hasOwnProperty(item)) {
           // TODO: throw a meaningful error

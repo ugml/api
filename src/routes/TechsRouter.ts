@@ -6,9 +6,9 @@ import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { Buildings } from "../units/Buildings";
-import { Planet } from "../units/Planet";
-import { Techs } from "../units/Techs";
+import Buildings from "../units/Buildings";
+import Planet from "../units/Planet";
+import Techs from "../units/Techs";
 
 const units = new Units();
 
@@ -73,7 +73,7 @@ export default class TechsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const techs: Techs = await this.techService.getTechs(userID);
 
       // player does not own the planet
@@ -139,6 +139,10 @@ export default class TechsRouter {
         });
       }
 
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+      const techID = parseInt(request.body.techID, 10);
+
       if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
@@ -146,10 +150,6 @@ export default class TechsRouter {
           data: {},
         });
       }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-      const techID = parseInt(request.body.techID, 10);
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);

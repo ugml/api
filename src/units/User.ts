@@ -1,6 +1,3 @@
-import squel = require("squel");
-import { Database } from "../common/Database";
-import { Logger } from "../common/Logger";
 import { IUnits } from "../interfaces/IUnits";
 
 /***
@@ -8,7 +5,7 @@ import { IUnits } from "../interfaces/IUnits";
  * @classdesc Represents a user
  *
  */
-class User implements IUnits {
+export default class User implements IUnits {
   /**
    * The ID of the user
    * @type {number}
@@ -53,5 +50,3 @@ class User implements IUnits {
     return false;
   }
 }
-
-export { User };

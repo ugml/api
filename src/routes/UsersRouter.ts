@@ -6,13 +6,14 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { IGameConfig } from "../interfaces/IGameConfig";
-import { Planet, PlanetType } from "../units/Planet";
-import { User } from "../units/User";
+import Planet from "../units/Planet";
+import User from "../units/User";
 import PlanetsRouter from "./PlanetsRouter";
 import { Logger } from "../common/Logger";
 
 const bcrypt = require("bcryptjs");
 import { JwtHelper } from "../common/JwtHelper";
+import PlanetType = Globals.PlanetType;
 
 export default class UsersRouter {
   public router: IRouter<{}> = newRouter();

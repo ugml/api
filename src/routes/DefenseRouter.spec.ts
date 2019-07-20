@@ -3,7 +3,7 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 
 const createContainer = require("../ioc/createContainer");
 

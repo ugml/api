@@ -4,8 +4,8 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { Buildings } from "../units/Buildings";
-import { Planet } from "../units/Planet";
+import Buildings from "../units/Buildings";
+import Planet from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
 

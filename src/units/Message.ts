@@ -1,4 +1,6 @@
-class Message {
+import { IUnits } from "../interfaces/IUnits";
+
+export default class Message implements IUnits {
   public messageID: number;
   public senderID: number;
   public receiverID: string;
@@ -12,5 +14,3 @@ class Message {
     return false;
   }
 }
-
-export { Message };

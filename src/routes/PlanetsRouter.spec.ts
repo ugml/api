@@ -3,8 +3,8 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import { Planet } from "../units/Planet";
-import { User } from "../units/User";
+import Planet from "../units/Planet";
+import User from "../units/User";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -196,7 +196,7 @@ describe("planetsRouter", () => {
       .post("/v1/planets/rename")
       .send({ planetID, name: "FancyNewName" })
       .set("Authorization", authToken)
-      .then(async (res) => {
+      .then(async res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.name).to.be.equals("FancyNewName");
@@ -219,7 +219,7 @@ describe("planetsRouter", () => {
       });
   });
 
-  it("should fail (invalid planetID passed)", () => {
+  it("should return a planet", () => {
     const planetID = 167546850;
 
     return request
@@ -233,6 +233,61 @@ describe("planetsRouter", () => {
       });
   });
 
-  // TODO:
-  // destroyPlanet  /destroy/
+  it("should fail (nothing sent)", () => {
+    return request
+      .post("/v1/planets/destroy/")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (invalid planetID)", () => {
+    const planetID = "asdf";
+
+    return request
+      .post("/v1/planets/destroy/")
+      .set("Authorization", authToken)
+      .send({ planetID })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  let secondPlanetBackup: Planet;
+
+  it("should delete the planet", async () => {
+    const planetID = 167546999;
+
+    secondPlanetBackup = await container.planetService.getPlanet(1, planetID, true);
+
+    return request
+      .post("/v1/planets/destroy/")
+      .set("Authorization", authToken)
+      .send({ planetID })
+      .then(async res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("The planet was deleted");
+      });
+  });
+
+  it("should fail (last planet can't be deleted)", async () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/planets/destroy/")
+      .set("Authorization", authToken)
+      .send({ planetID })
+      .then(async res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("The last planet cannot be destroyed");
+        await container.planetService.createNewPlanet(secondPlanetBackup);
+      });
+  });
 });

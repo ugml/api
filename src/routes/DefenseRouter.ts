@@ -6,9 +6,9 @@ import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { Buildings } from "../units/Buildings";
-import { Defenses } from "../units/Defenses";
-import { Planet } from "../units/Planet";
+import Buildings from "../units/Buildings";
+import Defenses from "../units/Defenses";
+import Planet from "../units/Planet";
 
 const units = new Units();
 

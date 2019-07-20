@@ -174,21 +174,65 @@ describe("planetsRouter", () => {
       });
   });
 
-  it("should rename a planet", () => {
+  it("should fail (invalid planetID passed)", () => {
+    const planetID = "aa";
+
+    return request
+      .get(`/v1/planets/movement/${planetID}`)
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should rename a planet", async () => {
     const planetID = 167546850;
+
+    let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
     return request
       .post("/v1/planets/rename")
       .send({ planetID, name: "FancyNewName" })
       .set("Authorization", authToken)
-      .then(res => {
+      .then(async (res) => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.name).to.be.equals("FancyNewName");
+
+        // reset
+        await container.planetService.updatePlanet(planet);
+      });
+  });
+
+  it("should fail (invalid planetID passed)", () => {
+    const planetID = "asdf";
+
+    return request
+      .get(`/v1/planets/${planetID}`)
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (invalid planetID passed)", () => {
+    const planetID = 167546850;
+
+    return request
+      .get(`/v1/planets/${planetID}`)
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Success");
+        expect(res.body.data.planetID).to.be.equals(planetID);
       });
   });
 
   // TODO:
   // destroyPlanet  /destroy/
-  // getPlanetByID  /:planetID
 });

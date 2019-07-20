@@ -4,7 +4,7 @@ import { Logger } from "./common/Logger";
 import App from "./App";
 import Container from "./ioc/container";
 
-const createContainer = require("./createContainer");
+const createContainer = require("./ioc/createContainer");
 
 const container: Container = createContainer();
 

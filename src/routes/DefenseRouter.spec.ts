@@ -65,13 +65,24 @@ describe("defenseRoute", () => {
       });
   });
 
+  it("should fail (invalid planetID)", () => {
+    return request
+      .get("/v1/defenses/asdf")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
   it("should build defense", () => {
     const planetID = 167546850;
 
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: JSON.stringify({ 301: 1 }) })
+      .send({ planetID, buildOrder: JSON.stringify({ 301: 10000 }) })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
@@ -116,17 +127,65 @@ describe("defenseRoute", () => {
       });
   });
 
-  it("should fail (wrong buildOrder format)", () => {
+  it("should fail (invalid buildOrder)", () => {
     const planetID = 167546850;
 
-    return request
-      .post("/v1/defenses/build")
-      .set("Authorization", authToken)
-      .send({ planetID, buildOrder: "'{ \"xyz\": 1 }'" })
-      .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
-      });
+    return (
+      request
+        .post("/v1/defenses/build")
+        .set("Authorization", authToken)
+        // eslint-disable-next-line prettier/prettier
+      .send({ planetID, buildOrder: "{ \"xyz\": 1 }" })
+        .then(res => {
+          expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.message).to.be.equals("Invalid parameter");
+          expect(res.body.data).to.be.eql({});
+        })
+    );
+  });
+
+  it("should fail (player does not own the planet)", () => {
+    const planetID = 1234;
+
+    return (
+      request
+        .post("/v1/defenses/build")
+        .set("Authorization", authToken)
+        // eslint-disable-next-line prettier/prettier
+        .send({ planetID, buildOrder: "{ \"301\": 1 }" })
+        .then(res => {
+          expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.message).to.be.equals("The player does not own the planet");
+          expect(res.body.data).to.be.eql({});
+        })
+    );
+  });
+
+  it("should fail (shipyard is currently upgrading)", async () => {
+    const planetID = 167546850;
+
+    let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+    const valueBefore = planet.b_hangar_plus;
+
+    planet.b_hangar_plus = true;
+
+    await container.planetService.updatePlanet(planet);
+
+    return (
+      request
+        .post("/v1/defenses/build")
+        .set("Authorization", authToken)
+        // eslint-disable-next-line prettier/prettier
+        .send({ planetID, buildOrder: "{ \"301\": 1 }" })
+        .then(async res => {
+          expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.message).to.be.equals("Shipyard is currently upgrading");
+          expect(res.body.data).to.be.eql({});
+
+          planet.b_hangar_plus = valueBefore;
+          await container.planetService.updatePlanet(planet);
+        })
+    );
   });
 });

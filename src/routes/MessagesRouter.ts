@@ -131,8 +131,8 @@ export default class MessagesRouter {
 
       if (!InputValidator.isSet(receiver)) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "The receiver does not exist.",
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "The receiver does not exist",
           data: {},
         });
       }

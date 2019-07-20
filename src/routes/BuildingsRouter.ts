@@ -225,7 +225,7 @@ export default class BuildingsRouter {
           return response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Requirements are not met",
-            data: planet.planetID,
+            data: {},
           });
         }
       }
@@ -263,12 +263,7 @@ export default class BuildingsRouter {
       planet.b_building_id = buildingID;
       planet.b_building_endtime = endTime;
 
-      const updateSuccessful = await this.planetService.updatePlanet(planet);
-
-      if (!updateSuccessful) {
-        // TODO: throw something more meaningful
-        throw Error();
-      }
+      await this.planetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { InputValidator } from "./InputValidator";
+import InputValidator from "./InputValidator";
 
 const assert = chai.assert;
 const expect = chai.expect;
@@ -10,8 +10,13 @@ describe("InputValidator", function() {
   });
 
   it("Valid Int", function() {
-    const num = 12;
     assert.equal(InputValidator.isValidInt(`${12}`), true);
+  });
+
+  it("Valid Int", function() {
+    // eslint-disable-next-line quotes
+    const data = JSON.parse('{ "test": 1 }');
+    assert.equal(InputValidator.isValidInt(data.test), true);
   });
 
   it("Invalid Int", function() {
@@ -24,6 +29,16 @@ describe("InputValidator", function() {
 
   it("Valid Float", function() {
     assert.equal(InputValidator.isValidFloat("1.23"), true);
+  });
+
+  it("Valid Float", function() {
+    assert.equal(InputValidator.isValidFloat(`${1.23}`), true);
+  });
+
+  it("Valid Float", function() {
+    // eslint-disable-next-line quotes
+    const data = JSON.parse('{ "test": 1.2 }');
+    assert.equal(InputValidator.isValidFloat(data.test), true);
   });
 
   it("Invalid Float", function() {
@@ -54,7 +69,6 @@ describe("InputValidator", function() {
   });
 
   it("Sanitize string", function() {
-    const test = undefined;
     assert.equal(InputValidator.sanitizeString("häl/+=\"'lü"), "hll");
   });
 });

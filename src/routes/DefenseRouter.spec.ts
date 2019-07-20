@@ -1,10 +1,15 @@
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
-import app from "../App";
+import App from "../App";
 import { Globals } from "../common/Globals";
-import { PlanetService } from "../services/PlanetService";
 import { Planet } from "../units/Planet";
+
+const createContainer = require("../ioc/createContainer");
+
+const container = createContainer();
+
+const app = new App(container).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -16,7 +21,7 @@ describe("defenseRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await this.planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -26,7 +31,7 @@ describe("defenseRoute", () => {
   });
 
   after(async () => {
-    await this.planetService.updatePlanet(planetBeforeTests);
+    await container.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {

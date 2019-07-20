@@ -1,11 +1,15 @@
 import * as chai from "chai";
-import { UserService } from "./UserService";
+import UserService from "./UserService";
 
 const expect = chai.expect;
 
+const createContainer = require("../ioc/createContainer");
+
+const container = createContainer();
+
 describe("UserService", () => {
   it("should return a valid userID", async () => {
-    const result = await this.userService.getNewId();
+    const result = await container.userService.getNewId();
 
     expect(result).to.be.above(0);
   });
@@ -13,7 +17,7 @@ describe("UserService", () => {
   it("should return information about an authenticated user", async () => {
     const userID = 1;
 
-    const result = await this.userService.getAuthenticatedUser(userID);
+    const result = await container.userService.getAuthenticatedUser(userID);
 
     expect(result.userID).to.be.equals(userID);
     expect(result.username).to.be.equals("admin");
@@ -25,7 +29,7 @@ describe("UserService", () => {
   it("should return information about an user", async () => {
     const userID = 1;
 
-    const result = await this.userService.getUserById(userID);
+    const result = await container.userService.getUserById(userID);
 
     expect(result.userID).to.be.equals(userID);
     expect(result.username).to.be.equals("admin");
@@ -37,7 +41,7 @@ describe("UserService", () => {
   it("should return nothing because the user does not exist", async () => {
     const userID = -1;
 
-    const result = await this.userService.getUserById(userID);
+    const result = await container.userService.getUserById(userID);
 
     expect(result).to.be.equals(null);
   });
@@ -46,7 +50,7 @@ describe("UserService", () => {
     const email = "user_1501005189510@test.com";
     const userID = 1;
 
-    const result = await this.userService.getUserForAuthentication(email);
+    const result = await container.userService.getUserForAuthentication(email);
 
     expect(result.userID).to.be.equals(userID);
     expect(result.email).to.be.equals(email);
@@ -56,7 +60,7 @@ describe("UserService", () => {
   it("should return nothing because the user does not exist", async () => {
     const email = "idontexist@test.com";
 
-    const result = await this.userService.getUserForAuthentication(email);
+    const result = await container.userService.getUserForAuthentication(email);
 
     expect(result).to.be.equals(null);
   });
@@ -64,7 +68,7 @@ describe("UserService", () => {
   it("should return nothing because the user does not exist", async () => {
     const userID = -1;
 
-    const result = await this.userService.getUserById(userID);
+    const result = await container.userService.getUserById(userID);
 
     expect(result).to.be.equals(null);
   });
@@ -73,7 +77,7 @@ describe("UserService", () => {
     const username = "admin";
     const email = "user_1501005189510@test.com";
 
-    const result = await this.userService.checkIfNameOrMailIsTaken(username, email);
+    const result = await container.userService.checkIfNameOrMailIsTaken(username, email);
 
     expect(result.username_taken).to.be.equals(1);
     expect(result.email_taken).to.be.equals(1);
@@ -83,7 +87,7 @@ describe("UserService", () => {
     const username = "WhatEver";
     const email = "whatever@test.com";
 
-    const result = await this.userService.checkIfNameOrMailIsTaken(username, email);
+    const result = await container.userService.checkIfNameOrMailIsTaken(username, email);
 
     expect(result.username_taken).to.be.equals(0);
     expect(result.email_taken).to.be.equals(0);

@@ -1,31 +1,25 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+import { NextFunction, Response, Router as newRouter, IRouter } from "express";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 
 import { Logger } from "../common/Logger";
-import { TYPES } from "../types";
 
-export class GalaxyRouter {
-  public router: Router;
+export default class GalaxyRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IGalaxyService) private galaxyService;
+  private galaxyService;
 
-  /**
-   * Initialize the Router
-   */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.galaxyService = container.galaxyService;
+    this.router.get("/:galaxy/:system", this.getGalaxyInformation);
   }
 
   /**
    * GET planet by ID
    */
-  public async getGalaxyInformation(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getGalaxyInformation = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (
@@ -69,18 +63,5 @@ export class GalaxyRouter {
         data: {},
       });
     }
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.get("/:galaxy/:system", this.getGalaxyInformation);
-  }
+  };
 }
-
-const galaxyRouter = new GalaxyRouter();
-galaxyRouter.init();
-
-export default galaxyRouter.router;

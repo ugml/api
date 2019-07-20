@@ -1,36 +1,37 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+import { IRouter, NextFunction, Response, Router as newRouter, Router } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Defenses } from "../units/Defenses";
 import { Planet } from "../units/Planet";
 
 const units = new Units();
 
-export class DefenseRouter {
-  public router: Router;
+export default class DefenseRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IPlanetService) private planetService;
-  @inject(TYPES.IBuildingService) private buildingService;
-  @inject(TYPES.IDefenseService) private defenseService;
+  private planetService;
+  private buildingService;
+  private defenseService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.planetService = container.planetService;
+    this.buildingService = container.buildingService;
+    this.defenseService = container.defenseService;
+
+    this.router.get("/:planetID", this.getAllDefensesOnPlanet);
+    this.router.post("/build/", this.buildDefense);
   }
 
-  public async getAllDefensesOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllDefensesOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -60,9 +61,9 @@ export class DefenseRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async buildDefense(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public buildDefense = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||
@@ -242,19 +243,5 @@ export class DefenseRouter {
         data: {},
       });
     }
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.get("/:planetID", this.getAllDefensesOnPlanet);
-    this.router.post("/build/", this.buildDefense);
-  }
+  };
 }
-
-const defenseRoutes = new DefenseRouter();
-defenseRoutes.init();
-
-export default defenseRoutes.router;

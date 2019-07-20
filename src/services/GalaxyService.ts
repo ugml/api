@@ -1,5 +1,3 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { ICoordinates } from "../interfaces/ICoordinates";
 import { IGalaxyService } from "../interfaces/IGalaxyService";
@@ -7,8 +5,7 @@ import { PlanetType } from "../units/Planet";
 
 import squel = require("squel");
 
-@injectable()
-export class GalaxyService implements IGalaxyService {
+export default class GalaxyService implements IGalaxyService {
   public async getFreePosition(
     maxGalaxy: number,
     maxSystem: number,

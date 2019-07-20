@@ -33,7 +33,7 @@ module.exports =  {
     "@typescript-eslint/no-namespace": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "on",
-    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-explicit-any": "on",
     "@typescript-eslint/explicit-function-return-type": "off",
     "camelcase": "off",
     "@typescript-eslint/camelcase": "off",

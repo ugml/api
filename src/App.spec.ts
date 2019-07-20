@@ -1,9 +1,13 @@
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
-import app from "./App";
+import App from "./App";
 import { Globals } from "./common/Globals";
 import { JwtHelper } from "./common/JwtHelper";
+
+const createContainer = require("./ioc/createContainer");
+
+const app = new App(createContainer()).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;

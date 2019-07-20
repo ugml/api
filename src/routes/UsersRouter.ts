@@ -1,35 +1,39 @@
-import "reflect-metadata";
-import { NextFunction, Request, Response, Router } from "express";
-import { inject } from "inversify";
+
+import { IRouter, NextFunction, Request, Response, Router as newRouter, Router } from "express";
 import { Config } from "../common/Config";
 import { Database } from "../common/Database";
 import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { IGameConfig } from "../interfaces/IGameConfig";
-import { TYPES } from "../types";
 import { Planet, PlanetType } from "../units/Planet";
 import { User } from "../units/User";
-import { PlanetsRouter } from "./PlanetsRouter";
+import PlanetsRouter from "./PlanetsRouter";
 import { Logger } from "../common/Logger";
 
 const bcrypt = require("bcryptjs");
 import { JwtHelper } from "../common/JwtHelper";
 
-export class UsersRouter {
-  public router: Router;
+export default class UsersRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IUserService) private userService;
-  @inject(TYPES.IGalaxyService) private galaxyService;
-  @inject(TYPES.IPlanetService) private planetService;
-  @inject(TYPES.IBuildingService) private buildingService;
-  @inject(TYPES.IDefenseService) private defenseService;
-  @inject(TYPES.IShipService) private shipService;
-  @inject(TYPES.ITechService) private techService;
+  private userService;
+  private galaxyService;
+  private planetService;
+  private buildingService;
+  private defenseService;
+  private shipService;
+  private techService;
 
-  public constructor() {
-    this.router = Router();
+  public constructor(container) {
+    this.userService = container.userService;
+    this.galaxyService = container.galaxyService;
+    this.planetService = container.planetService;
+    this.buildingService = container.buildingService;
+    this.defenseService = container.defenseService;
+    this.shipService = container.shipService;
+    this.techService = container.techService;
 
     // /user/create/
     this.router.post("/create", this.createUser);
@@ -38,13 +42,13 @@ export class UsersRouter {
     this.router.post("/update", this.updateUser);
 
     // /user/planet/:planetID
-    this.router.get("/planet/:planetID", new PlanetsRouter().getOwnPlanet);
+    this.router.get("/planet/:planetID", new PlanetsRouter(container).getOwnPlanet);
 
     // /user/planetlist/
-    this.router.get("/planetlist/", new PlanetsRouter().getAllPlanets);
+    this.router.get("/planetlist/", new PlanetsRouter(container).getAllPlanets);
 
     // /user/planetlist/:userID
-    this.router.get("/planetlist/:userID", new PlanetsRouter().getAllPlanetsOfUser);
+    this.router.get("/planetlist/:userID", new PlanetsRouter(container).getAllPlanetsOfUser);
 
     // /user/currentplanet/set/:planetID
     this.router.post("/currentplanet/set", this.setCurrentPlanet);
@@ -56,7 +60,7 @@ export class UsersRouter {
     this.router.get("/", this.getUserSelf);
   }
 
-  public async getUserSelf(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getUserSelf = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
@@ -83,9 +87,9 @@ export class UsersRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async getUserByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getUserByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
@@ -112,9 +116,9 @@ export class UsersRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async createUser(request: Request, response: Response, next: NextFunction) {
+  public createUser = async (request: Request, response: Response, next: NextFunction) => {
     if (
       !InputValidator.isSet(request.body.username) ||
       !InputValidator.isSet(request.body.password) ||
@@ -297,9 +301,9 @@ export class UsersRouter {
         token: JwtHelper.generateToken(newUser.userID),
       },
     });
-  }
+  };
 
-  public async updateUser(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public updateUser = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // if no parameters are set
       if (
@@ -361,9 +365,9 @@ export class UsersRouter {
 
       return;
     }
-  }
+  };
 
-  public async setCurrentPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
@@ -407,9 +411,5 @@ export class UsersRouter {
         data: {},
       });
     }
-  }
+  };
 }
-
-const usersRouter = new UsersRouter();
-
-export default usersRouter.router;

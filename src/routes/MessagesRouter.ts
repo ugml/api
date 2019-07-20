@@ -1,27 +1,28 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Logger } from "../common/Logger";
-import { TYPES } from "../types";
 
-export class MessagesRouter {
-  public router: Router;
+export default class MessagesRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IUserService) private userService;
-  @inject(TYPES.IMessageService) private messageService;
+  private userService;
+  private messageService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.userService = container.userService;
+    this.messageService = container.messageService;
+    this.router.get("/get", this.getAllMessages);
+    this.router.get("/get/:messageID", this.getMessageByID);
+    this.router.post("/delete", this.deleteMessage);
+    this.router.post("/send", this.sendMessage);
   }
 
-  public async getAllMessages(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllMessages = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -42,9 +43,9 @@ export class MessagesRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async getMessageByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getMessageByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -73,9 +74,9 @@ export class MessagesRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async deleteMessage(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public deleteMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -104,9 +105,9 @@ export class MessagesRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async sendMessage(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public sendMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.receiverID) ||
@@ -152,24 +153,5 @@ export class MessagesRouter {
         data: {},
       });
     }
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.get("/get", this.getAllMessages);
-
-    this.router.get("/get/:messageID", this.getMessageByID);
-
-    this.router.post("/delete", this.deleteMessage);
-
-    this.router.post("/send", this.sendMessage);
-  }
+  };
 }
-
-const messagesRouter = new MessagesRouter();
-messagesRouter.init();
-
-export default messagesRouter.router;

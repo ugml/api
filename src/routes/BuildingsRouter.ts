@@ -1,12 +1,9 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
@@ -14,18 +11,22 @@ import { Logger } from "../common/Logger";
 
 const units = new Units();
 
-export class BuildingsRouter {
-  public router: Router;
+export default class BuildingsRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IPlanetService) private planetService;
-  @inject(TYPES.IBuildingService) private buildingService;
+  private buildingService;
+  private planetService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.buildingService = container.buildingService;
+    this.planetService = container.planetService;
+
+    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
+    this.router.post("/build", this.startBuilding);
+    this.router.post("/cancel", this.cancelBuilding);
   }
 
   /**
@@ -34,7 +35,7 @@ export class BuildingsRouter {
    * @param response
    * @param next
    */
-  public async getAllBuildingsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -62,9 +63,9 @@ export class BuildingsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async cancelBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public cancelBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -126,9 +127,9 @@ export class BuildingsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async startBuilding(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public startBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||
@@ -283,20 +284,5 @@ export class BuildingsRouter {
         data: {},
       });
     }
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
-    this.router.post("/build", this.startBuilding);
-    this.router.post("/cancel", this.cancelBuilding);
-  }
+  };
 }
-
-const buildingRoutes = new BuildingsRouter();
-buildingRoutes.init();
-
-export default buildingRoutes.router;

@@ -1,27 +1,28 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { Logger } from "../common/Logger";
-import { TYPES } from "../types";
 import { Planet } from "../units/Planet";
 
-export class PlanetsRouter {
-  public router: Router;
+export default class PlanetsRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IPlanetService) private planetService;
+  private planetService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.planetService = container.planetService;
+
+    this.router.get("/movement/:planetID", this.getMovement);
+    this.router.post("/destroy/", this.destroyPlanet);
+    this.router.post("/rename/", this.renamePlanet);
+    this.router.get("/:planetID", this.getPlanetByID);
   }
 
-  public async getAllPlanets(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllPlanets = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -42,9 +43,9 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async getAllPlanetsOfUser(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       const userID = parseInt(request.params.userID, 10);
 
@@ -65,9 +66,9 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async getOwnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getOwnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -97,9 +98,9 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async getMovement(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getMovement = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -130,9 +131,9 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async destroyPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public destroyPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
@@ -173,9 +174,9 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async renamePlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public renamePlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (
@@ -225,12 +226,12 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
+  };
 
   /**
    * GET planet by ID
    */
-  public async getPlanetByID(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getPlanetByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -260,21 +261,5 @@ export class PlanetsRouter {
         data: {},
       });
     }
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.get("/movement/:planetID", this.getMovement);
-    this.router.post("/destroy/", this.destroyPlanet);
-    this.router.post("/rename/", this.renamePlanet);
-    this.router.get("/:planetID", this.getPlanetByID);
-  }
+  };
 }
-
-const playerRoutes = new PlanetsRouter();
-playerRoutes.init();
-
-export default playerRoutes.router;

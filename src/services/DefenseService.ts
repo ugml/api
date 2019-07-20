@@ -1,12 +1,9 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { IDefenseService } from "../interfaces/IDefenseService";
 
 import squel = require("squel");
 
-@injectable()
-export class DefenseService implements IDefenseService {
+export default class DefenseService implements IDefenseService {
   public async createDefenseRow(planetID: number, connection = null) {
     const query = `INSERT INTO defenses (\`planetID\`) VALUES (${planetID});`;
 

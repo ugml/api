@@ -1,7 +1,7 @@
 import { NextFunction, Response, Router } from "express";
 import { Database } from "../common/Database";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Redis } from "../common/Redis";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICoordinates } from "../interfaces/ICoordinates";

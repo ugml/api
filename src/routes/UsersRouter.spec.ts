@@ -1,8 +1,14 @@
 import * as chai from "chai";
 
-import app from "../App";
+import App from "../App";
 import { Globals } from "../common/Globals";
 import chaiHttp = require("chai-http");
+
+const createContainer = require("../ioc/createContainer");
+
+const container = createContainer();
+
+const app = new App(container).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;

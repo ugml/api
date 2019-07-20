@@ -1,7 +1,5 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { IPlanetService } from "../interfaces/IPlanetService";
@@ -9,8 +7,7 @@ import { Planet } from "../units/Planet";
 
 import squel = require("squel");
 
-@injectable()
-export class PlanetService implements IPlanetService {
+export default class PlanetService implements IPlanetService {
   public async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {
     let query = squel
       .select()

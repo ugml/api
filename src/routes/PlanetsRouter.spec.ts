@@ -1,12 +1,16 @@
 import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
-import app from "../App";
+import App from "../App";
 import { Globals } from "../common/Globals";
-import { PlanetService } from "../services/PlanetService";
-import { UserService } from "../services/UserService";
 import { Planet } from "../units/Planet";
 import { User } from "../units/User";
+
+const createContainer = require("../ioc/createContainer");
+
+const container = createContainer();
+
+const app = new App(container).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -19,8 +23,8 @@ describe("planetsRouter", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    authUserBeforeTests = await this.userService.getAuthenticatedUser(1);
-    planetBeforeTests = await this.planetService.getPlanet(1, 167546850, true);
+    authUserBeforeTests = await container.userService.getAuthenticatedUser(1);
+    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -30,8 +34,8 @@ describe("planetsRouter", () => {
   });
 
   after(async () => {
-    await this.userService.updateUserData(authUserBeforeTests);
-    await this.planetService.updatePlanet(planetBeforeTests);
+    await container.userService.updateUserData(authUserBeforeTests);
+    await container.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {

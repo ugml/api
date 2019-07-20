@@ -1,12 +1,9 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
 import { ITechService } from "../interfaces/ITechService";
 
 import squel = require("squel");
 
-@injectable()
-export class TechService implements ITechService {
+export default class TechService implements ITechService {
   public async createTechRow(userID: number, connection = null) {
     const query = `INSERT INTO techs (\`userID\`) VALUES (${userID});`;
 

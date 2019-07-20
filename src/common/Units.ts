@@ -1,7 +1,7 @@
 import { ICosts } from "../interfaces/ICosts";
 import { IPricelist } from "../interfaces/IPricelist";
 import { Globals } from "./Globals";
-import { InputValidator } from "./InputValidator";
+import InputValidator from "./InputValidator";
 
 const enum UnitType {
   BUILDING,

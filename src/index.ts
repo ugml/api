@@ -1,17 +1,22 @@
 import * as debug from "debug";
 import * as http from "http";
-
-import App from "./App";
-
 import { Logger } from "./common/Logger";
+import App from "./App";
+import Container from "./ioc/container";
+
+const createContainer = require("./createContainer");
+
+const container: Container = createContainer();
+
+const app = new App(container);
 
 debug("ts-express:server");
 
 const port = process.env.PORT || 3000;
 
-App.set("port", port);
+app.express.set("port", port);
 
-const server = http.createServer(App);
+const server = http.createServer(app.express);
 
 server.on("error", function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== "listen") {

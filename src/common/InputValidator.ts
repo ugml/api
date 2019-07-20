@@ -1,4 +1,4 @@
-class InputValidator {
+export default class InputValidator {
   public static isValidInt(input: string): boolean {
     if (!this.isSet(input)) {
       return false;
@@ -8,11 +8,7 @@ class InputValidator {
       return true;
     }
 
-    if (!input.match(/^-{0,1}\d+$/)) {
-      return false;
-    }
-
-    return true;
+    return input.match(/^-{0,1}\d+$/) !== null;
   }
 
   public static isValidFloat(input: string): boolean {
@@ -24,11 +20,7 @@ class InputValidator {
       return true;
     }
 
-    if (!input.match(/^\d+\.\d+$/)) {
-      return false;
-    }
-
-    return true;
+    return input.match(/^\d+\.\d+$/) !== null;
   }
 
   public static isValidJson(input: string): boolean {
@@ -48,5 +40,3 @@ class InputValidator {
     return input.replace(/[^a-z0-9@ .,_-]/gim, "").trim();
   }
 }
-
-export { InputValidator };

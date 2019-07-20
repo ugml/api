@@ -1,13 +1,10 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { IShipService } from "../interfaces/IShipService";
 
 import squel = require("squel");
 
-@injectable()
-export class ShipService implements IShipService{
+export default class ShipService implements IShipService {
   public async createShipsRow(planetID: number, connection = null) {
     const query = `INSERT INTO ships (\`planetID\`) VALUES (${planetID});`;
 

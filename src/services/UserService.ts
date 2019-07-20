@@ -1,14 +1,11 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { IUserService } from "../interfaces/IUserService";
 import { User } from "../units/User";
 import squel = require("squel");
 
-@injectable()
-class UserService implements IUserService {
+export default class UserService implements IUserService {
   public constructor() {}
   /**
    * Returns all information about an authenticated user.
@@ -164,5 +161,3 @@ class UserService implements IUserService {
     }
   }
 }
-
-export { UserService };

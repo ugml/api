@@ -1,25 +1,20 @@
-import "reflect-metadata";
-import { NextFunction, Request, Response, Router } from "express";
-import { inject, injectable } from "inversify";
+import { NextFunction, Response, Router as newRouter, IRouter, Request } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { JwtHelper } from "../common/JwtHelper";
 import { Logger } from "../common/Logger";
-import { IUserService } from "../interfaces/IUserService";
-import { myContainer } from "../inversify.config";
-import { TYPES } from "../types";
+import IRequest from "../interfaces/IRequest";
 
 const bcrypt = require("bcryptjs");
 
-export class AuthRouter {
-  public router: Router;
-  private userService: IUserService;
+export default class AuthRouter {
+  public router: IRouter<{}> = newRouter();
 
-  public constructor() {
-    this.router = Router();
-    this.init();
+  private userService;
 
-    this.userService = myContainer.get<IUserService>(TYPES.IUserService);
+  public constructor(container) {
+    this.userService = container.userService;
+    this.router.post("/login", this.authenticate);
   }
 
   /***
@@ -29,16 +24,14 @@ export class AuthRouter {
    * @param response
    * @param next
    */
-  public async authenticate(req: Request, response: Response, next: NextFunction) {
+  public authenticate = async (req: IRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
           data: {},
         });
-
-        return;
       }
 
       const email: string = InputValidator.sanitizeString(req.body.email);
@@ -82,14 +75,5 @@ export class AuthRouter {
         data: {},
       });
     }
-  }
-
-  public init() {
-    this.router.post("/login", this.authenticate);
-  }
+  };
 }
-
-const authRoutes = new AuthRouter();
-authRoutes.init();
-
-export default authRoutes.router;

@@ -1,17 +1,14 @@
-import "reflect-metadata";
+
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { IBuildingService } from "../interfaces/IBuildingService";
 import { Buildings } from "../units/Buildings";
 
-import { injectable } from "inversify";
-
 import squel = require("squel");
 
-@injectable()
-export class BuildingService implements IBuildingService {
+export default class BuildingService implements IBuildingService {
   public async getBuildings(planetID: number): Promise<Buildings> {
     try {
       const query: string = squel

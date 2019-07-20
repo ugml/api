@@ -1,35 +1,36 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { QueueItem } from "../common/QueueItem";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
-import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 
 const units = new Units();
 
-export class ShipsRouter {
-  public router: Router;
+export default class ShipsRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IPlanetService) private planetService;
-  @inject(TYPES.IBuildingService) private buildingService;
-  @inject(TYPES.IShipService) private shipService;
+  private planetService;
+  private buildingService;
+  private shipService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.planetService = container.planetService;
+    this.buildingService = container.buildingService;
+    this.shipService = container.shipService;
+
+    this.router.get("/:planetID", this.getAllShipsOnPlanet);
+    this.router.post("/build/", this.buildShips);
   }
 
-  public async getAllShipsOnPlanet(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -59,9 +60,9 @@ export class ShipsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async buildShips(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public buildShips = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||
@@ -217,19 +218,5 @@ export class ShipsRouter {
         data: {},
       });
     }
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.get("/:planetID", this.getAllShipsOnPlanet);
-    this.router.post("/build/", this.buildShips);
-  }
+  };
 }
-
-const shipsRoutes = new ShipsRouter();
-shipsRoutes.init();
-
-export default shipsRoutes.router;

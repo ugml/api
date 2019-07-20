@@ -1,33 +1,36 @@
-import "reflect-metadata";
-import { NextFunction, Response, Router } from "express";
-import { inject } from "inversify";
+
+import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { TYPES } from "../types";
 import { Buildings } from "../units/Buildings";
 import { Planet } from "../units/Planet";
 import { Techs } from "../units/Techs";
 
 const units = new Units();
 
-export class TechsRouter {
-  public router: Router;
+export default class TechsRouter {
+  public router: IRouter<{}> = newRouter();
 
-  @inject(TYPES.IPlanetService) private planetService;
-  @inject(TYPES.IBuildingService) private buildingService;
-  @inject(TYPES.ITechService) private techService;
+  private planetService;
+  private buildingService;
+  private techService;
 
   /**
    * Initialize the Router
    */
-  public constructor() {
-    this.router = Router();
-    this.init();
+  public constructor(container) {
+    this.planetService = container.planetService;
+    this.buildingService = container.buildingService;
+    this.techService = container.techService;
+
+    this.router.get("/", this.getTechs);
+    this.router.post("/build/", this.buildTech);
+    this.router.post("/cancel/", this.cancelTech);
   }
 
   /**
@@ -36,7 +39,7 @@ export class TechsRouter {
    * @param response
    * @param next
    */
-  public async getTechs(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public getTechs = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -56,9 +59,9 @@ export class TechsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async cancelTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public cancelTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -120,9 +123,9 @@ export class TechsRouter {
         data: {},
       });
     }
-  }
+  };
 
-  public async buildTech(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public buildTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||
@@ -261,16 +264,5 @@ export class TechsRouter {
         data: {},
       });
     }
-  }
-
-  public init() {
-    this.router.get("/", this.getTechs);
-    this.router.post("/build/", this.buildTech);
-    this.router.post("/cancel/", this.cancelTech);
-  }
+  };
 }
-
-const techsRouter = new TechsRouter();
-techsRouter.init();
-
-export default techsRouter.router;

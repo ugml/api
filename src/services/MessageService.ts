@@ -1,15 +1,12 @@
-import "reflect-metadata";
-import { injectable } from "inversify";
 import { Database } from "../common/Database";
-import { InputValidator } from "../common/InputValidator";
+import InputValidator from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { IMessageService } from "../interfaces/IMessageService";
 import { Message } from "../units/Message";
 
 import squel = require("squel");
 
-@injectable()
-class MessageService implements IMessageService {
+export default class MessageService implements IMessageService {
   public async getAllMessages(userID: number) {
     const query: string = squel
       .select()
@@ -102,5 +99,3 @@ class MessageService implements IMessageService {
     await Database.query(query);
   }
 }
-
-export { MessageService };

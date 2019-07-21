@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 import PlanetService from "./PlanetService";
 
 const expect = chai.expect;

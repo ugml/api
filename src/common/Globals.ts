@@ -45,6 +45,11 @@ namespace Globals {
     NOT_FOUND = 404,
     SERVER_ERROR = 500,
   }
+
+  export enum PlanetType {
+    Planet = 1,
+    Moon = 2,
+  }
 }
 
 export { Globals };

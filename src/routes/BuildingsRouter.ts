@@ -4,8 +4,8 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { Buildings } from "../units/Buildings";
-import { Planet } from "../units/Planet";
+import Buildings from "../units/Buildings";
+import Planet from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
 
@@ -181,7 +181,8 @@ export default class BuildingsRouter {
         (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
           buildingID === Globals.Buildings.NANITE_FACTORY ||
           buildingID === Globals.Buildings.SHIPYARD) &&
-        (planet.b_hangar_queue.length > 0 || planet.b_hangar_start_time > 0)
+        ((InputValidator.isSet(planet.b_hangar_queue) && planet.b_hangar_queue.length > 0) ||
+          planet.b_hangar_start_time > 0)
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
@@ -225,7 +226,7 @@ export default class BuildingsRouter {
           return response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Requirements are not met",
-            data: planet.planetID,
+            data: {},
           });
         }
       }
@@ -263,12 +264,7 @@ export default class BuildingsRouter {
       planet.b_building_id = buildingID;
       planet.b_building_endtime = endTime;
 
-      const updateSuccessful = await this.planetService.updatePlanet(planet);
-
-      if (!updateSuccessful) {
-        // TODO: throw something more meaningful
-        throw Error();
-      }
+      await this.planetService.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

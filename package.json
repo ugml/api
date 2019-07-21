@@ -85,6 +85,7 @@
     "@types/superagent": "^3.8.4",
     "@typescript-eslint/eslint-plugin": "^1.10.2",
     "@typescript-eslint/parser": "^1.10.2",
+    "audit-ci": "^2.2.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.3.0",

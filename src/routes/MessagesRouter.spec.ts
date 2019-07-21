@@ -99,6 +99,58 @@ describe("messagesRouter", () => {
       });
   });
 
+  it("should fail (receiverID not set)", () => {
+    return request
+      .post("/v1/messages/send")
+      .send({ subject: "Test", body: "Test" })
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (subject not set)", () => {
+    return request
+      .post("/v1/messages/send")
+      .send({ receiverID: 1, body: "Test" })
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (body not set)", () => {
+    return request
+      .post("/v1/messages/send")
+      .send({ receiverID: 1, subject: "Test" })
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (receiver does not exist)", () => {
+    return request
+      .post("/v1/messages/send")
+      .send({ receiverID: 91283917239, subject: "Test", body: "Test" })
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.message).to.be.equals("The receiver does not exist");
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
   it("should delete a message", () => {
     return request
       .post("/v1/messages/delete")

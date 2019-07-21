@@ -1,4 +1,4 @@
-import { User } from "../units/User";
+import User from "../units/User";
 
 export interface IUserService {
   getAuthenticatedUser(userID: number): Promise<User>;

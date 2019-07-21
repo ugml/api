@@ -43,7 +43,152 @@ describe("techsRouter", () => {
       });
   });
 
-  // TODO:
-  // /v1/techs/build/
-  // /v1/techs/cancel/
+  it("should fail (missing techID-parameter)", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (missing planetID-parameter)", () => {
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ techID: 1 })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (techID is negative)", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID, techID: -1 })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (techID is higher than global maximum)", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID, techID: 500 })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (player does not own planet)", () => {
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID: 1234, techID: 101 })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("start a tech-build-order", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID, techID: 101 })
+      .then(res => {
+        expect(res.body.message).equals("Job started");
+        expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.data.planet.planetID).to.be.equals(planetID);
+      });
+  });
+
+  it("try to start another tech-build-order", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, techID: "101" })
+      .then(res => {
+        expect(res.body.message).equals("Planet already has a build-job");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (invalid planetID)", () => {
+    const planetID = "test";
+
+    return request
+      .post("/v1/techs/cancel")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, techID: "101" })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("cancel the tech-build-order", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/cancel")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, techID: "101" })
+      .then(res => {
+        expect(res.body.message).equals("Tech canceled");
+        expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+      });
+  });
+
+  it("should fail (user does not own the planet)", () => {
+    const planetID = 1234;
+
+    return request
+      .post("/v1/techs/cancel")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, techID: "1101" })
+      .then(res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("try cancel the build-order again", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/techs/cancel")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, techID: "1" })
+      .then(res => {
+        expect(res.body.message).equals("Planet has no build-job");
+        expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
 });

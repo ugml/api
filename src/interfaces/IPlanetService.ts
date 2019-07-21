@@ -1,4 +1,4 @@
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 
 export interface IPlanetService {
   getPlanet(userID: number, planetID: number, fullInfo: boolean): Promise<Planet>;

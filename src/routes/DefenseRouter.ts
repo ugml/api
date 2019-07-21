@@ -6,9 +6,9 @@ import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
-import { Buildings } from "../units/Buildings";
-import { Defenses } from "../units/Defenses";
-import { Planet } from "../units/Planet";
+import Buildings from "../units/Buildings";
+import Defenses from "../units/Defenses";
+import Planet from "../units/Planet";
 
 const units = new Units();
 
@@ -111,7 +111,7 @@ export default class DefenseRouter {
       if (planet.b_hangar_plus) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
-          message: "Shipyard is currently upgrading.",
+          message: "Shipyard is currently upgrading",
           data: {},
         });
       }
@@ -125,6 +125,7 @@ export default class DefenseRouter {
       let freeSiloSlots: number =
         buildings.missile_silo * 10 - defenses.anti_ballistic_missile - defenses.interplanetary_missile * 2;
 
+      // TODO: put this into a seperate function
       for (const item in buildOrders) {
         if (buildOrders.hasOwnProperty(item)) {
           let count: number = buildOrders[item];

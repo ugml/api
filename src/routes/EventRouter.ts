@@ -160,48 +160,40 @@ export class EventRouter {
     // TODO: check if planet has enough deuterium
 
     if (!InputValidator.isSet(request.body.event)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
-
-      return;
     }
 
     const eventData = JSON.parse(request.body.event);
 
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid json",
         data: {},
       });
-
-      return;
     }
 
     // check if sender of event == currently authenticated user
     if (request.userID !== eventData.ownerID) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
         message: "Event-creator is not currently authenticated user",
         data: {},
       });
-
-      return;
     }
 
     // TODO: temporary
     if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
-      response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: "Missiontype not yet supported",
         data: {},
       });
-
-      return;
     }
 
     let planetQuery: string = squel
@@ -221,13 +213,11 @@ export class EventRouter {
 
         // planet does not exist or player does not own it
         if (!InputValidator.isSet(startPlanet)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
+          return response.status(Globals.Statuscode.BAD_REQUEST).json({
             status: Globals.Statuscode.BAD_REQUEST,
             message: "Invalid parameter",
             data: {},
           });
-
-          return;
         }
 
         // get the destination-planet
@@ -247,13 +237,11 @@ export class EventRouter {
 
             // destination does not exist
             if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
-              response.status(Globals.Statuscode.BAD_REQUEST).json({
+              return response.status(Globals.Statuscode.BAD_REQUEST).json({
                 status: Globals.Statuscode.BAD_REQUEST,
                 message: "Destination does not exist",
                 data: {},
               });
-
-              return;
             }
 
             // calculate distance
@@ -302,46 +290,41 @@ export class EventRouter {
               eventData.eventID = parseInt(result.insertId, 10);
 
               // all done
-              response.status(Globals.Statuscode.SUCCESS).json({
+              return response.status(Globals.Statuscode.SUCCESS).json({
                 status: Globals.Statuscode.SUCCESS,
                 message: "Event successfully created.",
                 data: eventData,
               });
-              return;
             });
           })
           .catch(error => {
             Logger.error(error);
 
-            response.status(Globals.Statuscode.SERVER_ERROR).json({
+            return response.status(Globals.Statuscode.SERVER_ERROR).json({
               status: Globals.Statuscode.SERVER_ERROR,
               message: `An error occured: ${error.message}`,
               data: eventData,
             });
-            return;
           });
       })
       .catch(error => {
         Logger.error(error);
 
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
+        return response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: `An error occured: ${error.message}`,
           data: eventData,
         });
-        return;
       });
   }
 
   public cancelEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
-
-      return;
     }
 
     const planetQuery: string = squel
@@ -359,13 +342,11 @@ export class EventRouter {
 
         // destination does not exist
         if (!InputValidator.isSet(event)) {
-          response.status(Globals.Statuscode.BAD_REQUEST).json({
+          return response.status(Globals.Statuscode.BAD_REQUEST).json({
             status: Globals.Statuscode.BAD_REQUEST,
             message: "The event does not exist or can't be canceled",
             data: {},
           });
-
-          return;
         }
 
         // (time passed from start until cancel) + (time now)
@@ -394,23 +375,21 @@ export class EventRouter {
           Redis.getConnection().zadd("eventQueue", request.body.eventID, newEndTime);
 
           // all done
-          response.status(Globals.Statuscode.SUCCESS).json({
+          return response.status(Globals.Statuscode.SUCCESS).json({
             status: Globals.Statuscode.SUCCESS,
             message: "Event successfully canceled.",
             data: {},
           });
-          return;
         });
       })
       .catch(error => {
         Logger.error(error);
 
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
+        return response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: `An error occured: ${error.message}`,
           data: {},
         });
-        return;
       });
   }
 

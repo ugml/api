@@ -3,7 +3,7 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import { Planet } from "../units/Planet";
+import Planet from "../units/Planet";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -333,6 +333,7 @@ describe("buildingsRoute", () => {
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
         });
     });
+
     it("try cancel the build-order again", () => {
       const planetID = 167546850;
 
@@ -344,6 +345,98 @@ describe("buildingsRoute", () => {
           expect(res.body.message).equals("Planet has no build-job");
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
           expect(res.body.data).to.be.eql({});
+        });
+    });
+
+    it("should fail (can't build shipyard/robotic/nanite while it is being used)", async () => {
+      const planetID = 167546850;
+
+      let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+      const valueBefore = planet.b_hangar_start_time;
+
+      planet.b_hangar_start_time = 1;
+
+      await container.planetService.updatePlanet(planet);
+
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.ROBOTIC_FACTORY })
+        .then(async res => {
+          expect(res.body.message).equals("Can't build this building while it is in use");
+          expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.eql({});
+
+          // reset planet
+          planet.b_hangar_start_time = valueBefore;
+          await container.planetService.updatePlanet(planet);
+        });
+    });
+
+    it("should fail (can't build research-lab while it is being used)", async () => {
+      const planetID = 167546850;
+
+      let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+      const valueBefore = planet.b_tech_endtime;
+
+      planet.b_tech_endtime = 1;
+
+      await container.planetService.updatePlanet(planet);
+
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.RESEARCH_LAB })
+        .then(async res => {
+          expect(res.body.message).equals("Can't build this building while it is in use");
+          expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.eql({});
+
+          // reset planet
+          planet.b_tech_endtime = valueBefore;
+          await container.planetService.updatePlanet(planet);
+        });
+    });
+
+    it("should fail (requirements are not met)", async () => {
+      const planetID = 167546850;
+
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.TERRAFORMER })
+        .then(async res => {
+          expect(res.body.message).equals("Requirements are not met");
+          expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.eql({});
+        });
+    });
+
+    it("should fail (planet has not enough resources)", async () => {
+      const planetID = 167546850;
+
+      let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+      const metalBefore = planet.metal;
+
+      planet.metal = 0;
+
+      await container.planetService.updatePlanet(planet);
+
+      return request
+        .post("/v1/buildings/build")
+        .set("Authorization", authToken)
+        .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
+        .then(async res => {
+          expect(res.body.message).equals("Not enough resources");
+          expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.body.data).to.be.eql({});
+
+          // reset planet
+          planet.metal = metalBefore;
+          await container.planetService.updatePlanet(planet);
         });
     });
   });

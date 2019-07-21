@@ -6,13 +6,14 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { IGameConfig } from "../interfaces/IGameConfig";
-import { Planet, PlanetType } from "../units/Planet";
-import { User } from "../units/User";
+import Planet from "../units/Planet";
+import User from "../units/User";
 import PlanetsRouter from "./PlanetsRouter";
 import { Logger } from "../common/Logger";
 
 const bcrypt = require("bcryptjs");
 import { JwtHelper } from "../common/JwtHelper";
+import PlanetType = Globals.PlanetType;
 
 export default class UsersRouter {
   public router: IRouter<{}> = newRouter();
@@ -123,13 +124,11 @@ export default class UsersRouter {
       !InputValidator.isSet(request.body.password) ||
       !InputValidator.isSet(request.body.email)
     ) {
-      response.status(Globals.Statuscode.BAD_REQUEST).json({
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
         message: "Invalid parameter",
         data: {},
       });
-
-      return;
     }
 
     const gameConfig: IGameConfig = Config.Get;
@@ -310,13 +309,11 @@ export default class UsersRouter {
         !InputValidator.isSet(request.body.password) &&
         !InputValidator.isSet(request.body.email)
       ) {
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "No parameters were passed",
           data: {},
         });
-
-        return;
       }
 
       const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
@@ -348,21 +345,19 @@ export default class UsersRouter {
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         // return the result
-        response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: `There was an error while handling the request: ${error.message}`,
           data: {},
         });
       } else {
         // return the result
-        response.status(Globals.Statuscode.SERVER_ERROR).json({
+        return response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: "There was an error while handling the request.",
           data: {},
         });
       }
-
-      return;
     }
   };
 

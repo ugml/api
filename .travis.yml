@@ -23,7 +23,8 @@ stages:
 jobs:
   include:
     - stage: audit
-      script: if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then audit-ci --low --report-type full; fi
+      if: type = pull_request
+      script: audit-ci --low --report-type full
     - &build
       stage: build
       script: npm run-script build

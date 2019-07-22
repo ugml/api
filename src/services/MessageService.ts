@@ -1,6 +1,6 @@
 import { Database } from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import { SerializationHelper } from "../common/SerializationHelper";
+import SerializationHelper from "../common/SerializationHelper";
 import { IMessageService } from "../interfaces/IMessageService";
 import Message from "../units/Message";
 

@@ -2,7 +2,7 @@ import { IRouter, NextFunction, Response, Router as newRouter, Router } from "ex
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { QueueItem } from "../common/QueueItem";
+import Queue from "../common/Queue";
 
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
@@ -81,7 +81,7 @@ export default class DefenseRouter {
 
       const buildOrders = JSON.parse(request.body.buildOrder);
 
-      const queueItem: QueueItem = new QueueItem();
+      const queueItem: Queue = new Queue();
 
       queueItem.setPlanetID(planetID);
 

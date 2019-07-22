@@ -1,4 +1,4 @@
-/***
+/**
  * This class holds all global variables
  */
 class Globals {

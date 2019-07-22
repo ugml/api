@@ -17,7 +17,7 @@ export default class AuthRouter {
     this.router.post("/login", this.authenticate);
   }
 
-  /***
+  /**
    * Validates the passed login-data. If the data is valid,
    * a new JWT-token is returned.
    * @param req

@@ -1,6 +1,6 @@
 import { Database } from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import { SerializationHelper } from "../common/SerializationHelper";
+import SerializationHelper from "../common/SerializationHelper";
 import { IUserService } from "../interfaces/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");

@@ -1,7 +1,26 @@
-class QueueItem {
+/**
+ * This class represents a Queue.
+ * A Queue is part of a build-queue.
+ */
+export default class Queue {
+  /**
+   * The planetID, on which the queue will be processed
+   */
   private planetID: number = -1;
+
+  /**
+   * The last time, the queue was updated
+   */
   private lastUpdateTime: number = 0;
+
+  /**
+   * The remaining time for the queue
+   */
   private timeRemaining: number = 0;
+
+  /**
+   * The queue itself
+   */
   private queue: object = {};
 
   public setPlanetID(planetID: number) {
@@ -32,6 +51,11 @@ class QueueItem {
     return this.queue;
   }
 
+  /**
+   * Appends a new build-order to the queue
+   * @param key the key of the unit
+   * @param value the amount of units to be built in this order
+   */
   public addToQueue(key: string, value: number) {
     if (value <= 0) {
       return;
@@ -42,5 +66,3 @@ class QueueItem {
     }
   }
 }
-
-export { QueueItem };

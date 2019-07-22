@@ -1,5 +1,6 @@
 const gulp = require("gulp");
 const ts = require("gulp-typescript");
+const typedoc = require("gulp-typedoc");
 const nodemon = require("gulp-nodemon");
 const JSON_FILES = ["src/*.json", "src/**/*.json"];
 const TEST_FILES = ["src/**/*.spec.ts", "src/**/*.test.ts"];
@@ -33,6 +34,29 @@ gulp.task("watch", done => {
     },
     done,
   }).on("restart", () => console.log("Restart!"));
+});
+
+gulp.task("doc", function() {
+  return gulp.src(["src/*.ts"]).pipe(
+    typedoc({
+      // TypeScript options (see typescript docs)
+      module: "commonjs",
+      target: "es6",
+      includeDeclarations: true,
+      exclude: "**/*.spec.ts",
+
+      // Output options (see typedoc docs)
+      out: "./docs",
+      //json: "output/to/file.json",
+
+      // TypeDoc options (see typedoc docs)
+      name: "ugamela api",
+      // theme: "/path/to/my/theme",
+      // plugins: ["my", "plugins"],
+      ignoreCompilerErrors: false,
+      version: true,
+    }),
+  );
 });
 
 gulp.task("copy:config", () => gulp.src(CONFIG_FILES).pipe(gulp.dest("dist/config")));

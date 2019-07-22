@@ -1,4 +1,4 @@
-/***
+/**
  * Helper class to distinguish errors.
  * This error is thrown when a record already exists in the database.
  */

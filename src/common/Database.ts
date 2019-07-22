@@ -1,33 +1,18 @@
 import mysql = require("mysql2/promise");
 import { Logger } from "./Logger";
-
 import dotenv = require("dotenv-safe");
 
 dotenv.config({
   example: process.env.CI ? ".env.ci.example" : ".env.example",
 });
 
-/***
+/**
  * Manages the connection to the (mysql/mariaDB)-database
  */
 class Database {
-  /***
-   * Returns the current connection to the mysql-database
+  /**
+   * Represents a mysql connection-pool
    */
-  public static getConnectionPool() {
-    return this.pool;
-  }
-
-  /***
-   * Returns a promise for a query
-   * @param sql
-   * @param args
-   */
-  public static query(sql: string, args: object = null): Promise<any> {
-    Logger.info(sql);
-    return this.pool.query(sql);
-  }
-
   private static pool = mysql
     .createPool({
       host: process.env.DB_HOST || "localhost",
@@ -42,6 +27,23 @@ class Database {
     .on("error", function(err) {
       Logger.error(err);
     });
+
+  /**
+   * Returns the connection-pool to the mysql-database
+   */
+  public static getConnectionPool() {
+    return this.pool;
+  }
+
+  /**
+   * Returns a promise for a query
+   * @param sql the sql-query
+   * @param args optional arguments
+   */
+  public static query(sql: string, args: object = null): Promise<any> {
+    Logger.info(sql);
+    return this.pool.query(sql);
+  }
 }
 
 export { Database };

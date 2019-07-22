@@ -1,7 +1,7 @@
 import { Database } from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
-import { SerializationHelper } from "../common/SerializationHelper";
+import SerializationHelper from "../common/SerializationHelper";
 import { IBuildingService } from "../interfaces/IBuildingService";
 import Buildings from "../units/Buildings";
 

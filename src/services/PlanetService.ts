@@ -1,7 +1,7 @@
 import { Database } from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
-import { SerializationHelper } from "../common/SerializationHelper";
+import SerializationHelper from "../common/SerializationHelper";
 import { IPlanetService } from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
 
@@ -158,7 +158,7 @@ export default class PlanetService implements IPlanetService {
     return result.planetID;
   }
 
-  /***
+  /**
    * Stores the current object in the database
    */
   public async createNewPlanet(planet: Planet, connection = null) {

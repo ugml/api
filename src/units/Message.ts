@@ -15,6 +15,7 @@ export default class Message implements IUnits {
       0 < this.messageID &&
       0 < this.senderID &&
       0 < this.receiverID &&
+      this.senderID !== this.receiverID &&
       0 < this.sendtime &&
       0 <= this.type &&
       0 < this.subject.length &&

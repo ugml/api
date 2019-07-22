@@ -1,8 +1,6 @@
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
-import InputValidator from "../common/InputValidator";
 import { IUnits } from "../interfaces/IUnits";
-import PlanetType = Globals.PlanetType;
 
 export default class Planet implements IUnits {
   public planetID: number;
@@ -12,7 +10,7 @@ export default class Planet implements IUnits {
   public system: number;
   public planet: number;
   public last_update: number;
-  public planet_type: PlanetType;
+  public planet_type: Globals.PlanetType;
   public image: string;
   public diameter: number;
   public fields_current: number;

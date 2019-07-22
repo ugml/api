@@ -8,8 +8,8 @@ export default class Ships implements IUnits {
   public heavy_fighter: number;
   public cruiser: number;
   public battleship: number;
-  public colony_ship: boolean;
-  public recycler: boolean;
+  public colony_ship: number;
+  public recycler: number;
   public espionage_probe: number;
   public bomber: number;
   public solar_satellite: number;
@@ -84,6 +84,22 @@ export default class Ships implements IUnits {
   // }
 
   public isValid(): boolean {
-    return false;
+    return (
+      0 < this.planetID &&
+      0 <= this.small_cargo_ship &&
+      0 <= this.large_cargo_ship &&
+      0 <= this.light_fighter &&
+      0 <= this.heavy_fighter &&
+      0 <= this.cruiser &&
+      0 <= this.battleship &&
+      0 <= this.colony_ship &&
+      0 <= this.recycler &&
+      0 <= this.espionage_probe &&
+      0 <= this.bomber &&
+      0 <= this.solar_satellite &&
+      0 <= this.destroyer &&
+      0 <= this.battlecruiser &&
+      0 <= this.deathstar
+    );
   }
 }

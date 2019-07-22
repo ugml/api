@@ -122,7 +122,7 @@
     "mysql2": "^1.6.5",
     "redis": "^2.8.0",
     "reflect-metadata": "^0.1.13",
-    "squel": "^5.12.2",
+    "safe-squel": "^5.12.4",
     "winston": "^3.1.0"
   }
 }

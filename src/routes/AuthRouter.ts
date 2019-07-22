@@ -5,7 +5,7 @@ import { JwtHelper } from "../common/JwtHelper";
 import { Logger } from "../common/Logger";
 import IRequest from "../interfaces/IRequest";
 
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
 export default class AuthRouter {
   public router: IRouter<{}> = newRouter();

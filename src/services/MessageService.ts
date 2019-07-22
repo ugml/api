@@ -4,7 +4,7 @@ import { SerializationHelper } from "../common/SerializationHelper";
 import { IMessageService } from "../interfaces/IMessageService";
 import Message from "../units/Message";
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class MessageService implements IMessageService {
   public async getAllMessages(userID: number) {

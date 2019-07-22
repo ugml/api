@@ -2,7 +2,7 @@ import { Database } from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import { IShipService } from "../interfaces/IShipService";
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class ShipService implements IShipService {
   public async createShipsRow(planetID: number, connection = null) {

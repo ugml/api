@@ -1,7 +1,7 @@
 import { Database } from "../common/Database";
 import { ITechService } from "../interfaces/ITechService";
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class TechService implements ITechService {
   public async createTechRow(userID: number, connection = null) {

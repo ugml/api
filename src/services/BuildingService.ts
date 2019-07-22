@@ -5,7 +5,7 @@ import { SerializationHelper } from "../common/SerializationHelper";
 import { IBuildingService } from "../interfaces/IBuildingService";
 import Buildings from "../units/Buildings";
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class BuildingService implements IBuildingService {
   public async getBuildings(planetID: number): Promise<Buildings> {

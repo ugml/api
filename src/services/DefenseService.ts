@@ -1,7 +1,7 @@
 import { Database } from "../common/Database";
 import { IDefenseService } from "../interfaces/IDefenseService";
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class DefenseService implements IDefenseService {
   public async createDefenseRow(planetID: number, connection = null) {

@@ -108,7 +108,6 @@
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "debug": "^4.1.0",
     "dotenv-safe": "^6.1.0",
@@ -121,8 +120,7 @@
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
     "redis": "^2.8.0",
-    "reflect-metadata": "^0.1.13",
-    "squel": "^5.12.2",
+    "safe-squel": "^5.12.4",
     "winston": "^3.1.0"
   }
 }

@@ -18,6 +18,7 @@ stages:
   - build
   - test
   - lint
+  - documentation
   - deploy
 
 jobs:
@@ -45,6 +46,9 @@ jobs:
       script:
         - npm run-script lint
         - npm run-script tslint
+    - stage: documentation
+      if: branch = master
+      script: echo "TODO"
     - stage: deploy
       if: branch = master
       script: echo "TODO"

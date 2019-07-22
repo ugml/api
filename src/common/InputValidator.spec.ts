@@ -1,4 +1,5 @@
 import * as chai from "chai";
+import { Globals } from "./Globals";
 import InputValidator from "./InputValidator";
 
 const assert = chai.assert;
@@ -70,5 +71,29 @@ describe("InputValidator", function() {
 
   it("Sanitize string", function() {
     assert.equal(InputValidator.sanitizeString("häl/+=\"'lü"), "hll");
+  });
+
+  it("Valid build-order (building)", function() {
+    assert.equal(InputValidator.isValidBuildOrder({}, Globals.UnitType.BUILDING), null);
+  });
+
+  it("Valid build-order (technology)", function() {
+    assert.equal(InputValidator.isValidBuildOrder({}, Globals.UnitType.TECHNOLOGY), null);
+  });
+
+  it("Valid build-order (ship)", function() {
+    assert.equal(InputValidator.isValidBuildOrder({ 201: 1 }, Globals.UnitType.SHIP), true);
+  });
+
+  it("Valid build-order (ship)", function() {
+    assert.equal(InputValidator.isValidBuildOrder({ 301: 1 }, Globals.UnitType.SHIP), false);
+  });
+
+  it("Valid build-order (defense)", function() {
+    assert.equal(InputValidator.isValidBuildOrder({ 301: 1 }, Globals.UnitType.DEFENSE), true);
+  });
+
+  it("Valid build-order (defense)", function() {
+    assert.equal(InputValidator.isValidBuildOrder({ 401: 1 }, Globals.UnitType.DEFENSE), false);
   });
 });

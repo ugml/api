@@ -1,15 +1,13 @@
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { Logger } from "../common/Logger";
 import { QueueItem } from "../common/QueueItem";
-import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
-
-const units = new Units();
 
 export default class ShipsRouter {
   public router: IRouter<{}> = newRouter();
@@ -45,7 +43,6 @@ export default class ShipsRouter {
 
       const ships = await this.shipService.getShips(userID, planetID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -80,7 +77,7 @@ export default class ShipsRouter {
       const buildOrders = JSON.parse(request.body.buildOrder);
 
       // validate build-order
-      if (!units.isValidBuildOrder(buildOrders, UnitType.SHIP)) {
+      if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.SHIP)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
@@ -129,7 +126,7 @@ export default class ShipsRouter {
         }
 
         let count: number = buildOrders[item];
-        const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.SHIP);
+        const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1, Globals.UnitType.SHIP);
 
         // if the user has not enough ressources to fullfill the complete build-order
         if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
@@ -165,7 +162,7 @@ export default class ShipsRouter {
 
         // build time in seconds
         buildTime +=
-          units.getBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
+          Calculations.calculateBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
           Math.floor(count);
 
         queueItem.addToQueue(item, Math.floor(count));

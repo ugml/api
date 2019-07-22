@@ -1,3 +1,4 @@
+import InputValidator from "../common/InputValidator";
 import { IUnits } from "../interfaces/IUnits";
 
 /***
@@ -46,7 +47,13 @@ export default class User implements IUnits {
    * Checks, if the object holds valid data
    */
   public isValid(): boolean {
-    // TODO
-    return false;
+    if (!InputValidator.isSet(this.userID) || this.userID <= 0) return false;
+    if (!InputValidator.isSet(this.username) || this.username.length > 20) return false;
+    if (!InputValidator.isSet(this.password) || this.password.length > 60) return false;
+    if (!InputValidator.isSet(this.email) || this.email.length > 64) return false;
+    if (!InputValidator.isSet(this.onlinetime) || this.onlinetime <= 0) return false;
+    if (!InputValidator.isSet(this.currentplanet) || this.currentplanet <= 0) return false;
+
+    return true;
   }
 }

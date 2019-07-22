@@ -28,7 +28,6 @@ export default class PlanetsRouter {
 
       const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -51,7 +50,6 @@ export default class PlanetsRouter {
 
       const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -116,7 +114,6 @@ export default class PlanetsRouter {
 
       const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -211,7 +208,6 @@ export default class PlanetsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",

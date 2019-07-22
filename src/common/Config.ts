@@ -3,12 +3,34 @@
  */
 import { IGameConfig } from "../interfaces/IGameConfig";
 
+// TODO: define Interfaces for return-values
 class Config {
-  /***
-   * Returns the current game-configuration
-   */
-  public static get Get(): IGameConfig {
+  public static getGameConfig(): IGameConfig {
     return require("../config/game.json");
+  }
+
+  public static getRequirements() {
+    return require("../config/units.json").requirements;
+  }
+
+  public static getMappings() {
+    return require("../config/units.json").mappings;
+  }
+
+  public static getBuildings() {
+    return require("../config/units.json").units.buildings;
+  }
+
+  public static getShips() {
+    return require("../config/units.json").units.ships;
+  }
+
+  public static getDefenses() {
+    return require("../config/units.json").units.defenses;
+  }
+
+  public static getTechnologies() {
+    return require("../config/units.json").units.technologies;
   }
 }
 

@@ -348,6 +348,19 @@ describe("buildingsRoute", () => {
         });
     });
 
+    it("cancel should fail (player does not own the planet)", () => {
+      const planetID = 1234;
+
+      return request
+        .post("/v1/buildings/cancel")
+        .set("Authorization", authToken)
+        .send({ planetID: `${planetID}`, buildingID: "1" })
+        .then(res => {
+          expect(res.body.message).equals("Invalid parameter");
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        });
+    });
+
     it("should fail (can't build shipyard/robotic/nanite while it is being used)", async () => {
       const planetID = 167546850;
 
@@ -355,6 +368,7 @@ describe("buildingsRoute", () => {
 
       const valueBefore = planet.b_hangar_start_time;
 
+      planet.b_hangar_queue = "[ { test: 1234 } ]";
       planet.b_hangar_start_time = 1;
 
       await container.planetService.updatePlanet(planet);
@@ -382,6 +396,7 @@ describe("buildingsRoute", () => {
       const valueBefore = planet.b_tech_endtime;
 
       planet.b_tech_endtime = 1;
+      planet.b_tech_id = 109;
 
       await container.planetService.updatePlanet(planet);
 

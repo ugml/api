@@ -38,7 +38,7 @@ export default class GalaxyRouter {
       const galaxy = parseInt(request.params.galaxy, 10);
       const system = parseInt(request.params.system, 10);
 
-      if (galaxy < 1 || galaxy > Config.Get.pos_galaxy_max || system < 1 || system > Config.Get.pos_system_max) {
+      if (!InputValidator.isValidPosition(galaxy, system)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
@@ -48,7 +48,6 @@ export default class GalaxyRouter {
 
       const galaxyData = await this.galaxyService.getGalaxyInfo(galaxy, system);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",

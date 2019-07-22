@@ -50,6 +50,13 @@ namespace Globals {
     Planet = 1,
     Moon = 2,
   }
+
+  export enum UnitType {
+    BUILDING,
+    SHIP,
+    DEFENSE,
+    TECHNOLOGY,
+  }
 }
 
 export { Globals };

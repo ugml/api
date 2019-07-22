@@ -28,7 +28,6 @@ export default class MessagesRouter {
 
       const messages = await this.messageService.getAllMessages(userID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -59,7 +58,6 @@ export default class MessagesRouter {
       const messageID = parseInt(request.params.messageID, 10);
       const message = await this.messageService.getMessageById(userID, messageID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",

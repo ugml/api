@@ -1,4 +1,5 @@
 import { Globals } from "../common/Globals";
+import InputValidator from "../common/InputValidator";
 import { IUnits } from "../interfaces/IUnits";
 import PlanetType = Globals.PlanetType;
 
@@ -36,6 +37,31 @@ export default class Planet implements IUnits {
   public b_hangar_start_time: number;
   public b_hangar_plus: boolean = false;
   public destroyed: boolean = false;
+
+  public isUpgradingBuilding(): boolean {
+    return this.b_building_id > 0 && this.b_building_endtime > 0;
+  }
+
+  public isUpgradingHangar(): boolean {
+    return this.b_hangar_plus;
+  }
+
+  public isUpgradingResearchLab(): boolean {
+    return this.b_building_id === Globals.Buildings.RESEARCH_LAB && this.b_building_endtime > 0;
+  }
+
+  public isBuildingUnits(): boolean {
+    return (
+      this.b_hangar_queue !== undefined &&
+      this.b_hangar_queue !== null &&
+      this.b_hangar_queue.length > 0 &&
+      this.b_hangar_start_time > 0
+    );
+  }
+
+  public isResearching(): boolean {
+    return this.b_tech_id > 0 && this.b_tech_endtime > 0;
+  }
 
   public isValid(): boolean {
     // TODO

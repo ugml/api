@@ -131,7 +131,7 @@ export default class UsersRouter {
       });
     }
 
-    const gameConfig: IGameConfig = Config.Get;
+    const gameConfig: IGameConfig = Config.getGameConfig();
 
     const username: string = InputValidator.sanitizeString(request.body.username);
     const password: string = InputValidator.sanitizeString(request.body.password);
@@ -334,7 +334,6 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -344,14 +343,12 @@ export default class UsersRouter {
       Logger.error(error);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
-        // return the result
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: `There was an error while handling the request: ${error.message}`,
           data: {},
         });
       } else {
-        // return the result
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
           message: "There was an error while handling the request.",

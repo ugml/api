@@ -1,16 +1,15 @@
 import { IRouter, NextFunction, Response, Router as newRouter, Router } from "express";
+import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { QueueItem } from "../common/QueueItem";
-import { Units, UnitType } from "../common/Units";
+
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
 import Buildings from "../units/Buildings";
 import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
-
-const units = new Units();
 
 export default class DefenseRouter {
   public router: IRouter<{}> = newRouter();
@@ -46,7 +45,6 @@ export default class DefenseRouter {
 
       const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -88,7 +86,7 @@ export default class DefenseRouter {
       queueItem.setPlanetID(planetID);
 
       // validate build-order
-      if (!units.isValidBuildOrder(buildOrders, UnitType.DEFENSE)) {
+      if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.DEFENSE)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
@@ -108,7 +106,7 @@ export default class DefenseRouter {
         });
       }
 
-      if (planet.b_hangar_plus) {
+      if (planet.isUpgradingHangar()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Shipyard is currently upgrading",
@@ -122,14 +120,18 @@ export default class DefenseRouter {
 
       let stopProcessing = false;
       let buildTime = 0;
-      let freeSiloSlots: number =
-        buildings.missile_silo * 10 - defenses.anti_ballistic_missile - defenses.interplanetary_missile * 2;
+
+      let freeSiloSlots: number = Calculations.calculateFreeMissileSlots(
+        buildings.missile_silo,
+        defenses.anti_ballistic_missile,
+        defenses.interplanetary_missile,
+      );
 
       // TODO: put this into a seperate function
       for (const item in buildOrders) {
         if (buildOrders.hasOwnProperty(item)) {
           let count: number = buildOrders[item];
-          const cost: ICosts = units.getCosts(parseInt(item, 10), 1, UnitType.DEFENSE);
+          const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1, Globals.UnitType.DEFENSE);
 
           // if the user has not enough ressources to fullfill the complete build-order
           if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
@@ -186,7 +188,7 @@ export default class DefenseRouter {
 
           // build time in seconds
           buildTime +=
-            units.getBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
+            Calculations.calculateBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
             Math.floor(count);
 
           queueItem.addToQueue(item, Math.floor(count));
@@ -209,9 +211,10 @@ export default class DefenseRouter {
 
       let oldBuildOrder;
 
-      if (!InputValidator.isSet(planet.b_hangar_queue)) {
+      if (!planet.isBuildingUnits()) {
         planet.b_hangar_queue = JSON.parse("[]");
         oldBuildOrder = planet.b_hangar_queue;
+        planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
       } else {
         oldBuildOrder = JSON.parse(planet.b_hangar_queue);
       }
@@ -219,10 +222,6 @@ export default class DefenseRouter {
       oldBuildOrder.push(queueItem);
 
       planet.b_hangar_queue = JSON.stringify(oldBuildOrder);
-
-      if (planet.b_hangar_start_time === 0) {
-        planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
-      }
 
       planet.metal = metal;
       planet.crystal = crystal;

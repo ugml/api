@@ -1,15 +1,16 @@
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import Calculations from "../common/Calculations";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { Units, UnitType } from "../common/Units";
+
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
 
-const units = new Units();
+// const units = new Units();
 
 export default class BuildingsRouter {
   public router: IRouter<{}> = newRouter();
@@ -48,7 +49,6 @@ export default class BuildingsRouter {
       // TODO: check if user owns the planet
       const data = await this.buildingService.getBuildings(request.params.planetID);
 
-      // return the result
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
         message: "Success",
@@ -89,35 +89,33 @@ export default class BuildingsRouter {
         });
       }
 
-      // 1. check if there is already a build-job on the planet
-      if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
-        const buildingKey = units.getMappings()[planet.b_building_id];
-
-        // give back the ressources
-        const currentLevel = buildings[buildingKey];
-
-        const cost: ICosts = units.getCosts(planet.b_building_id, currentLevel, UnitType.BUILDING);
-
-        planet.b_building_id = 0;
-        planet.b_building_endtime = 0;
-        planet.metal = planet.metal + cost.metal;
-        planet.crystal = planet.crystal + cost.crystal;
-        planet.crystal = planet.crystal + cost.crystal;
-
-        await this.planetService.updatePlanet(planet);
-
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Building canceled",
-          data: { planet },
-        });
-      } else {
+      if (!planet.isUpgradingBuilding()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Planet has no build-job",
           data: {},
         });
       }
+
+      const buildingKey = Config.getMappings()[planet.b_building_id];
+
+      const currentLevel = buildings[buildingKey];
+
+      const cost: ICosts = Calculations.getCosts(planet.b_building_id, currentLevel, Globals.UnitType.BUILDING);
+
+      planet.b_building_id = 0;
+      planet.b_building_endtime = 0;
+      planet.metal = planet.metal + cost.metal;
+      planet.crystal = planet.crystal + cost.crystal;
+      planet.crystal = planet.crystal + cost.crystal;
+
+      await this.planetService.updatePlanet(planet);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Building canceled",
+        data: { planet },
+      });
     } catch (error) {
       Logger.error(error);
 
@@ -148,7 +146,7 @@ export default class BuildingsRouter {
       const planetID = parseInt(request.body.planetID, 10);
       const buildingID = parseInt(request.body.buildingID, 10);
 
-      if (request.body.buildingID < Globals.MIN_BUILDING_ID || request.body.buildingID > Globals.MAX_BUILDING_ID) {
+      if (!InputValidator.isValidBuildingId(buildingID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
@@ -168,7 +166,7 @@ export default class BuildingsRouter {
       }
 
       // 1. check if there is already a build-job on the planet
-      if (planet.b_building_id !== 0 || planet.b_building_endtime !== 0) {
+      if (planet.isUpgradingBuilding()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Planet already has a build-job",
@@ -181,8 +179,8 @@ export default class BuildingsRouter {
         (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
           buildingID === Globals.Buildings.NANITE_FACTORY ||
           buildingID === Globals.Buildings.SHIPYARD) &&
-        ((InputValidator.isSet(planet.b_hangar_queue) && planet.b_hangar_queue.length > 0) ||
-          planet.b_hangar_start_time > 0)
+        InputValidator.isSet(planet.b_hangar_queue) &&
+        planet.isBuildingUnits()
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
@@ -192,7 +190,7 @@ export default class BuildingsRouter {
       }
 
       // can't build research lab while they are researching... poor scientists :(
-      if (buildingID === Globals.Buildings.RESEARCH_LAB && (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
+      if (buildingID === Globals.Buildings.RESEARCH_LAB && planet.isResearching()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Can't build this building while it is in use",
@@ -201,8 +199,9 @@ export default class BuildingsRouter {
       }
 
       // 2. check, if requirements are met
-      const requirements = units.getRequirements()[buildingID];
+      const requirements = Config.getRequirements()[buildingID];
 
+      // TODO: move to seperate file
       // building has requirements
       if (requirements !== undefined) {
         let requirementsMet = true;
@@ -210,7 +209,7 @@ export default class BuildingsRouter {
         for (const reqID in requirements) {
           if (requirements.hasOwnProperty(reqID)) {
             const reqLevel = requirements[reqID];
-            const key = units.getMappings()[buildingID];
+            const key = Config.getMappings()[buildingID];
 
             if (buildings[key] < reqLevel) {
               requirementsMet = false;
@@ -232,10 +231,10 @@ export default class BuildingsRouter {
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = units.getMappings()[buildingID];
+      const buildingKey = Config.getMappings()[buildingID];
       const currentLevel = buildings[buildingKey];
 
-      const cost = units.getCosts(buildingID, currentLevel, UnitType.BUILDING);
+      const cost = Calculations.getCosts(buildingID, currentLevel, Globals.UnitType.BUILDING);
 
       if (
         planet.metal < cost.metal ||
@@ -251,9 +250,11 @@ export default class BuildingsRouter {
       }
 
       // 4. start the build-job
-      const buildTime: number = Math.round(
-        (cost.metal + cost.crystal) /
-          (2500 * (1 + buildings.robotic_factory) * 2 ** buildings.nanite_factory * Config.Get.speed),
+      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
+        cost.metal,
+        cost.crystal,
+        buildings.robotic_factory,
+        buildings.nanite_factory,
       );
 
       const endTime: number = Math.round(+new Date() / 1000) + buildTime;

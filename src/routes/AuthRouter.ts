@@ -68,7 +68,6 @@ export default class AuthRouter {
     } catch (err) {
       Logger.error(err);
 
-      // return the result
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         message: `There was an error: ${err.message}`,

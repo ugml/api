@@ -1,16 +1,14 @@
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import Calculations from "../common/Calculations";
 import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { Units, UnitType } from "../common/Units";
 import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
 import { ICosts } from "../interfaces/ICosts";
 import { Logger } from "../common/Logger";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import Techs from "../units/Techs";
-
-const units = new Units();
 
 export default class TechsRouter {
   public router: IRouter<{}> = newRouter();
@@ -94,11 +92,11 @@ export default class TechsRouter {
         });
       }
 
-      const techKey = units.getMappings()[planet.b_tech_id];
+      const techKey = Config.getMappings()[planet.b_tech_id];
 
       const currentLevel = techs[techKey];
 
-      const cost: ICosts = units.getCosts(planet.b_tech_id, currentLevel, UnitType.TECHNOLOGY);
+      const cost: ICosts = Calculations.getCosts(planet.b_tech_id, currentLevel, Globals.UnitType.TECHNOLOGY);
 
       planet.metal += cost.metal;
       planet.crystal += cost.crystal;
@@ -186,7 +184,7 @@ export default class TechsRouter {
       // }
 
       // 2. check, if requirements are met
-      const requirements = units.getRequirements()[techID];
+      const requirements = Config.getRequirements()[techID];
 
       // building has requirements
       if (requirements !== undefined) {
@@ -195,7 +193,7 @@ export default class TechsRouter {
         for (const reqID in requirements) {
           if (requirements.hasOwnProperty(reqID)) {
             const reqLevel = requirements[reqID];
-            const key = units.getMappings()[reqID];
+            const key = Config.getMappings()[reqID];
 
             if (techs[key] < reqLevel) {
               requirementsMet = false;
@@ -217,11 +215,11 @@ export default class TechsRouter {
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = units.getMappings()[techID];
+      const buildingKey = Config.getMappings()[techID];
 
       const currentLevel = techs[buildingKey];
 
-      const cost = units.getCosts(techID, currentLevel, UnitType.TECHNOLOGY);
+      const cost = Calculations.getCosts(techID, currentLevel, Globals.UnitType.TECHNOLOGY);
 
       if (
         planet.metal < cost.metal ||
@@ -237,7 +235,7 @@ export default class TechsRouter {
       }
 
       // 4. start the build-job
-      const buildTime = Math.round((cost.metal + cost.crystal) / (Config.Get.speed * 1000 * buildings.research_lab));
+      const buildTime = Calculations.calculateResearchTimeInSeconds(cost.metal, cost.crystal, buildings.research_lab);
 
       const endTime = Math.round(+new Date() / 1000) + buildTime;
 

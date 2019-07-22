@@ -3,7 +3,7 @@ import { IUnits } from "../interfaces/IUnits";
 export default class Message implements IUnits {
   public messageID: number;
   public senderID: number;
-  public receiverID: string;
+  public receiverID: number;
   public sendtime: number;
   public type: number;
   public subject: string;
@@ -11,6 +11,15 @@ export default class Message implements IUnits {
   public deleted: boolean;
 
   public isValid(): boolean {
-    return false;
+    return (
+      0 < this.messageID &&
+      0 < this.senderID &&
+      0 < this.receiverID &&
+      0 < this.sendtime &&
+      0 <= this.type &&
+      0 < this.subject.length &&
+      this.subject.length <= 45 &&
+      0 < this.body.length
+    );
   }
 }

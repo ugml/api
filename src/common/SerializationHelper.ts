@@ -2,7 +2,6 @@
  * Helper-class to create a instance of a class from a json-string
  */
 export default class SerializationHelper {
-
   /**
    * Takes an object and a json-string and returns a new instance of the given object
    * with the given values of the parsed json-string

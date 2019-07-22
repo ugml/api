@@ -9,7 +9,7 @@ describe("User-units", function() {
   it("user should be valid", function() {
     const data = {
       userID: 1,
-      username: "Test",
+      username: "Testuser",
       password: "iAmNotSecure",
       email: "hello@world.com",
       onlinetime: 1234,
@@ -24,7 +24,22 @@ describe("User-units", function() {
   it("Should fail (userID negative)", function() {
     const data = {
       userID: -1,
-      username: "Test",
+      username: "Testuser",
+      password: "iAmNotSecure",
+      email: "hello@world.com",
+      onlinetime: 1234,
+      currentplanet: 45312,
+    };
+
+    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+
+    assert.equal(user.isValid(), false);
+  });
+
+  it("Should fail (username too short)", function() {
+    const data = {
+      userID: 1,
+      username: "Hi",
       password: "iAmNotSecure",
       email: "hello@world.com",
       onlinetime: 1234,

@@ -43,8 +43,20 @@ export default class InputValidator {
     return input.replace(/[^a-z0-9@ .,_-]/gim, "").trim();
   }
 
-  public static isValidBuildingId(buildingID: number): boolean {
-    return Globals.MIN_BUILDING_ID <= buildingID && buildingID <= Globals.MAX_BUILDING_ID;
+  public static isValidBuildingId(unitID: number): boolean {
+    return Globals.MIN_BUILDING_ID <= unitID && unitID <= Globals.MAX_BUILDING_ID;
+  }
+
+  public static isValidDefenseId(unitID: number): boolean {
+    return Globals.MIN_DEFENSE_ID <= unitID && unitID <= Globals.MAX_DEFENSE_ID;
+  }
+
+  public static isValidShipId(unitID: number): boolean {
+    return Globals.MIN_SHIP_ID <= unitID && unitID <= Globals.MAX_SHIP_ID;
+  }
+
+  public static isValidTechnologyId(unitID: number): boolean {
+    return Globals.MIN_TECHNOLOGY_ID <= unitID && unitID <= Globals.MAX_TECHNOLOGY_ID;
   }
 
   public static isValidBuildOrder(buildOrders: object, unitType: Globals.UnitType): boolean {

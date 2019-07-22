@@ -101,7 +101,7 @@ export default class BuildingsRouter {
 
       const currentLevel = buildings[buildingKey];
 
-      const cost: ICosts = Calculations.getCosts(planet.b_building_id, currentLevel, Globals.UnitType.BUILDING);
+      const cost: ICosts = Calculations.getCosts(planet.b_building_id, currentLevel);
 
       planet.b_building_id = 0;
       planet.b_building_endtime = 0;
@@ -234,7 +234,7 @@ export default class BuildingsRouter {
       const buildingKey = Config.getMappings()[buildingID];
       const currentLevel = buildings[buildingKey];
 
-      const cost = Calculations.getCosts(buildingID, currentLevel, Globals.UnitType.BUILDING);
+      const cost = Calculations.getCosts(buildingID, currentLevel);
 
       if (
         planet.metal < cost.metal ||

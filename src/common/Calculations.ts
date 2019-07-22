@@ -1,7 +1,7 @@
 import { ICosts } from "../interfaces/ICosts";
 import { IPricelist } from "../interfaces/IPricelist";
 import { Config } from "./Config";
-import { Globals } from "./Globals";
+import InputValidator from "./InputValidator";
 
 export default class Calculations {
   public static calculateBuildTimeInSeconds(
@@ -28,41 +28,26 @@ export default class Calculations {
     return siloLevel * 10 - numAntiBallisticMissiles - numInterplanetaryMissiles * 2;
   }
 
-  public static getCosts(buildingID: number, currentLevel: number, unitType: Globals.UnitType): ICosts {
+  public static getCosts(unitID: number, currentLevel: number): ICosts {
     let costs: IPricelist;
 
-    switch (unitType) {
-      case Globals.UnitType.BUILDING:
-        if (buildingID < Globals.MIN_BUILDING_ID || Globals.MAX_BUILDING_ID < buildingID) {
-          return null;
-        }
-        costs = Config.getBuildings()[buildingID];
-        break;
-      case Globals.UnitType.SHIP:
-        if (buildingID < Globals.MIN_SHIP_ID || Globals.MAX_SHIP_ID < buildingID) {
-          return null;
-        }
-        costs = Config.getShips()[buildingID];
-        break;
-      case Globals.UnitType.DEFENSE:
-        if (buildingID < Globals.MIN_DEFENSE_ID || Globals.MAX_DEFENSE_ID < buildingID) {
-          return null;
-        }
-        costs = Config.getDefenses()[buildingID];
-        break;
-      case Globals.UnitType.TECHNOLOGY:
-        if (buildingID < Globals.MIN_TECHNOLOGY_ID || Globals.MAX_TECHNOLOGY_ID < buildingID) {
-          return null;
-        }
-        costs = Config.getTechnologies()[buildingID];
-        break;
+    if (InputValidator.isValidBuildingId(unitID)) {
+      costs = Config.getBuildings()[unitID];
+    } else if (InputValidator.isValidShipId(unitID)) {
+      costs = Config.getShips()[unitID];
+    } else if (InputValidator.isValidDefenseId(unitID)) {
+      costs = Config.getDefenses()[unitID];
+    } else if (InputValidator.isValidTechnologyId(unitID)) {
+      costs = Config.getTechnologies()[unitID];
+    } else {
+      return null;
     }
 
     return {
-      metal: costs.metal * costs.factor ** currentLevel,
-      crystal: costs.crystal * costs.factor ** currentLevel,
-      deuterium: costs.deuterium * costs.factor ** currentLevel,
-      energy: costs.energy * costs.factor ** currentLevel,
+      metal: Math.round(costs.metal * costs.factor ** currentLevel),
+      crystal: Math.round(costs.crystal * costs.factor ** currentLevel),
+      deuterium: Math.round(costs.deuterium * costs.factor ** currentLevel),
+      energy: Math.round(costs.energy * costs.factor ** currentLevel),
     };
   }
 }

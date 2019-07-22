@@ -96,7 +96,7 @@ export default class TechsRouter {
 
       const currentLevel = techs[techKey];
 
-      const cost: ICosts = Calculations.getCosts(planet.b_tech_id, currentLevel, Globals.UnitType.TECHNOLOGY);
+      const cost: ICosts = Calculations.getCosts(planet.b_tech_id, currentLevel);
 
       planet.metal += cost.metal;
       planet.crystal += cost.crystal;
@@ -219,7 +219,7 @@ export default class TechsRouter {
 
       const currentLevel = techs[buildingKey];
 
-      const cost = Calculations.getCosts(techID, currentLevel, Globals.UnitType.TECHNOLOGY);
+      const cost = Calculations.getCosts(techID, currentLevel);
 
       if (
         planet.metal < cost.metal ||

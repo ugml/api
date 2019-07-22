@@ -131,7 +131,7 @@ export default class DefenseRouter {
       for (const item in buildOrders) {
         if (buildOrders.hasOwnProperty(item)) {
           let count: number = buildOrders[item];
-          const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1, Globals.UnitType.DEFENSE);
+          const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1);
 
           // if the user has not enough ressources to fullfill the complete build-order
           if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
@@ -188,8 +188,12 @@ export default class DefenseRouter {
 
           // build time in seconds
           buildTime +=
-            Calculations.calculateBuildTimeInSeconds(cost.metal, cost.crystal, buildings.shipyard, buildings.nanite_factory) *
-            Math.floor(count);
+            Calculations.calculateBuildTimeInSeconds(
+              cost.metal,
+              cost.crystal,
+              buildings.shipyard,
+              buildings.nanite_factory,
+            ) * Math.floor(count);
 
           queueItem.addToQueue(item, Math.floor(count));
 

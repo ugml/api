@@ -18,6 +18,27 @@ export default class Techs implements IUnits {
   public intergalactic_research_tech: number;
   public graviton_tech: number;
 
+  public isValid(): boolean {
+    return (
+      0 < this.userID &&
+      0 <= this.espionage_tech &&
+      0 <= this.computer_tech &&
+      0 <= this.weapon_tech &&
+      0 <= this.armour_tech &&
+      0 <= this.shielding_tech &&
+      0 <= this.energy_tech &&
+      0 <= this.hyperspace_tech &&
+      0 <= this.combustion_drive_tech &&
+      0 <= this.impulse_drive_tech &&
+      0 <= this.hyperspace_drive_tech &&
+      0 <= this.laser_tech &&
+      0 <= this.ion_tech &&
+      0 <= this.plasma_tech &&
+      0 <= this.intergalactic_research_tech &&
+      0 <= this.graviton_tech
+    );
+  }
+
   // public save(): Promise<{}> {
   //   return new Promise((resolve, reject) => {
   //     const query = squel
@@ -85,8 +106,4 @@ export default class Techs implements IUnits {
   //       });
   //   });
   // }
-
-  public isValid(): boolean {
-    return false;
-  }
 }

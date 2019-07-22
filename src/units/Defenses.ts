@@ -13,6 +13,20 @@ export default class Defenses implements IUnits {
   public anti_ballistic_missile: number;
   public interplanetary_missile: number;
 
+  public isValid(): boolean {
+    return (
+      0 <= this.planetID &&
+      0 <= this.rocket_launcher &&
+      0 <= this.light_laser &&
+      0 <= this.heavy_laser &&
+      0 <= this.ion_cannon &&
+      0 <= this.gauss_cannon &&
+      0 <= this.plasma_turret &&
+      0 <= this.anti_ballistic_missile &&
+      0 <= this.interplanetary_missile
+    );
+  }
+
   // public save(): Promise<{}> {
   //   return new Promise((resolve, reject) => {
   //     const query = squel
@@ -70,8 +84,4 @@ export default class Defenses implements IUnits {
   //       });
   //   });
   // }
-
-  public isValid(): boolean {
-    return false;
-  }
 }

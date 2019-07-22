@@ -48,7 +48,7 @@ export default class User implements IUnits {
    */
   public isValid(): boolean {
     if (!InputValidator.isSet(this.userID) || this.userID <= 0) return false;
-    if (!InputValidator.isSet(this.username) || this.username.length > 20) return false;
+    if (!InputValidator.isSet(this.username) || this.username.length > 20 || this.username.length < 5) return false;
     if (!InputValidator.isSet(this.password) || this.password.length > 60) return false;
     if (!InputValidator.isSet(this.email) || this.email.length > 64) return false;
     if (!InputValidator.isSet(this.onlinetime) || this.onlinetime <= 0) return false;

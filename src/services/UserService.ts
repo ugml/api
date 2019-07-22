@@ -14,11 +14,7 @@ export default class UserService implements IUserService {
   public async getAuthenticatedUser(userID: number): Promise<User> {
     const query: string = squel
       .select()
-      .field("userID")
-      .field("username")
-      .field("email")
-      .field("onlinetime")
-      .field("currentplanet")
+      .field("*")
       .from("users")
       .where("userID = ?", userID)
       .toString();

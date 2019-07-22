@@ -34,8 +34,8 @@ export default class Planet implements IUnits {
   public b_tech_endtime: number;
   public b_hangar_queue: string;
   public b_hangar_start_time: number;
-  public b_hangar_plus: boolean = false;
-  public destroyed: boolean = false;
+  public b_hangar_plus: boolean;
+  public destroyed: boolean;
 
   public isUpgradingBuilding(): boolean {
     return this.b_building_id > 0 && this.b_building_endtime > 0;

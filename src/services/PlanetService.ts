@@ -41,6 +41,11 @@ export default class PlanetService implements IPlanetService {
     try {
       let query = squel.update().table("planets");
 
+      if (!planet.isValid()) {
+        // TODO: throw exception
+        return null;
+      }
+
       if (typeof planet.name !== "undefined") {
         query = query.set("name", planet.name);
       }

@@ -132,6 +132,11 @@ export default class UserService implements IUserService {
   public async updateUserData(user: User, connection = null) {
     let query = squel.update().table("users");
 
+    if (!user.isValid()) {
+      // TODO: throw exception
+      return null;
+    }
+
     if (typeof user.username !== "undefined") {
       query = query.set("username", user.username);
     }

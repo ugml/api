@@ -1,3 +1,4 @@
+import { Config } from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import { IUnits } from "../interfaces/IUnits";
@@ -64,7 +65,51 @@ export default class Planet implements IUnits {
   }
 
   public isValid(): boolean {
-    // TODO
-    return false;
+    return (
+      0 < this.planetID &&
+      0 < this.ownerID &&
+      5 <= this.name.length &&
+      this.name.length < 45 &&
+      0 < this.galaxy &&
+      this.galaxy <= Config.getGameConfig().pos_galaxy_max &&
+      0 < this.system &&
+      this.system <= Config.getGameConfig().pos_system_max &&
+      0 < this.planet &&
+      this.planet <= Config.getGameConfig().pos_planet_max &&
+      0 < this.last_update &&
+      0 < this.diameter &&
+      0 <= this.fields_current &&
+      0 < this.fields_max &&
+      this.fields_current <= this.fields_max &&
+      this.temp_min <= this.temp_max &&
+      0 <= this.metal &&
+      0 <= this.crystal &&
+      0 <= this.deuterium &&
+      0 <= this.energy_used &&
+      0 <= this.energy_max &&
+      0 <= this.metal_mine_percent &&
+      this.metal_mine_percent <= 100 &&
+      this.metal_mine_percent % 10 === 0 &&
+      0 <= this.crystal_mine_percent &&
+      this.crystal_mine_percent <= 100 &&
+      this.crystal_mine_percent % 10 === 0 &&
+      0 <= this.deuterium_synthesizer_percent &&
+      this.deuterium_synthesizer_percent <= 100 &&
+      this.deuterium_synthesizer_percent % 10 === 0 &&
+      0 <= this.solar_plant_percent &&
+      this.solar_plant_percent <= 100 &&
+      this.solar_plant_percent % 10 === 0 &&
+      0 <= this.fusion_reactor_percent &&
+      this.fusion_reactor_percent <= 100 &&
+      this.fusion_reactor_percent % 10 === 0 &&
+      0 <= this.solar_satellite_percent &&
+      this.solar_satellite_percent <= 100 &&
+      this.solar_satellite_percent % 10 === 0 &&
+      0 <= this.b_building_id &&
+      0 <= this.b_building_endtime &&
+      0 <= this.b_tech_id &&
+      0 <= this.b_tech_endtime &&
+      0 <= this.b_hangar_start_time
+    );
   }
 }

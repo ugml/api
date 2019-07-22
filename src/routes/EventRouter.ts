@@ -9,7 +9,7 @@ import { IShipUnits } from "../interfaces/IShipUnits";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
-import squel = require("squel");
+import squel = require("safe-squel");
 
 import { Logger } from "../common/Logger";
 

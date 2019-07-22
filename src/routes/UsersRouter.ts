@@ -11,7 +11,7 @@ import User from "../units/User";
 import PlanetsRouter from "./PlanetsRouter";
 import { Logger } from "../common/Logger";
 
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 import { JwtHelper } from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 

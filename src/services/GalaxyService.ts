@@ -4,7 +4,7 @@ import { ICoordinates } from "../interfaces/ICoordinates";
 import { IGalaxyService } from "../interfaces/IGalaxyService";
 import PlanetType = Globals.PlanetType;
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class GalaxyService implements IGalaxyService {
   public async getFreePosition(

@@ -5,7 +5,7 @@ import { SerializationHelper } from "../common/SerializationHelper";
 import { IPlanetService } from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
 
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class PlanetService implements IPlanetService {
   public async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {

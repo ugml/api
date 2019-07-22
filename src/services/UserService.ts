@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 import { SerializationHelper } from "../common/SerializationHelper";
 import { IUserService } from "../interfaces/IUserService";
 import User from "../units/User";
-import squel = require("squel");
+import squel = require("safe-squel");
 
 export default class UserService implements IUserService {
   public constructor() {}

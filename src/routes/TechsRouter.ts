@@ -161,8 +161,16 @@ export default class TechsRouter {
         });
       }
 
+      if (planet.isUpgradingResearchLab()) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Planet is upgrading the research-lab",
+          data: {},
+        });
+      }
+
       // 1. check if there is already a build-job on the planet
-      if (planet.b_tech_id !== 0 || planet.b_tech_endtime !== 0) {
+      if (planet.isResearching()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Planet already has a build-job",

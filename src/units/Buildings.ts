@@ -18,6 +18,27 @@ export default class Buildings implements IUnits {
   public alliance_depot: number;
   public missile_silo: number;
 
+  public isValid(): boolean {
+    return (
+      0 <= this.planetID &&
+      0 <= this.metal_mine &&
+      0 <= this.crystal_mine &&
+      0 <= this.deuterium_synthesizer &&
+      0 <= this.solar_plant &&
+      0 <= this.fusion_reactor &&
+      0 <= this.robotic_factory &&
+      0 <= this.nanite_factory &&
+      0 <= this.shipyard &&
+      0 <= this.metal_storage &&
+      0 <= this.crystal_storage &&
+      0 <= this.deuterium_storage &&
+      0 <= this.research_lab &&
+      0 <= this.terraformer &&
+      0 <= this.alliance_depot &&
+      0 <= this.missile_silo
+    );
+  }
+
   // public save(): Promise<{}> {
   //   return new Promise((resolve, reject) => {
   //     const query = squel
@@ -85,8 +106,4 @@ export default class Buildings implements IUnits {
   //       });
   //   });
   // }
-
-  public isValid(): boolean {
-    return false;
-  }
 }

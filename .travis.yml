@@ -48,7 +48,9 @@ jobs:
         - npm run-script tslint
     - stage: documentation
       if: branch = master
-      script: echo "TODO"
+      script:
+        - gulp doc
+        - echo "TODO -> depoy to github pages"
     - stage: deploy
       if: branch = master
       script: echo "TODO"

@@ -37,22 +37,15 @@ gulp.task("watch", done => {
 });
 
 gulp.task("doc", function() {
-  return gulp.src(["src/*.ts"]).pipe(
+  return gulp.src(["src/**/*.ts"]).pipe(
     typedoc({
-      // TypeScript options (see typescript docs)
       module: "commonjs",
       target: "es6",
       includeDeclarations: true,
-      exclude: "**/*.spec.ts",
-
-      // Output options (see typedoc docs)
-      out: "./docs",
-      //json: "output/to/file.json",
-
-      // TypeDoc options (see typedoc docs)
+      exclude: "**/*+(index|.spec|.e2e).ts",
+      out: "./docs/",
       name: "ugamela api",
-      // theme: "/path/to/my/theme",
-      // plugins: ["my", "plugins"],
+      theme: "default",
       ignoreCompilerErrors: false,
       version: true,
     }),

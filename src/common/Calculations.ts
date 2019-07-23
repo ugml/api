@@ -1,3 +1,4 @@
+import ICoordinates from "../interfaces/ICoordinates";
 import ICosts from "../interfaces/ICosts";
 import IPricelist from "../interfaces/IPricelist";
 import Config from "./Config";
@@ -81,5 +82,52 @@ export default class Calculations {
       deuterium: Math.round(costs.deuterium * costs.factor ** currentLevel),
       energy: Math.round(costs.energy * costs.factor ** currentLevel),
     };
+  }
+
+  /**
+   * Calculates the distances between two planets
+   * Source: http://www.owiki.de/index.php?title=Entfernung
+   * @param origin The first planet
+   * @param destination The second planet
+   */
+  public static calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
+    const distances = [
+      Math.abs(origin.galaxy - destination.galaxy),
+      Math.abs(origin.system - destination.system),
+      Math.abs(origin.planet - destination.planet),
+    ];
+
+    const distance = 0;
+
+    if (distances[0] !== 0) {
+      return distances[0] * 20000;
+    }
+    if (distances[1] !== 0) {
+      return distances[1] * 95 + 2700;
+    }
+    if (distances[2] !== 0) {
+      return distances[2] * 5 + 1000;
+    }
+
+    return distance;
+  }
+
+  /**
+   * Calculates the time of flight in seconds
+   * @param gameSpeed The speed of the game (default: 3500)
+   * @param missionSpeed The speed of the whole mission (possible values: 0, 10, 20, ..., 100)
+   * @param distance The distance between the start and the end
+   * @param slowestShipSpeed The speed of the slowest ship in the fleet
+   */
+  public static calculateTimeOfFlight(
+    gameSpeed: number,
+    missionSpeed: number,
+    distance: number,
+    slowestShipSpeed: number,
+  ): number {
+    // source: http://owiki.de/index.php?title=Flugzeit
+    return Math.round(
+      Math.pow((3500 / (missionSpeed / 100)) * ((distance * 10) / slowestShipSpeed), 0.5) + 10 / gameSpeed,
+    );
   }
 }

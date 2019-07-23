@@ -1,5 +1,6 @@
 import BuildingService from "../services/BuildingService";
 import DefenseService from "../services/DefenseService";
+import EventService from "../services/EventService";
 import Container from "./container";
 import GalaxyService from "../services/GalaxyService";
 import MessageService from "../services/MessageService";
@@ -13,6 +14,7 @@ module.exports = function() {
 
   container.service("buildingService", () => new BuildingService());
   container.service("defenseService", () => new DefenseService());
+  container.service("eventService", () => new EventService());
   container.service("galaxyService", () => new GalaxyService());
   container.service("messageService", () => new MessageService());
   container.service("planetService", () => new PlanetService());

@@ -1,4 +1,4 @@
-![N|Solid](https://mamen.at/ugamela/images/logo.png)
+![N|Solid](https://ugamela.org/images/logo.png)
 
 [![Travis-ci](https://travis-ci.org/ugml/api.svg?branch=master)](https://travis-ci.org/ugml/api)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ugml/api&amp;utm_campaign=Badge_Grade)
@@ -1059,7 +1059,7 @@ npm run watch
     "message": "Success",
     "data": {
         "0": {
-            "flightID": 1,
+            "eventID": 1,
             "ownerID": 1,
             "mission": 2,
             "fleetlist": "{\"201\":612,\"202\":357,\"203\":617,\"204\":800,\"205\":709,\"206\":204,\"207\":703,\"208\":85,\"209\":631,\"210\":388,\"211\":0,\"212\":723,\"213\":557,\"214\":106}",

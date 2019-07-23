@@ -1,5 +1,6 @@
 import Config from "./Config";
 import { Globals } from "./Globals";
+import PlanetType = Globals.PlanetType;
 
 /**
  * This class contains methods for input- and data-validation

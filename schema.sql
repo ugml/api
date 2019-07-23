@@ -107,11 +107,11 @@ CREATE TABLE `fleet` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS `flights`;
+DROP TABLE IF EXISTS `events`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `flights` (
-                           `flightID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `events` (
+                           `eventID` int(11) NOT NULL AUTO_INCREMENT,
                            `ownerID` int(11) NOT NULL,
                            `mission` tinyint(1) NOT NULL,
                            `fleetlist` text NOT NULL,
@@ -126,9 +126,9 @@ CREATE TABLE `flights` (
                            `loaded_deuterium` int(11) NOT NULL DEFAULT '0',
                            `returning` tinyint(1) NOT NULL DEFAULT '0',
                            `deleted` tinyint(1) NOT NULL DEFAULT '0',
-                           PRIMARY KEY (`flightID`),
-                           KEY `fk_flight_ownerid` (`ownerID`),
-                           CONSTRAINT `fk_flight_ownerid` FOREIGN KEY (`ownerID`) REFERENCES `users` (`userID`) ON DELETE CASCADE
+                           PRIMARY KEY (`eventID`),
+                           KEY `fk_event_ownerid` (`ownerID`),
+                           CONSTRAINT `fk_event_ownerid` FOREIGN KEY (`ownerID`) REFERENCES `users` (`userID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

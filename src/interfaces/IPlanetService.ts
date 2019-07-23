@@ -1,4 +1,5 @@
 import Planet from "../units/Planet";
+import ICoordinates from "./ICoordinates";
 
 export default interface IPlanetService {
   getPlanet(userID: number, planetID: number, fullInfo?: boolean): Promise<Planet>;
@@ -8,4 +9,5 @@ export default interface IPlanetService {
   getAllPlanetsOfUser(userID: number, fullInfo?: boolean);
   getMovementOnPlanet(userID: number, planetID: number);
   deletePlanet(userID: number, planetID: number);
+  getPlanetOrMoonAtPosition(position: ICoordinates): Promise<Planet>;
 }

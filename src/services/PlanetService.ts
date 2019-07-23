@@ -2,6 +2,7 @@ import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import Logger from "../common/Logger";
 import SerializationHelper from "../common/SerializationHelper";
+import ICoordinates from "../interfaces/ICoordinates";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
 import squel = require("safe-squel");
@@ -35,7 +36,6 @@ export default class PlanetService implements IPlanetService {
         .field("image");
     }
 
-    // execute the query
     const [rows] = await Database.query(query.toString());
 
     if (!InputValidator.isSet(rows)) {
@@ -247,7 +247,7 @@ export default class PlanetService implements IPlanetService {
   public async getMovementOnPlanet(userID: number, planetID: number) {
     const query: string = squel
       .select()
-      .from("flights")
+      .from("events")
       .where("ownerID = ?", userID)
       .where(
         squel
@@ -280,5 +280,29 @@ export default class PlanetService implements IPlanetService {
       .toString();
 
     await Database.query(query);
+  }
+
+  /**
+   * Returns a planet or moon at a given position
+   * @param userID
+   * @param position
+   */
+  public async getPlanetOrMoonAtPosition(position: ICoordinates): Promise<Planet> {
+    const query = squel
+      .select({ autoQuoteFieldNames: true })
+      .from("planets")
+      .where("galaxy = ?", position.galaxy)
+      .where("system = ?", position.system)
+      .where("planet = ?", position.planet)
+      .where("planet_type = ?", position.type)
+      .toString();
+
+    const [[rows]] = await Database.query(query);
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return rows;
   }
 }

@@ -1,13 +1,18 @@
-import { NextFunction, Response, Router } from "express";
+import { IRouter, NextFunction, Response, Router as newRouter, Router } from "express";
+import Calculations from "../common/Calculations";
+import Config from "../common/Config";
 import Database from "../common/Database";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import Redis from "../common/Redis";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
+import IEventService from "../interfaces/IEventService";
+import IPlanetService from "../interfaces/IPlanetService";
 import IShipUnits from "../interfaces/IShipUnits";
 import squel = require("safe-squel");
 import Logger from "../common/Logger";
+import Event from "../units/Event";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
@@ -22,60 +27,29 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
 /**
  * Defines routes for event-creation and cancellation
  */
-export class EventRouter {
-  // TODO: relocate to own file with other game-related calculations
-  /**
-   * Calculates the distances between two planets
-   * Source: http://www.owiki.de/index.php?title=Entfernung
-   * @param origin The first planet
-   * @param destination The second planet
-   */
-  private static calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
-    const distances = [
-      Math.abs(origin.galaxy - destination.galaxy),
-      Math.abs(origin.system - destination.system),
-      Math.abs(origin.planet - destination.planet),
-    ];
+export default class EventRouter {
+  public router: IRouter<{}> = newRouter();
 
-    const distance = 0;
-
-    if (distances[0] !== 0) {
-      return distances[0] * 20000;
-    }
-    if (distances[1] !== 0) {
-      return distances[1] * 95 + 2700;
-    }
-    if (distances[2] !== 0) {
-      return distances[2] * 5 + 1000;
-    }
-
-    return distance;
-  }
+  private planetService: IPlanetService;
+  private eventService: IEventService;
 
   /**
-   * Calculates the time of flight in seconds
-   * @param gameSpeed The speed of the game (default: 3500)
-   * @param missionSpeed The speed of the whole mission (possible values: 0, 10, 20, ..., 100)
-   * @param distance The distance between the start and the end
-   * @param slowestShipSpeed The speed of the slowest ship in the fleet
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
    */
-  private static calculateTimeOfFlight(
-    gameSpeed: number,
-    missionSpeed: number,
-    distance: number,
-    slowestShipSpeed: number,
-  ): number {
-    // source: http://owiki.de/index.php?title=Flugzeit
-    return Math.round(
-      Math.pow((3500 / (missionSpeed / 100)) * ((distance * 10) / slowestShipSpeed), 0.5) + 10 / gameSpeed,
-    );
+  public constructor(container) {
+    this.planetService = container.planetService;
+    this.eventService = container.eventService;
+
+    this.router.post("/create/", this.createEvent);
+    this.router.post("/cancel/", this.cancelEvent);
   }
 
   /**
    * Returns the speed of the slowest ship in the fleet
    * @param units The sent ship in this event
    */
-  private static getSlowestShipSpeed(units: IShipUnits): number {
+  private getSlowestShipSpeed(units: IShipUnits): number {
     const unitData = require("../config/units.json");
 
     let minimum: number = Number.MAX_VALUE;
@@ -93,7 +67,7 @@ export class EventRouter {
    * Returns the ID of the destination-type
    * @param type The type as a string (planet, moon or debris)
    */
-  private static getDestinationTypeID(type: string): number {
+  private static getDestinationTypeByName(type: string): number {
     let typeID: number;
     switch (type) {
       case "planet":
@@ -146,15 +120,6 @@ export class EventRouter {
 
     return missionTypeID;
   }
-  public router: Router;
-
-  /**
-   * Initialize the Router
-   */
-  public constructor() {
-    this.router = Router();
-    this.init();
-  }
 
   /**
    * Creates a new event
@@ -162,7 +127,7 @@ export class EventRouter {
    * @param response
    * @param next
    */
-  public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public createEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     // TODO: check if enough ships on planet
     // TODO: check if planet has enough deuterium
 
@@ -176,6 +141,9 @@ export class EventRouter {
 
     const eventData = JSON.parse(request.body.event);
 
+    const userID = parseInt(request.userID, 10);
+    const ownerID = parseInt(eventData.ownerID, 10);
+
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -186,7 +154,7 @@ export class EventRouter {
     }
 
     // check if sender of event == currently authenticated user
-    if (request.userID !== eventData.ownerID) {
+    if (userID !== ownerID) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
         message: "Event-creator is not currently authenticated user",
@@ -203,127 +171,92 @@ export class EventRouter {
       });
     }
 
-    let planetQuery: string = squel
-      .select()
-      .from("planets")
-      .where("galaxy = ?", eventData.data.origin.galaxy)
-      .where("system = ?", eventData.data.origin.system)
-      .where("planet = ?", eventData.data.origin.planet)
-      .where("planet_type = ?", eventData.data.origin.type === "planet" ? 1 : 2)
-      .where("ownerID = ?", request.userID)
-      .toString();
+    const positionOrigin: ICoordinates = {
+      galaxy: eventData.data.origin.galaxy,
+      system: eventData.data.origin.system,
+      planet: eventData.data.origin.planet,
+      type: EventRouter.getDestinationTypeByName(eventData.data.origin.type),
+    };
 
-    // check if origin-planet exists and the user owns it
-    Database.query(planetQuery)
-      .then(planet => {
-        const startPlanet = planet[0];
+    const positionDestination: ICoordinates = {
+      galaxy: eventData.data.destination.galaxy,
+      system: eventData.data.destination.system,
+      planet: eventData.data.destination.planet,
+      type: EventRouter.getDestinationTypeByName(eventData.data.destination.type),
+    };
 
-        // planet does not exist or player does not own it
-        if (!InputValidator.isSet(startPlanet)) {
-          return response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "Invalid parameter",
-            data: {},
-          });
-        }
+    const startPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionOrigin);
+    const destinationPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionDestination);
 
-        // get the destination-planet
-        planetQuery = squel
-          .select()
-          .from("planets")
-          .where("galaxy = ?", eventData.data.destination.galaxy)
-          .where("system = ?", eventData.data.destination.system)
-          .where("planet = ?", eventData.data.destination.planet)
-          .where("planet_type = ?", eventData.data.destination.type === "planet" ? 1 : 2)
-          .toString();
-
-        // gather data about destination
-        Database.query(planetQuery)
-          .then(results => {
-            const destinationPlanet = results[0];
-
-            // destination does not exist
-            if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
-              return response.status(Globals.Statuscode.BAD_REQUEST).json({
-                status: Globals.Statuscode.BAD_REQUEST,
-                message: "Destination does not exist",
-                data: {},
-              });
-            }
-
-            // calculate distance
-            const distance = EventRouter.calculateDistance(eventData.data.origin, eventData.data.destination);
-
-            const gameConfig = require("../config/game.json");
-
-            const slowestShipSpeed = EventRouter.getSlowestShipSpeed(eventData.data.ships);
-
-            // calculate duration of flight
-            const timeOfFlight = EventRouter.calculateTimeOfFlight(
-              gameConfig.speed,
-              eventData.speed,
-              distance,
-              slowestShipSpeed,
-            );
-
-            // set start-time
-            eventData.starttime = Math.round(+new Date() / 1000);
-
-            // set end-time
-            eventData.endtime = Math.round(eventData.starttime + timeOfFlight);
-
-            // store event in database
-            const eventQuery: string = squel
-              .insert()
-              .into("flights")
-              .set("ownerID", eventData.ownerID)
-              .set("mission", EventRouter.getMissionTypeID(eventData.mission))
-              .set("fleetlist", JSON.stringify(eventData.data.ships))
-              .set("start_id", startPlanet.planetID)
-              .set("start_type", EventRouter.getDestinationTypeID(eventData.data.origin.type))
-              .set("start_time", eventData.starttime)
-              .set("end_id", destinationPlanet.planetID)
-              .set("end_type", EventRouter.getDestinationTypeID(eventData.data.destination.type))
-              .set("end_time", eventData.endtime)
-              .set("loaded_metal", eventData.data.loadedRessources.metal)
-              .set("loaded_crystal", eventData.data.loadedRessources.crystal)
-              .set("loaded_deuterium", eventData.data.loadedRessources.deuterium)
-              .toString();
-
-            Database.query(eventQuery).then((result: any) => {
-              // add event to redis-queue
-              Redis.getConnection().zadd("eventQueue", result.insertId.toString(), eventData.endtime.toString());
-
-              eventData.eventID = parseInt(result.insertId, 10);
-
-              // all done
-              return response.status(Globals.Statuscode.SUCCESS).json({
-                status: Globals.Statuscode.SUCCESS,
-                message: "Event successfully created.",
-                data: eventData,
-              });
-            });
-          })
-          .catch(error => {
-            Logger.error(error);
-
-            return response.status(Globals.Statuscode.SERVER_ERROR).json({
-              status: Globals.Statuscode.SERVER_ERROR,
-              message: `An error occured: ${error.message}`,
-              data: eventData,
-            });
-          });
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        return response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: `An error occured: ${error.message}`,
-          data: eventData,
-        });
+    if (startPlanet.ownerID !== userID) {
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
+        message: "The player does not own the start-planet",
+        data: {},
       });
-  }
+    }
+
+    // planet does not exist or player does not own it
+    if (!InputValidator.isSet(startPlanet)) {
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
+        message: "Invalid parameter",
+        data: {},
+      });
+    }
+
+    // destination does not exist
+    if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
+        message: "Destination does not exist",
+        data: {},
+      });
+    }
+
+    const distance = Calculations.calculateDistance(eventData.data.origin, eventData.data.destination);
+
+    const gameConfig = Config.getGameConfig();
+
+    const slowestShipSpeed = this.getSlowestShipSpeed(eventData.data.ships);
+
+    // calculate duration of flight
+    const timeOfFlight = Calculations.calculateTimeOfFlight(
+      gameConfig.speed,
+      eventData.speed,
+      distance,
+      slowestShipSpeed,
+    );
+
+    let event: Event = new Event();
+
+    event.eventID = 0;
+    event.ownerID = eventData.ownerID;
+    event.mission = EventRouter.getMissionTypeID(eventData.mission);
+    event.fleetlist = JSON.stringify(eventData.data.ships);
+    event.start_id = startPlanet.planetID;
+    event.start_type = EventRouter.getDestinationTypeByName(eventData.data.origin.type);
+    event.start_time = Math.round(+new Date() / 1000);
+    event.end_id = destinationPlanet.planetID;
+    event.end_type = EventRouter.getDestinationTypeByName(eventData.data.destination.type);
+    event.end_time = Math.round(event.start_time + timeOfFlight);
+    event.loaded_metal = eventData.data.loadedRessources.metal;
+    event.loaded_crystal = eventData.data.loadedRessources.crystal;
+    event.loaded_deuterium = eventData.data.loadedRessources.deuterium;
+    event.returning = false;
+    event.deleted = false;
+
+    const [result] = await this.eventService.createNewEvent(event);
+
+    event.eventID = parseInt(result.insertId, 10);
+
+    // all done
+    return response.status(Globals.Statuscode.SUCCESS).json({
+      status: Globals.Statuscode.SUCCESS,
+      message: "Event successfully created.",
+      data: event,
+    });
+  };
 
   /**
    * Cancels an event
@@ -331,7 +264,7 @@ export class EventRouter {
    * @param response
    * @param next
    */
-  public cancelEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
+  public cancelEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
@@ -342,8 +275,8 @@ export class EventRouter {
 
     const planetQuery: string = squel
       .select()
-      .from("flights")
-      .where("flightID = ?", request.body.eventID)
+      .from("events")
+      .where("eventID = ?", request.body.eventID)
       .where("`returning` = ?", 0)
       .where("ownerID = ?", request.userID)
       .toString();
@@ -367,7 +300,7 @@ export class EventRouter {
 
         const updateQuery: string = squel
           .update()
-          .table("flights")
+          .table("events")
           .set("start_id", event.end_id)
           .set("start_type", event.end_type)
           .set("start_time", Math.round(+new Date() / 1000))
@@ -375,7 +308,7 @@ export class EventRouter {
           .set("end_type", event.start_type)
           .set("end_time", newEndTime)
           .set("`returning`", 1)
-          .where("flightID = ?", request.body.eventID)
+          .where("eventID = ?", request.body.eventID)
           .where("`returning` = ?", 0)
           .where("ownerID = ?", request.userID)
           .toString();
@@ -404,19 +337,5 @@ export class EventRouter {
           data: {},
         });
       });
-  }
-
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
-  public init() {
-    this.router.post("/create/", this.createEvent);
-    this.router.post("/cancel/", this.cancelEvent);
-  }
+  };
 }
-
-const eventRouter = new EventRouter();
-eventRouter.init();
-
-export default eventRouter.router;

@@ -23,7 +23,7 @@ export default class BuildingService implements IBuildingService {
         .where("b.planetID = ?", planetID)
         .toString();
 
-      // execute the query
+
       const [rows] = await Database.query(query);
 
       if (!InputValidator.isSet(rows)) {

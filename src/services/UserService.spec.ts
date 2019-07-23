@@ -1,5 +1,4 @@
 import * as chai from "chai";
-import UserService from "./UserService";
 
 const expect = chai.expect;
 

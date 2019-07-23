@@ -191,7 +191,7 @@ export default class App {
 
     this.register("/v1/defenses", new DefenseRouter(this.container).router);
 
-    this.register("/v1/events", EventRouter);
+    this.register("/v1/events", new EventRouter(this.container).router);
 
     this.register("/v1/galaxy", new GalaxyRouter(this.container).router);
 

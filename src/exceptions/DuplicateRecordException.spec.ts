@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { DuplicateRecordException } from "./DuplicateRecordException";
+import DuplicateRecordException from "./DuplicateRecordException";
 
 const expect = chai.expect;
 

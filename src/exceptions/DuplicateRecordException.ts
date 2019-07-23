@@ -1,8 +1,11 @@
 /**
- * Helper class to distinguish errors.
- * This error is thrown when a record already exists in the database.
+ * This error should be thrown when a record already exists in the database.
  */
-class DuplicateRecordException extends Error {
+export default class DuplicateRecordException extends Error {
+  /**
+   * Takes a message-string and returns a new DuplicateRecordException-object
+   * @param m the exception-message
+   */
   public constructor(m: string) {
     super(m);
 
@@ -10,5 +13,3 @@ class DuplicateRecordException extends Error {
     Object.setPrototypeOf(this, DuplicateRecordException.prototype);
   }
 }
-
-export { DuplicateRecordException };

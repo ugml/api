@@ -23,30 +23,54 @@ export default class Queue {
    */
   private queue: object = {};
 
+  /**
+   * Sets the planetID
+   * @param planetID
+   */
   public setPlanetID(planetID: number) {
     this.planetID = planetID;
   }
 
+  /**
+   * Returns the planetID
+   */
   public getPlanetID(): number {
     return this.planetID;
   }
 
+  /**
+   * Sets the last time, the queue was updated
+   * @param updateTime
+   */
   public setLastUpdateTime(updateTime: number) {
     this.lastUpdateTime = updateTime;
   }
 
+  /**
+   * Returns the last time, the queue was updated
+   */
   public getLastUpdateTime(): number {
     return this.lastUpdateTime;
   }
 
+  /**
+   * Sets the time remaining
+   * @param timeRemaining
+   */
   public setTimeRemaining(timeRemaining: number) {
     this.timeRemaining = timeRemaining;
   }
 
+  /**
+   * Returns the time remaining
+   */
   public getTimeRemaining(): number {
     return this.timeRemaining;
   }
 
+  /**
+   * Returns the queue
+   */
   public getQueue() {
     return this.queue;
   }

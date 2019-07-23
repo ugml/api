@@ -1,6 +1,5 @@
 import * as chai from "chai";
-import { Config } from "./Config";
-import { Database } from "./Database";
+import Database from "./Database";
 
 import chaiAsPromised = require("chai-as-promised");
 

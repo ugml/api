@@ -1,4 +1,4 @@
-export interface IPricelist {
+export default interface IPricelist {
   metal: number;
   crystal: number;
   deuterium: number;

@@ -26,7 +26,7 @@ describe("Techs-units", function() {
       graviton_tech: 1,
     };
 
-    let techs: Techs = SerializationHelper.toInstance(new Techs(), JSON.stringify(data));
+    const techs: Techs = SerializationHelper.toInstance(new Techs(), JSON.stringify(data));
 
     assert.equal(techs.isValid(), true);
   });
@@ -51,7 +51,7 @@ describe("Techs-units", function() {
       graviton_tech: 1,
     };
 
-    let techs: Techs = SerializationHelper.toInstance(new Techs(), JSON.stringify(data));
+    const techs: Techs = SerializationHelper.toInstance(new Techs(), JSON.stringify(data));
 
     assert.equal(techs.isValid(), false);
   });
@@ -75,7 +75,7 @@ describe("Techs-units", function() {
       graviton_tech: 1,
     };
 
-    let techs: Techs = SerializationHelper.toInstance(new Techs(), JSON.stringify(data));
+    const techs: Techs = SerializationHelper.toInstance(new Techs(), JSON.stringify(data));
 
     assert.equal(techs.isValid(), false);
   });

@@ -1,18 +1,66 @@
-import { IUnits } from "../interfaces/IUnits";
-
+import IUnits from "../interfaces/IUnits";
+/**
+ * Represents a defenses-row in the database
+ */
 export default class Defenses implements IUnits {
+  /**
+   * The ID of the planet
+   */
   public planetID: number;
+
+  /**
+   * The current amount of rocket_launcher on the planet
+   */
   public rocket_launcher: number;
+
+  /**
+   * The current amount of light_laser on the planet
+   */
   public light_laser: number;
+
+  /**
+   * The current amount of heavy_laser on the planet
+   */
   public heavy_laser: number;
+
+  /**
+   * The current amount of ion_cannon on the planet
+   */
   public ion_cannon: number;
+
+  /**
+   * The current amount of gauss_cannon on the planet
+   */
   public gauss_cannon: number;
+
+  /**
+   * The current amount of plasma_turret on the planet
+   */
   public plasma_turret: number;
+
+  /**
+   * Is true, if the planet has a small_shield_dome
+   */
   public small_shield_dome: boolean;
+
+  /**
+   * Is true, if the planet has a large_shield_dome
+   */
   public large_shield_dome: boolean;
+
+  /**
+   * The current amount of anti_ballistic_missile on the planet
+   */
   public anti_ballistic_missile: number;
+
+  /**
+   * The current amount of interplanetary_missile on the planet
+   */
   public interplanetary_missile: number;
 
+  /**
+   * Returns, if the contains valid data or not
+   */
   public isValid(): boolean {
     return (
       0 <= this.planetID &&

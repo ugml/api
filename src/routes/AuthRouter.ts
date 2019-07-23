@@ -1,17 +1,25 @@
 import { NextFunction, Response, Router as newRouter, IRouter, Request } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { JwtHelper } from "../common/JwtHelper";
-import { Logger } from "../common/Logger";
+import JwtHelper from "../common/JwtHelper";
+import Logger from "../common/Logger";
 import IRequest from "../interfaces/IRequest";
+import IUserService from "../interfaces/IUserService";
 
 const bcrypt = require("bcrypt");
 
+/**
+ * Defines routes for authentication
+ */
 export default class AuthRouter {
   public router: IRouter<{}> = newRouter();
 
-  private userService;
+  private userService: IUserService;
 
+  /**
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
+   */
   public constructor(container) {
     this.userService = container.userService;
     this.router.post("/login", this.authenticate);

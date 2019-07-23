@@ -1,6 +1,6 @@
-import { ICosts } from "../interfaces/ICosts";
-import { IPricelist } from "../interfaces/IPricelist";
-import { Config } from "./Config";
+import ICosts from "../interfaces/ICosts";
+import IPricelist from "../interfaces/IPricelist";
+import Config from "./Config";
 import InputValidator from "./InputValidator";
 
 /**

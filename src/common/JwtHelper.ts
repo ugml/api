@@ -1,11 +1,11 @@
-import { IJwt } from "../interfaces/IJwt";
+import IJwt from "../interfaces/IJwt";
 
 const jwt = require("jsonwebtoken");
 
 /**
  * This class contains functionality to generate and validate JWT-token
  */
-class JwtHelper {
+export default class JwtHelper {
   /**
    * Generates a new JWT-token containing the passed userID
    * @param userID the userID of the authenticated user
@@ -36,5 +36,3 @@ class JwtHelper {
     }
   }
 }
-
-export { JwtHelper };

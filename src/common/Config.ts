@@ -1,13 +1,13 @@
 /**
  * Helper-class to get the current game-configuration
  */
-import { IGameConfig } from "../interfaces/IGameConfig";
+import IGameConfig from "../interfaces/IGameConfig";
 
 // TODO: define Interfaces for return-values
 /**
  * This class reads and returns the two main config files for the game.
  */
-class Config {
+export default class Config {
   /**
    * Returns the current configuration for the game
    */
@@ -58,5 +58,3 @@ class Config {
     return require("../config/units.json").units.technologies;
   }
 }
-
-export { Config };

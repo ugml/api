@@ -1,25 +1,29 @@
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
-import { Config } from "../common/Config";
+import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import IBuildingService from "../interfaces/IBuildingService";
+import IPlanetService from "../interfaces/IPlanetService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
-import { ICosts } from "../interfaces/ICosts";
-import { Logger } from "../common/Logger";
+import ICosts from "../interfaces/ICosts";
+import Logger from "../common/Logger";
 
-// const units = new Units();
-
+/**
+ * Defines routes for building-data
+ */
 export default class BuildingsRouter {
   public router: IRouter<{}> = newRouter();
 
-  private buildingService;
-  private planetService;
+  private buildingService: IBuildingService;
+  private planetService: IPlanetService;
 
   /**
-   * Initialize the Router
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
    */
   public constructor(container) {
     this.buildingService = container.buildingService;
@@ -65,6 +69,12 @@ export default class BuildingsRouter {
     }
   };
 
+  /**
+   * Cancels a build-order on a planet
+   * @param request
+   * @param response
+   * @param next
+   */
   public cancelBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
@@ -127,6 +137,12 @@ export default class BuildingsRouter {
     }
   };
 
+  /**
+   * Starts a new build-order
+   * @param request
+   * @param response
+   * @param next
+   */
   public startBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (

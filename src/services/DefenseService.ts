@@ -1,19 +1,16 @@
-import { Database } from "../common/Database";
-import { IDefenseService } from "../interfaces/IDefenseService";
-
+import Database from "../common/Database";
+import IDefenseService from "../interfaces/IDefenseService";
 import squel = require("safe-squel");
 
+/**
+ * This class defines a service to interact with the defenses-table in the database
+ */
 export default class DefenseService implements IDefenseService {
-  public async createDefenseRow(planetID: number, connection = null) {
-    const query = `INSERT INTO defenses (\`planetID\`) VALUES (${planetID});`;
-
-    if (connection === null) {
-      return await Database.query(query);
-    }
-
-    return await connection.query(query);
-  }
-
+  /**
+   * Returns a list of defenses on a given planet owner by a given user
+   * @param userID the ID of the user
+   * @param planetID the ID of the planet
+   */
   public async getDefenses(userID: number, planetID: number) {
     const query: string = squel
       .select()
@@ -28,5 +25,20 @@ export default class DefenseService implements IDefenseService {
     const [[rows]] = await Database.query(query);
 
     return rows;
+  }
+
+  /**
+   * Creates a new row in the database.
+   * @param planetID the ID of the planet
+   * @param connection a connection from the connection-pool, if this query should be executed within a transaction
+   */
+  public async createDefenseRow(planetID: number, connection = null) {
+    const query = `INSERT INTO defenses (\`planetID\`) VALUES (${planetID});`;
+
+    if (connection === null) {
+      return await Database.query(query);
+    }
+
+    return await connection.query(query);
   }
 }

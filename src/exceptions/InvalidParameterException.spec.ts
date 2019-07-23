@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { InvalidParameterException } from "./InvalidParameterException";
+import InvalidParameterException from "./InvalidParameterException";
 
 const expect = chai.expect;
 

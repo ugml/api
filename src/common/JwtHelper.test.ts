@@ -1,7 +1,5 @@
-import * as mocha from "mocha";
 import * as chai from "chai";
-import { IJwt } from "../interfaces/IJwt";
-import { JwtHelper } from "./JwtHelper";
+import JwtHelper from "./JwtHelper";
 
 const assert = chai.assert;
 const expect = chai.expect;

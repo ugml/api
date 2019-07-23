@@ -1,6 +1,6 @@
 import * as debug from "debug";
 import * as http from "http";
-import { Logger } from "./common/Logger";
+import Logger from "./common/Logger";
 import App from "./App";
 import Container from "./ioc/container";
 

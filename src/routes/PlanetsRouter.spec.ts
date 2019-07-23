@@ -190,7 +190,7 @@ describe("planetsRouter", () => {
   it("should rename a planet", async () => {
     const planetID = 167546850;
 
-    let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
     return request
       .post("/v1/planets/rename")

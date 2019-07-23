@@ -1,31 +1,45 @@
 import { IRouter, NextFunction, Request, Response, Router as newRouter, Router } from "express";
-import { Config } from "../common/Config";
-import { Database } from "../common/Database";
-import { DuplicateRecordException } from "../exceptions/DuplicateRecordException";
+import Config from "../common/Config";
+import Database from "../common/Database";
+import DuplicateRecordException from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { IGameConfig } from "../interfaces/IGameConfig";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import IBuildingService from "../interfaces/IBuildingService";
+import IDefenseService from "../interfaces/IDefenseService";
+import IGalaxyService from "../interfaces/IGalaxyService";
+import IGameConfig from "../interfaces/IGameConfig";
+import IPlanetService from "../interfaces/IPlanetService";
+import IShipService from "../interfaces/IShipService";
+import ITechService from "../interfaces/ITechService";
+import IUserService from "../interfaces/IUserService";
 import Planet from "../units/Planet";
 import User from "../units/User";
 import PlanetsRouter from "./PlanetsRouter";
-import { Logger } from "../common/Logger";
-
-const bcrypt = require("bcrypt");
-import { JwtHelper } from "../common/JwtHelper";
+import Logger from "../common/Logger";
+import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 
+const bcrypt = require("bcrypt");
+
+/**
+ * Defines routes for user-data
+ */
 export default class UsersRouter {
   public router: IRouter<{}> = newRouter();
 
-  private userService;
-  private galaxyService;
-  private planetService;
-  private buildingService;
-  private defenseService;
-  private shipService;
-  private techService;
+  private userService: IUserService;
+  private galaxyService: IGalaxyService;
+  private planetService: IPlanetService;
+  private buildingService: IBuildingService;
+  private defenseService: IDefenseService;
+  private shipService: IShipService;
+  private techService: ITechService;
 
+  /**
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
+   */
   public constructor(container) {
     this.userService = container.userService;
     this.galaxyService = container.galaxyService;
@@ -60,6 +74,12 @@ export default class UsersRouter {
     this.router.get("/", this.getUserSelf);
   }
 
+  /**
+   * Returns sensible information about the currently authenticated user
+   * @param request
+   * @param response
+   * @param next
+   */
   public getUserSelf = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
@@ -89,6 +109,12 @@ export default class UsersRouter {
     }
   };
 
+  /**
+   * Returns basic information about a user given its userID
+   * @param request
+   * @param response
+   * @param next
+   */
   public getUserByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
@@ -118,6 +144,12 @@ export default class UsersRouter {
     }
   };
 
+  /**
+   * Creates a new user with homeplanet
+   * @param request
+   * @param response
+   * @param next
+   */
   public createUser = async (request: Request, response: Response, next: NextFunction) => {
     if (
       !InputValidator.isSet(request.body.username) ||
@@ -301,6 +333,12 @@ export default class UsersRouter {
     });
   };
 
+  /**
+   * Updates a user
+   * @param request
+   * @param response
+   * @param next
+   */
   public updateUser = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // if no parameters are set
@@ -358,6 +396,12 @@ export default class UsersRouter {
     }
   };
 
+  /**
+   * Sets the current planet for a user
+   * @param request
+   * @param response
+   * @param next
+   */
   public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters

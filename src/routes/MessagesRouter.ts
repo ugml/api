@@ -1,17 +1,23 @@
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { Logger } from "../common/Logger";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import Logger from "../common/Logger";
+import IMessageService from "../interfaces/IMessageService";
+import IUserService from "../interfaces/IUserService";
 
+/**
+ * Defines routes for message-sending and receiving
+ */
 export default class MessagesRouter {
   public router: IRouter<{}> = newRouter();
 
-  private userService;
-  private messageService;
+  private userService: IUserService;
+  private messageService: IMessageService;
 
   /**
-   * Initialize the Router
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
    */
   public constructor(container) {
     this.userService = container.userService;
@@ -22,6 +28,12 @@ export default class MessagesRouter {
     this.router.post("/send", this.sendMessage);
   }
 
+  /**
+   * Returns a list of all messages
+   * @param request
+   * @param response
+   * @param next
+   */
   public getAllMessages = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       const userID = parseInt(request.userID, 10);
@@ -44,6 +56,12 @@ export default class MessagesRouter {
     }
   };
 
+  /**
+   * Returns a specific message by its messageID
+   * @param request
+   * @param response
+   * @param next
+   */
   public getMessageByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
@@ -74,6 +92,12 @@ export default class MessagesRouter {
     }
   };
 
+  /**
+   * Deletes a message by its messageID
+   * @param request
+   * @param response
+   * @param next
+   */
   public deleteMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
@@ -105,6 +129,12 @@ export default class MessagesRouter {
     }
   };
 
+  /**
+   * Sends a new message
+   * @param request
+   * @param response
+   * @param next
+   */
   public sendMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (

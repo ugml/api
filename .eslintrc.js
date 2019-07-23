@@ -38,6 +38,15 @@ module.exports =  {
     "camelcase": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-var-requires": "on",
+    "require-jsdoc": ["error", {
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": true,
+        "ClassDeclaration": true,
+        "ArrowFunctionExpression": true,
+        "FunctionExpression": true
+      }
+    }]
   },
   settings:  {
     react:  {

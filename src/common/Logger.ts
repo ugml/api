@@ -38,4 +38,4 @@ Logger.getPath = function() {
   return path;
 };
 
-export { Logger };
+export default Logger;

@@ -1,13 +1,21 @@
-import { Database } from "../common/Database";
+import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import { Logger } from "../common/Logger";
+import Logger from "../common/Logger";
 import SerializationHelper from "../common/SerializationHelper";
-import { IPlanetService } from "../interfaces/IPlanetService";
+import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
-
 import squel = require("safe-squel");
 
+/**
+ * This class defines a service to interact with the planets-table in the database
+ */
 export default class PlanetService implements IPlanetService {
+  /**
+   * Returns all information about a given planet owned by the given user.
+   * @param userID the ID of the user
+   * @param planetID the ID of the planet
+   * @param fullInfo true - all informations are returned, false - only basic information is returned
+   */
   public async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {
     let query = squel
       .select()
@@ -37,6 +45,10 @@ export default class PlanetService implements IPlanetService {
     return SerializationHelper.toInstance(new Planet(), JSON.stringify(rows[0]));
   }
 
+  /**
+   * Updates a planet given a planet-object
+   * @param planet the planet with changed data
+   */
   public async updatePlanet(planet: Planet): Promise<Planet> {
     try {
       let query = squel.update().table("planets");
@@ -150,6 +162,9 @@ export default class PlanetService implements IPlanetService {
     }
   }
 
+  /**
+   * Returns a new, not yet taken planetID
+   */
   public async getNewId(): Promise<number> {
     const query = "CALL getNewPlanetId();";
 
@@ -159,7 +174,9 @@ export default class PlanetService implements IPlanetService {
   }
 
   /**
-   * Stores the current object in the database
+   * Inserts a new planet into the database given a planet-object
+   * @param planet the planet-object containing the information
+   * @param connection a connection from the connection-pool, if this query should be executed within a transaction
    */
   public async createNewPlanet(planet: Planet, connection = null) {
     const query = squel
@@ -190,6 +207,11 @@ export default class PlanetService implements IPlanetService {
     }
   }
 
+  /**
+   * Returns a list of all planets of a given user
+   * @param userID the ID of the user
+   * @param fullInfo true - all informations are returned, false - only basic information is returned
+   */
   public async getAllPlanetsOfUser(userID: number, fullInfo: boolean = false) {
     let query = squel
       .select()
@@ -217,6 +239,11 @@ export default class PlanetService implements IPlanetService {
     return rows;
   }
 
+  /**
+   * Returns a list of flights to and from a given planet owned by a given user
+   * @param userID the ID of the user
+   * @param planetID the ID of the planet
+   */
   public async getMovementOnPlanet(userID: number, planetID: number) {
     const query: string = squel
       .select()
@@ -239,6 +266,11 @@ export default class PlanetService implements IPlanetService {
     return rows;
   }
 
+  /**
+   * Deletes a planet
+   * @param userID the ID of the user
+   * @param planetID the ID of the planet
+   */
   public async deletePlanet(userID: number, planetID: number) {
     const query: string = squel
       .delete()

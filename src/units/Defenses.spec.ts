@@ -21,7 +21,7 @@ describe("Defenses-units", function() {
       interplanetary_missile: 1,
     };
 
-    let defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
+    const defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
 
     assert.equal(defenses.isValid(), true);
   });
@@ -41,7 +41,7 @@ describe("Defenses-units", function() {
       interplanetary_missile: 1,
     };
 
-    let defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
+    const defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
 
     assert.equal(defenses.isValid(), false);
   });
@@ -60,7 +60,7 @@ describe("Defenses-units", function() {
       interplanetary_missile: 1,
     };
 
-    let defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
+    const defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
 
     assert.equal(defenses.isValid(), false);
   });

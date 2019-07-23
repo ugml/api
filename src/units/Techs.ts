@@ -1,23 +1,91 @@
-import { IUnits } from "../interfaces/IUnits";
-
+import IUnits from "../interfaces/IUnits";
+/**
+ * Represents a techs-row in the database
+ */
 export default class Techs implements IUnits {
+  /**
+   * The ID of the user
+   */
   public userID: number;
+
+  /**
+   * The current espionage_tech level
+   */
   public espionage_tech: number;
+
+  /**
+   * The current computer_tech level
+   */
   public computer_tech: number;
+
+  /**
+   * The current weapon_tech level
+   */
   public weapon_tech: number;
+
+  /**
+   * The current armour_tech level
+   */
   public armour_tech: number;
+
+  /**
+   * The current shielding_tech level
+   */
   public shielding_tech: number;
+
+  /**
+   * The current energy_tech level
+   */
   public energy_tech: number;
+
+  /**
+   * The current hyperspace_tech level
+   */
   public hyperspace_tech: number;
+
+  /**
+   * The current combustion_drive_tech level
+   */
   public combustion_drive_tech: number;
+
+  /**
+   * The current impulse_drive_tech level
+   */
   public impulse_drive_tech: number;
+
+  /**
+   * The current hyperspace_drive_tech level
+   */
   public hyperspace_drive_tech: number;
+
+  /**
+   * The current laser_tech level
+   */
   public laser_tech: number;
+
+  /**
+   * The current ion_tech level
+   */
   public ion_tech: number;
+
+  /**
+   * The current plasma_tech level
+   */
   public plasma_tech: number;
+
+  /**
+   * The current intergalactic_research_tech level
+   */
   public intergalactic_research_tech: number;
+
+  /**
+   * The current graviton_tech level
+   */
   public graviton_tech: number;
 
+  /**
+   * Returns, if the contains valid data or not
+   */
   public isValid(): boolean {
     return (
       0 < this.userID &&

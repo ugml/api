@@ -1,11 +1,10 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import { Router } from "express";
-import { JwtHelper } from "./common/JwtHelper";
-import { IAuthorizedRequest } from "./interfaces/IAuthorizedRequest";
-
+import JwtHelper from "./common/JwtHelper";
+import IAuthorizedRequest from "./interfaces/IAuthorizedRequest";
 import { Globals } from "./common/Globals";
-import { IJwt } from "./interfaces/IJwt";
+import IJwt from "./interfaces/IJwt";
 import InputValidator from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -33,20 +32,25 @@ const expressWinston = require("express-winston");
 const { format } = winston;
 const { combine, printf } = format;
 
-import { Logger } from "./common/Logger";
+import Logger from "./common/Logger";
 
 const logFormat = printf(({ message, timestamp }) => {
   return `${timestamp} [REQUEST] ${message}`;
 });
 
-// Creates and configures an ExpressJS web server.
+/**
+ * Creates and configures an ExpressJS web server.
+ */
 export default class App {
   // ref to Express instance
   public express: express.Application;
   public userID: string;
   public container;
 
-  // Run configuration methods on the Express instance.
+  /**
+   * Creates and configures a new App-instance
+   * @param container the IoC-container with registered services
+   */
   public constructor(container) {
     this.container = container;
     this.express = express();
@@ -54,7 +58,9 @@ export default class App {
     this.routes();
   }
 
-  // Configure Express middleware.
+  /**
+   * Registers middleware
+   */
   private middleware(): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
@@ -70,7 +76,9 @@ export default class App {
     );
   }
 
-  // Configure API endpoints.
+  /**
+   * Configure API endpoints
+   */
   private routes(): void {
     const self = this;
 
@@ -163,7 +171,7 @@ export default class App {
       }),
     );
 
-    this.register("/v1/config", ConfigRouter);
+    this.register("/v1/config", new ConfigRouter().router);
 
     this.register("/v1/auth", new AuthRouter(this.container).router);
 
@@ -198,11 +206,16 @@ export default class App {
     });
   }
 
-  private register(route: string, router: Router) {
+  /**
+   * Helper-function to register routes
+   * @param path the path of the route
+   * @param router the router which handles the requests to the given path
+   */
+  private register(path: string, router: Router) {
     const self = this;
 
     this.express.use(
-      route,
+      path,
       function(req: IAuthorizedRequest, res, next) {
         req.userID = self.userID;
         next();

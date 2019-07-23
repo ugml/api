@@ -25,7 +25,7 @@ describe("Buildings-units", function() {
       missile_silo: 1,
     };
 
-    let buildings: Buildings = SerializationHelper.toInstance(new Buildings(), JSON.stringify(data));
+    const buildings: Buildings = SerializationHelper.toInstance(new Buildings(), JSON.stringify(data));
 
     assert.equal(buildings.isValid(), true);
   });
@@ -50,7 +50,7 @@ describe("Buildings-units", function() {
       missile_silo: 1,
     };
 
-    let buildings: Buildings = SerializationHelper.toInstance(new Buildings(), JSON.stringify(data));
+    const buildings: Buildings = SerializationHelper.toInstance(new Buildings(), JSON.stringify(data));
 
     assert.equal(buildings.isValid(), false);
   });
@@ -74,7 +74,7 @@ describe("Buildings-units", function() {
       missile_silo: 1,
     };
 
-    let buildings: Buildings = SerializationHelper.toInstance(new Buildings(), JSON.stringify(data));
+    const buildings: Buildings = SerializationHelper.toInstance(new Buildings(), JSON.stringify(data));
 
     assert.equal(buildings.isValid(), false);
   });

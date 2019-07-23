@@ -25,7 +25,7 @@ describe("Ships-units", function() {
       deathstar: 1,
     };
 
-    let ships: Ships = SerializationHelper.toInstance(new Ships(), JSON.stringify(data));
+    const ships: Ships = SerializationHelper.toInstance(new Ships(), JSON.stringify(data));
 
     assert.equal(ships.isValid(), true);
   });
@@ -49,7 +49,7 @@ describe("Ships-units", function() {
       deathstar: 1,
     };
 
-    let ships: Ships = SerializationHelper.toInstance(new Ships(), JSON.stringify(data));
+    const ships: Ships = SerializationHelper.toInstance(new Ships(), JSON.stringify(data));
 
     assert.equal(ships.isValid(), false);
   });
@@ -72,7 +72,7 @@ describe("Ships-units", function() {
       deathstar: 1,
     };
 
-    let ships: Ships = SerializationHelper.toInstance(new Ships(), JSON.stringify(data));
+    const ships: Ships = SerializationHelper.toInstance(new Ships(), JSON.stringify(data));
 
     assert.equal(ships.isValid(), false);
   });

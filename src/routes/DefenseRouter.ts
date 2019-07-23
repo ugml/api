@@ -3,23 +3,29 @@ import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import Queue from "../common/Queue";
-
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { ICosts } from "../interfaces/ICosts";
-import { Logger } from "../common/Logger";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import IBuildingService from "../interfaces/IBuildingService";
+import ICosts from "../interfaces/ICosts";
+import Logger from "../common/Logger";
+import IDefenseService from "../interfaces/IDefenseService";
+import IPlanetService from "../interfaces/IPlanetService";
 import Buildings from "../units/Buildings";
 import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
 
+/**
+ * Defines routes for defense-data
+ */
 export default class DefenseRouter {
   public router: IRouter<{}> = newRouter();
 
-  private planetService;
-  private buildingService;
-  private defenseService;
+  private planetService: IPlanetService;
+  private buildingService: IBuildingService;
+  private defenseService: IDefenseService;
 
   /**
-   * Initialize the Router
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
    */
   public constructor(container) {
     this.planetService = container.planetService;
@@ -30,6 +36,12 @@ export default class DefenseRouter {
     this.router.post("/build/", this.buildDefense);
   }
 
+  /**
+   * Returns a list of defenses on a given planet
+   * @param request
+   * @param response
+   * @param next
+   */
   public getAllDefensesOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -61,6 +73,12 @@ export default class DefenseRouter {
     }
   };
 
+  /**
+   * Append a new build-order to the current build-queue
+   * @param request
+   * @param response
+   * @param next
+   */
   public buildDefense = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (

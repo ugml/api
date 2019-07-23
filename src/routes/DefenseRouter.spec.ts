@@ -164,7 +164,7 @@ describe("defenseRoute", () => {
   it("should fail (shipyard is currently upgrading)", async () => {
     const planetID = 167546850;
 
-    let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
     const valueBefore = planet.b_hangar_plus;
 

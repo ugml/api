@@ -21,6 +21,7 @@
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false,
     "no-namespace": false,
-    "static-before-instance": false
+    "static-before-instance": false,
+    "semicolon": [true, "always", "ignore-bound-class-methods"]
   }
 }

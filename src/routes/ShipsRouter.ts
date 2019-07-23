@@ -2,22 +2,29 @@ import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { Logger } from "../common/Logger";
+import Logger from "../common/Logger";
 import Queue from "../common/Queue";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { ICosts } from "../interfaces/ICosts";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import IBuildingService from "../interfaces/IBuildingService";
+import ICosts from "../interfaces/ICosts";
+import IPlanetService from "../interfaces/IPlanetService";
+import IShipService from "../interfaces/IShipService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 
+/**
+ * Defines routes for ships-data
+ */
 export default class ShipsRouter {
   public router: IRouter<{}> = newRouter();
 
-  private planetService;
-  private buildingService;
-  private shipService;
+  private planetService: IPlanetService;
+  private buildingService: IBuildingService;
+  private shipService: IShipService;
 
   /**
-   * Initialize the Router
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
    */
   public constructor(container) {
     this.planetService = container.planetService;
@@ -28,6 +35,12 @@ export default class ShipsRouter {
     this.router.post("/build/", this.buildShips);
   }
 
+  /**
+   * Returns a list of all ships on a given planet owned by the authenticated user
+   * @param request
+   * @param response
+   * @param next
+   */
   public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -59,6 +72,12 @@ export default class ShipsRouter {
     }
   };
 
+  /**
+   * Starts a new build-order on the planet and appends it to the build-queue
+   * @param request
+   * @param response
+   * @param next
+   */
   public buildShips = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (

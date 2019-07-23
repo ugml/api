@@ -16,7 +16,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), true);
   });
@@ -31,7 +31,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });
@@ -46,7 +46,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });
@@ -61,7 +61,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });
@@ -76,7 +76,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });
@@ -91,7 +91,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });
@@ -106,7 +106,7 @@ describe("User-units", function() {
       currentplanet: 45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });
@@ -121,7 +121,7 @@ describe("User-units", function() {
       currentplanet: -45312,
     };
 
-    let user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
     assert.equal(user.isValid(), false);
   });

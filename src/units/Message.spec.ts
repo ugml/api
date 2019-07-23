@@ -19,7 +19,7 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    let message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
     assert.equal(message.isValid(), true);
   });
@@ -36,7 +36,7 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    let message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
     assert.equal(message.isValid(), false);
   });
@@ -52,7 +52,7 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    let message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
     assert.equal(message.isValid(), false);
   });
@@ -69,7 +69,7 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    let message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
     assert.equal(message.isValid(), false);
   });
@@ -86,7 +86,7 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    let message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
     assert.equal(message.isValid(), false);
   });

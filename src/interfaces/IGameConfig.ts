@@ -1,4 +1,4 @@
-export interface IGameConfig {
+export default interface IGameConfig {
   speed: number;
   metal_start: number;
   crystal_start: number;

@@ -1,24 +1,31 @@
 import { IRouter, NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
-import { Config } from "../common/Config";
+import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { ICosts } from "../interfaces/ICosts";
-import { Logger } from "../common/Logger";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import IBuildingService from "../interfaces/IBuildingService";
+import ICosts from "../interfaces/ICosts";
+import Logger from "../common/Logger";
+import IPlanetService from "../interfaces/IPlanetService";
+import ITechService from "../interfaces/ITechService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import Techs from "../units/Techs";
 
+/**
+ * Defines routes for technology-data
+ */
 export default class TechsRouter {
   public router: IRouter<{}> = newRouter();
 
-  private planetService;
-  private buildingService;
-  private techService;
+  private planetService: IPlanetService;
+  private buildingService: IBuildingService;
+  private techService: ITechService;
 
   /**
-   * Initialize the Router
+   * Registers the routes and needed services
+   * @param container the IoC-container with registered services
    */
   public constructor(container) {
     this.planetService = container.planetService;
@@ -58,6 +65,12 @@ export default class TechsRouter {
     }
   };
 
+  /**
+   * Cancels a currently researching technology
+   * @param request
+   * @param response
+   * @param next
+   */
   public cancelTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
@@ -122,6 +135,12 @@ export default class TechsRouter {
     }
   };
 
+  /**
+   * Starts researching a new technology
+   * @param request
+   * @param response
+   * @param next
+   */
   public buildTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (

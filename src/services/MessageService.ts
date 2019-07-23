@@ -1,12 +1,19 @@
-import { Database } from "../common/Database";
+import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import { IMessageService } from "../interfaces/IMessageService";
+import IMessageService from "../interfaces/IMessageService";
 import Message from "../units/Message";
 
 import squel = require("safe-squel");
 
+/**
+ * This class defines a service to interact with the messages-table in the database
+ */
 export default class MessageService implements IMessageService {
+  /**
+   * Returns a list of all messages a user has sent or received
+   * @param userID the ID of the user
+   */
   public async getAllMessages(userID: number) {
     const query: string = squel
       .select()
@@ -33,6 +40,11 @@ export default class MessageService implements IMessageService {
     return rows;
   }
 
+  /**
+   * Returns a specific message given the messageID and the sender- or receiverID
+   * @param userID the sender- or receiverID
+   * @param messageID the ID of the message
+   */
   public async getMessageById(userID: number, messageID: number): Promise<Message> {
     const query: string = squel
       .select()
@@ -59,6 +71,11 @@ export default class MessageService implements IMessageService {
     return SerializationHelper.toInstance(new Message(), JSON.stringify(rows[0]));
   }
 
+  /**
+   * Marks a message as deleted in the database
+   * @param userID the ID of the user
+   * @param messageID the ID of the message
+   */
   public async deleteMessage(userID: number, messageID: number) {
     const query: string = squel
       .update()
@@ -78,7 +95,15 @@ export default class MessageService implements IMessageService {
     return rows;
   }
 
+  /**
+   * Sends a new message
+   * @param senderID the ID of the sender
+   * @param receiverID the ID of the receiver
+   * @param subject the subject of the message
+   * @param messageText the message-text
+   */
   public async sendMessage(senderID: number, receiverID: number, subject: string, messageText: string) {
+    // TODO: set unread-message-count + 1 at receiver?
     const query: string = squel
       .insert()
       .into("messages")

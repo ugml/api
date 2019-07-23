@@ -1,18 +1,16 @@
 import { NextFunction, Response, Router } from "express";
-import { Database } from "../common/Database";
+import Database from "../common/Database";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import Redis from "../common/Redis";
-import { IAuthorizedRequest } from "../interfaces/IAuthorizedRequest";
-import { ICoordinates } from "../interfaces/ICoordinates";
-import { IShipUnits } from "../interfaces/IShipUnits";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import ICoordinates from "../interfaces/ICoordinates";
+import IShipUnits from "../interfaces/IShipUnits";
+import squel = require("safe-squel");
+import Logger from "../common/Logger";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
-import squel = require("safe-squel");
-
-import { Logger } from "../common/Logger";
-
 const eventSchema = require("../schemas/fleetevent.schema.json");
 
 // TODO: validate input data:
@@ -21,6 +19,9 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
 //  units.json => check all values (capacity, etc).
 //  loaded resources > storage?
 
+/**
+ * Defines routes for event-creation and cancellation
+ */
 export class EventRouter {
   // TODO: relocate to own file with other game-related calculations
   /**
@@ -155,6 +156,12 @@ export class EventRouter {
     this.init();
   }
 
+  /**
+   * Creates a new event
+   * @param request
+   * @param response
+   * @param next
+   */
   public createEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     // TODO: check if enough ships on planet
     // TODO: check if planet has enough deuterium
@@ -318,6 +325,12 @@ export class EventRouter {
       });
   }
 
+  /**
+   * Cancels an event
+   * @param request
+   * @param response
+   * @param next
+   */
   public cancelEvent(request: IAuthorizedRequest, response: Response, next: NextFunction) {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({

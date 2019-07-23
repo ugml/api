@@ -1,3 +1,3 @@
-export interface IUnits {
+export default interface IUnits {
   isValid(): boolean;
 }

@@ -1,44 +1,20 @@
-import { Database } from "../common/Database";
+import Database from "../common/Database";
 import { Globals } from "../common/Globals";
-import { ICoordinates } from "../interfaces/ICoordinates";
-import { IGalaxyService } from "../interfaces/IGalaxyService";
+import ICoordinates from "../interfaces/ICoordinates";
+import IGalaxyService from "../interfaces/IGalaxyService";
 import PlanetType = Globals.PlanetType;
 
 import squel = require("safe-squel");
 
+/**
+ * This class defines a service to interact with the galaxy-table in the database
+ */
 export default class GalaxyService implements IGalaxyService {
-  public async getFreePosition(
-    maxGalaxy: number,
-    maxSystem: number,
-    minPlanet: number,
-    maxPlanet: number,
-  ): Promise<ICoordinates> {
-    // getFreePosition(MAX_GALAXY, MAX_SYSTEM, MIN_PLANET, MAX_PLANET)
-    const queryUser = `CALL getFreePosition(${maxGalaxy}, ${maxSystem}, ${minPlanet}, ${maxPlanet});`;
-
-    const [[[result]]] = await Database.query(queryUser);
-
-    return {
-      galaxy: result.posGalaxy,
-      system: result.posSystem,
-      planet: result.posPlanet,
-      type: PlanetType.Planet,
-    };
-  }
-
-  public async createGalaxyRow(planetID: number, galaxy: number, system: number, planet: number, connection = null) {
-    /* tslint:disable:max-line-length*/
-    // eslint-disable-next-line max-len
-    const query = `INSERT INTO galaxy(\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`) VALUES (${planetID}, ${galaxy}, ${system}, ${planet});`;
-    /* tslint:enable:max-line-length*/
-
-    if (connection === null) {
-      return await Database.query(query);
-    }
-
-    return await connection.query(query);
-  }
-
+  /**
+   * Returns all information for a given galaxy-position
+   * @param galaxy the galaxy
+   * @param system the system
+   */
   public async getGalaxyInfo(galaxy: number, system: number) {
     const query: string = squel
       .select()
@@ -65,5 +41,52 @@ export default class GalaxyService implements IGalaxyService {
     const [rows] = await Database.query(query);
 
     return rows;
+  }
+
+  /**
+   * Returns a not yet populated position in the universe within the given boundaries
+   * @param maxGalaxy the maximum galaxy-position
+   * @param maxSystem the maximum system-position
+   * @param minPlanet the minimum planet-position
+   * @param maxPlanet the maximum planet-position
+   */
+  public async getFreePosition(
+    maxGalaxy: number,
+    maxSystem: number,
+    minPlanet: number,
+    maxPlanet: number,
+  ): Promise<ICoordinates> {
+    // getFreePosition(MAX_GALAXY, MAX_SYSTEM, MIN_PLANET, MAX_PLANET)
+    const queryUser = `CALL getFreePosition(${maxGalaxy}, ${maxSystem}, ${minPlanet}, ${maxPlanet});`;
+
+    const [[[result]]] = await Database.query(queryUser);
+
+    return {
+      galaxy: result.posGalaxy,
+      system: result.posSystem,
+      planet: result.posPlanet,
+      type: PlanetType.Planet,
+    };
+  }
+
+  /**
+   * Creates a new row in the database.
+   * @param planetID the ID of the planet
+   * @param galaxy the galaxy-position
+   * @param system the system-position
+   * @param planet the planet-position
+   * @param connection a connection from the connection-pool, if this query should be executed within a transaction
+   */
+  public async createGalaxyRow(planetID: number, galaxy: number, system: number, planet: number, connection = null) {
+    /* tslint:disable:max-line-length*/
+    // eslint-disable-next-line max-len
+    const query = `INSERT INTO galaxy(\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`) VALUES (${planetID}, ${galaxy}, ${system}, ${planet});`;
+    /* tslint:enable:max-line-length*/
+
+    if (connection === null) {
+      return await Database.query(query);
+    }
+
+    return await connection.query(query);
   }
 }

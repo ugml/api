@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import { Config } from "./Config";
+import Config from "./Config";
 
 const expect = chai.expect;
 const assert = chai.assert;

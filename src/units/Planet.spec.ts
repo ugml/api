@@ -44,7 +44,7 @@ describe("Planet-units", function() {
       destroyed: false,
     };
 
-    let planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(data));
+    const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(data));
 
     assert.equal(planet.isValid(), true);
   });
@@ -86,7 +86,7 @@ describe("Planet-units", function() {
       destroyed: false,
     };
 
-    let planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(data));
+    const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(data));
 
     assert.equal(planet.isValid(), false);
   });
@@ -127,7 +127,7 @@ describe("Planet-units", function() {
       destroyed: false,
     };
 
-    let planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(data));
+    const planet: Planet = SerializationHelper.toInstance(new Planet(), JSON.stringify(data));
 
     assert.equal(planet.isValid(), false);
   });

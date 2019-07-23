@@ -3,7 +3,7 @@ import chaiHttp = require("chai-http");
 
 import App from "./App";
 import { Globals } from "./common/Globals";
-import { JwtHelper } from "./common/JwtHelper";
+import JwtHelper from "./common/JwtHelper";
 
 const createContainer = require("./ioc/createContainer");
 

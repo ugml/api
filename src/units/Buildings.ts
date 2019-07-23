@@ -1,23 +1,92 @@
-import { IUnits } from "../interfaces/IUnits";
+import IUnits from "../interfaces/IUnits";
 
+/**
+ * Represents a buildings-row in the database
+ */
 export default class Buildings implements IUnits {
+  /**
+   * The ID of the planet
+   */
   public planetID: number;
+
+  /**
+   * Current metal_mine level
+   */
   public metal_mine: number;
+
+  /**
+   * Current crystal_mine level
+   */
   public crystal_mine: number;
+
+  /**
+   * Current deuterium_synthesizer level
+   */
   public deuterium_synthesizer: number;
+
+  /**
+   * Current solar_plant level
+   */
   public solar_plant: number;
+
+  /**
+   * Current fusion_reactor level
+   */
   public fusion_reactor: number;
+
+  /**
+   * Current robotic_factory level
+   */
   public robotic_factory: number;
+
+  /**
+   * Current nanite_factory level
+   */
   public nanite_factory: number;
+
+  /**
+   * Current shipyard level
+   */
   public shipyard: number;
+
+  /**
+   * Current metal_storage level
+   */
   public metal_storage: number;
+
+  /**
+   * Current crystal_storage level
+   */
   public crystal_storage: number;
+
+  /**
+   * Current deuterium_storage level
+   */
   public deuterium_storage: number;
+
+  /**
+   * Current research_lab level
+   */
   public research_lab: number;
+
+  /**
+   * Current terraformer level
+   */
   public terraformer: number;
+
+  /**
+   * Current alliance_depot level
+   */
   public alliance_depot: number;
+
+  /**
+   * Current missile_silo level
+   */
   public missile_silo: number;
 
+  /**
+   * Returns, if the contains valid data or not
+   */
   public isValid(): boolean {
     return (
       0 <= this.planetID &&

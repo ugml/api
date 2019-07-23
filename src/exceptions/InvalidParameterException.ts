@@ -1,8 +1,11 @@
 /**
- * Helper class to distinguish errors.
- * This error is thrown when a parameter is invalid.
+ * This error sgould be thrown when a parameter is invalid.
  */
-class InvalidParameterException extends Error {
+export default class InvalidParameterException extends Error {
+  /**
+   * Takes a message-string and returns a new InvalidParameterException-object
+   * @param m the exception-message
+   */
   public constructor(m: string) {
     super(m);
 
@@ -10,5 +13,3 @@ class InvalidParameterException extends Error {
     Object.setPrototypeOf(this, InvalidParameterException.prototype);
   }
 }
-
-export { InvalidParameterException };

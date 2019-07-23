@@ -1,5 +1,5 @@
 import mysql = require("mysql2/promise");
-import { Logger } from "./Logger";
+import Logger from "./Logger";
 import dotenv = require("dotenv-safe");
 
 dotenv.config({
@@ -9,7 +9,24 @@ dotenv.config({
 /**
  * Manages the connection to the (mysql/mariaDB)-database
  */
-class Database {
+export default class Database {
+  /**
+   * Returns the connection-pool to the mysql-database
+   */
+  public static getConnectionPool() {
+    return this.pool;
+  }
+
+  /**
+   * Returns a promise for a query
+   * @param sql the sql-query
+   * @param args optional arguments
+   */
+  public static query(sql: string, args: object = null): Promise<any> {
+    Logger.info(sql);
+    return this.pool.query(sql);
+  }
+
   /**
    * Represents a mysql connection-pool
    */
@@ -27,23 +44,4 @@ class Database {
     .on("error", function(err) {
       Logger.error(err);
     });
-
-  /**
-   * Returns the connection-pool to the mysql-database
-   */
-  public static getConnectionPool() {
-    return this.pool;
-  }
-
-  /**
-   * Returns a promise for a query
-   * @param sql the sql-query
-   * @param args optional arguments
-   */
-  public static query(sql: string, args: object = null): Promise<any> {
-    Logger.info(sql);
-    return this.pool.query(sql);
-  }
 }
-
-export { Database };

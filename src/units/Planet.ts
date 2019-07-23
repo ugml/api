@@ -1,54 +1,202 @@
-import { Config } from "../common/Config";
+import Config from "../common/Config";
 import { Globals } from "../common/Globals";
-import { IUnits } from "../interfaces/IUnits";
-
+import IUnits from "../interfaces/IUnits";
+/**
+ * Represents a planet-row in the database
+ */
 export default class Planet implements IUnits {
+  /**
+   * The ID of the planet
+   */
   public planetID: number;
+
+  /**
+   * The ID of the owner
+   */
   public ownerID: number;
+
+  /**
+   * The name of the planet
+   */
   public name: string;
+
+  /**
+   * The galaxy-position in the universe
+   */
   public galaxy: number;
+
+  /**
+   * The system-position in the universe
+   */
   public system: number;
+
+  /**
+   * the planet-position in the universe
+   */
   public planet: number;
+
+  /**
+   * The unix-timestamp the planet was last updated
+   */
   public last_update: number;
+
+  /**
+   * The type of the planet
+   */
   public planet_type: Globals.PlanetType;
+
+  /**
+   * The image of the planet
+   */
   public image: string;
+
+  /**
+   * The diameter of the planet
+   */
   public diameter: number;
+
+  /**
+   * The currently populated fields on the planet
+   */
   public fields_current: number;
+
+  /**
+   * The maximum fields on the planet
+   */
   public fields_max: number;
+
+  /**
+   * The minimum temperature on the planet
+   */
   public temp_min: number;
+
+  /**
+   * The maximum temperature on the planet
+   */
   public temp_max: number;
+
+  /**
+   * The current amount of metal on the planet
+   */
   public metal: number;
+
+  /**
+   * The current amount of crystal on the planet
+   */
   public crystal: number;
+
+  /**
+   * The current amount of deuterium on the planet
+   */
   public deuterium: number;
+
+  /**
+   * The current amount of energy used on the planet
+   */
   public energy_used: number;
+
+  /**
+   * The maximum amount of energy on the planet
+   */
   public energy_max: number;
+
+  /**
+   * The percentage of production metal-mine
+   */
   public metal_mine_percent: number;
+
+  /**
+   * The percentage of production of the crystal-mine
+   */
   public crystal_mine_percent: number;
+
+  /**
+   * The percentage of production deuterium-synthesizer
+   */
   public deuterium_synthesizer_percent: number;
+
+  /**
+   * The percentage of production solar-planet
+   */
   public solar_plant_percent: number;
+
+  /**
+   * The percentage of production fusion-reactor
+   */
   public fusion_reactor_percent: number;
+
+  /**
+   * The percentage of production solar-sattelite
+   */
   public solar_satellite_percent: number;
+
+  /**
+   * The ID of the building currently upgrading.
+   * This value is 0 if no building is currently upgrading.
+   */
   public b_building_id: number;
+
+  /**
+   * The time, at which the upgrade will be completed
+   */
   public b_building_endtime: number;
+
+  /**
+   * The ID of the technology which is currently being researched.
+   * This value is 0 if no technology is currently being researched.
+   */
   public b_tech_id: number;
+
+  /**
+   * The time, at which the reserach will be completed
+   */
   public b_tech_endtime: number;
+
+  /**
+   * The curreny queue of the hangar
+   */
   public b_hangar_queue: string;
+
+  /**
+   * The time, the queue was started
+   */
   public b_hangar_start_time: number;
+
+  // TODO: obsolete?
+  /**
+   * True, if the hangar is currently upgraded
+   */
   public b_hangar_plus: boolean;
+
+  /**
+   * Indicates, if the planet is destroyed
+   */
   public destroyed: boolean;
 
+  /**
+   * Checks, if the planet is currently upgrading a building
+   */
   public isUpgradingBuilding(): boolean {
     return this.b_building_id > 0 && this.b_building_endtime > 0;
   }
 
+  /**
+   * Checks, if the planet is currently upgrading its hangar
+   */
   public isUpgradingHangar(): boolean {
     return this.b_hangar_plus;
   }
 
+  /**
+   *  Checks, if the planet is currently upgrading the research-lab
+   */
   public isUpgradingResearchLab(): boolean {
     return this.b_building_id === Globals.Buildings.RESEARCH_LAB && this.b_building_endtime > 0;
   }
 
+  /**
+   *  Checks, if the planet is currently building units
+   */
   public isBuildingUnits(): boolean {
     return (
       this.b_hangar_queue !== undefined &&
@@ -58,10 +206,16 @@ export default class Planet implements IUnits {
     );
   }
 
+  /**
+   *  Checks, if the planet is currently researching
+   */
   public isResearching(): boolean {
     return this.b_tech_id > 0 && this.b_tech_endtime > 0;
   }
 
+  /**
+   * Returns, if the contains valid data or not
+   */
   public isValid(): boolean {
     return (
       0 < this.planetID &&

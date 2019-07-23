@@ -1,10 +1,8 @@
 import InputValidator from "../common/InputValidator";
-import { IUnits } from "../interfaces/IUnits";
+import IUnits from "../interfaces/IUnits";
 
 /**
- * @class
- * @classdesc Represents a user
- *
+ * Represents a user-row in the database
  */
 export default class User implements IUnits {
   /**
@@ -38,15 +36,32 @@ export default class User implements IUnits {
   public currentplanet: number;
 
   /**
-   * Checks, if the object holds valid data
+   * Returns, if the contains valid data or not
    */
   public isValid(): boolean {
-    if (!InputValidator.isSet(this.userID) || this.userID <= 0) return false;
-    if (!InputValidator.isSet(this.username) || this.username.length > 20 || this.username.length < 5) return false;
-    if (!InputValidator.isSet(this.password) || this.password.length > 60) return false;
-    if (!InputValidator.isSet(this.email) || this.email.length > 64) return false;
-    if (!InputValidator.isSet(this.onlinetime) || this.onlinetime <= 0) return false;
-    if (!InputValidator.isSet(this.currentplanet) || this.currentplanet <= 0) return false;
+    if (!InputValidator.isSet(this.userID) || this.userID <= 0) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.username) || this.username.length > 20 || this.username.length < 5) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.password) || this.password.length > 60) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.email) || this.email.length > 64) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.onlinetime) || this.onlinetime <= 0) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.currentplanet) || this.currentplanet <= 0) {
+      return false;
+    }
 
     return true;
   }

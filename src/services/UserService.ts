@@ -1,12 +1,14 @@
-import { Database } from "../common/Database";
+import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import { IUserService } from "../interfaces/IUserService";
+import IUserService from "../interfaces/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");
 
+/**
+ * This class defines a service to interact with the users-table in the database
+ */
 export default class UserService implements IUserService {
-  public constructor() {}
   /**
    * Returns all information about an authenticated user.
    * @param userID The ID of the currently authenticated user
@@ -74,6 +76,18 @@ export default class UserService implements IUserService {
     return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
   }
 
+  /**
+   * Checks, if a username of a email-address is already taken.
+   * Returns an object containing the following informations:
+   * ```
+   * {
+   *   username_taken: 0 (if not taken),
+   *   email_taken: 1 (if taken)
+   * }
+   * ```
+   * @param username the username
+   * @param email the email-address
+   */
   public async checkIfNameOrMailIsTaken(username: string, email: string) {
     const query =
       `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
@@ -85,7 +99,7 @@ export default class UserService implements IUserService {
   }
 
   /**
-   * Returns a new userID
+   * Returns a new, not yet taken userID
    * @returns The new ID
    */
   public async getNewId(): Promise<number> {

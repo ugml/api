@@ -364,7 +364,7 @@ describe("buildingsRoute", () => {
     it("should fail (can't build shipyard/robotic/nanite while it is being used)", async () => {
       const planetID = 167546850;
 
-      let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
       const valueBefore = planet.b_hangar_start_time;
 
@@ -391,7 +391,7 @@ describe("buildingsRoute", () => {
     it("should fail (can't build research-lab while it is being used)", async () => {
       const planetID = 167546850;
 
-      let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
       const valueBefore = planet.b_tech_endtime;
 
@@ -432,7 +432,7 @@ describe("buildingsRoute", () => {
     it("should fail (planet has not enough resources)", async () => {
       const planetID = 167546850;
 
-      let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
       const metalBefore = planet.metal;
 

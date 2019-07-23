@@ -20,6 +20,5 @@ describe("EventService", () => {
     };
 
     const result = await container.eventService.getPlanetPosition(ownerID, position);
-
   });
 });

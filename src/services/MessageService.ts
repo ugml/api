@@ -30,7 +30,6 @@ export default class MessageService implements IMessageService {
       .order("sendtime", false)
       .toString();
 
-
     const [rows] = await Database.query(query);
 
     if (!InputValidator.isSet(rows)) {
@@ -61,7 +60,6 @@ export default class MessageService implements IMessageService {
       .where("deleted = ?", 0)
       .toString();
 
-
     const [rows] = await Database.query(query.toString());
 
     if (!InputValidator.isSet(rows)) {
@@ -84,7 +82,6 @@ export default class MessageService implements IMessageService {
       .where("messageID = ?", messageID)
       .where("receiverID = ?", userID)
       .toString();
-
 
     const [rows] = await Database.query(query);
 

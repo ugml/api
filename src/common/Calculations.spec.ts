@@ -1,5 +1,8 @@
 import * as chai from "chai";
+import ICoordinates from "../interfaces/ICoordinates";
 import Calculations from "./Calculations";
+import { Globals } from "./Globals";
+import PlanetType = Globals.PlanetType;
 
 const expect = chai.expect;
 const assert = chai.assert;
@@ -119,5 +122,117 @@ describe("Calculations", function() {
 
   it("Calculate costs of building 5 (should be null, unitID does not exist)", function() {
     expect(Calculations.getCosts(23, 8)).to.be.eql(null);
+  });
+
+  it("Calculate distance 1", function() {
+    const origin: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Planet,
+    };
+
+    const destination: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Moon,
+    };
+
+    expect(Calculations.calculateDistance(origin, destination)).to.be.equals(5);
+  });
+
+  it("Calculate distance 2", function() {
+    const origin: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Planet,
+    };
+
+    const destination: ICoordinates = {
+      galaxy: 2,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Moon,
+    };
+
+    expect(Calculations.calculateDistance(origin, destination)).to.be.equals(20000);
+  });
+
+  it("Calculate distance 3", function() {
+    const origin: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Planet,
+    };
+
+    const destination: ICoordinates = {
+      galaxy: 3,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Moon,
+    };
+
+    expect(Calculations.calculateDistance(origin, destination)).to.be.equals(40000);
+  });
+
+  it("Calculate distance 4", function() {
+    const origin: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Planet,
+    };
+
+    const destination: ICoordinates = {
+      galaxy: 1,
+      system: 2,
+      planet: 1,
+      type: PlanetType.Moon,
+    };
+
+    expect(Calculations.calculateDistance(origin, destination)).to.be.equals(2795);
+  });
+
+  it("Calculate distance 5", function() {
+    const origin: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 1,
+      type: PlanetType.Planet,
+    };
+
+    const destination: ICoordinates = {
+      galaxy: 1,
+      system: 1,
+      planet: 2,
+      type: PlanetType.Moon,
+    };
+
+    expect(Calculations.calculateDistance(origin, destination)).to.be.equals(1005);
+  });
+
+  it("Calculate distance 6", function() {
+    const origin: ICoordinates = {
+      galaxy: 9,
+      system: 3,
+      planet: 1,
+      type: PlanetType.Planet,
+    };
+
+    const destination: ICoordinates = {
+      galaxy: 3,
+      system: 8,
+      planet: 5,
+      type: PlanetType.Moon,
+    };
+
+    expect(Calculations.calculateDistance(origin, destination)).to.be.equals(120000);
+  });
+
+  it("Calculate time-of-flight 1", function() {
+    expect(Calculations.calculateTimeOfFlight(1, 100, 0, 100)).to.be.equals(10);
   });
 });

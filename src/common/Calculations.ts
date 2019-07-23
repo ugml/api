@@ -97,7 +97,7 @@ export default class Calculations {
       Math.abs(origin.planet - destination.planet),
     ];
 
-    const distance = 0;
+    const distance = 5;
 
     if (distances[0] !== 0) {
       return distances[0] * 20000;
@@ -114,7 +114,7 @@ export default class Calculations {
 
   /**
    * Calculates the time of flight in seconds
-   * @param gameSpeed The speed of the game (default: 3500)
+   * @param gameSpeed The speed of the game
    * @param missionSpeed The speed of the whole mission (possible values: 0, 10, 20, ..., 100)
    * @param distance The distance between the start and the end
    * @param slowestShipSpeed The speed of the slowest ship in the fleet
@@ -127,7 +127,7 @@ export default class Calculations {
   ): number {
     // source: http://owiki.de/index.php?title=Flugzeit
     return Math.round(
-      Math.pow((3500 / (missionSpeed / 100)) * ((distance * 10) / slowestShipSpeed), 0.5) + 10 / gameSpeed,
+      ((3500 * gameSpeed) / (missionSpeed / 100)) * Math.pow((distance * 10) / slowestShipSpeed, 0.5) + 10,
     );
   }
 }

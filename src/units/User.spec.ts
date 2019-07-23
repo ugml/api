@@ -1,6 +1,5 @@
 import * as chai from "chai";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "./Buildings";
 import User from "./User";
 
 const assert = chai.assert;
@@ -69,7 +68,7 @@ describe("User-units", function() {
   it("Should fail (password too long)", function() {
     const data = {
       userID: 1,
-      username: "Test",
+      username: "Testname",
       password: "IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong",
       email: "hello@world.com",
       onlinetime: 1234,
@@ -84,9 +83,10 @@ describe("User-units", function() {
   it("Should fail (email too long)", function() {
     const data = {
       userID: 1,
-      username: "Test",
+      username: "Testname",
       password: "iAmNotSecure",
-      email: "hello@IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong.com",
+      email:
+        "hello@IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong.com",
       onlinetime: 1234,
       currentplanet: 45312,
     };
@@ -99,7 +99,7 @@ describe("User-units", function() {
   it("Should fail (onlinetime negative)", function() {
     const data = {
       userID: 1,
-      username: "Test",
+      username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
       onlinetime: -1,
@@ -114,7 +114,22 @@ describe("User-units", function() {
   it("Should fail (currentplanet negative)", function() {
     const data = {
       userID: 1,
-      username: "Test",
+      username: "Testname",
+      password: "iAmNotSecure",
+      email: "hello@world.com",
+      onlinetime: 1,
+      currentplanet: -45312,
+    };
+
+    const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
+
+    assert.equal(user.isValid(), false);
+  });
+
+  it("Should fail (currentplanet negative)", function() {
+    const data = {
+      userID: 1,
+      username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
       onlinetime: 1,

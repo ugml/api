@@ -21,7 +21,14 @@ export default class Queue {
   /**
    * The queue itself
    */
-  private queue: object = {};
+  private queue: Map<string, number>;
+
+  /**
+   * Creates a new Queue-instance
+   */
+  public constructor() {
+    this.queue = new Map<string, number>();
+  }
 
   /**
    * Sets the planetID
@@ -71,22 +78,7 @@ export default class Queue {
   /**
    * Returns the queue
    */
-  public getQueue() {
+  public getQueue(): Map<string, number> {
     return this.queue;
-  }
-
-  /**
-   * Appends a new build-order to the queue
-   * @param key the key of the unit
-   * @param value the amount of units to be built in this order
-   */
-  public addToQueue(key: string, value: number) {
-    if (value <= 0) {
-      return;
-    }
-
-    if (typeof this.queue[key] === "undefined") {
-      this.queue[key] = value;
-    }
   }
 }

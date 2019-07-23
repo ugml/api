@@ -99,9 +99,9 @@ export default class DefenseRouter {
 
       const buildOrders = JSON.parse(request.body.buildOrder);
 
-      const queueItem: Queue = new Queue();
+      const queue: Queue = new Queue();
 
-      queueItem.setPlanetID(planetID);
+      queue.setPlanetID(planetID);
 
       // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.DEFENSE)) {
@@ -213,7 +213,7 @@ export default class DefenseRouter {
               buildings.nanite_factory,
             ) * Math.floor(count);
 
-          queueItem.addToQueue(item, Math.floor(count));
+          queue.getQueue().set(item, Math.floor(count));
 
           metal -= cost.metal * count;
           crystal -= cost.crystal * count;
@@ -228,8 +228,8 @@ export default class DefenseRouter {
         }
       }
 
-      queueItem.setTimeRemaining(buildTime);
-      queueItem.setLastUpdateTime(Math.floor(Date.now() / 1000));
+      queue.setTimeRemaining(buildTime);
+      queue.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
       let oldBuildOrder;
 
@@ -241,7 +241,7 @@ export default class DefenseRouter {
         oldBuildOrder = JSON.parse(planet.b_hangar_queue);
       }
 
-      oldBuildOrder.push(queueItem);
+      oldBuildOrder.push(queue);
 
       planet.b_hangar_queue = JSON.stringify(oldBuildOrder);
 

@@ -36,6 +36,7 @@ export default class Event implements IUnits {
     if (!InputValidator.isSet(this.mission) || this.mission < 0) {
       return false;
     }
+    // TODO: validate against schema
     if (!InputValidator.isSet(this.fleetlist) || this.fleetlist.length === 0) {
       return false;
     }
@@ -45,7 +46,7 @@ export default class Event implements IUnits {
     if (this.start_type !== PlanetType.Planet && this.start_type !== PlanetType.Moon) {
       return false;
     }
-    if (!InputValidator.isSet(this.start_time) || this.mission < 0) {
+    if (!InputValidator.isSet(this.start_time) || this.start_time < 0) {
       return false;
     }
     if (!InputValidator.isSet(this.end_id) || this.end_id < 0) {

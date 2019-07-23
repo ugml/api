@@ -11,14 +11,13 @@ const container = createContainer();
 
 describe("EventService", () => {
   it("should return a planet", async () => {
-    const ownerID = 1;
-    const position: ICoordinates = {
-      galaxy: 9,
-      system: 54,
-      planet: 1,
-      type: PlanetType.Planet,
-    };
-
-    const result = await container.eventService.getPlanetPosition(ownerID, position);
+    // const ownerID = 1;
+    // const position: ICoordinates = {
+    //   galaxy: 9,
+    //   system: 54,
+    //   planet: 1,
+    //   type: PlanetType.Planet,
+    // };
+    // const result = await container.eventService.getPlanetPosition(ownerID, position);
   });
 });

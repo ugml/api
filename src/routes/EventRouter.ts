@@ -9,7 +9,6 @@ import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
 import IEventService from "../interfaces/IEventService";
 import IPlanetService from "../interfaces/IPlanetService";
-import IShipUnits from "../interfaces/IShipUnits";
 import squel = require("safe-squel");
 import Logger from "../common/Logger";
 import Event from "../units/Event";
@@ -46,28 +45,10 @@ export default class EventRouter {
   }
 
   /**
-   * Returns the speed of the slowest ship in the fleet
-   * @param units The sent ship in this event
-   */
-  private getSlowestShipSpeed(units: IShipUnits): number {
-    const unitData = require("../config/units.json");
-
-    let minimum: number = Number.MAX_VALUE;
-
-    for (const ship in units) {
-      if (units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
-        minimum = unitData.units.ships[ship].speed;
-      }
-    }
-
-    return minimum;
-  }
-
-  /**
    * Returns the ID of the destination-type
    * @param type The type as a string (planet, moon or debris)
    */
-  private static getDestinationTypeByName(type: string): number {
+  private getDestinationTypeByName(type: string): number {
     let typeID: number;
     switch (type) {
       case "planet":
@@ -87,7 +68,7 @@ export default class EventRouter {
    * Returns the ID of the mission-type
    * @param mission The type as a string (transport, attack, ...)
    */
-  private static getMissionTypeID(mission: string): number {
+  private getMissionTypeID(mission: string): number {
     let missionTypeID: number;
     switch (mission) {
       case "transport":
@@ -141,9 +122,6 @@ export default class EventRouter {
 
     const eventData = JSON.parse(request.body.event);
 
-    const userID = parseInt(request.userID, 10);
-    const ownerID = parseInt(eventData.ownerID, 10);
-
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -152,6 +130,9 @@ export default class EventRouter {
         data: {},
       });
     }
+
+    const userID = parseInt(request.userID, 10);
+    const ownerID = parseInt(eventData.ownerID, 10);
 
     // check if sender of event == currently authenticated user
     if (userID !== ownerID) {
@@ -165,7 +146,7 @@ export default class EventRouter {
     // TODO: temporary
     if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
+        status: Globals.Statuscode.BAD_REQUEST,
         message: "Missiontype not yet supported",
         data: {},
       });
@@ -175,32 +156,23 @@ export default class EventRouter {
       galaxy: eventData.data.origin.galaxy,
       system: eventData.data.origin.system,
       planet: eventData.data.origin.planet,
-      type: EventRouter.getDestinationTypeByName(eventData.data.origin.type),
+      type: this.getDestinationTypeByName(eventData.data.origin.type),
     };
 
     const positionDestination: ICoordinates = {
       galaxy: eventData.data.destination.galaxy,
       system: eventData.data.destination.system,
       planet: eventData.data.destination.planet,
-      type: EventRouter.getDestinationTypeByName(eventData.data.destination.type),
+      type: this.getDestinationTypeByName(eventData.data.destination.type),
     };
 
     const startPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionOrigin);
     const destinationPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionDestination);
 
-    if (startPlanet.ownerID !== userID) {
+    if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
         status: Globals.Statuscode.BAD_REQUEST,
-        message: "The player does not own the start-planet",
-        data: {},
-      });
-    }
-
-    // planet does not exist or player does not own it
-    if (!InputValidator.isSet(startPlanet)) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
+        message: "Origin does not exist or user is not the owner",
         data: {},
       });
     }
@@ -218,7 +190,7 @@ export default class EventRouter {
 
     const gameConfig = Config.getGameConfig();
 
-    const slowestShipSpeed = this.getSlowestShipSpeed(eventData.data.ships);
+    const slowestShipSpeed = Calculations.getSlowestShipSpeed(eventData.data.ships);
 
     // calculate duration of flight
     const timeOfFlight = Calculations.calculateTimeOfFlight(
@@ -232,13 +204,13 @@ export default class EventRouter {
 
     event.eventID = 0;
     event.ownerID = eventData.ownerID;
-    event.mission = EventRouter.getMissionTypeID(eventData.mission);
+    event.mission = this.getMissionTypeID(eventData.mission);
     event.fleetlist = JSON.stringify(eventData.data.ships);
     event.start_id = startPlanet.planetID;
-    event.start_type = EventRouter.getDestinationTypeByName(eventData.data.origin.type);
+    event.start_type = this.getDestinationTypeByName(eventData.data.origin.type);
     event.start_time = Math.round(+new Date() / 1000);
     event.end_id = destinationPlanet.planetID;
-    event.end_type = EventRouter.getDestinationTypeByName(eventData.data.destination.type);
+    event.end_type = this.getDestinationTypeByName(eventData.data.destination.type);
     event.end_time = Math.round(event.start_time + timeOfFlight);
     event.loaded_metal = eventData.data.loadedRessources.metal;
     event.loaded_crystal = eventData.data.loadedRessources.crystal;
@@ -253,7 +225,7 @@ export default class EventRouter {
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({
       status: Globals.Statuscode.SUCCESS,
-      message: "Event successfully created.",
+      message: "Event successfully created",
       data: event,
     });
   };

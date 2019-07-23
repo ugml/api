@@ -1,6 +1,7 @@
 import ICoordinates from "../interfaces/ICoordinates";
 import ICosts from "../interfaces/ICosts";
 import IPricelist from "../interfaces/IPricelist";
+import IShipUnits from "../interfaces/IShipUnits";
 import Config from "./Config";
 import InputValidator from "./InputValidator";
 
@@ -129,5 +130,23 @@ export default class Calculations {
     return Math.round(
       ((3500 * gameSpeed) / (missionSpeed / 100)) * Math.pow((distance * 10) / slowestShipSpeed, 0.5) + 10,
     );
+  }
+
+  /**
+   * Returns the speed of the slowest ship in the fleet
+   * @param units The sent ship in this event
+   */
+  public static getSlowestShipSpeed(units: IShipUnits): number {
+    const unitData = require("../config/units.json");
+
+    let minimum: number = Number.MAX_VALUE;
+
+    for (const ship in units) {
+      if (units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
+        minimum = unitData.units.ships[ship].speed;
+      }
+    }
+
+    return minimum;
   }
 }

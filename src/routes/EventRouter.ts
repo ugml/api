@@ -11,6 +11,7 @@ import IEventService from "../interfaces/IEventService";
 import IPlanetService from "../interfaces/IPlanetService";
 import squel = require("safe-squel");
 import Logger from "../common/Logger";
+import EventService from "../services/EventService";
 import Event from "../units/Event";
 
 const validator = require("jsonschema").Validator;
@@ -153,16 +154,16 @@ export default class EventRouter {
     }
 
     const positionOrigin: ICoordinates = {
-      galaxy: eventData.data.origin.galaxy,
-      system: eventData.data.origin.system,
-      planet: eventData.data.origin.planet,
+      pos_galaxy: eventData.data.origin.pos_galaxy,
+      pos_system: eventData.data.origin.pos_system,
+      pos_planet: eventData.data.origin.pos_planet,
       type: this.getDestinationTypeByName(eventData.data.origin.type),
     };
 
     const positionDestination: ICoordinates = {
-      galaxy: eventData.data.destination.galaxy,
-      system: eventData.data.destination.system,
-      planet: eventData.data.destination.planet,
+      pos_galaxy: eventData.data.destination.pos_galaxy,
+      pos_system: eventData.data.destination.pos_system,
+      pos_planet: eventData.data.destination.pos_planet,
       type: this.getDestinationTypeByName(eventData.data.destination.type),
     };
 
@@ -245,69 +246,36 @@ export default class EventRouter {
       });
     }
 
-    const planetQuery: string = squel
-      .select()
-      .from("events")
-      .where("eventID = ?", request.body.eventID)
-      .where("`returning` = ?", 0)
-      .where("ownerID = ?", request.userID)
-      .toString();
+    const userID = parseInt(request.userID, 10);
+    const eventID = parseInt(request.body.eventID, 10);
 
-    // check if origin-planet exists and the user owns it
-    Database.query(planetQuery)
-      .then(results => {
-        const event = results[0];
+    const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
 
-        // destination does not exist
-        if (!InputValidator.isSet(event)) {
-          return response.status(Globals.Statuscode.BAD_REQUEST).json({
-            status: Globals.Statuscode.BAD_REQUEST,
-            message: "The event does not exist or can't be canceled",
-            data: {},
-          });
-        }
-
-        // (time passed from start until cancel) + (time now)
-        const newEndTime: number = Math.round(+new Date() / 1000) - event.start_time + Math.round(+new Date() / 1000);
-
-        const updateQuery: string = squel
-          .update()
-          .table("events")
-          .set("start_id", event.end_id)
-          .set("start_type", event.end_type)
-          .set("start_time", Math.round(+new Date() / 1000))
-          .set("end_id", event.start_id)
-          .set("end_type", event.start_type)
-          .set("end_time", newEndTime)
-          .set("`returning`", 1)
-          .where("eventID = ?", request.body.eventID)
-          .where("`returning` = ?", 0)
-          .where("ownerID = ?", request.userID)
-          .toString();
-
-        Database.query(updateQuery).then(() => {
-          // remove the event from the redis-queue
-          Redis.getConnection().zremrangebyscore("eventQueue", request.body.eventID, request.body.eventID);
-
-          // add the event with the new endtime
-          Redis.getConnection().zadd("eventQueue", request.body.eventID, newEndTime);
-
-          // all done
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Event successfully canceled.",
-            data: {},
-          });
-        });
-      })
-      .catch(error => {
-        Logger.error(error);
-
-        return response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: `An error occured: ${error.message}`,
-          data: {},
-        });
+    if (!InputValidator.isSet(event) || event.returning === true) {
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        status: Globals.Statuscode.BAD_REQUEST,
+        message: "The event does not exist or can't be canceled",
+        data: {},
       });
+    }
+
+    // (time passed from start until cancel) + (time now)
+    event.end_time = Math.round(+new Date() / 1000) - event.start_time + Math.round(+new Date() / 1000);
+    event.start_time = Math.round(+new Date() / 1000);
+
+    await this.eventService.cancelEvent(event);
+
+    // remove the event from the redis-queue
+    Redis.getConnection().zremrangebyscore("eventQueue", event.eventID, event.eventID);
+
+    // add the event with the new endtime
+    Redis.getConnection().zadd("eventQueue", request.body.eventID, event.end_time);
+
+    // all done
+    return response.status(Globals.Statuscode.SUCCESS).json({
+      status: Globals.Statuscode.SUCCESS,
+      message: "Event successfully canceled",
+      data: {},
+    });
   };
 }

@@ -11,8 +11,8 @@ describe("User-units", function() {
       username: "Testuser",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: 1234,
-      currentplanet: 45312,
+      last_time_online: 1234,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -26,8 +26,8 @@ describe("User-units", function() {
       username: "Testuser",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: 1234,
-      currentplanet: 45312,
+      last_time_online: 1234,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -41,8 +41,8 @@ describe("User-units", function() {
       username: "Hi",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: 1234,
-      currentplanet: 45312,
+      last_time_online: 1234,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -56,8 +56,8 @@ describe("User-units", function() {
       username: "IamWaaaaaaaaaaaaaaaayTooLong",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: 1234,
-      currentplanet: 45312,
+      last_time_online: 1234,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -71,8 +71,8 @@ describe("User-units", function() {
       username: "Testname",
       password: "IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong",
       email: "hello@world.com",
-      onlinetime: 1234,
-      currentplanet: 45312,
+      last_time_online: 1234,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -86,8 +86,8 @@ describe("User-units", function() {
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong.com",
-      onlinetime: 1234,
-      currentplanet: 45312,
+      last_time_online: 1234,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -95,14 +95,14 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (onlinetime negative)", function() {
+  it("Should fail (last_time_online negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: -1,
-      currentplanet: 45312,
+      last_time_online: -1,
+      current_planet: 45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -110,14 +110,14 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (currentplanet negative)", function() {
+  it("Should fail (current_planet negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: 1,
-      currentplanet: -45312,
+      last_time_online: 1,
+      current_planet: -45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -125,14 +125,14 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (currentplanet negative)", function() {
+  it("Should fail (current_planet negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      onlinetime: 1,
-      currentplanet: -45312,
+      last_time_online: 1,
+      current_planet: -45312,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));

@@ -23,17 +23,17 @@ export default class Planet implements IUnits {
   /**
    * The galaxy-position in the universe
    */
-  public galaxy: number;
+  public pos_galaxy: number;
 
   /**
    * The system-position in the universe
    */
-  public system: number;
+  public pos_system: number;
 
   /**
    * the planet-position in the universe
    */
-  public planet: number;
+  public pos_planet: number;
 
   /**
    * The unix-timestamp the planet was last updated
@@ -222,12 +222,12 @@ export default class Planet implements IUnits {
       0 < this.ownerID &&
       5 <= this.name.length &&
       this.name.length < 45 &&
-      0 < this.galaxy &&
-      this.galaxy <= Config.getGameConfig().pos_galaxy_max &&
-      0 < this.system &&
-      this.system <= Config.getGameConfig().pos_system_max &&
-      0 < this.planet &&
-      this.planet <= Config.getGameConfig().pos_planet_max &&
+      0 < this.pos_galaxy &&
+      this.pos_galaxy <= Config.getGameConfig().pos_galaxy_max &&
+      0 < this.pos_system &&
+      this.pos_system <= Config.getGameConfig().pos_system_max &&
+      0 < this.pos_planet &&
+      this.pos_planet <= Config.getGameConfig().pos_planet_max &&
       0 < this.last_update &&
       0 < this.diameter &&
       0 <= this.fields_current &&

@@ -43,7 +43,11 @@ export default class Event implements IUnits {
     if (!InputValidator.isSet(this.start_id) || this.start_id < 0) {
       return false;
     }
-    if (this.start_type !== PlanetType.Planet && this.start_type !== PlanetType.Moon) {
+    if (
+      this.start_type !== PlanetType.Planet &&
+      this.start_type !== PlanetType.Moon &&
+      this.start_type !== PlanetType.Debris
+    ) {
       return false;
     }
     if (!InputValidator.isSet(this.start_time) || this.start_time < 0) {
@@ -52,7 +56,11 @@ export default class Event implements IUnits {
     if (!InputValidator.isSet(this.end_id) || this.end_id < 0) {
       return false;
     }
-    if (this.end_type !== PlanetType.Planet && this.end_type !== PlanetType.Moon) {
+    if (
+      this.end_type !== PlanetType.Planet &&
+      this.end_type !== PlanetType.Moon &&
+      this.end_type !== PlanetType.Debris
+    ) {
       return false;
     }
     if (!InputValidator.isSet(this.end_time) || this.end_time < 0) {

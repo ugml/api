@@ -237,7 +237,7 @@ export default class PlanetsRouter {
       if (newName.length <= 4) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
-          message: "New name is too short. Minimum length is 4 characters.",
+          message: "New name is too short",
           data: {},
         });
       }

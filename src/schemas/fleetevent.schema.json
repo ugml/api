@@ -73,26 +73,26 @@
           "$id": "#/properties/data/properties/origin",
           "type": "object",
           "required": [
-            "galaxy",
-            "system",
-            "planet",
+            "pos_galaxy",
+            "pos_system",
+            "pos_planet",
             "type"
           ],
           "properties": {
-            "galaxy": {
-              "$id": "#/properties/data/properties/origin/properties/galaxy",
+            "pos_galaxy": {
+              "$id": "#/properties/data/properties/origin/properties/pos_galaxy",
               "type": "integer",
               "minimum": 1,
               "multipleOf": 1
             },
-            "system": {
-              "$id": "#/properties/data/properties/origin/properties/system",
+            "pos_system": {
+              "$id": "#/properties/data/properties/origin/properties/pos_system",
               "type": "integer",
               "minimum": 1,
               "multipleOf": 1
             },
-            "planet": {
-              "$id": "#/properties/data/properties/origin/properties/planet",
+            "pos_planet": {
+              "$id": "#/properties/data/properties/origin/properties/pos_planet",
               "type": "integer",
               "minimum": 1,
               "multipleOf": 1
@@ -112,26 +112,26 @@
           "$id": "#/properties/data/properties/destination",
           "type": "object",
           "required": [
-            "galaxy",
-            "system",
-            "planet",
+            "pos_galaxy",
+            "pos_system",
+            "pos_planet",
             "type"
           ],
           "properties": {
-            "galaxy": {
-              "$id": "#/properties/data/properties/destination/properties/galaxy",
+            "pos_galaxy": {
+              "$id": "#/properties/data/properties/destination/properties/pos_galaxy",
               "type": "integer",
               "minimum": 1,
               "multipleOf": 1
             },
-            "system": {
-              "$id": "#/properties/data/properties/destination/properties/system",
+            "pos_system": {
+              "$id": "#/properties/data/properties/destination/properties/pos_system",
               "type": "integer",
               "minimum": 1,
               "multipleOf": 1
             },
-            "planet": {
-              "$id": "#/properties/data/properties/destination/properties/planet",
+            "pos_planet": {
+              "$id": "#/properties/data/properties/destination/properties/pos_planet",
               "type": "integer",
               "minimum": 1,
               "multipleOf": 1

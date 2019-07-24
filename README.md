@@ -159,9 +159,9 @@ npm run watch
         "planetID": 333,
         "ownerID": 76487,
         "name": "Homeplanet",
-        "galaxy": 1,
-        "system": 16,
-        "planet": 11,
+        "pos_galaxy": 1,
+        "pos_system": 16,
+        "pos_planet": 11,
         "last_update": 1521056629,
         "planet_type": 1,
         "image": "trockenplanet08",
@@ -195,9 +195,9 @@ npm run watch
         "planetID": 60881,
         "ownerID": 1,
         "name": "test123",
-        "galaxy": 1,
-        "system": 4,
-        "planet": 3,
+        "pos_galaxy": 1,
+        "pos_system": 4,
+        "pos_planet": 3,
         "last_update": 1521057636,
         "planet_type": 1,
         "image": "trockenplanet08",
@@ -339,8 +339,8 @@ npm run watch
         "userID": 1,
         "username": "admin",
         "email": "xxx@xxx.xx",
-        "onlinetime": "1548524754",
-        "currentplanet": 167546850
+        "last_time_online": "1548524754",
+        "current_planet": 167546850
     }
 }
 ```
@@ -493,9 +493,9 @@ npm run watch
             "planetID": 60881,
             "ownerID": 1,
             "name": "Sampleplanet",
-            "galaxy": 1,
-            "system": 4,
-            "planet": 3,
+            "pos_galaxy": 1,
+            "pos_system": 4,
+            "pos_planet": 3,
             .
             .
             .
@@ -531,9 +531,9 @@ npm run watch
             "planetID": 60881,
             "ownerID": 1,
             "name": "Sampleplanet",
-            "galaxy": 1,
-            "system": 4,
-            "planet": 3,
+            "pos_galaxy": 1,
+            "pos_system": 4,
+            "pos_planet": 3,
             .
             .
             .
@@ -773,7 +773,7 @@ npm run watch
 
 #### Get information for a given galaxy and system
 ```
-/v1/galaxy/{galaxy}/{system}
+/v1/galaxy/{pos_galaxy}/{pos_system}
 ```
 **Request-Type:** GET
 
@@ -781,8 +781,8 @@ npm run watch
 
 | Parameter | Description              | Required |
 |-----------|--------------------------|----------|
-| galaxy    | The galaxy-position      |    Yes   |
-| system    | The system-position      |    Yes   |
+| pos_galaxy    | The galaxy-position      |    Yes   |
+| pos_system    | The system-position      |    Yes   |
 
 **Returns:** Information about the galaxy
 
@@ -798,9 +798,9 @@ npm run watch
             "ownerID": 751782555,
             "username": "Testuser",
             "name": "Homeplanet",
-            "galaxy": 4,
-            "system": 88,
-            "planet": 6,
+            "pos_galaxy": 4,
+            "pos_system": 88,
+            "pos_planet": 6,
             "last_update": 1558452853,
             "planet_type": 1,
             "image": "normal3.png",
@@ -974,15 +974,15 @@ npm run watch
         "speed": 30,
         "data": {
             "origin": {
-                "galaxy": 1,
-                "system": 4,
-                "planet": 3,
+                "pos_galaxy": 1,
+                "pos_system": 4,
+                "pos_planet": 3,
                 "type": "planet"
             },
             "destination": {
-                "galaxy": 9,
-                "system": 84,
-                "planet": 14,
+                "pos_galaxy": 9,
+                "pos_system": 84,
+                "pos_planet": 14,
                 "type": "planet"
             },
             "ships": {

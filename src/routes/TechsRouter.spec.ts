@@ -3,6 +3,8 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
+import IPlanetService from "../interfaces/IPlanetService";
+import Planet from "../units/Planet";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -134,6 +136,31 @@ describe("techsRouter", () => {
         expect(res.body.message).equals("Planet already has a build-job");
         expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("try to start a tech-build-order while research-lab is upgrading", async () => {
+    const planetID = 167546850;
+
+    const planetBackup: Planet = await container.planetService.getPlanet(1, planetID, true);
+    let planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+    planet.b_building_id = Globals.Buildings.RESEARCH_LAB;
+    planet.b_building_endtime = 1;
+
+    await container.planetService.updatePlanet(planet);
+
+    return request
+      .post("/v1/techs/build")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, techID: "101" })
+      .then(async res => {
+        expect(res.body.message).equals("Planet is upgrading the research-lab");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+
+        // reset
+        await container.planetService.updatePlanet(planetBackup);
       });
   });
 

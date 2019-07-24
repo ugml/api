@@ -3,7 +3,6 @@
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
@@ -27,13 +26,13 @@ CREATE TABLE `users` (
                          `username` varchar(20) NOT NULL,
                          `password` varchar(60) NOT NULL,
                          `email` varchar(64) NOT NULL,
-                         `onlinetime` varchar(10) NOT NULL,
-                         `currentplanet` int(11) NOT NULL,
+                         `last_time_online` varchar(10) NOT NULL,
+                         `current_planet` int(11) NOT NULL,
                          PRIMARY KEY (`userID`),
                          UNIQUE KEY `id_UNIQUE` (`userID`),
                          UNIQUE KEY `username_UNIQUE` (`username`),
                          UNIQUE KEY `email_UNIQUE` (`email`),
-                         UNIQUE KEY `currentplanet_UNIQUE` (`currentplanet`)
+                         UNIQUE KEY `current_planet_UNIQUE` (`current_planet`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -47,9 +46,9 @@ CREATE TABLE `planets` (
                            `planetID` int(11) NOT NULL,
                            `ownerID` int(11) NOT NULL,
                            `name` varchar(45) DEFAULT NULL,
-                           `galaxy` int(11) NOT NULL,
-                           `system` int(11) NOT NULL,
-                           `planet` int(11) NOT NULL,
+                           `pos_galaxy` int(11) NOT NULL,
+                           `pos_system` int(11) NOT NULL,
+                           `pos_planet` int(11) NOT NULL,
                            `last_update` int(11) DEFAULT NULL,
                            `planet_type` int(1) NOT NULL,
                            `image` char(32) NOT NULL,
@@ -187,24 +186,24 @@ CREATE TABLE `ships` (
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `events` (
-                           `eventID` int(11) NOT NULL AUTO_INCREMENT,
-                           `ownerID` int(11) NOT NULL,
-                           `mission` tinyint(1) NOT NULL,
-                           `fleetlist` text NOT NULL,
-                           `start_id` int(11) NOT NULL,
-                           `start_type` tinyint(1) NOT NULL,
-                           `start_time` int(11) NOT NULL,
-                           `end_id` int(11) NOT NULL,
-                           `end_type` tinyint(1) NOT NULL,
-                           `end_time` int(11) NOT NULL,
-                           `loaded_metal` int(11) NOT NULL DEFAULT 0,
-                           `loaded_crystal` int(11) NOT NULL DEFAULT 0,
-                           `loaded_deuterium` int(11) NOT NULL DEFAULT 0,
-                           `returning` tinyint(1) NOT NULL DEFAULT 0,
-                           `deleted` tinyint(1) NOT NULL DEFAULT 0,
-                           PRIMARY KEY (`eventID`),
-                           KEY `fk_event_ownerid` (`ownerID`),
-                           CONSTRAINT `fk_event_ownerid` FOREIGN KEY (`ownerID`) REFERENCES `users` (`userID`) ON DELETE CASCADE
+                          `eventID` int(11) NOT NULL AUTO_INCREMENT,
+                          `ownerID` int(11) NOT NULL,
+                          `mission` tinyint(1) NOT NULL,
+                          `fleetlist` text NOT NULL,
+                          `start_id` int(11) NOT NULL,
+                          `start_type` tinyint(1) NOT NULL,
+                          `start_time` int(11) NOT NULL,
+                          `end_id` int(11) NOT NULL,
+                          `end_type` tinyint(1) NOT NULL,
+                          `end_time` int(11) NOT NULL,
+                          `loaded_metal` int(11) NOT NULL DEFAULT 0,
+                          `loaded_crystal` int(11) NOT NULL DEFAULT 0,
+                          `loaded_deuterium` int(11) NOT NULL DEFAULT 0,
+                          `returning` tinyint(1) NOT NULL DEFAULT 0,
+                          `deleted` tinyint(1) NOT NULL DEFAULT 0,
+                          PRIMARY KEY (`eventID`),
+                          KEY `fk_event_ownerid` (`ownerID`),
+                          CONSTRAINT `fk_event_ownerid` FOREIGN KEY (`ownerID`) REFERENCES `users` (`userID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -302,6 +301,8 @@ INSERT INTO `galaxy` VALUES (50832,9,44,4,0,0),(61614,7,5,7,0,0),(62338,6,46,7,0
 INSERT INTO `messages` VALUES (1,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(2,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(3,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(4,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(5,1,1,'2019-07-15 14:46:13',1,'test','asdf',0),(6,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(7,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(8,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(9,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(10,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(11,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(12,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(13,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(14,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(15,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(16,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(17,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(18,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(19,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(20,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(21,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(22,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(23,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(24,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(25,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(26,1,1,'0000-00-00 00:00:00',1,'test','asdf',0),(27,1,1,'2019-07-08 16:23:23',1,'test','asdf',0),(35,1,48,'2019-07-08 19:27:21',1,'Test','Test',0),(36,1,48,'2019-07-08 19:28:16',1,'Test','Test',0),(37,1,48,'2019-07-08 19:28:28',1,'Test','Test',0),(38,1,48,'2019-07-12 10:53:17',1,'Test','Test',0),(39,1,48,'2019-07-12 10:54:44',1,'Test','Test',0),(40,1,48,'2019-07-12 10:55:57',1,'Test','Test',0),(41,1,48,'2019-07-12 10:56:48',1,'Test','Test',0),(42,1,48,'2019-07-12 10:58:14',1,'Test','Test',0),(43,1,48,'2019-07-12 11:08:39',1,'Test','Test',0),(44,1,48,'2019-07-14 15:20:08',1,'Test','Test',0),(45,1,48,'2019-07-14 15:21:46',1,'Test','Test',0),(46,1,48,'2019-07-14 15:22:33',1,'Test','Test',0),(47,1,48,'2019-07-14 15:23:36',1,'Test','Test',0),(48,1,48,'2019-07-14 15:27:50',1,'Test','Test',0),(49,1,48,'2019-07-14 15:30:02',1,'Test','Test',0),(50,1,48,'2019-07-14 16:06:17',1,'Test','Test',0),(51,1,48,'2019-07-14 16:12:22',1,'Test','Test',0),(52,1,48,'2019-07-14 16:29:43',1,'Test','Test',0),(53,1,48,'2019-07-14 16:30:14',1,'Test','Test',0),(54,1,48,'2019-07-14 16:30:40',1,'Test','Test',0),(55,1,48,'2019-07-14 17:58:55',1,'Test','Test',0),(56,1,48,'2019-07-14 18:04:55',1,'Test','Test',0),(57,1,48,'2019-07-14 18:20:00',1,'Test','Test',0),(58,1,48,'2019-07-14 18:21:26',1,'Test','Test',0),(59,1,48,'2019-07-14 18:22:11',1,'Test','Test',0),(60,1,48,'2019-07-14 18:24:26',1,'Test','Test',0),(61,1,48,'2019-07-15 04:26:21',1,'Test','Test',0),(62,1,48,'2019-07-15 04:29:06',1,'Test','Test',0),(63,1,48,'2019-07-15 04:32:30',1,'Test','Test',0),(64,1,48,'2019-07-15 04:38:53',1,'Test','Test',0),(65,1,48,'2019-07-15 04:53:32',1,'Test','Test',0),(66,1,48,'2019-07-15 05:01:35',1,'Test','Test',0),(67,1,48,'2019-07-15 05:08:03',1,'Test','Test',0),(68,1,48,'2019-07-15 13:55:41',1,'Test','Test',0),(69,1,48,'2019-07-15 14:17:12',1,'Test','Test',0),(70,1,48,'2019-07-15 14:21:55',1,'Test','Test',0),(71,1,48,'2019-07-15 14:43:56',1,'Test','Test',0),(72,1,48,'2019-07-15 14:45:58',1,'Test','Test',0);
 INSERT INTO `stats` VALUES (1,2220584795,1,1);
 INSERT INTO `techs` VALUES (1,1,23,23,23,23,23,23,23,23,23,23,23,23,21,1),(35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+INSERT INTO `events` VALUES (1, 1, 2, '{"201":612,"202":357,"203":617,"204":800,"205":709,"206":204,"207":703,"208":85,"209":631,"210":388,"211":0,"212":723,"213":557,"214":106}', 167546850, 1, 1563979907, 93133, 1, 1565146584, 443, 980, 220, 0, 0);
+
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -329,7 +330,7 @@ BEGIN
 
     END WHILE;
 
-    SELECT pos_galaxy AS `posGalaxy`, pos_system AS `posSystem`, pos_planet AS `posPlanet`;
+    SELECT pos_galaxy AS `pos_galaxy`, pos_system AS `pos_system`, pos_planet AS `pos_planet`;
 
 END//
 DELIMITER ;

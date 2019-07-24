@@ -76,13 +76,27 @@ describe("defenseRoute", () => {
       });
   });
 
+  it("should build multiple defenses", () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/defenses/build")
+      .set("Authorization", authToken)
+      .send({ planetID, buildOrder: JSON.stringify({ 301: 1, 302: 1, 309: 1, 310: 1 }) })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body.data.planetID).equals(planetID);
+      });
+  });
+
   it("should build defense", () => {
     const planetID = 167546850;
 
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: JSON.stringify({ 301: 10000 }) })
+      .send({ planetID, buildOrder: JSON.stringify({ 310: 10000 }) })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");

@@ -28,12 +28,12 @@ export default class User implements IUnits {
   /**
    * The unix-timestamp of the last time the user was online
    */
-  public onlinetime: number;
+  public last_time_online: number;
 
   /**
    * The current planet of the user
    */
-  public currentplanet: number;
+  public current_planet: number;
 
   /**
    * Returns, if the contains valid data or not
@@ -55,11 +55,11 @@ export default class User implements IUnits {
       return false;
     }
 
-    if (!InputValidator.isSet(this.onlinetime) || this.onlinetime <= 0) {
+    if (!InputValidator.isSet(this.last_time_online) || this.last_time_online <= 0) {
       return false;
     }
 
-    if (!InputValidator.isSet(this.currentplanet) || this.currentplanet <= 0) {
+    if (!InputValidator.isSet(this.current_planet) || this.current_planet <= 0) {
       return false;
     }
 

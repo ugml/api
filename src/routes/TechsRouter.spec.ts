@@ -19,7 +19,6 @@ let authToken = "";
 let request = chai.request(app);
 
 describe("techsRouter", () => {
-
   before(() => {
     return request
       .post("/v1/auth/login")
@@ -155,7 +154,7 @@ describe("techsRouter", () => {
       .post("/v1/techs/build")
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "101" })
-      .then(async (res) => {
+      .then(async res => {
         expect(res.body.message).equals("Planet is upgrading the research-lab");
         expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.data).to.be.eql({});

@@ -51,7 +51,7 @@ export default class EventService implements IEventService {
 
     const [[result]] = await Database.query(query);
 
-    if(!InputValidator.isSet(result)) {
+    if (!InputValidator.isSet(result)) {
       return null;
     }
 

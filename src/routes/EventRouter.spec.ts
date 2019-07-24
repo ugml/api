@@ -39,15 +39,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "galaxy": 9,
-            "system": 54,
-            "planet": 1,
+            "pos_galaxy": 9,
+            "pos_system": 54,
+            "pos_planet": 1,
             "type": "planet"
         },
         "destination": {
-            "galaxy": 4,
-            "system": 71,
-            "planet": 2,
+            "pos_galaxy": 4,
+            "pos_system": 71,
+            "pos_planet": 2,
             "type": "planet"
         },
         "ships": {
@@ -102,15 +102,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "galaxy": 9,
-            "system": 54,
-            "planet": 1,
+            "pos_galaxy": 9,
+            "pos_system": 54,
+            "pos_planet": 1,
             "type": "planet"
         },
         "destination": {
-            "galaxy": 4,
-            "system": 71,
-            "planet": 2,
+            "pos_galaxy": 4,
+            "pos_system": 71,
+            "pos_planet": 2,
             "type": "planet"
         }
     }
@@ -134,15 +134,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "galaxy": 9,
-            "system": 54,
-            "planet": 1,
+            "pos_galaxy": 9,
+            "pos_system": 54,
+            "pos_planet": 1,
             "type": "planet"
         },
         "destination": {
-            "galaxy": 4,
-            "system": 71,
-            "planet": 2,
+            "pos_galaxy": 4,
+            "pos_system": 71,
+            "pos_planet": 2,
             "type": "planet"
         },
         "ships": {
@@ -187,15 +187,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "galaxy": 9,
-            "system": 54,
-            "planet": 1,
+            "pos_galaxy": 9,
+            "pos_system": 54,
+            "pos_planet": 1,
             "type": "planet"
         },
         "destination": {
-            "galaxy": 4,
-            "system": 71,
-            "planet": 2,
+            "pos_galaxy": 4,
+            "pos_system": 71,
+            "pos_planet": 2,
             "type": "planet"
         },
         "ships": {
@@ -240,15 +240,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "galaxy": 6,
-            "system": 46,
-            "planet": 7,
+            "pos_galaxy": 6,
+            "pos_system": 46,
+            "pos_planet": 7,
             "type": "planet"
         },
         "destination": {
-            "galaxy": 4,
-            "system": 71,
-            "planet": 2,
+            "pos_galaxy": 4,
+            "pos_system": 71,
+            "pos_planet": 2,
             "type": "planet"
         },
         "ships": {
@@ -293,15 +293,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "galaxy": 9,
-            "system": 54,
-            "planet": 1,
+            "pos_galaxy": 9,
+            "pos_system": 54,
+            "pos_planet": 1,
             "type": "planet"
         },
         "destination": {
-            "galaxy": 1,
-            "system": 1,
-            "planet": 1,
+            "pos_galaxy": 1,
+            "pos_system": 1,
+            "pos_planet": 1,
             "type": "planet"
         },
         "ships": {
@@ -344,8 +344,8 @@ describe("eventRouter", () => {
       .send({ eventID: 1 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.body.message).to.be.equals("Event successfully canceled");
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
       });
   });
 
@@ -354,8 +354,8 @@ describe("eventRouter", () => {
       .post("/v1/events/cancel")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
 
@@ -365,8 +365,8 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .send({ eventID: "asdf" })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
 
@@ -376,8 +376,8 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .send({ eventID: 33580 })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("The event does not exist or can't be canceled");
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
 

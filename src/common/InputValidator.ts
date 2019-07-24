@@ -140,18 +140,18 @@ export default class InputValidator {
 
   /**
    * Validates a given position. The planet-parameter is optional and will be set to 1 if no paramter is passed
-   * @param galaxy the galaxy-position
-   * @param system the system-position
-   * @param planet the planet-position
+   * @param pos_galaxy the galaxy-position
+   * @param pos_system the pos_system-position
+   * @param pos_planet the planet-position
    */
-  public static isValidPosition(galaxy, system, planet = 1): boolean {
+  public static isValidPosition(pos_galaxy, pos_system, pos_planet = 1): boolean {
     return (
-      galaxy >= 1 &&
-      galaxy <= Config.getGameConfig().pos_galaxy_max &&
-      system >= 1 &&
-      system <= Config.getGameConfig().pos_system_max &&
-      planet >= 1 &&
-      planet <= Config.getGameConfig().pos_planet_max
+      pos_galaxy >= 1 &&
+      pos_galaxy <= Config.getGameConfig().pos_galaxy_max &&
+      pos_system >= 1 &&
+      pos_system <= Config.getGameConfig().pos_system_max &&
+      pos_planet >= 1 &&
+      pos_planet <= Config.getGameConfig().pos_planet_max
     );
   }
 }

@@ -2,7 +2,6 @@ import { NextFunction, Response, Router as newRouter, IRouter } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-
 import Logger from "../common/Logger";
 import IGalaxyService from "../interfaces/IGalaxyService";
 
@@ -20,7 +19,7 @@ export default class GalaxyRouter {
    */
   public constructor(container) {
     this.galaxyService = container.galaxyService;
-    this.router.get("/:galaxy/:system", this.getGalaxyInformation);
+    this.router.get("/:pos_galaxy/:pos_system", this.getGalaxyInformation);
   }
 
   /**
@@ -33,10 +32,10 @@ export default class GalaxyRouter {
     try {
       // validate parameters
       if (
-        !InputValidator.isSet(request.params.galaxy) ||
-        !InputValidator.isValidInt(request.params.galaxy) ||
-        !InputValidator.isSet(request.params.system) ||
-        !InputValidator.isValidInt(request.params.system)
+        !InputValidator.isSet(request.params.pos_galaxy) ||
+        !InputValidator.isValidInt(request.params.pos_galaxy) ||
+        !InputValidator.isSet(request.params.pos_system) ||
+        !InputValidator.isValidInt(request.params.pos_system)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
@@ -45,10 +44,10 @@ export default class GalaxyRouter {
         });
       }
 
-      const galaxy = parseInt(request.params.galaxy, 10);
-      const system = parseInt(request.params.system, 10);
+      const pos_galaxy = parseInt(request.params.pos_galaxy, 10);
+      const pos_system = parseInt(request.params.pos_system, 10);
 
-      if (!InputValidator.isValidPosition(galaxy, system)) {
+      if (!InputValidator.isValidPosition(pos_galaxy, pos_system)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Invalid parameter",
@@ -56,7 +55,7 @@ export default class GalaxyRouter {
         });
       }
 
-      const galaxyData = await this.galaxyService.getGalaxyInfo(galaxy, system);
+      const galaxyData = await this.galaxyService.getGalaxyInfo(pos_galaxy, pos_system);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

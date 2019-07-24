@@ -123,8 +123,8 @@ export default class UserService implements IUserService {
       .set("username", user.username)
       .set("password", user.password)
       .set("email", user.email)
-      .set("onlinetime", user.onlinetime)
-      .set("currentplanet", user.currentplanet)
+      .set("last_time_online", user.last_time_online)
+      .set("current_planet", user.current_planet)
       .toString();
 
     if (connection === null) {
@@ -159,12 +159,12 @@ export default class UserService implements IUserService {
       query = query.set("email", user.email);
     }
 
-    if (typeof user.onlinetime !== "undefined") {
-      query = query.set("currentplanet", user.onlinetime);
+    if (typeof user.last_time_online !== "undefined") {
+      query = query.set("last_time_online", user.last_time_online);
     }
 
-    if (typeof user.currentplanet !== "undefined") {
-      query = query.set("currentplanet", user.currentplanet);
+    if (typeof user.current_planet !== "undefined") {
+      query = query.set("current_planet", user.current_planet);
     }
 
     query = query.where("userID = ?", user.userID);

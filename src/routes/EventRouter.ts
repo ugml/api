@@ -154,16 +154,16 @@ export default class EventRouter {
     }
 
     const positionOrigin: ICoordinates = {
-      galaxy: eventData.data.origin.galaxy,
-      system: eventData.data.origin.system,
-      planet: eventData.data.origin.planet,
+      pos_galaxy: eventData.data.origin.pos_galaxy,
+      pos_system: eventData.data.origin.pos_system,
+      pos_planet: eventData.data.origin.pos_planet,
       type: this.getDestinationTypeByName(eventData.data.origin.type),
     };
 
     const positionDestination: ICoordinates = {
-      galaxy: eventData.data.destination.galaxy,
-      system: eventData.data.destination.system,
-      planet: eventData.data.destination.planet,
+      pos_galaxy: eventData.data.destination.pos_galaxy,
+      pos_system: eventData.data.destination.pos_system,
+      pos_planet: eventData.data.destination.pos_planet,
       type: this.getDestinationTypeByName(eventData.data.destination.type),
     };
 

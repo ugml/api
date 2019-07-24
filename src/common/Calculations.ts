@@ -93,9 +93,9 @@ export default class Calculations {
    */
   public static calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
     const distances = [
-      Math.abs(origin.galaxy - destination.galaxy),
-      Math.abs(origin.system - destination.system),
-      Math.abs(origin.planet - destination.planet),
+      Math.abs(origin.pos_galaxy - destination.pos_galaxy),
+      Math.abs(origin.pos_system - destination.pos_system),
+      Math.abs(origin.pos_planet - destination.pos_planet),
     ];
 
     const distance = 5;

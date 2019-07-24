@@ -29,9 +29,9 @@ export default class PlanetService implements IPlanetService {
         .field("planetID")
         .field("ownerID")
         .field("name")
-        .field("galaxy")
-        .field("system")
-        .field("planet")
+        .field("pos_galaxy")
+        .field("pos_system")
+        .field("pos_planet")
         .field("planet_type")
         .field("image");
     }
@@ -185,9 +185,9 @@ export default class PlanetService implements IPlanetService {
       .set("planetID", planet.planetID)
       .set("ownerID", planet.ownerID)
       .set("name", planet.name)
-      .set("galaxy", planet.galaxy)
-      .set("system", planet.system)
-      .set("planet", planet.planet)
+      .set("pos_galaxy", planet.pos_galaxy)
+      .set("pos_system", planet.pos_system)
+      .set("pos_planet", planet.pos_planet)
       .set("last_update", planet.last_update)
       .set("planet_type", planet.planet_type)
       .set("image", planet.image)
@@ -223,9 +223,9 @@ export default class PlanetService implements IPlanetService {
         .field("planetID")
         .field("ownerID")
         .field("name")
-        .field("galaxy")
-        .field("system")
-        .field("planet")
+        .field("pos_galaxy")
+        .field("pos_system")
+        .field("pos_planet")
         .field("planet_type")
         .field("image");
     }
@@ -291,9 +291,9 @@ export default class PlanetService implements IPlanetService {
     const query = squel
       .select({ autoQuoteFieldNames: true })
       .from("planets")
-      .where("galaxy = ?", position.galaxy)
-      .where("system = ?", position.system)
-      .where("planet = ?", position.planet)
+      .where("pos_galaxy = ?", position.pos_galaxy)
+      .where("pos_system = ?", position.pos_system)
+      .where("pos_planet = ?", position.pos_planet)
       .where("planet_type = ?", position.type)
       .toString();
 

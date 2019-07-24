@@ -205,7 +205,7 @@ export default class UsersRouter {
 
       const planetID = await await this.planetService.getNewId();
 
-      newUser.currentplanet = planetID;
+      newUser.current_planet = planetID;
       newPlanet.planetID = planetID;
 
       Logger.info("Finding free position for new planet");
@@ -217,9 +217,9 @@ export default class UsersRouter {
         12,
       );
 
-      newPlanet.galaxy = galaxyData.galaxy;
-      newPlanet.system = galaxyData.system;
-      newPlanet.planet = galaxyData.planet;
+      newPlanet.pos_galaxy = galaxyData.pos_galaxy;
+      newPlanet.pos_system = galaxyData.pos_system;
+      newPlanet.pos_planet = galaxyData.pos_planet;
 
       Logger.info("Creating a new user");
 
@@ -236,7 +236,7 @@ export default class UsersRouter {
       newPlanet.deuterium = gameConfig.deuterium_start;
 
       switch (true) {
-        case newPlanet.planet <= 5: {
+        case newPlanet.pos_planet <= 5: {
           newPlanet.temp_min = Math.random() * (130 - 40) + 40;
           newPlanet.temp_max = Math.random() * (150 - 240) + 240;
 
@@ -247,7 +247,7 @@ export default class UsersRouter {
 
           break;
         }
-        case newPlanet.planet <= 10: {
+        case newPlanet.pos_planet <= 10: {
           newPlanet.temp_min = Math.random() * (130 - 40) + 40;
           newPlanet.temp_max = Math.random() * (150 - 240) + 240;
 
@@ -258,7 +258,7 @@ export default class UsersRouter {
 
           break;
         }
-        case newPlanet.planet <= 15: {
+        case newPlanet.pos_planet <= 15: {
           newPlanet.temp_min = Math.random() * (130 - 40) + 40;
           newPlanet.temp_max = Math.random() * (150 - 240) + 240;
 
@@ -287,9 +287,9 @@ export default class UsersRouter {
 
       await this.galaxyService.createGalaxyRow(
         newPlanet.planetID,
-        newPlanet.galaxy,
-        newPlanet.system,
-        newPlanet.planet,
+        newPlanet.pos_galaxy,
+        newPlanet.pos_system,
+        newPlanet.pos_planet,
         connection,
       );
 
@@ -428,7 +428,7 @@ export default class UsersRouter {
 
       const user: User = await this.userService.getUserById(userID);
 
-      user.currentplanet = planetID;
+      user.current_planet = planetID;
 
       await this.userService.updateUserData(user);
 

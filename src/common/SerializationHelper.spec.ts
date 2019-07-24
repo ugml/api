@@ -12,8 +12,8 @@ describe("Redis", function() {
       username: "testname",
       password: "password",
       email: "hello@world.com",
-      onlinetime: 42,
-      currentplanet: 1,
+      last_time_online: 42,
+      current_planet: 1,
     };
     const result: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
@@ -21,8 +21,8 @@ describe("Redis", function() {
     expect(result.username).to.be.equals(data.username);
     expect(result.password).to.be.equals(data.password);
     expect(result.email).to.be.equals(data.email);
-    expect(result.onlinetime).to.be.equals(data.onlinetime);
-    expect(result.currentplanet).to.be.equals(data.currentplanet);
+    expect(result.last_time_online).to.be.equals(data.last_time_online);
+    expect(result.current_planet).to.be.equals(data.current_planet);
     expect(result.isValid()).to.be.equals(true);
   });
 });

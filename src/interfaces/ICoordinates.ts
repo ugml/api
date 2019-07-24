@@ -2,8 +2,8 @@ import { Globals } from "../common/Globals";
 import PlanetType = Globals.PlanetType;
 
 export default interface ICoordinates {
-  galaxy: number;
-  system: number;
-  planet: number;
+  pos_galaxy: number;
+  pos_system: number;
+  pos_planet: number;
   type: PlanetType;
 }

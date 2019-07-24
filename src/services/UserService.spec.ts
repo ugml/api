@@ -21,8 +21,8 @@ describe("UserService", () => {
     expect(result.userID).to.be.equals(userID);
     expect(result.username).to.be.equals("admin");
     expect(result.email).to.be.equals("user_1501005189510@test.com");
-    expect(result.onlinetime).to.not.be.equals(null);
-    expect(result.currentplanet).to.be.equals(167546850);
+    expect(result.last_time_online).to.not.be.equals(null);
+    expect(result.current_planet).to.be.equals(167546850);
   });
 
   it("should return information about an user", async () => {
@@ -33,8 +33,8 @@ describe("UserService", () => {
     expect(result.userID).to.be.equals(userID);
     expect(result.username).to.be.equals("admin");
     expect(result.email).to.be.equals(undefined);
-    expect(result.onlinetime).to.be.equals(undefined);
-    expect(result.currentplanet).to.be.equals(undefined);
+    expect(result.last_time_online).to.be.equals(undefined);
+    expect(result.current_planet).to.be.equals(undefined);
   });
 
   it("should return nothing because the user does not exist", async () => {

@@ -206,6 +206,43 @@ describe("planetsRouter", () => {
       });
   });
 
+  it("should fail (name not passed)", async () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/planets/rename")
+      .send({ planetID })
+      .set("Authorization", authToken)
+      .then(async res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (planerID not passed)", async () => {
+    return request
+      .post("/v1/planets/rename")
+      .send({ name: "NewName" })
+      .set("Authorization", authToken)
+      .then(async res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (planerID not passed)", async () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/planets/rename")
+      .send({ planetID, name: "A" })
+      .set("Authorization", authToken)
+      .then(async res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("New name is too short");
+      });
+  });
+
   it("should fail (invalid planetID passed)", () => {
     const planetID = "asdf";
 

@@ -1,13 +1,9 @@
 import Database from "../common/Database";
-import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import ICoordinates from "../interfaces/ICoordinates";
 import IEventService from "../interfaces/IEventService";
 import Event from "../units/Event";
-import Planet from "../units/Planet";
 import squel = require("safe-squel");
-import PlanetType = Globals.PlanetType;
 
 /**
  * This class defines a service to interact manage events
@@ -35,12 +31,53 @@ export default class EventService implements IEventService {
       .set("loaded_deuterium", event.loaded_deuterium)
       .toString();
 
-    console.log(query);
-
     const result = await Database.query(query);
 
-    console.log(result);
-
     return result;
+  }
+
+  /**
+   * Returns an event of a user
+   * @param userID the ID of the user
+   * @param eventID the ID of the event
+   */
+  public async getEventOfPlayer(userID: number, eventID: number): Promise<Event> {
+    const query: string = squel
+      .select()
+      .from("events")
+      .where("eventID = ?", eventID)
+      .where("ownerID = ?", userID)
+      .toString();
+
+    const [[result]] = await Database.query(query);
+
+    if(!InputValidator.isSet(result)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new Event(), JSON.stringify(result));
+  }
+
+  /**
+   * Cancels an event
+   * @param event the event to be canceled
+   */
+  public async cancelEvent(event: Event) {
+    const query: string = squel
+      .update()
+      .table("events")
+      .set("start_id", event.end_id)
+      .set("start_type", event.end_type)
+      .set("start_time", event.start_time)
+      .set("end_id", event.start_id)
+      .set("end_type", event.start_type)
+      .set("end_time", event.end_time)
+      .set("`returning`", 1)
+      .where("eventID = ?", event.eventID)
+      .where("`returning` = ?", 0)
+      .where("ownerID = ?", event.ownerID)
+      .toString();
+
+    return await Database.query(query);
   }
 }

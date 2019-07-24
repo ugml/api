@@ -337,4 +337,50 @@ describe("eventRouter", () => {
         expect(res.body.message).to.be.equals("Destination does not exist");
       });
   });
+
+  it("should cancel an event", () => {
+    return request
+      .post("/v1/events/cancel")
+      .send({ eventID: 1 })
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.message).to.be.equals("Event successfully canceled");
+      });
+  });
+
+  it("should fail (no parameter sent)", () => {
+    return request
+      .post("/v1/events/cancel")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (invalid parameter sent)", () => {
+    return request
+      .post("/v1/events/cancel")
+      .set("Authorization", authToken)
+      .send({ eventID: "asdf" })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("Invalid parameter");
+      });
+  });
+
+  it("should fail (event does not exist)", () => {
+    return request
+      .post("/v1/events/cancel")
+      .set("Authorization", authToken)
+      .send({ eventID: 33580 })
+      .then(res => {
+        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.message).to.be.equals("The event does not exist or can't be canceled");
+      });
+  });
+
+  // TODO: check, if event is in redis
+  // TODO: check, if event really is returning
 });

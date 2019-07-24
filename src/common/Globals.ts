@@ -49,6 +49,7 @@ namespace Globals {
   export enum PlanetType {
     Planet = 1,
     Moon = 2,
+    Debris = 3,
   }
 
   export enum UnitType {

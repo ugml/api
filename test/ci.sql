@@ -70,6 +70,7 @@ CREATE TABLE `planets` (
                            `solar_satellite_percent` int(3) NOT NULL DEFAULT 100,
                            `b_building_id` int(3) DEFAULT NULL,
                            `b_building_endtime` int(10) DEFAULT NULL,
+                           `b_building_demolition` bool default FALSE not null,
                            `b_tech_id` int(3) DEFAULT NULL,
                            `b_tech_endtime` int(10) DEFAULT NULL,
                            `b_hangar_queue` text default NULL,

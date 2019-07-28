@@ -29,9 +29,10 @@ export default class BuildingsRouter {
     this.buildingService = container.buildingService;
     this.planetService = container.planetService;
 
-    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
     this.router.post("/build", this.startBuilding);
     this.router.post("/cancel", this.cancelBuilding);
+    this.router.post("/demolish", this.demolishBuilding);
+    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
   }
 
   /**
@@ -280,6 +281,96 @@ export default class BuildingsRouter {
       planet.deuterium = planet.deuterium - cost.deuterium;
       planet.b_building_id = buildingID;
       planet.b_building_endtime = endTime;
+
+      await this.planetService.updatePlanet(planet);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Job started",
+        data: { planet },
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: `There was an error while handling the request: ${error}`,
+        data: {},
+      });
+    }
+  };
+
+  public demolishBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (
+        !InputValidator.isSet(request.body.planetID) ||
+        !InputValidator.isValidInt(request.body.planetID) ||
+        !InputValidator.isSet(request.body.buildingID) ||
+        !InputValidator.isValidInt(request.body.buildingID)
+      ) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+      const buildingID = parseInt(request.body.buildingID, 10);
+
+      if (!InputValidator.isValidBuildingId(buildingID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      if (planet.isUpgradingBuilding()) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "Planet already has a build-job",
+          data: {},
+        });
+      }
+
+      const buildingKey = Config.getMappings()[buildingID];
+      const currentLevel = buildings[buildingKey];
+
+      if (currentLevel === 0) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          status: Globals.Statuscode.SUCCESS,
+          message: "This building can't be demlished",
+          data: {},
+        });
+      }
+
+      const cost = Calculations.getCosts(buildingID, currentLevel - 1);
+
+      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
+        cost.metal,
+        cost.crystal,
+        buildings.robotic_factory,
+        buildings.nanite_factory,
+      );
+
+      const endTime: number = Math.round(+new Date() / 1000) + buildTime;
+
+      planet.b_building_id = buildingID;
+      planet.b_building_endtime = endTime;
+      planet.b_building_demolition = true;
 
       await this.planetService.updatePlanet(planet);
 

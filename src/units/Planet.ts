@@ -142,13 +142,18 @@ export default class Planet implements IUnits {
   public b_building_endtime: number;
 
   /**
+   * True, if the current build-order is a demolition job
+   */
+  public b_building_demolition: boolean;
+
+  /**
    * The ID of the technology which is currently being researched.
    * This value is 0 if no technology is currently being researched.
    */
   public b_tech_id: number;
 
   /**
-   * The time, at which the reserach will be completed
+   * The time, at which the research will be completed
    */
   public b_tech_endtime: number;
 

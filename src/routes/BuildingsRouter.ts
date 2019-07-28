@@ -339,8 +339,8 @@ export default class BuildingsRouter {
       }
 
       if (planet.isUpgradingBuilding()) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
           message: "Planet already has a build-job",
           data: {},
         });
@@ -350,9 +350,9 @@ export default class BuildingsRouter {
       const currentLevel = buildings[buildingKey];
 
       if (currentLevel === 0) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "This building can't be demlished",
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "This building can't be demolished",
           data: {},
         });
       }

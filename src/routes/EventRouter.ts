@@ -217,11 +217,14 @@ export default class EventRouter {
     event.loaded_crystal = eventData.data.loadedRessources.crystal;
     event.loaded_deuterium = eventData.data.loadedRessources.deuterium;
     event.returning = false;
-    event.deleted = false;
+    event.processed = false;
 
     const [result] = await this.eventService.createNewEvent(event);
 
     event.eventID = parseInt(result.insertId, 10);
+
+    // insert into redis
+    Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
 
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({
@@ -266,10 +269,10 @@ export default class EventRouter {
     await this.eventService.cancelEvent(event);
 
     // remove the event from the redis-queue
-    Redis.getConnection().zremrangebyscore("eventQueue", event.eventID, event.eventID);
+    Redis.getConnection().zremrangebyscore("eventQueue", event.end_time, event.eventID);
 
     // add the event with the new endtime
-    Redis.getConnection().zadd("eventQueue", request.body.eventID, event.end_time);
+    Redis.getConnection().zadd("eventQueue", event.end_time, request.body.eventID);
 
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({

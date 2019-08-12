@@ -2,9 +2,12 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import { Router } from "express";
 import JwtHelper from "./common/JwtHelper";
+import Redis from "./common/Redis";
+import SerializationHelper from "./common/SerializationHelper";
 import IAuthorizedRequest from "./interfaces/IAuthorizedRequest";
 import { Globals } from "./common/Globals";
 import IJwt from "./interfaces/IJwt";
+import Event from "./units/Event";
 import InputValidator from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -56,6 +59,25 @@ export default class App {
     this.express = express();
     this.middleware();
     this.routes();
+    // TODO: await this call
+    this.loadEventsIntoQueue();
+  }
+
+  /**
+   * Loads all events from the database into the eventqueue
+   */
+  private async loadEventsIntoQueue(): Promise<void> {
+    Logger.info("Loading unprocessed events into Queue");
+
+    const eventService = this.container.eventService;
+
+    const eventList = await eventService.getAllUnprocessedEvents();
+
+    for (let i = 0; i < eventList.length; i++) {
+      Redis.getConnection().zadd("eventQueue", eventList[i].end_time, eventList[i].eventID);
+    }
+
+    Logger.info(`Finished loading ${eventList.length} events into Queue`);
   }
 
   /**

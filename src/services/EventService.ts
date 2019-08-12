@@ -31,9 +31,7 @@ export default class EventService implements IEventService {
       .set("loaded_deuterium", event.loaded_deuterium)
       .toString();
 
-    const result = await Database.query(query);
-
-    return result;
+    return await Database.query(query);
   }
 
   /**
@@ -79,5 +77,20 @@ export default class EventService implements IEventService {
       .toString();
 
     return await Database.query(query);
+  }
+
+  /**
+   * Retuns a list of all not yet processed events
+   */
+  public async getAllUnprocessedEvents() {
+    const query: string = squel
+      .select()
+      .from("events")
+      .where("processed = ?", false)
+      .toString();
+
+    const [result] = await Database.query(query);
+
+    return result;
   }
 }

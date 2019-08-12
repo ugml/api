@@ -201,7 +201,7 @@ CREATE TABLE `events` (
                           `loaded_crystal` int(11) NOT NULL DEFAULT 0,
                           `loaded_deuterium` int(11) NOT NULL DEFAULT 0,
                           `returning` tinyint(1) NOT NULL DEFAULT 0,
-                          `deleted` tinyint(1) NOT NULL DEFAULT 0,
+                          `processed` tinyint(1) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`eventID`),
                           KEY `fk_event_ownerid` (`ownerID`),
                           CONSTRAINT `fk_event_ownerid` FOREIGN KEY (`ownerID`) REFERENCES `users` (`userID`) ON DELETE CASCADE

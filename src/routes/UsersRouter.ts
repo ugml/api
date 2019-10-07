@@ -126,7 +126,10 @@ export default class UsersRouter {
         });
       }
 
-      const user = await this.userService.getUserById(request.params.userID);
+      const userID: number = parseInt(request.params.userID, 10);
+
+
+      const user = await this.userService.getUserById(userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

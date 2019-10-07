@@ -51,8 +51,10 @@ export default class BuildingsRouter {
         });
       }
 
+      const planetID: number = parseInt(request.params.planetID, 10);
+
       // TODO: check if user owns the planet
-      const data = await this.buildingService.getBuildings(request.params.planetID);
+      const data = await this.buildingService.getBuildings(planetID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

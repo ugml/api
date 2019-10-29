@@ -1,4 +1,5 @@
 FROM node:12.13-alpine
+LABEL maintainer="docker@ugamela.org"
 
 RUN apk update
 

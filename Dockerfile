@@ -13,6 +13,7 @@ COPY src/ src/
 COPY package.json .
 COPY tsconfig.json .
 COPY gulpfile.js .
+COPY .env.example .
 
 RUN npm i -g npm
 
@@ -26,7 +27,9 @@ RUN npm install
 
 RUN npm run build
 
-RUN npm prune --production
+RUN rm -rf node_modules
+
+RUN npm install --production
 
 # https://github.com/tj/node-prune
 RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | sh; ./bin/node-prune

@@ -9,9 +9,7 @@ RUN apk --no-cache add --virtual native-deps \
 
 WORKDIR /srv/www/api/
 
-COPY ./app/ .
-
-COPY ./config.env ./.env
+RUN git clone https://github.com/ugml/api.git .
 
 RUN npm i -g npm
 

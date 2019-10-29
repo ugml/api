@@ -2,7 +2,7 @@ const redis = require("redis"); // typescript throws errors if do es6 import
 import dotenv = require("dotenv-safe");
 
 dotenv.config({
-  example: process.env.CI ? ".env.ci.example" : ".env.example",
+  example: ".env.example",
 });
 
 /**

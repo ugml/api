@@ -22,9 +22,11 @@ RUN npm install --global gulp-cli
 
 RUN npm install --global pm2
 
-RUN npm install --production
+RUN npm install
 
 RUN npm run build
+
+RUN npm prune --production
 
 EXPOSE 3000
 

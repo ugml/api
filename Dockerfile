@@ -29,4 +29,6 @@ RUN npm run build
 
 EXPOSE 3000
 
+RUN ls -la
+
 CMD ["pm2-runtime", "/srv/www/api/dist/index.js", "&"]

@@ -9,7 +9,10 @@ RUN apk --no-cache add --virtual native-deps \
 
 WORKDIR /srv/www/api/
 
-RUN git clone https://github.com/ugml/api.git .
+COPY src/ .
+COPY package.json .
+COPY tsconfig.json .
+COPY gulpfile.js .
 
 RUN npm i -g npm
 

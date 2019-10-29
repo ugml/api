@@ -29,7 +29,7 @@ RUN npm run build
 RUN npm prune --production
 
 # https://github.com/tj/node-prune
-RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | sh; node-prune
+RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | sh; ./bin/node-prune
 
 EXPOSE 3000
 

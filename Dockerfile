@@ -9,7 +9,7 @@ RUN apk --no-cache add --virtual native-deps \
 
 WORKDIR /srv/www/api/
 
-COPY src/ .
+COPY src/ src/
 COPY package.json .
 COPY tsconfig.json .
 COPY gulpfile.js .
@@ -27,6 +27,9 @@ RUN npm install
 RUN npm run build
 
 RUN npm prune --production
+
+# https://github.com/tj/node-prune
+RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | sh; node-prune
 
 EXPOSE 3000
 

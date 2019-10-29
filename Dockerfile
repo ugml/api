@@ -4,7 +4,7 @@ LABEL maintainer="docker@ugamela.org"
 RUN apk update
 
 RUN apk --no-cache add --virtual native-deps \
-  g++ gcc libgcc libstdc++ linux-headers autoconf automake make nasm python git && \
+  g++ gcc libgcc libstdc++ linux-headers curl autoconf automake make nasm python git && \
   npm install --quiet node-gyp -g
 
 WORKDIR /srv/www/api/

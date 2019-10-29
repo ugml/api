@@ -56,7 +56,5 @@ jobs:
       #if: branch = master
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker build -t travis-ci-build-stages-demo .
-        - docker images
-        - docker tag travis-ci-build-stages-demo $DOCKER_USERNAME/api
-        - docker push $DOCKER_USERNAME/api
+        - docker build -t $DOCKER_USERNAME/api:$TRAVIS_BRANCH .
+        - docker push $DOCKER_USERNAME/api:$TRAVIS_BRANCH

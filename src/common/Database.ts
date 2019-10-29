@@ -3,7 +3,7 @@ import Logger from "./Logger";
 import dotenv = require("dotenv-safe");
 
 dotenv.config({
-  example: process.env.CI ? ".env.ci.example" : ".env.example",
+  example: ".env.example",
 });
 
 /**

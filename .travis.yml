@@ -52,6 +52,9 @@ jobs:
       script:
         - gulp doc
         - echo "TODO -> depoy to github pages"
-    - stage: deploy
-      if: branch = master
-      script: echo "TODO"
+    - stage: deploy to docker hub
+      if: type = push AND (branch = master OR branch = development)
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker build -t $DOCKER_USERNAME/api:$TRAVIS_BRANCH .
+        - docker push $DOCKER_USERNAME/api:$TRAVIS_BRANCH

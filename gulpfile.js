@@ -1,6 +1,5 @@
 const gulp = require("gulp");
 const ts = require("gulp-typescript");
-const typedoc = require("gulp-typedoc");
 const nodemon = require("gulp-nodemon");
 const JSON_FILES = ["src/*.json", "src/**/*.json"];
 const TEST_FILES = ["src/**/*.spec.ts", "src/**/*.test.ts"];
@@ -37,7 +36,8 @@ gulp.task("watch", done => {
 });
 
 gulp.task("doc", function() {
-  return gulp.src(["src/**/*.ts"]).pipe(
+  const typedoc = require("gulp-typedoc");
+  return gulp.src(SOURCE_FILES).pipe(
     typedoc({
       module: "commonjs",
       target: "es6",

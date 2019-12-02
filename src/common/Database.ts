@@ -4,6 +4,7 @@ import dotenv = require("dotenv-safe");
 
 dotenv.config({
   example: ".env.example",
+  allowEmptyValues: true,
 });
 
 /**

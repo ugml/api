@@ -20,7 +20,7 @@ import Logger from "../common/Logger";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 /**
  * Defines routes for user-data
@@ -49,6 +49,7 @@ export default class UsersRouter {
     this.shipService = container.shipService;
     this.techService = container.techService;
 
+
     // /user/create/
     this.router.post("/create", this.createUser);
 
@@ -61,7 +62,7 @@ export default class UsersRouter {
     // /user/planetlist/
     this.router.get("/planetlist/", new PlanetsRouter(container).getAllPlanets);
 
-    // /user/planetlist/:userID
+    // /users/planetlist/:userID
     this.router.get("/planetlist/:userID", new PlanetsRouter(container).getAllPlanetsOfUser);
 
     // /user/currentplanet/set/:planetID

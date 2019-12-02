@@ -6,7 +6,7 @@ import Logger from "../common/Logger";
 import IRequest from "../interfaces/IRequest";
 import IUserService from "../interfaces/IUserService";
 
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 /**
  * Defines routes for authentication

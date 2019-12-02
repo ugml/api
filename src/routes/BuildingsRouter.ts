@@ -16,7 +16,7 @@ import Logger from "../common/Logger";
  * Defines routes for building-data
  */
 export default class BuildingsRouter {
-  public router: IRouter<{}> = newRouter();
+  public router: IRouter = newRouter();
 
   private buildingService: IBuildingService;
   private planetService: IPlanetService;

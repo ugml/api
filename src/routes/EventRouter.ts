@@ -46,64 +46,6 @@ export default class EventRouter {
   }
 
   /**
-   * Returns the ID of the destination-type
-   * @param type The type as a string (planet, moon or debris)
-   */
-  private getDestinationTypeByName(type: string): number {
-    let typeID: number;
-    switch (type) {
-      case "planet":
-        typeID = 1;
-        break;
-      case "moon":
-        typeID = 2;
-        break;
-      case "debris":
-        typeID = 3;
-    }
-
-    return typeID;
-  }
-
-  /**
-   * Returns the ID of the mission-type
-   * @param mission The type as a string (transport, attack, ...)
-   */
-  private getMissionTypeID(mission: string): number {
-    let missionTypeID: number;
-    switch (mission) {
-      case "transport":
-        missionTypeID = 0;
-        break;
-      case "deploy":
-        missionTypeID = 1;
-        break;
-      case "attack":
-        missionTypeID = 2;
-        break;
-      case "acs":
-        missionTypeID = 3;
-        break;
-      case "hold":
-        missionTypeID = 4;
-        break;
-      case "colonize":
-        missionTypeID = 5;
-        break;
-      case "harvest":
-        missionTypeID = 6;
-        break;
-      case "espionage":
-        missionTypeID = 7;
-        break;
-      case "destroy":
-        missionTypeID = 8;
-    }
-
-    return missionTypeID;
-  }
-
-  /**
    * Creates a new event
    * @param request
    * @param response
@@ -201,7 +143,7 @@ export default class EventRouter {
       slowestShipSpeed,
     );
 
-    let event: Event = new Event();
+    const event: Event = new Event();
 
     event.eventID = 0;
     event.ownerID = eventData.ownerID;
@@ -281,4 +223,62 @@ export default class EventRouter {
       data: {},
     });
   };
+
+  /**
+   * Returns the ID of the destination-type
+   * @param type The type as a string (planet, moon or debris)
+   */
+  private getDestinationTypeByName(type: string): number {
+    let typeID: number;
+    switch (type) {
+      case "planet":
+        typeID = 1;
+        break;
+      case "moon":
+        typeID = 2;
+        break;
+      case "debris":
+        typeID = 3;
+    }
+
+    return typeID;
+  }
+
+  /**
+   * Returns the ID of the mission-type
+   * @param mission The type as a string (transport, attack, ...)
+   */
+  private getMissionTypeID(mission: string): number {
+    let missionTypeID: number;
+    switch (mission) {
+      case "transport":
+        missionTypeID = 0;
+        break;
+      case "deploy":
+        missionTypeID = 1;
+        break;
+      case "attack":
+        missionTypeID = 2;
+        break;
+      case "acs":
+        missionTypeID = 3;
+        break;
+      case "hold":
+        missionTypeID = 4;
+        break;
+      case "colonize":
+        missionTypeID = 5;
+        break;
+      case "harvest":
+        missionTypeID = 6;
+        break;
+      case "espionage":
+        missionTypeID = 7;
+        break;
+      case "destroy":
+        missionTypeID = 8;
+    }
+
+    return missionTypeID;
+  }
 }

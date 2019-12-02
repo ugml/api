@@ -49,7 +49,6 @@ export default class UsersRouter {
     this.shipService = container.shipService;
     this.techService = container.techService;
 
-
     // /user/create/
     this.router.post("/create", this.createUser);
 

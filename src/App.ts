@@ -24,6 +24,7 @@ import dotenv = require("dotenv-safe");
 
 dotenv.config({
   example: ".env.example",
+  allowEmptyValues: true,
 });
 
 const expressip = require("express-ip");
@@ -203,7 +204,7 @@ export default class App {
 
     this.register("/v1/planet", new PlanetRouter(this.container).router);
 
-    this.register("/v1/planets", new PlanetRouter(this.container).router);
+    // this.register("/v1/planets", new PlanetRouter(this.container).router);
 
     this.register("/v1/buildings", new BuildingRouter(this.container).router);
 

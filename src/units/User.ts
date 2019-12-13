@@ -1,5 +1,6 @@
 import InputValidator from "../common/InputValidator";
 import IUnits from "../interfaces/IUnits";
+import {Globals} from "../common/Globals";
 
 /**
  * Represents a user-row in the database
@@ -81,11 +82,11 @@ export default class User implements IUnits {
       return false;
     }
 
-    if (!InputValidator.isSet(this.b_tech_id) || this.b_tech_id <= 0) {
+    if (!InputValidator.isSet(this.b_tech_id) || this.b_tech_id < 0 || this.b_tech_id > Globals.MAX_TECHNOLOGY_ID) {
       return false;
     }
 
-    if (!InputValidator.isSet(this.b_tech_endtime) || this.b_tech_endtime <= 0) {
+    if (!InputValidator.isSet(this.b_tech_endtime) || this.b_tech_endtime < 0) {
       return false;
     }
 

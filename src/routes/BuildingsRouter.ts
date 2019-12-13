@@ -18,7 +18,7 @@ import IUserService from "../interfaces/IUserService";
  * Defines routes for building-data
  */
 export default class BuildingsRouter {
-  public router: IRouter<BuildingsRouter> = newRouter();
+  public router: IRouter = newRouter();
 
   private buildingService: IBuildingService;
   private planetService: IPlanetService;

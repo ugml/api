@@ -29,7 +29,7 @@ jobs:
       script: echo "I am disabled"
     - &build
       stage: build
-      script: tsc --project tsconfig.json
+      script: npm run-script build
       node_js: '8'
     - <<: *build
       node_js: '10'

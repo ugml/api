@@ -10,7 +10,7 @@ import IUserService from "../interfaces/IUserService";
  * Defines routes for message-sending and receiving
  */
 export default class MessagesRouter {
-  public router: IRouter<MessagesRouter> = newRouter();
+  public router: IRouter = newRouter();
 
   private userService: IUserService;
   private messageService: IMessageService;

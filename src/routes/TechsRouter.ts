@@ -19,7 +19,7 @@ import IUserService from "../interfaces/IUserService";
  * Defines routes for technology-data
  */
 export default class TechsRouter {
-  public router: IRouter<TechsRouter> = newRouter();
+  public router: IRouter = newRouter();
 
   private userService: IUserService;
   private planetService: IPlanetService;

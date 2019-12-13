@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import SerializationHelper from "../common/SerializationHelper";
 import User from "./User";
-import {Globals} from "../common/Globals";
+import { Globals } from "../common/Globals";
 
 const assert = chai.assert;
 

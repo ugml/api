@@ -17,7 +17,7 @@ import * as core from "express-serve-static-core";
  * Defines routes for ships-data
  */
 export default class ShipsRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

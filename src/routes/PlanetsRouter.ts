@@ -11,7 +11,7 @@ import * as core from "express-serve-static-core";
  * Defines routes for planet-data
  */
 export default class PlanetsRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
 

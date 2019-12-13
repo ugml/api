@@ -27,7 +27,7 @@ const bcrypt = require("bcryptjs");
  * Defines routes for user-data
  */
 export default class UsersRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private userService: IUserService;
   private galaxyService: IGalaxyService;

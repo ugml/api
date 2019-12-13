@@ -29,7 +29,7 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
  * Defines routes for event-creation and cancellation
  */
 export default class EventRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
   private eventService: IEventService;

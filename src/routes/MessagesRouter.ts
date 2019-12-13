@@ -11,7 +11,7 @@ import * as core from "express-serve-static-core";
  * Defines routes for message-sending and receiving
  */
 export default class MessagesRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private userService: IUserService;
   private messageService: IMessageService;

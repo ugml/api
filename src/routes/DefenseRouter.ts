@@ -18,7 +18,7 @@ import * as core from "express-serve-static-core";
  * Defines routes for defense-data
  */
 export default class DefenseRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

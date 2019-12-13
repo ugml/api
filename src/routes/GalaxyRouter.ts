@@ -10,7 +10,7 @@ import * as core from "express-serve-static-core";
  * Defines routes for galaxy-data
  */
 export default class GalaxyRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private galaxyService: IGalaxyService;
 

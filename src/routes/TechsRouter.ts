@@ -20,7 +20,7 @@ import * as core from "express-serve-static-core";
  * Defines routes for technology-data
  */
 export default class TechsRouter {
-  public router: IRouter<core.Router> = newRouter();
+  public router: IRouter = newRouter();
 
   private userService: IUserService;
   private planetService: IPlanetService;

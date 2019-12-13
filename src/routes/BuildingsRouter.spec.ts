@@ -4,6 +4,7 @@ import chaiHttp = require("chai-http");
 import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
+import User from "../units/User";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -392,13 +393,12 @@ describe("buildingsRoute", () => {
       const planetID = 167546850;
 
       const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const user: User = await container.userService.getAuthenticatedUser(planet.ownerID);
 
-      const valueBefore = planet.b_tech_endtime;
+      const valueBefore = user.b_tech_endtime;
 
-      planet.b_tech_endtime = 1;
-      planet.b_tech_id = 109;
-
-      await container.planetService.updatePlanet(planet);
+      user.b_tech_endtime = 1;
+      user.b_tech_id = 109;
 
       return request
         .post("/v1/buildings/build")
@@ -410,8 +410,9 @@ describe("buildingsRoute", () => {
           expect(res.body.data).to.be.eql({});
 
           // reset planet
-          planet.b_tech_endtime = valueBefore;
+          user.b_tech_endtime = valueBefore;
           await container.planetService.updatePlanet(planet);
+          await container.userService.updateUserData(user);
         });
     });
 

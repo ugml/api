@@ -17,7 +17,7 @@ import Planet from "../units/Planet";
  * Defines routes for defense-data
  */
 export default class DefenseRouter {
-  public router: IRouter<{}> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

@@ -17,7 +17,7 @@ import Techs from "../units/Techs";
  * Defines routes for technology-data
  */
 export default class TechsRouter {
-  public router: IRouter<{}> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

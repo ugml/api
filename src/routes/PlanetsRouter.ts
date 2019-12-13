@@ -10,7 +10,7 @@ import Planet from "../units/Planet";
  * Defines routes for planet-data
  */
 export default class PlanetsRouter {
-  public router: IRouter<{}> = newRouter();
+  public router: IRouter = newRouter();
 
   private planetService: IPlanetService;
 

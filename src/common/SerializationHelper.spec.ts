@@ -5,7 +5,7 @@ import SerializationHelper from "./SerializationHelper";
 
 const expect = chai.expect;
 
-describe("Redis", function() {
+describe("SerializationHelper", function() {
   it("Should create a new object of type user", function() {
     const data = {
       userID: 1,
@@ -14,6 +14,8 @@ describe("Redis", function() {
       email: "hello@world.com",
       last_time_online: 42,
       current_planet: 1,
+      b_tech_id: 0,
+      b_tech_endtime: 0,
     };
     const result: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 

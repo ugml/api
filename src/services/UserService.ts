@@ -167,6 +167,14 @@ export default class UserService implements IUserService {
       query = query.set("current_planet", user.current_planet);
     }
 
+    if (typeof user.b_tech_id !== "undefined") {
+      query = query.set("b_tech_id", user.b_tech_id);
+    }
+
+    if (typeof user.b_tech_endtime !== "undefined") {
+      query = query.set("b_tech_endtime", user.b_tech_endtime);
+    }
+
     query = query.where("userID = ?", user.userID);
 
     if (connection === null) {

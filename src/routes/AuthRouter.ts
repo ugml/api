@@ -12,7 +12,7 @@ const bcrypt = require("bcryptjs");
  * Defines routes for authentication
  */
 export default class AuthRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<AuthRouter> = newRouter();
 
   private userService: IUserService;
 

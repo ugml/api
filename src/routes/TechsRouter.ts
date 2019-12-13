@@ -12,13 +12,16 @@ import ITechService from "../interfaces/ITechService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import Techs from "../units/Techs";
+import User from "../units/User";
+import IUserService from "../interfaces/IUserService";
 
 /**
  * Defines routes for technology-data
  */
 export default class TechsRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<TechsRouter> = newRouter();
 
+  private userService: IUserService;
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
   private techService: ITechService;
@@ -28,6 +31,7 @@ export default class TechsRouter {
    * @param container the IoC-container with registered services
    */
   public constructor(container) {
+    this.userService = container.userService;
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
     this.techService = container.techService;
@@ -86,6 +90,7 @@ export default class TechsRouter {
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const techs: Techs = await this.techService.getTechs(userID);
+      const user: User = await this.userService.getAuthenticatedUser(userID);
 
       // player does not own the planet
       if (!InputValidator.isSet(planet)) {
@@ -97,7 +102,7 @@ export default class TechsRouter {
       }
 
       // 1. check if there is already a build-job on the planet
-      if (planet.b_tech_id === 0 && planet.b_tech_endtime === 0) {
+      if (user.b_tech_id === 0 && user.b_tech_endtime === 0) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Planet has no build-job",
@@ -105,19 +110,20 @@ export default class TechsRouter {
         });
       }
 
-      const techKey = Config.getMappings()[planet.b_tech_id];
+      const techKey = Config.getMappings()[user.b_tech_id];
 
       const currentLevel = techs[techKey];
 
-      const cost: ICosts = Calculations.getCosts(planet.b_tech_id, currentLevel);
+      const cost: ICosts = Calculations.getCosts(user.b_tech_id, currentLevel);
 
       planet.metal += cost.metal;
       planet.crystal += cost.crystal;
       planet.deuterium += cost.deuterium;
-      planet.b_tech_id = 0;
-      planet.b_tech_endtime = 0;
+      user.b_tech_id = 0;
+      user.b_tech_endtime = 0;
 
       await this.planetService.updatePlanet(planet);
+      await this.userService.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -171,6 +177,7 @@ export default class TechsRouter {
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
       const techs: Techs = await this.techService.getTechs(userID);
+      const user: User = await this.userService.getAuthenticatedUser(userID);
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -189,7 +196,7 @@ export default class TechsRouter {
       }
 
       // 1. check if there is already a build-job on the planet
-      if (planet.isResearching()) {
+      if (user.isResearching()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           status: Globals.Statuscode.BAD_REQUEST,
           message: "Planet already has a build-job",
@@ -269,10 +276,11 @@ export default class TechsRouter {
       planet.metal = planet.metal - cost.metal;
       planet.crystal = planet.crystal - cost.crystal;
       planet.deuterium = planet.deuterium - cost.deuterium;
-      planet.b_tech_id = techID;
-      planet.b_tech_endtime = endTime;
+      user.b_tech_id = techID;
+      user.b_tech_endtime = endTime;
 
       await this.planetService.updatePlanet(planet);
+      await this.userService.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,

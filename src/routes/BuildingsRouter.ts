@@ -11,15 +11,18 @@ import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import ICosts from "../interfaces/ICosts";
 import Logger from "../common/Logger";
+import User from "../units/User";
+import IUserService from "../interfaces/IUserService";
 
 /**
  * Defines routes for building-data
  */
 export default class BuildingsRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<BuildingsRouter> = newRouter();
 
   private buildingService: IBuildingService;
   private planetService: IPlanetService;
+  private userService: IUserService;
 
   /**
    * Registers the routes and needed services
@@ -28,6 +31,7 @@ export default class BuildingsRouter {
   public constructor(container) {
     this.buildingService = container.buildingService;
     this.planetService = container.planetService;
+    this.userService = container.userService;
 
     this.router.post("/build", this.startBuilding);
     this.router.post("/cancel", this.cancelBuilding);
@@ -175,6 +179,7 @@ export default class BuildingsRouter {
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const user: User = await this.userService.getAuthenticatedUser(userID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -209,7 +214,7 @@ export default class BuildingsRouter {
       }
 
       // can't build research lab while they are researching... poor scientists :(
-      if (buildingID === Globals.Buildings.RESEARCH_LAB && planet.isResearching()) {
+      if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Can't build this building while it is in use",

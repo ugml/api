@@ -130,14 +130,6 @@ export default class PlanetService implements IPlanetService {
         query = query.set("b_building_demolition", planet.b_building_demolition);
       }
 
-      if (typeof planet.b_tech_id !== "undefined") {
-        query = query.set("b_tech_id", planet.b_tech_id);
-      }
-
-      if (typeof planet.b_tech_endtime !== "undefined") {
-        query = query.set("b_tech_endtime", planet.b_tech_endtime);
-      }
-
       if (typeof planet.b_hangar_queue !== "undefined") {
         query = query.set("b_hangar_queue", planet.b_hangar_queue);
       }

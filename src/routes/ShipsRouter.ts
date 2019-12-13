@@ -16,7 +16,7 @@ import Planet from "../units/Planet";
  * Defines routes for ships-data
  */
 export default class ShipsRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<ShipsRouter> = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

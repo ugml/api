@@ -36,6 +36,24 @@ export default class User implements IUnits {
   public current_planet: number;
 
   /**
+   * The ID of the technology which is currently being researched.
+   * This value is 0 if no technology is currently being researched.
+   */
+  public b_tech_id: number;
+
+  /**
+   * The time, at which the research will be completed
+   */
+  public b_tech_endtime: number;
+
+  /**
+   *  Checks, if the planet is currently researching
+   */
+  public isResearching(): boolean {
+    return this.b_tech_id > 0 && this.b_tech_endtime > 0;
+  }
+
+  /**
    * Returns, if the contains valid data or not
    */
   public isValid(): boolean {
@@ -60,6 +78,14 @@ export default class User implements IUnits {
     }
 
     if (!InputValidator.isSet(this.current_planet) || this.current_planet <= 0) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.b_tech_id) || this.b_tech_id <= 0) {
+      return false;
+    }
+
+    if (!InputValidator.isSet(this.b_tech_endtime) || this.b_tech_endtime <= 0) {
       return false;
     }
 

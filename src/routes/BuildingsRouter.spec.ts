@@ -395,10 +395,13 @@ describe("buildingsRoute", () => {
       const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
       const user: User = await container.userService.getAuthenticatedUser(planet.ownerID);
 
-      const valueBefore = user.b_tech_endtime;
+      const techIDold = user.b_tech_id;
+      const endtime = user.b_tech_endtime;
 
       user.b_tech_endtime = 1;
       user.b_tech_id = 109;
+
+      await container.userService.updateUserData(user);
 
       return request
         .post("/v1/buildings/build")
@@ -409,9 +412,9 @@ describe("buildingsRoute", () => {
           expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
           expect(res.body.data).to.be.eql({});
 
-          // reset planet
-          user.b_tech_endtime = valueBefore;
-          await container.planetService.updatePlanet(planet);
+          user.b_tech_endtime = techIDold;
+          user.b_tech_id = endtime;
+
           await container.userService.updateUserData(user);
         });
     });

@@ -13,6 +13,7 @@ import squel = require("safe-squel");
 import Logger from "../common/Logger";
 import EventService from "../services/EventService";
 import Event from "../units/Event";
+import * as core from "express-serve-static-core";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
@@ -28,7 +29,7 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
  * Defines routes for event-creation and cancellation
  */
 export default class EventRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<core.Router> = newRouter();
 
   private planetService: IPlanetService;
   private eventService: IEventService;

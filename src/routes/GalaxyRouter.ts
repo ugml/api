@@ -4,12 +4,13 @@ import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import Logger from "../common/Logger";
 import IGalaxyService from "../interfaces/IGalaxyService";
+import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for galaxy-data
  */
 export default class GalaxyRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<core.Router> = newRouter();
 
   private galaxyService: IGalaxyService;
 

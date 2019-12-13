@@ -5,12 +5,13 @@ import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import Logger from "../common/Logger";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
+import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for planet-data
  */
 export default class PlanetsRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<core.Router> = newRouter();
 
   private planetService: IPlanetService;
 

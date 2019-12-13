@@ -12,12 +12,13 @@ import IPlanetService from "../interfaces/IPlanetService";
 import Buildings from "../units/Buildings";
 import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
+import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for defense-data
  */
 export default class DefenseRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<core.Router> = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

@@ -5,6 +5,7 @@ import JwtHelper from "../common/JwtHelper";
 import Logger from "../common/Logger";
 import IRequest from "../interfaces/IRequest";
 import IUserService from "../interfaces/IUserService";
+import * as core from "express-serve-static-core";
 
 const bcrypt = require("bcryptjs");
 
@@ -12,7 +13,7 @@ const bcrypt = require("bcryptjs");
  * Defines routes for authentication
  */
 export default class AuthRouter {
-  public router: IRouter = newRouter();
+  public router: IRouter<core.Router> = newRouter();
 
   private userService: IUserService;
 

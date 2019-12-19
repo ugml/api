@@ -218,7 +218,7 @@ export default class TechsRouter {
       // }
 
       // 2. check, if requirements are met
-      const requirements = Config.getRequirements()[techID];
+      const requirements = Config.getRequirements().find(r => r.unitID === techID);
 
       // building has requirements
       if (requirements !== undefined) {

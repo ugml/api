@@ -223,7 +223,7 @@ export default class BuildingsRouter {
       }
 
       // 2. check, if requirements are met
-      const requirements = Config.getRequirements()[buildingID];
+      const requirements = Config.getRequirements().find(r => r.unitID === buildingID);
 
       // TODO: move to seperate file
       // building has requirements

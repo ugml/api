@@ -64,15 +64,15 @@ export default class Calculations {
     let costs: IPricelist;
 
     if (InputValidator.isValidBuildingId(unitID)) {
-      costs = Config.getBuildings()[unitID];
+      costs = Config.getBuildings().find(r => r.unitID === unitID).costs;
     } else if (InputValidator.isValidShipId(unitID)) {
-      costs = Config.getShips()[unitID];
+      costs = Config.getShips().find(r => r.unitID === unitID).costs;
       currentLevel = 1;
     } else if (InputValidator.isValidDefenseId(unitID)) {
-      costs = Config.getDefenses()[unitID];
+      costs = Config.getDefenses().find(r => r.unitID === unitID).costs;
       currentLevel = 1;
     } else if (InputValidator.isValidTechnologyId(unitID)) {
-      costs = Config.getTechnologies()[unitID];
+      costs = Config.getTechnologies().find(r => r.unitID === unitID).costs;
     } else {
       return null;
     }
@@ -142,8 +142,9 @@ export default class Calculations {
     let minimum: number = Number.MAX_VALUE;
 
     for (const ship in units) {
-      if (units[ship] > 0 && unitData.units.ships[ship].speed < minimum) {
-        minimum = unitData.units.ships[ship].speed;
+      const speed = unitData.units.ships.find(r => r.unitID === Number(ship)).stats.speed;
+      if (units[ship] > 0 && speed < minimum) {
+        minimum = speed;
       }
     }
 

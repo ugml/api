@@ -31,7 +31,7 @@ describe("shipsRouter", () => {
   });
 
   after(async () => {
-    // await container.planetService.updatePlanet(planetBeforeTests);
+    await container.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {

@@ -13,7 +13,6 @@ import squel = require("safe-squel");
 import Logger from "../common/Logger";
 import EventService from "../services/EventService";
 import Event from "../units/Event";
-import * as core from "express-serve-static-core";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();

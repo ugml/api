@@ -11,7 +11,7 @@ import IPlanetService from "../interfaces/IPlanetService";
 import IShipService from "../interfaces/IShipService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
-import * as core from "express-serve-static-core";
+import QueueItem from "../common/QueueItem";
 
 /**
  * Defines routes for ships-data
@@ -110,8 +110,6 @@ export default class ShipsRouter {
 
       const queue: Queue = new Queue();
 
-      queue.setPlanetID(planetID);
-
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
@@ -189,7 +187,7 @@ export default class ShipsRouter {
             buildings.nanite_factory,
           ) * Math.floor(count);
 
-        queue.getQueue().set(item, Math.floor(count));
+        queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
 
         metal -= cost.metal * count;
         crystal -= cost.crystal * count;

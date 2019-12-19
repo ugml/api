@@ -13,7 +13,6 @@ import ICosts from "../interfaces/ICosts";
 import Logger from "../common/Logger";
 import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
-import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for building-data

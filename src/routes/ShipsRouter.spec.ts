@@ -31,7 +31,7 @@ describe("shipsRouter", () => {
   });
 
   after(async () => {
-    await container.planetService.updatePlanet(planetBeforeTests);
+    // await container.planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -170,14 +170,13 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: '{ "201": 3000 }' })
+      .send({ planetID, buildOrder: '{ "201": 4 }' })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.planetID).to.be.equals(planetID);
         const buildOrders = JSON.parse(res.body.data.b_hangar_queue);
         expect(buildOrders.length).to.be.equals(1);
-        expect(buildOrders[0].planetID).to.be.equals(planetID);
       });
     /* eslint-enable quotes */
   });

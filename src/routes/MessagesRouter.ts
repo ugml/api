@@ -5,7 +5,6 @@ import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import Logger from "../common/Logger";
 import IMessageService from "../interfaces/IMessageService";
 import IUserService from "../interfaces/IUserService";
-import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for message-sending and receiving

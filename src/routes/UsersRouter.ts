@@ -19,7 +19,6 @@ import PlanetsRouter from "./PlanetsRouter";
 import Logger from "../common/Logger";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
-import * as core from "express-serve-static-core";
 
 const bcrypt = require("bcryptjs");
 

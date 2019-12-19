@@ -5,7 +5,6 @@ import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import Logger from "../common/Logger";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
-import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for planet-data

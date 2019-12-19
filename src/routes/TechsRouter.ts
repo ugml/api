@@ -14,7 +14,6 @@ import Planet from "../units/Planet";
 import Techs from "../units/Techs";
 import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
-import * as core from "express-serve-static-core";
 
 /**
  * Defines routes for technology-data

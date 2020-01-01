@@ -109,7 +109,7 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^3.0.7",
     "body-parser": "^1.18.3",
     "debug": "^4.1.0",
     "dotenv-safe": "^6.1.0",

@@ -3,6 +3,7 @@ import Config from "../common/Config";
 import Database from "../common/Database";
 import DuplicateRecordException from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
+import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/IBuildingService";
@@ -19,8 +20,6 @@ import PlanetsRouter from "./PlanetsRouter";
 import Logger from "../common/Logger";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
-
-const bcrypt = require("bcryptjs");
 
 /**
  * Defines routes for user-data
@@ -171,7 +170,7 @@ export default class UsersRouter {
     const password: string = InputValidator.sanitizeString(request.body.password);
     const email: string = InputValidator.sanitizeString(request.body.email);
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = await Encryption.hash(password);
 
     const connection = await Database.getConnectionPool().getConnection();
 
@@ -365,7 +364,7 @@ export default class UsersRouter {
       if (InputValidator.isSet(request.body.password)) {
         const password = InputValidator.sanitizeString(request.body.password);
 
-        user.password = bcrypt.hashSync(password, 10);
+        user.password = await Encryption.hash(password);
       }
 
       if (InputValidator.isSet(request.body.email)) {

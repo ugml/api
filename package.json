@@ -104,6 +104,9 @@
     "typescript": "^3.7.3",
     "typedoc": "^0.14.2"
   },
+  "optionalDependencies": {
+    "bcrypt": "^3.0.7"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",

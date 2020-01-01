@@ -1,12 +1,11 @@
-import { NextFunction, Response, Router as newRouter, IRouter, Request } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
+import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
 import JwtHelper from "../common/JwtHelper";
 import Logger from "../common/Logger";
 import IRequest from "../interfaces/IRequest";
 import IUserService from "../interfaces/IUserService";
-
-const bcrypt = require("bcryptjs");
 
 /**
  * Defines routes for authentication
@@ -56,7 +55,7 @@ export default class AuthRouter {
         });
       }
 
-      const isValidPassword = await bcrypt.compare(password, data.password);
+      const isValidPassword = await Encryption.compare(password, data.password);
 
       if (!isValidPassword) {
         return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({

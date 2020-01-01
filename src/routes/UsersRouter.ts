@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Request, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Request, Response, Router as newRouter, Router } from "express";
 import Config from "../common/Config";
 import Database from "../common/Database";
 import DuplicateRecordException from "../exceptions/DuplicateRecordException";
@@ -26,7 +26,7 @@ const bcrypt = require("bcryptjs");
  * Defines routes for user-data
  */
 export default class UsersRouter {
-  public router: IRouter = newRouter();
+  public router = newRouter();
 
   private userService: IUserService;
   private galaxyService: IGalaxyService;

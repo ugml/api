@@ -139,8 +139,7 @@ export default class ShipsRouter {
       // TODO: put into seperate funciton (also reference this in defense-router)
       for (const item in buildOrders) {
         if (!buildOrders.hasOwnProperty(item)) {
-          // TODO: throw a meaningful error
-          throw Error();
+          continue;
         }
 
         let count: number = buildOrders[item];

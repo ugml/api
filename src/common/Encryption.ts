@@ -3,6 +3,7 @@ let bcrypt;
 try {
   bcrypt = require("bcrypt");
 } catch (e) {
+  // tslint:disable-next-line: no-console
   console.log("Warning falling back to bcryptjs");
   bcrypt = require("bcryptjs");
 }

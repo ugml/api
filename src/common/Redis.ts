@@ -1,10 +1,7 @@
 const redis = require("redis"); // typescript throws errors if do es6 import
-import dotenv = require("dotenv-safe");
+import dotenv = require("dotenv");
 
-dotenv.config({
-  example: ".env.example",
-  allowEmptyValues: true,
-});
+dotenv.config();
 
 /**
  * Manages the connection to the redis-database

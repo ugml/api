@@ -20,12 +20,9 @@ import PlanetRouter from "./routes/PlanetsRouter";
 import UsersRouter from "./routes/UsersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
-import dotenv = require("dotenv-safe");
+import dotenv = require("dotenv");
 
-dotenv.config({
-  example: ".env.example",
-  allowEmptyValues: true,
-});
+dotenv.config();
 
 const expressip = require("express-ip");
 const helmet = require("helmet");

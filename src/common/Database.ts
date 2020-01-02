@@ -1,11 +1,8 @@
 import mysql = require("mysql2/promise");
 import Logger from "./Logger";
-import dotenv = require("dotenv-safe");
+import dotenv = require("dotenv");
 
-dotenv.config({
-  example: ".env.example",
-  allowEmptyValues: true,
-});
+dotenv.config();
 
 /**
  * Manages the connection to the (mysql/mariaDB)-database

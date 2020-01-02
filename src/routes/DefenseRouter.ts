@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
@@ -18,7 +18,7 @@ import QueueItem from "../common/QueueItem";
  * Defines routes for defense-data
  */
 export default class DefenseRouter {
-  public router: IRouter = newRouter();
+  public router = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;

@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -19,7 +19,7 @@ import IUserService from "../interfaces/IUserService";
  * Defines routes for technology-data
  */
 export default class TechsRouter {
-  public router: IRouter = newRouter();
+  public router = newRouter();
 
   private userService: IUserService;
   private planetService: IPlanetService;

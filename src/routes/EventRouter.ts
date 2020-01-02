@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import Database from "../common/Database";
@@ -28,7 +28,7 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
  * Defines routes for event-creation and cancellation
  */
 export default class EventRouter {
-  public router: IRouter = newRouter();
+  public router = newRouter();
 
   private planetService: IPlanetService;
   private eventService: IEventService;

@@ -9,7 +9,7 @@ import IGalaxyService from "../interfaces/IGalaxyService";
  * Defines routes for galaxy-data
  */
 export default class GalaxyRouter {
-  public router: IRouter = newRouter();
+  public router = newRouter();
 
   private galaxyService: IGalaxyService;
 

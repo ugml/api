@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -18,7 +18,7 @@ import IUserService from "../interfaces/IUserService";
  * Defines routes for building-data
  */
 export default class BuildingsRouter {
-  public router: IRouter = newRouter();
+  public router = newRouter();
 
   private buildingService: IBuildingService;
   private planetService: IPlanetService;

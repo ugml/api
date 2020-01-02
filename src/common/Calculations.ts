@@ -142,6 +142,9 @@ export default class Calculations {
     let minimum: number = Number.MAX_VALUE;
 
     for (const ship in units) {
+      if (!units.hasOwnProperty(ship)) {
+        continue;
+      }
       const speed = unitData.units.ships.find(r => r.unitID === Number(ship)).stats.speed;
       if (units[ship] > 0 && speed < minimum) {
         minimum = speed;

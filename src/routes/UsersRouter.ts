@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Request, Response, Router as newRouter } from "express";
 import Config from "../common/Config";
 import Database from "../common/Database";
 import DuplicateRecordException from "../exceptions/DuplicateRecordException";

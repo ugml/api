@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import Database from "../common/Database";

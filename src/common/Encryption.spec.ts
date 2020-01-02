@@ -10,7 +10,7 @@ describe("Encryption, a simple bcrypt wrapper", function() {
   it("hashes", async () => {
     const hash = await Encryption.hash(PW);
     // start of the hash encodes format
-    expect(hash.slice(0, 7)).to.equal("$2b$10$");
+    expect(hash.slice(0, 7)).oneOf(["$2a$10$", "$2b$10$", "$2y$10$"]);
   });
 
   it("compare against hashes (different)", async () => {

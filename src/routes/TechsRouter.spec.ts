@@ -143,6 +143,7 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     const planetBackup: Planet = await container.planetService.getPlanet(1, planetID, true);
+  
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
     planet.b_building_id = Globals.Buildings.RESEARCH_LAB;

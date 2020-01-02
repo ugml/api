@@ -19,7 +19,7 @@ export default class Config {
    * Returns all configured requirements for all units
    */
   public static getRequirements() {
-    return require("../config/units.json").requirements;
+    return require("../config/units.json").units.requirements;
   }
 
   /**

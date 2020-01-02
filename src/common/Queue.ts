@@ -1,13 +1,9 @@
+import QueueItem from "./QueueItem";
+
 /**
  * This class represents a Queue.
- * A Queue is part of a build-queue.
  */
 export default class Queue {
-  /**
-   * The planetID, on which the queue will be processed
-   */
-  private planetID: number = -1;
-
   /**
    * The last time, the queue was updated
    */
@@ -21,29 +17,7 @@ export default class Queue {
   /**
    * The queue itself
    */
-  private queue: Map<string, number>;
-
-  /**
-   * Creates a new Queue-instance
-   */
-  public constructor() {
-    this.queue = new Map<string, number>();
-  }
-
-  /**
-   * Sets the planetID
-   * @param planetID
-   */
-  public setPlanetID(planetID: number) {
-    this.planetID = planetID;
-  }
-
-  /**
-   * Returns the planetID
-   */
-  public getPlanetID(): number {
-    return this.planetID;
-  }
+  private queue: QueueItem[] = [];
 
   /**
    * Sets the last time, the queue was updated
@@ -78,7 +52,7 @@ export default class Queue {
   /**
    * Returns the queue
    */
-  public getQueue(): Map<string, number> {
+  public getQueue(): QueueItem[] {
     return this.queue;
   }
 }

@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -11,15 +11,18 @@ import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import ICosts from "../interfaces/ICosts";
 import Logger from "../common/Logger";
+import User from "../units/User";
+import IUserService from "../interfaces/IUserService";
 
 /**
  * Defines routes for building-data
  */
 export default class BuildingsRouter {
-  public router: IRouter<{}> = newRouter();
+  public router = newRouter();
 
   private buildingService: IBuildingService;
   private planetService: IPlanetService;
+  private userService: IUserService;
 
   /**
    * Registers the routes and needed services
@@ -28,10 +31,12 @@ export default class BuildingsRouter {
   public constructor(container) {
     this.buildingService = container.buildingService;
     this.planetService = container.planetService;
+    this.userService = container.userService;
 
-    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
     this.router.post("/build", this.startBuilding);
     this.router.post("/cancel", this.cancelBuilding);
+    this.router.post("/demolish", this.demolishBuilding);
+    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
   }
 
   /**
@@ -50,8 +55,10 @@ export default class BuildingsRouter {
         });
       }
 
+      const planetID: number = parseInt(request.params.planetID, 10);
+
       // TODO: check if user owns the planet
-      const data = await this.buildingService.getBuildings(request.params.planetID);
+      const data = await this.buildingService.getBuildings(planetID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -172,6 +179,7 @@ export default class BuildingsRouter {
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const user: User = await this.userService.getAuthenticatedUser(userID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -206,7 +214,7 @@ export default class BuildingsRouter {
       }
 
       // can't build research lab while they are researching... poor scientists :(
-      if (buildingID === Globals.Buildings.RESEARCH_LAB && planet.isResearching()) {
+      if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           status: Globals.Statuscode.SUCCESS,
           message: "Can't build this building while it is in use",
@@ -215,7 +223,7 @@ export default class BuildingsRouter {
       }
 
       // 2. check, if requirements are met
-      const requirements = Config.getRequirements()[buildingID];
+      const requirements = Config.getRequirements().find(r => r.unitID === buildingID);
 
       // TODO: move to seperate file
       // building has requirements
@@ -280,6 +288,96 @@ export default class BuildingsRouter {
       planet.deuterium = planet.deuterium - cost.deuterium;
       planet.b_building_id = buildingID;
       planet.b_building_endtime = endTime;
+
+      await this.planetService.updatePlanet(planet);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        status: Globals.Statuscode.SUCCESS,
+        message: "Job started",
+        data: { planet },
+      });
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        message: `There was an error while handling the request: ${error}`,
+        data: {},
+      });
+    }
+  };
+
+  public demolishBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (
+        !InputValidator.isSet(request.body.planetID) ||
+        !InputValidator.isValidInt(request.body.planetID) ||
+        !InputValidator.isSet(request.body.buildingID) ||
+        !InputValidator.isValidInt(request.body.buildingID)
+      ) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+      const buildingID = parseInt(request.body.buildingID, 10);
+
+      if (!InputValidator.isValidBuildingId(buildingID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Invalid parameter",
+          data: {},
+        });
+      }
+
+      if (planet.isUpgradingBuilding()) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "Planet already has a build-job",
+          data: {},
+        });
+      }
+
+      const buildingKey = Config.getMappings()[buildingID];
+      const currentLevel = buildings[buildingKey];
+
+      if (currentLevel === 0) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          status: Globals.Statuscode.BAD_REQUEST,
+          message: "This building can't be demolished",
+          data: {},
+        });
+      }
+
+      const cost = Calculations.getCosts(buildingID, currentLevel - 1);
+
+      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
+        cost.metal,
+        cost.crystal,
+        buildings.robotic_factory,
+        buildings.nanite_factory,
+      );
+
+      const endTime: number = Math.round(+new Date() / 1000) + buildTime;
+
+      planet.b_building_id = buildingID;
+      planet.b_building_endtime = endTime;
+      planet.b_building_demolition = true;
 
       await this.planetService.updatePlanet(planet);
 

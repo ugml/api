@@ -5,7 +5,6 @@ node_modules/
 .node_modules/
 **/.DS_Store
 .env
-package-lock.json
 logs/*
 .nyc_output/
 coverage/

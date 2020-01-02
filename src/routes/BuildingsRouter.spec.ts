@@ -4,6 +4,7 @@ import chaiHttp = require("chai-http");
 import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
+import User from "../units/User";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -392,13 +393,15 @@ describe("buildingsRoute", () => {
       const planetID = 167546850;
 
       const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const user: User = await container.userService.getAuthenticatedUser(planet.ownerID);
 
-      const valueBefore = planet.b_tech_endtime;
+      const techIDold = user.b_tech_id;
+      const endtime = user.b_tech_endtime;
 
-      planet.b_tech_endtime = 1;
-      planet.b_tech_id = 109;
+      user.b_tech_endtime = 1;
+      user.b_tech_id = 109;
 
-      await container.planetService.updatePlanet(planet);
+      await container.userService.updateUserData(user);
 
       return request
         .post("/v1/buildings/build")
@@ -409,9 +412,10 @@ describe("buildingsRoute", () => {
           expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
           expect(res.body.data).to.be.eql({});
 
-          // reset planet
-          planet.b_tech_endtime = valueBefore;
-          await container.planetService.updatePlanet(planet);
+          user.b_tech_endtime = techIDold;
+          user.b_tech_id = endtime;
+
+          await container.userService.updateUserData(user);
         });
     });
 
@@ -454,5 +458,128 @@ describe("buildingsRoute", () => {
           await container.planetService.updatePlanet(planet);
         });
     });
+  });
+
+  it("should fail (missing planetID)", async () => {
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ buildingID: Globals.Buildings.METAL_MINE })
+      .then(async res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (missing buildingID)", async () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}` })
+      .then(async res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (nothing sent)", async () => {
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .then(async res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (invalid buildingID)", async () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, buildingID: 503 })
+      .then(async res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (player does not own planet)", async () => {
+    const planetID = 1234;
+
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
+      .then(async res => {
+        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.data).to.be.eql({});
+      });
+  });
+
+  it("should fail (building has level 0 and can't be demolished)", async () => {
+    const planetID = 167546850;
+
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.MISSILE_SILO })
+      .then(async res => {
+        expect(res.body.message).equals("This building can't be demolished");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+      });
+  });
+
+  it("should start demolition of a building", async () => {
+    const planetID = 167546850;
+
+    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
+      .then(async res => {
+        expect(res.body.message).equals("Job started");
+        expect(res.body.status).equals(Globals.Statuscode.SUCCESS);
+
+        // reset
+        await container.planetService.updatePlanet(planet);
+      });
+  });
+
+  it("should fail (planet has already a build job)", async () => {
+    const planetID = 167546850;
+
+    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+
+    planet.b_building_id = 1;
+    planet.b_building_endtime = 1234;
+    planet.b_building_demolition = true;
+
+    await container.planetService.updatePlanet(planet);
+
+    return request
+      .post("/v1/buildings/demolish")
+      .set("Authorization", authToken)
+      .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
+      .then(async res => {
+        expect(res.body.message).equals("Planet already has a build-job");
+        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+
+        // reset
+        planet.b_building_id = 0;
+        planet.b_building_endtime = 0;
+        planet.b_building_demolition = false;
+        await container.planetService.updatePlanet(planet);
+      });
   });
 });

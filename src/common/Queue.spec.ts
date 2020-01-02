@@ -1,16 +1,11 @@
 import * as chai from "chai";
 import Queue from "./Queue";
+import QueueItem from "./QueueItem";
 
 const assert = chai.assert;
 const expect = chai.expect;
 
 describe("Queue", function() {
-  it("PlanetID should be -1", function() {
-    const queue: Queue = new Queue();
-
-    assert.equal(queue.getPlanetID(), -1);
-  });
-
   it("LastUpdateTime should be 0", function() {
     const queue: Queue = new Queue();
 
@@ -34,17 +29,17 @@ describe("Queue", function() {
   it("Should add value to queue", function() {
     const queue: Queue = new Queue();
 
-    assert.equal(queue.getQueue().size, 0);
+    assert.equal(queue.getQueue().length, 0);
 
-    queue.getQueue().set("testKey", 1);
+    queue.getQueue().push(new QueueItem(201, 1));
 
-    assert.equal(queue.getQueue().size, 1);
-    assert.equal(queue.getQueue().get("testKey"), 1);
+    assert.equal(queue.getQueue().length, 1);
+    assert.equal(queue.getQueue()[0].unitID, 201);
+    assert.equal(queue.getQueue()[0].amount, 1);
   });
 
   it("Queue should be empty", function() {
     const queue: Queue = new Queue();
-    /* eslint-disable no-unused-expressions */
-    expect(queue.getQueue()).to.be.eql({});
+    expect(queue.getQueue()).to.be.eql([]);
   });
 });

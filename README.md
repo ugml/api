@@ -1,9 +1,10 @@
 ![N|Solid](https://ugamela.org/images/logo.png)
 
-[![Travis-ci](https://travis-ci.org/ugml/api.svg?branch=master)](https://travis-ci.org/ugml/api)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ugml/api&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&utm_medium=referral&utm_content=ugml/api&utm_campaign=Badge_Coverage)
-[![Discord Server](https://discordapp.com/api/guilds/339129999082913794/embed.png)](https://discord.gg/YDUHM3k)
+[![Travis (.org)](https://img.shields.io/travis/ugml/api)](https://travis-ci.org/ugml/api)
+[![Codacy grade](https://img.shields.io/codacy/grade/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ugml/api&amp;utm_campaign=Badge_Grade)
+[![Codacy coverage](https://img.shields.io/codacy/coverage/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&utm_medium=referral&utm_content=ugml/api&utm_campaign=Badge_Coverage)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ugamela/api)](https://hub.docker.com/r/ugamela/api)
+[![Discord](https://img.shields.io/discord/339129999082913794)](https://discord.gg/YDUHM3k)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](./LICENSE)
 
 # ugamela API

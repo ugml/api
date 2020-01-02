@@ -81,7 +81,7 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: { hallo: 3 } })
+      .send({ planetID, buildOrder: { hallo: 3 } })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
@@ -95,7 +95,7 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: { 201: "asdf" } })
+      .send({ planetID, buildOrder: { 201: "asdf" } })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
@@ -110,7 +110,7 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: '{ "301": 3000 }' })
+      .send({ planetID, buildOrder: '{ "301": 3000 }' })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
@@ -126,7 +126,7 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: '{ "201": 3000 }' })
+      .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
@@ -150,7 +150,7 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: '{ "201": 3000 }' })
+      .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(async res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
@@ -170,14 +170,13 @@ describe("shipsRouter", () => {
     return request
       .post("/v1/ships/build")
       .set("Authorization", authToken)
-      .send({ planetID: planetID, buildOrder: '{ "201": 3000 }' })
+      .send({ planetID, buildOrder: '{ "201": 4 }' })
       .then(res => {
         expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.planetID).to.be.equals(planetID);
         const buildOrders = JSON.parse(res.body.data.b_hangar_queue);
         expect(buildOrders.length).to.be.equals(1);
-        expect(buildOrders[0].planetID).to.be.equals(planetID);
       });
     /* eslint-enable quotes */
   });

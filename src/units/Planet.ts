@@ -142,15 +142,9 @@ export default class Planet implements IUnits {
   public b_building_endtime: number;
 
   /**
-   * The ID of the technology which is currently being researched.
-   * This value is 0 if no technology is currently being researched.
+   * True, if the current build-order is a demolition job
    */
-  public b_tech_id: number;
-
-  /**
-   * The time, at which the reserach will be completed
-   */
-  public b_tech_endtime: number;
+  public b_building_demolition: boolean;
 
   /**
    * The curreny queue of the hangar
@@ -207,13 +201,6 @@ export default class Planet implements IUnits {
   }
 
   /**
-   *  Checks, if the planet is currently researching
-   */
-  public isResearching(): boolean {
-    return this.b_tech_id > 0 && this.b_tech_endtime > 0;
-  }
-
-  /**
    * Returns, if the contains valid data or not
    */
   public isValid(): boolean {
@@ -259,8 +246,6 @@ export default class Planet implements IUnits {
       this.solar_satellite_percent % 10 === 0 &&
       0 <= this.b_building_id &&
       0 <= this.b_building_endtime &&
-      0 <= this.b_tech_id &&
-      0 <= this.b_tech_endtime &&
       0 <= this.b_hangar_start_time
     );
   }

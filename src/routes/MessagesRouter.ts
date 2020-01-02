@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
@@ -10,7 +10,7 @@ import IUserService from "../interfaces/IUserService";
  * Defines routes for message-sending and receiving
  */
 export default class MessagesRouter {
-  public router: IRouter<{}> = newRouter();
+  public router = newRouter();
 
   private userService: IUserService;
   private messageService: IMessageService;

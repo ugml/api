@@ -10,8 +10,6 @@ const container: Container = createContainer();
 
 const app = new App(container);
 
-debug("ts-express:server");
-
 const port = process.env.PORT || 3000;
 
 app.express.set("port", port);
@@ -42,7 +40,6 @@ server.on("listening", () => {
   const addr = server.address();
   const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
   Logger.info(`Listening on ${bind}`);
-  debug(`Listening on ${bind}`);
 });
 
 server.listen(port);

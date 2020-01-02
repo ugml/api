@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import Database from "../common/Database";
@@ -28,7 +28,7 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
  * Defines routes for event-creation and cancellation
  */
 export default class EventRouter {
-  public router: IRouter<{}> = newRouter();
+  public router = newRouter();
 
   private planetService: IPlanetService;
   private eventService: IEventService;
@@ -43,64 +43,6 @@ export default class EventRouter {
 
     this.router.post("/create/", this.createEvent);
     this.router.post("/cancel/", this.cancelEvent);
-  }
-
-  /**
-   * Returns the ID of the destination-type
-   * @param type The type as a string (planet, moon or debris)
-   */
-  private getDestinationTypeByName(type: string): number {
-    let typeID: number;
-    switch (type) {
-      case "planet":
-        typeID = 1;
-        break;
-      case "moon":
-        typeID = 2;
-        break;
-      case "debris":
-        typeID = 3;
-    }
-
-    return typeID;
-  }
-
-  /**
-   * Returns the ID of the mission-type
-   * @param mission The type as a string (transport, attack, ...)
-   */
-  private getMissionTypeID(mission: string): number {
-    let missionTypeID: number;
-    switch (mission) {
-      case "transport":
-        missionTypeID = 0;
-        break;
-      case "deploy":
-        missionTypeID = 1;
-        break;
-      case "attack":
-        missionTypeID = 2;
-        break;
-      case "acs":
-        missionTypeID = 3;
-        break;
-      case "hold":
-        missionTypeID = 4;
-        break;
-      case "colonize":
-        missionTypeID = 5;
-        break;
-      case "harvest":
-        missionTypeID = 6;
-        break;
-      case "espionage":
-        missionTypeID = 7;
-        break;
-      case "destroy":
-        missionTypeID = 8;
-    }
-
-    return missionTypeID;
   }
 
   /**
@@ -201,7 +143,7 @@ export default class EventRouter {
       slowestShipSpeed,
     );
 
-    let event: Event = new Event();
+    const event: Event = new Event();
 
     event.eventID = 0;
     event.ownerID = eventData.ownerID;
@@ -217,11 +159,14 @@ export default class EventRouter {
     event.loaded_crystal = eventData.data.loadedRessources.crystal;
     event.loaded_deuterium = eventData.data.loadedRessources.deuterium;
     event.returning = false;
-    event.deleted = false;
+    event.processed = false;
 
     const [result] = await this.eventService.createNewEvent(event);
 
     event.eventID = parseInt(result.insertId, 10);
+
+    // insert into redis
+    Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
 
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({
@@ -266,10 +211,10 @@ export default class EventRouter {
     await this.eventService.cancelEvent(event);
 
     // remove the event from the redis-queue
-    Redis.getConnection().zremrangebyscore("eventQueue", event.eventID, event.eventID);
+    Redis.getConnection().zremrangebyscore("eventQueue", event.end_time, event.eventID);
 
     // add the event with the new endtime
-    Redis.getConnection().zadd("eventQueue", request.body.eventID, event.end_time);
+    Redis.getConnection().zadd("eventQueue", event.end_time, request.body.eventID);
 
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({
@@ -278,4 +223,62 @@ export default class EventRouter {
       data: {},
     });
   };
+
+  /**
+   * Returns the ID of the destination-type
+   * @param type The type as a string (planet, moon or debris)
+   */
+  private getDestinationTypeByName(type: string): number {
+    let typeID: number;
+    switch (type) {
+      case "planet":
+        typeID = 1;
+        break;
+      case "moon":
+        typeID = 2;
+        break;
+      case "debris":
+        typeID = 3;
+    }
+
+    return typeID;
+  }
+
+  /**
+   * Returns the ID of the mission-type
+   * @param mission The type as a string (transport, attack, ...)
+   */
+  private getMissionTypeID(mission: string): number {
+    let missionTypeID: number;
+    switch (mission) {
+      case "transport":
+        missionTypeID = 0;
+        break;
+      case "deploy":
+        missionTypeID = 1;
+        break;
+      case "attack":
+        missionTypeID = 2;
+        break;
+      case "acs":
+        missionTypeID = 3;
+        break;
+      case "hold":
+        missionTypeID = 4;
+        break;
+      case "colonize":
+        missionTypeID = 5;
+        break;
+      case "harvest":
+        missionTypeID = 6;
+        break;
+      case "espionage":
+        missionTypeID = 7;
+        break;
+      case "destroy":
+        missionTypeID = 8;
+    }
+
+    return missionTypeID;
+  }
 }

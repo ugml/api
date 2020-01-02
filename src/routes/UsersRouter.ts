@@ -1,8 +1,9 @@
-import { IRouter, NextFunction, Request, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Request, Response, Router as newRouter } from "express";
 import Config from "../common/Config";
 import Database from "../common/Database";
 import DuplicateRecordException from "../exceptions/DuplicateRecordException";
 import { Globals } from "../common/Globals";
+import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/IBuildingService";
@@ -20,13 +21,11 @@ import Logger from "../common/Logger";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 
-const bcrypt = require("bcrypt");
-
 /**
  * Defines routes for user-data
  */
 export default class UsersRouter {
-  public router: IRouter<{}> = newRouter();
+  public router = newRouter();
 
   private userService: IUserService;
   private galaxyService: IGalaxyService;
@@ -61,7 +60,7 @@ export default class UsersRouter {
     // /user/planetlist/
     this.router.get("/planetlist/", new PlanetsRouter(container).getAllPlanets);
 
-    // /user/planetlist/:userID
+    // /users/planetlist/:userID
     this.router.get("/planetlist/:userID", new PlanetsRouter(container).getAllPlanetsOfUser);
 
     // /user/currentplanet/set/:planetID
@@ -126,7 +125,9 @@ export default class UsersRouter {
         });
       }
 
-      const user = await this.userService.getUserById(request.params.userID);
+      const userID: number = parseInt(request.params.userID, 10);
+
+      const user = await this.userService.getUserById(userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
@@ -169,7 +170,7 @@ export default class UsersRouter {
     const password: string = InputValidator.sanitizeString(request.body.password);
     const email: string = InputValidator.sanitizeString(request.body.email);
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = await Encryption.hash(password);
 
     const connection = await Database.getConnectionPool().getConnection();
 
@@ -363,7 +364,7 @@ export default class UsersRouter {
       if (InputValidator.isSet(request.body.password)) {
         const password = InputValidator.sanitizeString(request.body.password);
 
-        user.password = bcrypt.hashSync(password, 10);
+        user.password = await Encryption.hash(password);
       }
 
       if (InputValidator.isSet(request.body.email)) {

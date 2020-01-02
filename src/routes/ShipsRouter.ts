@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
@@ -11,12 +11,13 @@ import IPlanetService from "../interfaces/IPlanetService";
 import IShipService from "../interfaces/IShipService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
+import QueueItem from "../common/QueueItem";
 
 /**
  * Defines routes for ships-data
  */
 export default class ShipsRouter {
-  public router: IRouter<{}> = newRouter();
+  public router = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
@@ -109,8 +110,6 @@ export default class ShipsRouter {
 
       const queue: Queue = new Queue();
 
-      queue.setPlanetID(planetID);
-
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
@@ -140,8 +139,7 @@ export default class ShipsRouter {
       // TODO: put into seperate funciton (also reference this in defense-router)
       for (const item in buildOrders) {
         if (!buildOrders.hasOwnProperty(item)) {
-          // TODO: throw a meaningful error
-          throw Error();
+          continue;
         }
 
         let count: number = buildOrders[item];
@@ -188,7 +186,7 @@ export default class ShipsRouter {
             buildings.nanite_factory,
           ) * Math.floor(count);
 
-        queue.getQueue().set(item, Math.floor(count));
+        queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
 
         metal -= cost.metal * count;
         crystal -= cost.crystal * count;

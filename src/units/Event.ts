@@ -21,7 +21,7 @@ export default class Event implements IUnits {
   public loaded_crystal: number;
   public loaded_deuterium: number;
   public returning: boolean;
-  public deleted: boolean;
+  public processed: boolean;
 
   /**
    * Returns, if the contains valid data or not

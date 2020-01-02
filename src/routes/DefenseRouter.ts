@@ -1,4 +1,4 @@
-import { IRouter, NextFunction, Response, Router as newRouter, Router } from "express";
+import { NextFunction, Response, Router as newRouter } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
@@ -12,12 +12,13 @@ import IPlanetService from "../interfaces/IPlanetService";
 import Buildings from "../units/Buildings";
 import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
+import QueueItem from "../common/QueueItem";
 
 /**
  * Defines routes for defense-data
  */
 export default class DefenseRouter {
-  public router: IRouter<{}> = newRouter();
+  public router = newRouter();
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
@@ -100,8 +101,6 @@ export default class DefenseRouter {
       const buildOrders = JSON.parse(request.body.buildOrder);
 
       const queue: Queue = new Queue();
-
-      queue.setPlanetID(planetID);
 
       // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.DEFENSE)) {
@@ -213,7 +212,7 @@ export default class DefenseRouter {
               buildings.nanite_factory,
             ) * Math.floor(count);
 
-          queue.getQueue().set(item, Math.floor(count));
+          queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
 
           metal -= cost.metal * count;
           crystal -= cost.crystal * count;

@@ -17,7 +17,7 @@ export default class JwtHelper {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "30m",
+        expiresIn: "7d",
       },
     );
   }

@@ -1,5 +1,6 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
+import * as cors from "cors";
 import { Router } from "express";
 import JwtHelper from "./common/JwtHelper";
 import Redis from "./common/Redis";
@@ -23,6 +24,17 @@ import TechsRouter from "./routes/TechsRouter";
 import dotenv = require("dotenv");
 
 dotenv.config();
+// TODO move config imports and defaults out into config
+const productionMode = process.env.NODE_ENV === "production";
+const protocol = "http://";
+const origin = "localhost";
+const corsWhitelist = [
+  protocol + origin,
+  protocol + "www." + origin,
+  "file://",
+  "http://localhost",
+  "ionic://localhost",
+];
 
 const expressip = require("express-ip");
 const helmet = require("helmet");
@@ -84,6 +96,26 @@ export default class App {
   private middleware(): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+
+    /**
+     * Check if given origin is whitelisted
+     * @param checkOrigin
+     * @param callback
+     */
+    function corsHandler(checkOrigin: string, callback) {
+      if (corsWhitelist.indexOf(checkOrigin) === -1 && checkOrigin) {
+        return callback(new Error(`CORS "${checkOrigin}" is not whitelisted`));
+      }
+      callback(null, true);
+    }
+    this.express.use(function(req, res, next) {
+      cors({
+        origin: productionMode ? corsHandler : req.headers.origin,
+        allowedHeaders: ["Content-Type", "Authorization"],
+        methods: ["GET", "POST"],
+        credentials: true,
+      })(req, res, next);
+    });
 
     this.express.use(helmet.hidePoweredBy());
     this.express.use(helmet.noCache());

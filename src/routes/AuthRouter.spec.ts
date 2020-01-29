@@ -27,9 +27,9 @@ describe("authRoute", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
-        expect(res.body.message).equals("Success");
+        expect(res.body.token).to.not.be.null;
         expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-        expect(res.body.data.token).to.not.be.equals(null);
+        expect(res.body.token).to.not.be.equals(null);
       });
   });
 
@@ -38,7 +38,7 @@ describe("authRoute", () => {
       .post("/v1/auth/login")
       .send({ email: "idonotexist@test.com", password: "idontexisteither" })
       .then(res => {
-        expect(res.body.message).equals("Authentication failed");
+        expect(res.body.error).equals("Authentication failed");
         expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
       });
   });
@@ -48,7 +48,7 @@ describe("authRoute", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com" })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
@@ -58,14 +58,14 @@ describe("authRoute", () => {
       .post("/v1/auth/login")
       .send({ password: "admin" })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
 
   it("authentication should fail (nothing sent)", async () => {
     return request.post("/v1/auth/login").then(res => {
-      expect(res.body.message).equals("Invalid parameter");
+      expect(res.body.error).equals("Invalid parameter");
       expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
     });
   });
@@ -75,7 +75,7 @@ describe("authRoute", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "iAmWrong" })
       .then(res => {
-        expect(res.body.message).equals("Authentication failed");
+        expect(res.body.error).equals("Authentication failed");
         expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
       });
   });

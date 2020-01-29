@@ -35,9 +35,7 @@ export default class AuthRouter {
     try {
       if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -49,9 +47,7 @@ export default class AuthRouter {
 
       if (!InputValidator.isSet(data)) {
         return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          status: Globals.Statuscode.NOT_AUTHORIZED,
-          message: "Authentication failed",
-          data: {},
+          error: "Authentication failed",
         });
       }
 
@@ -59,26 +55,18 @@ export default class AuthRouter {
 
       if (!isValidPassword) {
         return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          status: Globals.Statuscode.NOT_AUTHORIZED,
-          message: "Authentication failed",
-          data: {},
+          error: "Authentication failed",
         });
       }
 
       return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: {
-          token: JwtHelper.generateToken(data.userID),
-        },
+        token: JwtHelper.generateToken(data.userID),
       });
     } catch (err) {
       Logger.error(err);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: `There was an error: ${err.message}`,
-        data: {},
+        error: `There was an error: ${err.message}`,
       });
     }
   };

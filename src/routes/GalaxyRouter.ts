@@ -38,9 +38,9 @@ export default class GalaxyRouter {
         !InputValidator.isValidInt(request.params.pos_system)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -49,9 +49,9 @@ export default class GalaxyRouter {
 
       if (!InputValidator.isValidPosition(pos_galaxy, pos_system)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -59,7 +59,7 @@ export default class GalaxyRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: galaxyData,
       });
     } catch (error) {
@@ -67,8 +67,8 @@ export default class GalaxyRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };

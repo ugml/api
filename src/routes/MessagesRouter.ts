@@ -42,7 +42,7 @@ export default class MessagesRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: messages,
       });
     } catch (error) {
@@ -50,8 +50,8 @@ export default class MessagesRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -66,9 +66,9 @@ export default class MessagesRouter {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -78,7 +78,7 @@ export default class MessagesRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: message || {},
       });
     } catch (error) {
@@ -86,8 +86,8 @@ export default class MessagesRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -102,9 +102,9 @@ export default class MessagesRouter {
     try {
       if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -115,16 +115,16 @@ export default class MessagesRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "The message was deleted.",
-        data: {},
+        error: "The message was deleted.",
+
       });
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -144,9 +144,9 @@ export default class MessagesRouter {
         !InputValidator.isSet(request.body.body)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -159,9 +159,9 @@ export default class MessagesRouter {
 
       if (!InputValidator.isSet(receiver)) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "The receiver does not exist",
-          data: {},
+
+          error: "The receiver does not exist",
+
         });
       }
 
@@ -169,16 +169,16 @@ export default class MessagesRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Message sent",
-        data: {},
+        error: "Message sent",
+
       });
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };

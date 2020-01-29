@@ -29,7 +29,7 @@ describe("planetsRouter", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
-        authToken = res.body.data.token;
+        authToken = res.body.token;
       });
   });
 
@@ -49,7 +49,7 @@ describe("planetsRouter", () => {
       .send({ planetID: 167546850 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.eql({});
       });
@@ -60,7 +60,7 @@ describe("planetsRouter", () => {
       .post("/v1/user/currentplanet/set")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("Invalid parameter");
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.eql({});
@@ -73,7 +73,7 @@ describe("planetsRouter", () => {
       .send({ planetID: 1 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("The player does not own the planet");
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.eql({});
@@ -85,7 +85,7 @@ describe("planetsRouter", () => {
       .get("/v1/user/planetlist/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data[0].planetID).to.be.equals(167546850);
         expect(res.body.data[0].ownerID).to.be.equals(1);
@@ -103,7 +103,7 @@ describe("planetsRouter", () => {
       .get("/v1/user/planetlist/35")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data[0].planetID).to.be.equals(93133);
         expect(res.body.data[0].ownerID).to.be.equals(35);
@@ -121,7 +121,7 @@ describe("planetsRouter", () => {
       .get("/v1/user/planet/1234")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data).to.be.equals(null);
       });
@@ -134,7 +134,7 @@ describe("planetsRouter", () => {
       .get(`/v1/user/planet/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.planetID).to.be.equals(planetID);
         expect(res.body.data.ownerID).to.be.equals(1);
@@ -154,7 +154,7 @@ describe("planetsRouter", () => {
       .get(`/v1/user/planet/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
         expect(res.body.data).to.be.eql({});
@@ -168,7 +168,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/movement/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         // TODO
       });
@@ -181,7 +181,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/movement/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
       });
@@ -197,7 +197,7 @@ describe("planetsRouter", () => {
       .send({ planetID, name: "FancyNewName" })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.name).to.be.equals("FancyNewName");
 
@@ -214,7 +214,7 @@ describe("planetsRouter", () => {
       .send({ planetID })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("Invalid parameter");
       });
   });
@@ -225,7 +225,7 @@ describe("planetsRouter", () => {
       .send({ name: "NewName" })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("Invalid parameter");
       });
   });
@@ -238,7 +238,7 @@ describe("planetsRouter", () => {
       .send({ planetID, name: "A" })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.message).to.be.equals("New name is too short");
       });
   });
@@ -250,7 +250,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
       });
@@ -263,7 +263,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Success");
         expect(res.body.data.planetID).to.be.equals(planetID);
@@ -275,7 +275,7 @@ describe("planetsRouter", () => {
       .post("/v1/planets/destroy/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
       });
@@ -289,7 +289,7 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("Invalid parameter");
       });
@@ -307,7 +307,7 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("The planet was deleted");
       });
@@ -321,7 +321,7 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.message).to.be.equals("The last planet cannot be destroyed");
         await container.planetService.createNewPlanet(secondPlanetBackup);

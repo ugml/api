@@ -42,7 +42,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: planetList,
       });
     } catch (error) {
@@ -50,8 +50,8 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -71,7 +71,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: planetList,
       });
     } catch (error) {
@@ -79,8 +79,8 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -96,9 +96,9 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -109,7 +109,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: planet,
       });
     } catch (error) {
@@ -117,8 +117,8 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -134,9 +134,9 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -147,7 +147,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: movement,
       });
     } catch (error) {
@@ -155,8 +155,8 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -172,9 +172,9 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -185,9 +185,9 @@ export default class PlanetsRouter {
 
       if (planetList.length === 1) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "The last planet cannot be destroyed",
-          data: {},
+
+          error: "The last planet cannot be destroyed",
+
         });
       }
 
@@ -196,16 +196,16 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "The planet was deleted",
-        data: {},
+        error: "The planet was deleted",
+
       });
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -225,9 +225,9 @@ export default class PlanetsRouter {
         !InputValidator.isSet(request.body.name)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -236,9 +236,9 @@ export default class PlanetsRouter {
       // TODO: check max-length
       if (newName.length <= 4) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "New name is too short",
-          data: {},
+
+          error: "New name is too short",
+
         });
       }
 
@@ -253,7 +253,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: planet,
       });
     } catch (error) {
@@ -261,8 +261,8 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
+
       });
     }
   };
@@ -278,9 +278,9 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+
+          error: "Invalid parameter",
+
         });
       }
 
@@ -291,7 +291,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         status: Globals.Statuscode.SUCCESS,
-        message: "Success",
+        error: "Success",
         data: planet,
       });
     } catch (error) {
@@ -299,7 +299,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
+        error: "There was an error while handling the request.",
         data: {},
       });
     }

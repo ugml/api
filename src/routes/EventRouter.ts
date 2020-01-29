@@ -57,9 +57,9 @@ export default class EventRouter {
 
     if (!InputValidator.isSet(request.body.event)) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
+
+        error: "Invalid parameter",
+
       });
     }
 
@@ -68,9 +68,9 @@ export default class EventRouter {
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid json",
-        data: {},
+
+        error: "Invalid json",
+
       });
     }
 
@@ -80,18 +80,18 @@ export default class EventRouter {
     // check if sender of event == currently authenticated user
     if (userID !== ownerID) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Event-creator is not currently authenticated user",
-        data: {},
+
+        error: "Event-creator is not currently authenticated user",
+
       });
     }
 
     // TODO: temporary
     if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Missiontype not yet supported",
-        data: {},
+
+        error: "Missiontype not yet supported",
+
       });
     }
 
@@ -114,18 +114,18 @@ export default class EventRouter {
 
     if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Origin does not exist or user is not the owner",
-        data: {},
+
+        error: "Origin does not exist or user is not the owner",
+
       });
     }
 
     // destination does not exist
     if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Destination does not exist",
-        data: {},
+
+        error: "Destination does not exist",
+
       });
     }
 
@@ -171,7 +171,7 @@ export default class EventRouter {
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({
       status: Globals.Statuscode.SUCCESS,
-      message: "Event successfully created",
+      error: "Event successfully created",
       data: event,
     });
   };
@@ -185,9 +185,9 @@ export default class EventRouter {
   public cancelEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
+
+        error: "Invalid parameter",
+
       });
     }
 
@@ -198,9 +198,9 @@ export default class EventRouter {
 
     if (!InputValidator.isSet(event) || event.returning === true) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "The event does not exist or can't be canceled",
-        data: {},
+
+        error: "The event does not exist or can't be canceled",
+
       });
     }
 
@@ -219,8 +219,8 @@ export default class EventRouter {
     // all done
     return response.status(Globals.Statuscode.SUCCESS).json({
       status: Globals.Statuscode.SUCCESS,
-      message: "Event successfully canceled",
-      data: {},
+      error: "Event successfully canceled",
+
     });
   };
 

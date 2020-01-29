@@ -24,7 +24,7 @@ describe("techsRouter", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
-        authToken = res.body.data.token;
+        authToken = res.body.token;
       });
   });
 
@@ -38,7 +38,7 @@ describe("techsRouter", () => {
       .get("/v1/techs/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.data.userID).to.be.equals(1);
         expect(res.body.data.graviton_tech).to.be.equals(1);
@@ -134,7 +134,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
         expect(res.body.message).equals("Planet already has a build-job");
-        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.data).to.be.eql({});
       });
   });
@@ -156,7 +156,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(async res => {
         expect(res.body.message).equals("Planet is upgrading the research-lab");
-        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.data).to.be.eql({});
 
         // reset

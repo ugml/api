@@ -56,11 +56,7 @@ export default class Event implements IUnits {
     if (!InputValidator.isSet(this.endID) || this.endID < 0) {
       return false;
     }
-    if (
-      this.endType !== PlanetType.Planet &&
-      this.endType !== PlanetType.Moon &&
-      this.endType !== PlanetType.Debris
-    ) {
+    if (this.endType !== PlanetType.Planet && this.endType !== PlanetType.Moon && this.endType !== PlanetType.Debris) {
       return false;
     }
     if (!InputValidator.isSet(this.endTime) || this.endTime < 0) {

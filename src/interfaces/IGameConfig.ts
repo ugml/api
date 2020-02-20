@@ -1,12 +1,12 @@
 export default interface IGameConfig {
   speed: number;
-  metal_start: number;
-  crystal_start: number;
-  deuterium_start: number;
-  startplanet_name: string;
-  startplanet_diameter: number;
-  startplanet_maxfields: number;
-  posGalaxy_max: number;
-  posSystem_max: number;
-  posPlanet_max: number;
+  metalStart: number;
+  crystalStart: number;
+  deuteriumStart: number;
+  startPlanetName: string;
+  startPlanetDiameter: number;
+  startPlanetMaxFields: number;
+  posGalaxyMax: number;
+  posSystemMax: number;
+  posPlanetMax: number;
 }

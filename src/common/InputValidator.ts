@@ -147,11 +147,11 @@ export default class InputValidator {
   public static isValidPosition(posGalaxy, posSystem, posPlanet = 1): boolean {
     return (
       posGalaxy >= 1 &&
-      posGalaxy <= Config.getGameConfig().posGalaxy_max &&
+      posGalaxy <= Config.getGameConfig().posGalaxyMax &&
       posSystem >= 1 &&
-      posSystem <= Config.getGameConfig().posSystem_max &&
+      posSystem <= Config.getGameConfig().posSystemMax &&
       posPlanet >= 1 &&
-      posPlanet <= Config.getGameConfig().posPlanet_max
+      posPlanet <= Config.getGameConfig().posPlanetMax
     );
   }
 }

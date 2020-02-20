@@ -51,7 +51,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
+        expect(res.body).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -63,7 +63,6 @@ describe("planetsRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.error).to.be.equals("Invalid parameter");
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -76,7 +75,6 @@ describe("planetsRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.error).to.be.equals("The player does not own the planet");
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -157,7 +155,6 @@ describe("planetsRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 

@@ -48,7 +48,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).equals(planetID);
+        expect(res.body.planetID).equals(planetID);
       });
   });
 
@@ -61,7 +61,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -72,7 +72,6 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.body.error).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.undefined;
       });
   });
 
@@ -110,7 +109,6 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ buildOrder: JSON.stringify({ 301: 1 }) })
       .then(res => {
-        console.log(res.body);
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");

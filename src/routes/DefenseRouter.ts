@@ -47,9 +47,7 @@ export default class DefenseRouter {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -58,18 +56,13 @@ export default class DefenseRouter {
 
       const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: defenses || {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(defenses);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };

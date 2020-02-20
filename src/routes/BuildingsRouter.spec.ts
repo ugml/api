@@ -48,7 +48,6 @@ describe("buildingsRoute", () => {
         .get(`/v1/buildings/${planetID}`)
         .set("Authorization", authToken)
         .then(res => {
-          console.log(res.body);
           expect(res.body.planetID).equals(planetID);
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
         });
@@ -149,7 +148,7 @@ describe("buildingsRoute", () => {
           .then(res => {
             expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
             expect(res.body.planetID).to.be.equals(planetID);
-            //TODO
+            // TODO
           });
       });
 
@@ -273,7 +272,7 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID, buildingID: buildingID })
+        .send({ planetID, buildingID })
         .then(res => {
           expect(res.body.planetID).equals(planetID);
           expect(res.body.b_building_id).equals(buildingID);
@@ -314,7 +313,7 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/cancel")
         .set("Authorization", authToken)
-        .send({ planetID: `${planetID}`, buildingID: buildingID })
+        .send({ planetID, buildingID })
         .then(res => {
           expect(res.body.planetID).to.be.equals(planetID);
           expect(res.body.b_building_id).to.be.equals(0);
@@ -394,7 +393,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.RESEARCH_LAB })
         .then(async res => {
-          console.log(res.body);
           expect(res.body.error).to.be.equal("Can't build this building while it is in use");
           expect(res.status).equals(Globals.Statuscode.SUCCESS);
 
@@ -527,7 +525,6 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
-        console.log(res.body);
         expect(res.body.planetID).equals(planetID);
         expect(res.body.b_building_id).greaterThan(0);
         expect(res.body.b_building_endtime).greaterThan(0);

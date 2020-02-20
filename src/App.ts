@@ -25,7 +25,7 @@ dotenv.config();
 
 const helmet = require("helmet");
 
-const apiConfig = require("../apiconfig.json");
+const apiConfig = require("./config/apiconfig.json");
 
 const winston = require("winston");
 const expressWinston = require("express-winston");

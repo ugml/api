@@ -1,5 +1,5 @@
 {
-    "baseurl": "",
+    "baseurl": "/v1",
     "cors": {
         "whitelist": [
             "https://localhost",

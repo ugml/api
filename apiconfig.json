@@ -1,0 +1,12 @@
+{
+    "baseurl": "",
+    "cors": {
+        "whitelist": [
+            "https://localhost",
+            "http://localhost",
+            "file://",
+            "ionic://localhost"
+        ]
+    }
+
+}

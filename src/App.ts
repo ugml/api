@@ -1,13 +1,12 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
+import * as cors from "cors";
 import { Router } from "express";
 import JwtHelper from "./common/JwtHelper";
 import Redis from "./common/Redis";
-import SerializationHelper from "./common/SerializationHelper";
 import IAuthorizedRequest from "./interfaces/IAuthorizedRequest";
 import { Globals } from "./common/Globals";
 import IJwt from "./interfaces/IJwt";
-import Event from "./units/Event";
 import InputValidator from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -24,8 +23,9 @@ import dotenv = require("dotenv");
 
 dotenv.config();
 
-const expressip = require("express-ip");
 const helmet = require("helmet");
+
+const apiConfig = require("../apiconfig.json");
 
 const winston = require("winston");
 const expressWinston = require("express-winston");
@@ -39,11 +39,12 @@ const logFormat = printf(({ message, timestamp }) => {
   return `${timestamp} [REQUEST] ${message}`;
 });
 
+const productionMode = process.env.NODE_ENV === "production";
+
 /**
  * Creates and configures an ExpressJS web server.
  */
 export default class App {
-  // ref to Express instance
   public express: express.Application;
   public userID: string;
   public container;
@@ -71,8 +72,8 @@ export default class App {
 
     const eventList = await eventService.getAllUnprocessedEvents();
 
-    for (const i of eventList) {
-      Redis.getConnection().zadd("eventQueue", eventList[i].end_time, eventList[i].eventID);
+    for (const event of eventList) {
+      Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
     }
 
     Logger.info(`Finished loading ${eventList.length} events into Queue`);
@@ -84,6 +85,27 @@ export default class App {
   private middleware(): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+
+    /**
+     * Check if given origin is whitelisted
+     * @param checkOrigin
+     * @param callback
+     */
+    function corsHandler(checkOrigin: string, callback) {
+      if (apiConfig.cors.whitelist.indexOf(checkOrigin) === -1 && checkOrigin) {
+        return callback(new Error(`CORS "${checkOrigin}" is not whitelisted`));
+      }
+      callback(null, true);
+    }
+
+    this.express.use(function(req, res, next) {
+      cors({
+        origin: productionMode ? corsHandler : req.headers.origin,
+        allowedHeaders: ["Content-Type", "Authorization"],
+        methods: ["GET", "POST"],
+        credentials: true,
+      })(req, res, next);
+    });
 
     this.express.use(helmet.hidePoweredBy());
     this.express.use(helmet.noCache());

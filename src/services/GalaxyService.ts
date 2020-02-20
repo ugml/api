@@ -38,8 +38,6 @@ export default class GalaxyService implements IGalaxyService {
       .where("p.pos_system = ?", pos_system)
       .toString();
 
-    console.log(query);
-
     const [rows] = await Database.query(query);
 
     return rows;

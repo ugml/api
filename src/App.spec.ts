@@ -21,7 +21,7 @@ describe("App", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com ", password: "admin" })
       .then(res => {
-        authToken = res.body.data.token;
+        authToken = res.body.token;
       });
   });
 
@@ -35,8 +35,7 @@ describe("App", () => {
 
     return request.get(`/v1/buildings/${planetID}`).then(res => {
       expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
-      expect(res.body.data).to.be.eql({});
-      expect(res.body.message).to.be.equals("Authentication failed");
+      expect(res.body.error).to.be.equals("Authentication failed");
     });
   });
 
@@ -47,8 +46,7 @@ describe("App", () => {
       .set("Authorization", JwtHelper.generateToken(parseInt("iAmNotAValidUserId", 10)))
       .then(res => {
         expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
-        expect(res.body.data).to.be.eql({});
-        expect(res.body.message).to.be.equals("Authentication failed");
+        expect(res.body.error).to.be.equals("Authentication failed");
       });
   });
 
@@ -58,8 +56,7 @@ describe("App", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.equals(Globals.Statuscode.NOT_FOUND);
-        expect(res.body.data).to.be.eql({});
-        expect(res.body.message).to.be.equals("The route does not exist");
+        expect(res.body.error).to.be.equals("The route does not exist");
       });
   });
 });

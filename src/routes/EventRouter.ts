@@ -52,128 +52,121 @@ export default class EventRouter {
    * @param next
    */
   public createEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
-    // TODO: check if enough ships on planet
-    // TODO: check if planet has enough deuterium
+    try {
+      // TODO: check if enough ships on planet
+      // TODO: check if planet has enough deuterium
 
-    if (!InputValidator.isSet(request.body.event)) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
-      });
-    }
+      if (!InputValidator.isSet(request.body.event)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
 
-    const eventData = JSON.parse(request.body.event);
+      const eventData = JSON.parse(request.body.event);
 
-    // validate JSON against schema
-    if (!jsonValidator.validate(eventData, eventSchema).valid) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid json",
-        data: {},
-      });
-    }
+      // validate JSON against schema
+      if (!jsonValidator.validate(eventData, eventSchema).valid) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid json",
+        });
+      }
 
-    const userID = parseInt(request.userID, 10);
-    const ownerID = parseInt(eventData.ownerID, 10);
+      const userID = parseInt(request.userID, 10);
+      const ownerID = parseInt(eventData.ownerID, 10);
 
-    // check if sender of event == currently authenticated user
-    if (userID !== ownerID) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Event-creator is not currently authenticated user",
-        data: {},
-      });
-    }
+      // check if sender of event == currently authenticated user
+      if (userID !== ownerID) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Event-creator is not currently authenticated user",
+        });
+      }
 
-    // TODO: temporary
-    if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
+      // TODO: temporary
+      if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Missiontype not yet supported",
+        });
+      }
+
+      const positionOrigin: ICoordinates = {
+        pos_galaxy: eventData.data.origin.pos_galaxy,
+        pos_system: eventData.data.origin.pos_system,
+        pos_planet: eventData.data.origin.pos_planet,
+        type: this.getDestinationTypeByName(eventData.data.origin.type),
+      };
+
+      const positionDestination: ICoordinates = {
+        pos_galaxy: eventData.data.destination.pos_galaxy,
+        pos_system: eventData.data.destination.pos_system,
+        pos_planet: eventData.data.destination.pos_planet,
+        type: this.getDestinationTypeByName(eventData.data.destination.type),
+      };
+
+      const startPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionOrigin);
+      const destinationPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionDestination);
+
+      if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Origin does not exist or user is not the owner",
+        });
+      }
+
+      // destination does not exist
+      if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Destination does not exist",
+        });
+      }
+
+      const distance = Calculations.calculateDistance(eventData.data.origin, eventData.data.destination);
+
+      const gameConfig = Config.getGameConfig();
+
+      const slowestShipSpeed = Calculations.getSlowestShipSpeed(eventData.data.ships);
+
+      // calculate duration of flight
+      const timeOfFlight = Calculations.calculateTimeOfFlight(
+        gameConfig.speed,
+        eventData.speed,
+        distance,
+        slowestShipSpeed,
+      );
+
+      const event: Event = new Event();
+
+      event.eventID = 0;
+      event.ownerID = eventData.ownerID;
+      event.mission = this.getMissionTypeID(eventData.mission);
+      event.fleetlist = JSON.stringify(eventData.data.ships);
+      event.start_id = startPlanet.planetID;
+      event.start_type = this.getDestinationTypeByName(eventData.data.origin.type);
+      event.start_time = Math.round(+new Date() / 1000);
+      event.end_id = destinationPlanet.planetID;
+      event.end_type = this.getDestinationTypeByName(eventData.data.destination.type);
+      event.end_time = Math.round(event.start_time + timeOfFlight);
+      event.loaded_metal = eventData.data.loadedRessources.metal;
+      event.loaded_crystal = eventData.data.loadedRessources.crystal;
+      event.loaded_deuterium = eventData.data.loadedRessources.deuterium;
+      event.returning = false;
+      event.processed = false;
+
+      const [result] = await this.eventService.createNewEvent(event);
+
+      event.eventID = parseInt(result.insertId, 10);
+
+      // insert into redis
+      Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
+
+      // all done
+      return response.status(Globals.Statuscode.SUCCESS).json(event);
+    } catch (error) {
+      Logger.error(error);
+
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Missiontype not yet supported",
-        data: {},
+        status: Globals.Statuscode.SERVER_ERROR,
+        error: "There was an error while handling the request.",
       });
     }
-
-    const positionOrigin: ICoordinates = {
-      pos_galaxy: eventData.data.origin.pos_galaxy,
-      pos_system: eventData.data.origin.pos_system,
-      pos_planet: eventData.data.origin.pos_planet,
-      type: this.getDestinationTypeByName(eventData.data.origin.type),
-    };
-
-    const positionDestination: ICoordinates = {
-      pos_galaxy: eventData.data.destination.pos_galaxy,
-      pos_system: eventData.data.destination.pos_system,
-      pos_planet: eventData.data.destination.pos_planet,
-      type: this.getDestinationTypeByName(eventData.data.destination.type),
-    };
-
-    const startPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionOrigin);
-    const destinationPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionDestination);
-
-    if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Origin does not exist or user is not the owner",
-        data: {},
-      });
-    }
-
-    // destination does not exist
-    if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Destination does not exist",
-        data: {},
-      });
-    }
-
-    const distance = Calculations.calculateDistance(eventData.data.origin, eventData.data.destination);
-
-    const gameConfig = Config.getGameConfig();
-
-    const slowestShipSpeed = Calculations.getSlowestShipSpeed(eventData.data.ships);
-
-    // calculate duration of flight
-    const timeOfFlight = Calculations.calculateTimeOfFlight(
-      gameConfig.speed,
-      eventData.speed,
-      distance,
-      slowestShipSpeed,
-    );
-
-    const event: Event = new Event();
-
-    event.eventID = 0;
-    event.ownerID = eventData.ownerID;
-    event.mission = this.getMissionTypeID(eventData.mission);
-    event.fleetlist = JSON.stringify(eventData.data.ships);
-    event.start_id = startPlanet.planetID;
-    event.start_type = this.getDestinationTypeByName(eventData.data.origin.type);
-    event.start_time = Math.round(+new Date() / 1000);
-    event.end_id = destinationPlanet.planetID;
-    event.end_type = this.getDestinationTypeByName(eventData.data.destination.type);
-    event.end_time = Math.round(event.start_time + timeOfFlight);
-    event.loaded_metal = eventData.data.loadedRessources.metal;
-    event.loaded_crystal = eventData.data.loadedRessources.crystal;
-    event.loaded_deuterium = eventData.data.loadedRessources.deuterium;
-    event.returning = false;
-    event.processed = false;
-
-    const [result] = await this.eventService.createNewEvent(event);
-
-    event.eventID = parseInt(result.insertId, 10);
-
-    // insert into redis
-    Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
-
-    // all done
-    return response.status(Globals.Statuscode.SUCCESS).json({
-      status: Globals.Statuscode.SUCCESS,
-      message: "Event successfully created",
-      data: event,
-    });
   };
 
   /**
@@ -183,45 +176,46 @@ export default class EventRouter {
    * @param next
    */
   public cancelEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
-    if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
+    try {
+      if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
+      const userID = parseInt(request.userID, 10);
+      const eventID = parseInt(request.body.eventID, 10);
+
+      const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
+
+      if (!InputValidator.isSet(event) || event.returning === true) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "The event does not exist or can't be canceled",
+        });
+      }
+
+      // (time passed from start until cancel) + (time now)
+      event.end_time = Math.round(+new Date() / 1000) - event.start_time + Math.round(+new Date() / 1000);
+      event.start_time = Math.round(+new Date() / 1000);
+
+      await this.eventService.cancelEvent(event);
+
+      // remove the event from the redis-queue
+      Redis.getConnection().zremrangebyscore("eventQueue", event.end_time, event.eventID);
+
+      // add the event with the new endtime
+      Redis.getConnection().zadd("eventQueue", event.end_time, request.body.eventID);
+
+      // all done
+      return response.status(Globals.Statuscode.SUCCESS).json();
+    } catch (error) {
+      Logger.error(error);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
+        error: "There was an error while handling the request.",
       });
     }
-
-    const userID = parseInt(request.userID, 10);
-    const eventID = parseInt(request.body.eventID, 10);
-
-    const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
-
-    if (!InputValidator.isSet(event) || event.returning === true) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "The event does not exist or can't be canceled",
-        data: {},
-      });
-    }
-
-    // (time passed from start until cancel) + (time now)
-    event.end_time = Math.round(+new Date() / 1000) - event.start_time + Math.round(+new Date() / 1000);
-    event.start_time = Math.round(+new Date() / 1000);
-
-    await this.eventService.cancelEvent(event);
-
-    // remove the event from the redis-queue
-    Redis.getConnection().zremrangebyscore("eventQueue", event.end_time, event.eventID);
-
-    // add the event with the new endtime
-    Redis.getConnection().zadd("eventQueue", event.end_time, request.body.eventID);
-
-    // all done
-    return response.status(Globals.Statuscode.SUCCESS).json({
-      status: Globals.Statuscode.SUCCESS,
-      message: "Event successfully canceled",
-      data: {},
-    });
   };
 
   /**

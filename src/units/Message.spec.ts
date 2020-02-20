@@ -19,9 +19,9 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const error: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
-    assert.equal(message.isValid(), true);
+    assert.equal(error.isValid(), true);
   });
 
   it("Should fail (negative ID)", function() {
@@ -36,9 +36,9 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const error: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
-    assert.equal(message.isValid(), false);
+    assert.equal(error.isValid(), false);
   });
 
   it("Should fail (missing value)", function() {
@@ -52,9 +52,9 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const error: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
-    assert.equal(message.isValid(), false);
+    assert.equal(error.isValid(), false);
   });
 
   it("Should fail (subject too short)", function() {
@@ -69,9 +69,9 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const error: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
-    assert.equal(message.isValid(), false);
+    assert.equal(error.isValid(), false);
   });
 
   it("Should fail (sender = receiver)", function() {
@@ -86,8 +86,8 @@ describe("Message-unit", function() {
       deleted: false,
     };
 
-    const message: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
+    const error: Message = SerializationHelper.toInstance(new Message(), JSON.stringify(data));
 
-    assert.equal(message.isValid(), false);
+    assert.equal(error.isValid(), false);
   });
 });

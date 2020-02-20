@@ -84,26 +84,18 @@ export default class UsersRouter {
       // validate parameters
       if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
       const data = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(data);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -119,9 +111,7 @@ export default class UsersRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -129,18 +119,13 @@ export default class UsersRouter {
 
       const user = await this.userService.getUserById(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: user || {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(user);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -158,9 +143,7 @@ export default class UsersRouter {
       !InputValidator.isSet(request.body.email)
     ) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
+        error: "Invalid parameter",
       });
     }
 
@@ -309,28 +292,20 @@ export default class UsersRouter {
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: `There was an error while handling the request: ${error.message}`,
-          data: {},
+          error: `There was an error while handling the request: ${error.message}`,
         });
       }
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     } finally {
       await connection.release();
     }
 
     return response.status(Globals.Statuscode.SUCCESS).json({
-      status: Globals.Statuscode.SUCCESS,
-      message: "Success",
-      data: {
-        userID: newUser.userID,
-        token: JwtHelper.generateToken(newUser.userID),
-      },
+      userID: newUser.userID,
+      token: JwtHelper.generateToken(newUser.userID),
     });
   };
 
@@ -349,15 +324,14 @@ export default class UsersRouter {
         !InputValidator.isSet(request.body.email)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "No parameters were passed",
-          data: {},
+          error: "No parameters were passed",
         });
       }
 
       const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
+        // TODO: Check if username already exists
         user.username = InputValidator.sanitizeString(request.body.username);
       }
 
@@ -373,25 +347,17 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: user,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(user);
     } catch (error) {
       Logger.error(error);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: `There was an error while handling the request: ${error.message}`,
-          data: {},
+          error: `There was an error while handling the request: ${error.message}`,
         });
       } else {
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
+          error: "There was an error while handling the request.",
         });
       }
     }
@@ -408,9 +374,7 @@ export default class UsersRouter {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -421,9 +385,7 @@ export default class UsersRouter {
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "The player does not own the planet",
-          data: {},
+          error: "The player does not own the planet",
         });
       }
 
@@ -433,18 +395,12 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };

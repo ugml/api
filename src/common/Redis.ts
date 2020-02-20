@@ -16,6 +16,6 @@ export default class Redis {
   private static client = redis.createClient({
     port: process.env.REDIS_PORT || 6379, // replace with your port
     host: process.env.REDIS_HOST || "localhost", // replace with your hostanme or IP address
-    password: process.env.REDIS_PASSWORD || "", // replace with your password
+    password: process.env.REDIS_PASSWORD || undefined, // replace with your password
   });
 }

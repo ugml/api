@@ -49,9 +49,7 @@ export default class BuildingsRouter {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -60,18 +58,12 @@ export default class BuildingsRouter {
       // TODO: check if user owns the planet
       const data = await this.buildingService.getBuildings(planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(data);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -86,9 +78,7 @@ export default class BuildingsRouter {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -100,17 +90,13 @@ export default class BuildingsRouter {
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
       if (!planet.isUpgradingBuilding()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Planet has no build-job",
-          data: {},
+          error: "Planet has no build-job",
         });
       }
 
@@ -128,18 +114,13 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Building canceled",
-        data: { planet },
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -159,9 +140,7 @@ export default class BuildingsRouter {
         !InputValidator.isValidInt(request.body.buildingID)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -171,9 +150,7 @@ export default class BuildingsRouter {
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -183,18 +160,14 @@ export default class BuildingsRouter {
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
       // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Planet already has a build-job",
-          data: {},
+          error: "Planet already has a build-job",
         });
       }
 
@@ -207,18 +180,14 @@ export default class BuildingsRouter {
         planet.isBuildingUnits()
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Can't build this building while it is in use",
-          data: {},
+          error: "Can't build this building while it is in use",
         });
       }
 
       // can't build research lab while they are researching... poor scientists :(
       if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Can't build this building while it is in use",
-          data: {},
+          error: "Can't build this building while it is in use",
         });
       }
 
@@ -247,9 +216,7 @@ export default class BuildingsRouter {
 
         if (!requirementsMet) {
           return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
-            message: "Requirements are not met",
-            data: {},
+            error: "Requirements are not met",
           });
         }
       }
@@ -267,9 +234,7 @@ export default class BuildingsRouter {
         planet.energy_used < cost.energy
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
-          message: "Not enough resources",
-          data: {},
+          error: "Not enough resources",
         });
       }
 
@@ -291,18 +256,13 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Job started",
-        data: { planet },
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: `There was an error while handling the request: ${error}`,
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -316,9 +276,7 @@ export default class BuildingsRouter {
         !InputValidator.isValidInt(request.body.buildingID)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -328,9 +286,7 @@ export default class BuildingsRouter {
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -339,17 +295,13 @@ export default class BuildingsRouter {
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
       if (planet.isUpgradingBuilding()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Planet already has a build-job",
-          data: {},
+          error: "Planet already has a build-job",
         });
       }
 
@@ -358,9 +310,7 @@ export default class BuildingsRouter {
 
       if (currentLevel === 0) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "This building can't be demolished",
-          data: {},
+          error: "This building can't be demolished",
         });
       }
 
@@ -381,18 +331,13 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Job started",
-        data: { planet },
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: `There was an error while handling the request: ${error}`,
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };

@@ -140,8 +140,8 @@ export default class App {
           ) {
             return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,
-              message: "Authentication failed",
-              data: {},
+              error: "Authentication failed",
+
             });
           }
 
@@ -156,8 +156,8 @@ export default class App {
             if (isNaN(parseInt(self.userID, 10))) {
               return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
                 status: Globals.Statuscode.NOT_AUTHORIZED,
-                message: "Invalid parameter2",
-                data: {},
+                error: "Invalid parameter2",
+
               });
             } else {
               next();
@@ -165,8 +165,8 @@ export default class App {
           } else {
             return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
               status: Globals.Statuscode.NOT_AUTHORIZED,
-              message: "Authentication failed",
-              data: {},
+              error: "Authentication failed",
+
             });
           }
         } else {
@@ -177,8 +177,8 @@ export default class App {
 
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
           status: Globals.Statuscode.SERVER_ERROR,
-          message: "Internal server error",
-          data: {},
+          error: "Internal server error",
+
         });
       }
     });
@@ -242,8 +242,8 @@ export default class App {
     this.express.use(function(request, response) {
       return response.status(Globals.Statuscode.NOT_FOUND).json({
         status: Globals.Statuscode.NOT_FOUND,
-        message: "The route does not exist",
-        data: {},
+        error: "The route does not exist",
+
       });
     });
   }

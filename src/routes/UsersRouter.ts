@@ -331,6 +331,7 @@ export default class UsersRouter {
       const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
+        // TODO: Check if username already exists
         user.username = InputValidator.sanitizeString(request.body.username);
       }
 

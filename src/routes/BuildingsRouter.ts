@@ -119,6 +119,7 @@ export default class BuildingsRouter {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -260,7 +261,8 @@ export default class BuildingsRouter {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: `There was an error while handling the request: ${error}`,
+        status: Globals.Statuscode.SERVER_ERROR,
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -334,7 +336,8 @@ export default class BuildingsRouter {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: `There was an error while handling the request: ${error}`,
+        status: Globals.Statuscode.SERVER_ERROR,
+        error: "There was an error while handling the request.",
       });
     }
   };

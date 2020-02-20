@@ -66,7 +66,8 @@ export default class AuthRouter {
       Logger.error(err);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: `There was an error: ${err.message}`,
+        status: Globals.Statuscode.SERVER_ERROR,
+        error: "There was an error while handling the request.",
       });
     }
   };

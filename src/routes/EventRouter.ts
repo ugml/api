@@ -57,9 +57,7 @@ export default class EventRouter {
 
     if (!InputValidator.isSet(request.body.event)) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "Invalid parameter",
-
       });
     }
 
@@ -68,9 +66,7 @@ export default class EventRouter {
     // validate JSON against schema
     if (!jsonValidator.validate(eventData, eventSchema).valid) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "Invalid json",
-
       });
     }
 
@@ -80,18 +76,14 @@ export default class EventRouter {
     // check if sender of event == currently authenticated user
     if (userID !== ownerID) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "Event-creator is not currently authenticated user",
-
       });
     }
 
     // TODO: temporary
     if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-
+      return response.status(Globals.Statuscode.BAD_REQUEST).json({
         error: "Missiontype not yet supported",
-
       });
     }
 
@@ -114,18 +106,14 @@ export default class EventRouter {
 
     if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "Origin does not exist or user is not the owner",
-
       });
     }
 
     // destination does not exist
     if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "Destination does not exist",
-
       });
     }
 
@@ -169,11 +157,7 @@ export default class EventRouter {
     Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
 
     // all done
-    return response.status(Globals.Statuscode.SUCCESS).json({
-      status: Globals.Statuscode.SUCCESS,
-      error: "Event successfully created",
-      data: event,
-    });
+    return response.status(Globals.Statuscode.SUCCESS).json(event);
   };
 
   /**
@@ -185,9 +169,7 @@ export default class EventRouter {
   public cancelEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "Invalid parameter",
-
       });
     }
 
@@ -198,9 +180,7 @@ export default class EventRouter {
 
     if (!InputValidator.isSet(event) || event.returning === true) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
         error: "The event does not exist or can't be canceled",
-
       });
     }
 
@@ -217,11 +197,7 @@ export default class EventRouter {
     Redis.getConnection().zadd("eventQueue", event.end_time, request.body.eventID);
 
     // all done
-    return response.status(Globals.Statuscode.SUCCESS).json({
-      status: Globals.Statuscode.SUCCESS,
-      error: "Event successfully canceled",
-
-    });
+    return response.status(Globals.Statuscode.SUCCESS).json();
   };
 
   /**

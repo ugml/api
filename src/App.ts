@@ -71,8 +71,8 @@ export default class App {
 
     const eventList = await eventService.getAllUnprocessedEvents();
 
-    for (const i of eventList) {
-      Redis.getConnection().zadd("eventQueue", eventList[i].end_time, eventList[i].eventID);
+    for (const event of eventList) {
+      Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
     }
 
     Logger.info(`Finished loading ${eventList.length} events into Queue`);

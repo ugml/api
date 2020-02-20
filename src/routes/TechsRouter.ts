@@ -53,18 +53,12 @@ export default class TechsRouter {
 
       const techs: Techs = await this.techService.getTechs(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: techs,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(techs);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -79,9 +73,7 @@ export default class TechsRouter {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -95,18 +87,14 @@ export default class TechsRouter {
       // player does not own the planet
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
       // 1. check if there is already a build-job on the planet
       if (user.b_tech_id === 0 && user.b_tech_endtime === 0) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Planet has no build-job",
-
         });
       }
 
@@ -125,18 +113,12 @@ export default class TechsRouter {
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Tech canceled",
-        data: { planet },
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -156,9 +138,7 @@ export default class TechsRouter {
         !InputValidator.isValidInt(request.body.techID)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -168,9 +148,7 @@ export default class TechsRouter {
 
       if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -181,26 +159,20 @@ export default class TechsRouter {
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
       if (planet.isUpgradingResearchLab()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Planet is upgrading the research-lab",
-
         });
       }
 
       // 1. check if there is already a build-job on the planet
       if (user.isResearching()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Planet already has a build-job",
-
         });
       }
 
@@ -241,9 +213,7 @@ export default class TechsRouter {
 
         if (!requirementsMet) {
           return response.status(Globals.Statuscode.SUCCESS).json({
-            status: Globals.Statuscode.SUCCESS,
             error: "Requirements are not met",
-            data: planet.planetID,
           });
         }
       }
@@ -262,9 +232,7 @@ export default class TechsRouter {
         planet.energy_max < cost.energy
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.SUCCESS,
           error: "Not enough resources",
-
         });
       }
 
@@ -282,18 +250,13 @@ export default class TechsRouter {
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Job started",
-        data: { planet },
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };

@@ -71,8 +71,8 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.undefined;
       });
   });
 
@@ -86,7 +86,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).equals(planetID);
+        expect(res.body.planetID).equals(planetID);
       });
   });
 
@@ -100,7 +100,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).equals(planetID);
+        expect(res.body.planetID).equals(planetID);
       });
   });
 
@@ -110,9 +110,10 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ buildOrder: JSON.stringify({ 301: 1 }) })
       .then(res => {
+        console.log(res.body);
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -126,7 +127,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -137,7 +138,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -152,8 +153,7 @@ describe("defenseRoute", () => {
       .send({ planetID, buildOrder: "{ \"xyz\": 1 }" })
         .then(res => {
           expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.message).to.be.equals("Invalid parameter");
-          expect(res.body.data).to.be.eql({});
+          expect(res.body.error).to.be.equals("Invalid parameter");
         })
     );
   });
@@ -169,8 +169,7 @@ describe("defenseRoute", () => {
         .send({ planetID, buildOrder: "{ \"301\": 1 }" })
         .then(res => {
           expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.message).to.be.equals("The player does not own the planet");
-          expect(res.body.data).to.be.eql({});
+          expect(res.body.error).to.be.equals("The player does not own the planet");
         })
     );
   });
@@ -194,8 +193,7 @@ describe("defenseRoute", () => {
         .send({ planetID, buildOrder: "{ \"301\": 1 }" })
         .then(async res => {
           expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.message).to.be.equals("Shipyard is currently upgrading");
-          expect(res.body.data).to.be.eql({});
+          expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
           planet.b_hangar_plus = valueBefore;
           await container.planetService.updatePlanet(planet);

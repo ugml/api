@@ -51,7 +51,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -61,9 +61,9 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -74,9 +74,9 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("The player does not own the planet");
+        expect(res.body.error).to.be.equals("The player does not own the planet");
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -87,14 +87,14 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data[0].planetID).to.be.equals(167546850);
-        expect(res.body.data[0].ownerID).to.be.equals(1);
-        expect(res.body.data[0].pos_galaxy).to.be.equals(9);
-        expect(res.body.data[0].pos_system).to.be.equals(54);
-        expect(res.body.data[0].pos_planet).to.be.equals(1);
-        expect(res.body.data[0].metal).to.be.greaterThan(0);
-        expect(res.body.data[0].crystal).to.be.greaterThan(0);
-        expect(res.body.data[0].deuterium).to.be.greaterThan(0);
+        expect(res.body[0].planetID).to.be.equals(167546850);
+        expect(res.body[0].ownerID).to.be.equals(1);
+        expect(res.body[0].pos_galaxy).to.be.equals(9);
+        expect(res.body[0].pos_system).to.be.equals(54);
+        expect(res.body[0].pos_planet).to.be.equals(1);
+        expect(res.body[0].metal).to.be.greaterThan(0);
+        expect(res.body[0].crystal).to.be.greaterThan(0);
+        expect(res.body[0].deuterium).to.be.greaterThan(0);
       });
   });
 
@@ -105,14 +105,14 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data[0].planetID).to.be.equals(93133);
-        expect(res.body.data[0].ownerID).to.be.equals(35);
-        expect(res.body.data[0].pos_galaxy).to.be.equals(4);
-        expect(res.body.data[0].pos_system).to.be.equals(71);
-        expect(res.body.data[0].pos_planet).to.be.equals(2);
-        expect(res.body.data[0].metal).to.be.equals(undefined);
-        expect(res.body.data[0].crystal).to.be.equals(undefined);
-        expect(res.body.data[0].deuterium).to.be.equals(undefined);
+        expect(res.body[0].planetID).to.be.equals(93133);
+        expect(res.body[0].ownerID).to.be.equals(35);
+        expect(res.body[0].pos_galaxy).to.be.equals(4);
+        expect(res.body[0].pos_system).to.be.equals(71);
+        expect(res.body[0].pos_planet).to.be.equals(2);
+        expect(res.body[0].metal).to.be.equals(undefined);
+        expect(res.body[0].crystal).to.be.equals(undefined);
+        expect(res.body[0].deuterium).to.be.equals(undefined);
       });
   });
 
@@ -123,11 +123,11 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.equals(null);
+        expect(res.body).to.be.oneOf([null, undefined, ""]);
       });
   });
 
-  it("should return a planet", () => {
+  it("should return a planet owned by the user", () => {
     const planetID = 167546850;
 
     return request
@@ -136,14 +136,14 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).to.be.equals(planetID);
-        expect(res.body.data.ownerID).to.be.equals(1);
-        expect(res.body.data.pos_galaxy).to.be.equals(9);
-        expect(res.body.data.pos_system).to.be.equals(54);
-        expect(res.body.data.pos_planet).to.be.equals(1);
-        expect(res.body.data.metal).to.be.greaterThan(0);
-        expect(res.body.data.crystal).to.be.greaterThan(0);
-        expect(res.body.data.deuterium).to.be.greaterThan(0);
+        expect(res.body.planetID).to.be.equals(planetID);
+        expect(res.body.ownerID).to.be.equals(1);
+        expect(res.body.pos_galaxy).to.be.equals(9);
+        expect(res.body.pos_system).to.be.equals(54);
+        expect(res.body.pos_planet).to.be.equals(1);
+        expect(res.body.metal).to.be.greaterThan(0);
+        expect(res.body.crystal).to.be.greaterThan(0);
+        expect(res.body.deuterium).to.be.greaterThan(0);
       });
   });
 
@@ -156,8 +156,8 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Invalid parameter");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.data).to.be.oneOf([null, undefined, ""]);
       });
   });
 
@@ -183,7 +183,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -199,7 +199,7 @@ describe("planetsRouter", () => {
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.name).to.be.equals("FancyNewName");
+        expect(res.body.name).to.be.equals("FancyNewName");
 
         // reset
         await container.planetService.updatePlanet(planet);
@@ -215,7 +215,8 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.type).to.eql("application/json");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -226,7 +227,8 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.type).to.eql("application/json");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -239,7 +241,8 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("New name is too short");
+        expect(res.type).to.eql("application/json");
+        expect(res.body.error).to.be.equals("New name is too short");
       });
   });
 
@@ -252,11 +255,11 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
-  it("should return a planet", () => {
+  it("should return a planet of another player", () => {
     const planetID = 167546850;
 
     return request
@@ -265,8 +268,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Success");
-        expect(res.body.data.planetID).to.be.equals(planetID);
+        expect(res.body.planetID).to.be.equals(planetID);
       });
   });
 
@@ -277,7 +279,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -291,7 +293,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -309,7 +311,6 @@ describe("planetsRouter", () => {
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("The planet was deleted");
       });
   });
 
@@ -323,7 +324,7 @@ describe("planetsRouter", () => {
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("The last planet cannot be destroyed");
+        expect(res.body.error).to.be.equals("The last planet cannot be destroyed");
         await container.planetService.createNewPlanet(secondPlanetBackup);
       });
   });

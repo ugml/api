@@ -51,8 +51,8 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data).to.have.keys("userID", "token");
-    expect(body.data.token.length).to.be.above(120);
+    expect(body).to.have.keys("userID", "token");
+    expect(body.token.length).to.be.above(120);
   });
 
   it("should fail (username already taken)", async () => {
@@ -66,8 +66,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("There was an error while handling the request: Username is already taken");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("There was an error while handling the request: Username is already taken");
   });
 
   it("should fail (email already taken)", async () => {
@@ -81,8 +80,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("There was an error while handling the request: Email is already taken");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("There was an error while handling the request: Email is already taken");
   });
 
   it("user-creation should fail (invalid parameters)", async () => {
@@ -95,8 +93,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("Invalid parameter");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("Invalid parameter");
   });
 
   it("user-creation should fail (invalid parameters)", async () => {
@@ -109,8 +106,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("Invalid parameter");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("Invalid parameter");
   });
 
   it("user-creation should fail (invalid parameters)", async () => {
@@ -123,8 +119,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("Invalid parameter");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("Invalid parameter");
   });
 
   it("user-creation should fail (no data sent)", async () => {
@@ -132,8 +127,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("Invalid parameter");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("Invalid parameter");
   });
 
   it("should return the user", async () => {
@@ -141,11 +135,11 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data.userID).to.be.equals(1);
-    expect(body.data.username).to.not.be.equals(null);
-    expect(body.data.email).to.not.be.equals(null);
-    expect(body.data.last_time_online).to.not.be.equals(null);
-    expect(body.data.current_planet).to.not.be.equals(null);
+    expect(body.userID).to.be.equals(1);
+    expect(body.username).to.not.be.equals(null);
+    expect(body.email).to.not.be.equals(null);
+    expect(body.last_time_online).to.not.be.equals(null);
+    expect(body.current_planet).to.not.be.equals(null);
   });
 
   it("should return a user", async () => {
@@ -153,11 +147,11 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data.userID).to.be.equals(41);
-    expect(body.data.username).to.not.be.equals(null);
-    expect(body.data.email).to.be.equals(undefined);
-    expect(body.data.last_time_online).to.be.equals(undefined);
-    expect(body.data.current_planet).to.be.equals(undefined);
+    expect(body.userID).to.be.equals(41);
+    expect(body.username).to.not.be.equals(null);
+    expect(body.email).to.be.equals(undefined);
+    expect(body.last_time_online).to.be.equals(undefined);
+    expect(body.current_planet).to.be.equals(undefined);
   });
 
   it("should fail (invalid userID)", async () => {
@@ -165,8 +159,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("Invalid parameter");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("Invalid parameter");
   });
 
   it("should return nothing (user does not exist)", async () => {
@@ -174,7 +167,6 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data).to.be.eql({});
   });
 
   it("should update the user", async () => {
@@ -189,8 +181,8 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data.userID).to.be.equals(1);
-    expect(body.data.username).to.be.equals("testuser1234");
+    expect(body.userID).to.be.equals(1);
+    expect(body.username).to.be.equals("testuser1234");
 
     // reset to old state
     request = chai.request(app);
@@ -205,8 +197,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).to.be.equals("No parameters were passed");
-    expect(body.data).to.be.eql({});
+    expect(body.error).to.be.equals("No parameters were passed");
   });
 
   it("update should fail (username already taken)", async () => {
@@ -221,8 +212,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).contain("There was an error while handling the request: ");
-    expect(body.data).to.be.eql({});
+    expect(body.error).contain("There was an error while handling the request: ");
   });
 
   it("update should fail (email already taken)", async () => {
@@ -237,8 +227,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-    expect(body.message).contain("There was an error while handling the request: ");
-    expect(body.data).to.be.eql({});
+    expect(body.error).contain("There was an error while handling the request: ");
   });
 
   it("update password", async () => {
@@ -253,7 +242,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
-    expect(body.data.userID).to.be.equals(1);
-    expect(body.data.username).to.be.equals("admin");
+    expect(body.userID).to.be.equals(1);
+    expect(body.username).to.be.equals("admin");
   });
 });

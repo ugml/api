@@ -47,7 +47,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).to.be.equals(planetID);
+        expect(res.body.planetID).to.be.equals(planetID);
       });
   });
 
@@ -59,7 +59,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -71,7 +71,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -85,7 +85,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -99,7 +99,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -114,7 +114,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
     /* eslint-enable quotes */
   });
@@ -130,7 +130,7 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("The player does not own the planet");
+        expect(res.body.error).to.be.equals("The player does not own the planet");
       });
     /* eslint-enable quotes */
   });
@@ -154,7 +154,7 @@ describe("shipsRouter", () => {
       .then(async res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Shipyard is currently upgrading");
+        expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
         // reset
         planet.b_hangar_plus = valueBefore;
@@ -174,8 +174,8 @@ describe("shipsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).to.be.equals(planetID);
-        const buildOrders = JSON.parse(res.body.data.b_hangar_queue);
+        expect(res.body.planetID).to.be.equals(planetID);
+        const buildOrders = JSON.parse(res.body.b_hangar_queue);
         expect(buildOrders.length).to.be.equals(1);
       });
     /* eslint-enable quotes */

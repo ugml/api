@@ -89,9 +89,7 @@ export default class DefenseRouter {
         !InputValidator.isValidJson(request.body.buildOrder)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -105,9 +103,7 @@ export default class DefenseRouter {
       // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.DEFENSE)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -117,17 +113,13 @@ export default class DefenseRouter {
 
       if (!InputValidator.isSet(buildings) || !InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "The player does not own the planet",
-
         });
       }
 
       if (planet.isUpgradingHangar()) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Shipyard is currently upgrading",
-
         });
       }
 
@@ -250,18 +242,13 @@ export default class DefenseRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: planet,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };

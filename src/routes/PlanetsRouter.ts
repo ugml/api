@@ -40,18 +40,12 @@ export default class PlanetsRouter {
 
       const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: planetList,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planetList);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -69,18 +63,12 @@ export default class PlanetsRouter {
 
       const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: planetList,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planetList);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -96,9 +84,7 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -107,18 +93,12 @@ export default class PlanetsRouter {
 
       const planet = await this.planetService.getPlanet(userID, planetID, true);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: planet,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -134,9 +114,7 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -145,18 +123,12 @@ export default class PlanetsRouter {
 
       const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: movement,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(movement);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -172,9 +144,7 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -185,27 +155,19 @@ export default class PlanetsRouter {
 
       if (planetList.length === 1) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "The last planet cannot be destroyed",
-
         });
       }
 
       // TODO: if the deleted planet was the current planet -> set another one as current planet
       await this.planetService.deletePlanet(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "The planet was deleted",
-
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -225,9 +187,7 @@ export default class PlanetsRouter {
         !InputValidator.isSet(request.body.name)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -236,9 +196,7 @@ export default class PlanetsRouter {
       // TODO: check max-length
       if (newName.length <= 4) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "New name is too short",
-
         });
       }
 
@@ -251,18 +209,12 @@ export default class PlanetsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: planet,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-
       });
     }
   };
@@ -278,9 +230,7 @@ export default class PlanetsRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-
           error: "Invalid parameter",
-
         });
       }
 
@@ -289,18 +239,12 @@ export default class PlanetsRouter {
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        error: "Success",
-        data: planet,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
-        data: {},
       });
     }
   };

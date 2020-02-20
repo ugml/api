@@ -80,7 +80,6 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
-        expect(res.body.message).to.be.equals("Event successfully created");
       });
   });
 
@@ -90,7 +89,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -122,7 +121,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Invalid json");
+        expect(res.body.error).to.be.equals("Invalid json");
       });
   });
 
@@ -175,7 +174,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Event-creator is not currently authenticated user");
+        expect(res.body.error).to.be.equals("Event-creator is not currently authenticated user");
       });
   });
 
@@ -228,7 +227,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Missiontype not yet supported");
+        expect(res.body.error).to.be.equals("Missiontype not yet supported");
       });
   });
 
@@ -281,7 +280,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Origin does not exist or user is not the owner");
+        expect(res.body.error).to.be.equals("Origin does not exist or user is not the owner");
       });
   });
 
@@ -334,7 +333,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.message).to.be.equals("Destination does not exist");
+        expect(res.body.error).to.be.equals("Destination does not exist");
       });
   });
 
@@ -344,7 +343,6 @@ describe("eventRouter", () => {
       .send({ eventID: 1 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.message).to.be.equals("Event successfully canceled");
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
       });
   });
@@ -354,7 +352,7 @@ describe("eventRouter", () => {
       .post("/v1/events/cancel")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
@@ -365,7 +363,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .send({ eventID: "asdf" })
       .then(res => {
-        expect(res.body.message).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Invalid parameter");
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
@@ -376,7 +374,7 @@ describe("eventRouter", () => {
       .set("Authorization", authToken)
       .send({ eventID: 33580 })
       .then(res => {
-        expect(res.body.message).to.be.equals("The event does not exist or can't be canceled");
+        expect(res.body.error).to.be.equals("The event does not exist or can't be canceled");
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });

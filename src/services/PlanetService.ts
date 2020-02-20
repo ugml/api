@@ -29,10 +29,10 @@ export default class PlanetService implements IPlanetService {
         .field("planetID")
         .field("ownerID")
         .field("name")
-        .field("pos_galaxy")
-        .field("pos_system")
-        .field("pos_planet")
-        .field("planet_type")
+        .field("posGalaxy")
+        .field("posSystem")
+        .field("posPlanet")
+        .field("planetType")
         .field("image");
     }
 
@@ -62,16 +62,16 @@ export default class PlanetService implements IPlanetService {
         query = query.set("name", planet.name);
       }
 
-      if (typeof planet.last_update !== "undefined") {
-        query = query.set("last_update", planet.last_update);
+      if (typeof planet.lastUpdate !== "undefined") {
+        query = query.set("lastUpdate", planet.lastUpdate);
       }
 
-      if (typeof planet.fields_current !== "undefined") {
-        query = query.set("fields_current", planet.fields_current);
+      if (typeof planet.fieldsCurrent !== "undefined") {
+        query = query.set("fieldsCurrent", planet.fieldsCurrent);
       }
 
-      if (typeof planet.fields_max !== "undefined") {
-        query = query.set("fields_max", planet.fields_max);
+      if (typeof planet.fieldsMax !== "undefined") {
+        query = query.set("fieldsMax", planet.fieldsMax);
       }
 
       if (typeof planet.metal !== "undefined") {
@@ -86,60 +86,60 @@ export default class PlanetService implements IPlanetService {
         query = query.set("deuterium", planet.deuterium);
       }
 
-      if (typeof planet.energy_used !== "undefined") {
-        query = query.set("energy_used", planet.energy_used);
+      if (typeof planet.energyUsed !== "undefined") {
+        query = query.set("energyUsed", planet.energyUsed);
       }
 
-      if (typeof planet.energy_max !== "undefined") {
-        query = query.set("energy_max", planet.energy_max);
+      if (typeof planet.energyMax !== "undefined") {
+        query = query.set("energyMax", planet.energyMax);
       }
 
-      if (typeof planet.metal_mine_percent !== "undefined") {
-        query = query.set("metal_mine_percent", planet.metal_mine_percent);
+      if (typeof planet.metalMinePercent !== "undefined") {
+        query = query.set("metalMinePercent", planet.metalMinePercent);
       }
 
-      if (typeof planet.crystal_mine_percent !== "undefined") {
-        query = query.set("crystal_mine_percent", planet.crystal_mine_percent);
+      if (typeof planet.crystalMinePercent !== "undefined") {
+        query = query.set("crystalMinePercent", planet.crystalMinePercent);
       }
 
-      if (typeof planet.deuterium_synthesizer_percent !== "undefined") {
-        query = query.set("deuterium_synthesizer_percent", planet.deuterium_synthesizer_percent);
+      if (typeof planet.deuteriumSynthesizerPercent !== "undefined") {
+        query = query.set("deuteriumSynthesizerPercent", planet.deuteriumSynthesizerPercent);
       }
 
-      if (typeof planet.solar_plant_percent !== "undefined") {
-        query = query.set("solar_plant_percent", planet.solar_plant_percent);
+      if (typeof planet.solarPlantPercent !== "undefined") {
+        query = query.set("solarPlantPercent", planet.solarPlantPercent);
       }
 
-      if (typeof planet.fusion_reactor_percent !== "undefined") {
-        query = query.set("fusion_reactor_percent", planet.fusion_reactor_percent);
+      if (typeof planet.fusionReactorPercent !== "undefined") {
+        query = query.set("fusionReactorPercent", planet.fusionReactorPercent);
       }
 
-      if (typeof planet.solar_satellite_percent !== "undefined") {
-        query = query.set("solar_satellite_percent", planet.solar_satellite_percent);
+      if (typeof planet.solarSatellitePercent !== "undefined") {
+        query = query.set("solarSatellitePercent", planet.solarSatellitePercent);
       }
 
-      if (typeof planet.b_building_id !== "undefined") {
-        query = query.set("b_building_id", planet.b_building_id);
+      if (typeof planet.bBuildingId !== "undefined") {
+        query = query.set("bBuildingId", planet.bBuildingId);
       }
 
-      if (typeof planet.b_building_endtime !== "undefined") {
-        query = query.set("b_building_endtime", planet.b_building_endtime);
+      if (typeof planet.bBuildingEndTime !== "undefined") {
+        query = query.set("bBuildingEndTime", planet.bBuildingEndTime);
       }
 
-      if (typeof planet.b_building_demolition !== "undefined") {
-        query = query.set("b_building_demolition", planet.b_building_demolition);
+      if (typeof planet.bBuildingDemolition !== "undefined") {
+        query = query.set("bBuildingDemolition", planet.bBuildingDemolition);
       }
 
-      if (typeof planet.b_hangar_queue !== "undefined") {
-        query = query.set("b_hangar_queue", planet.b_hangar_queue);
+      if (typeof planet.bHangarQueue !== "undefined") {
+        query = query.set("bHangarQueue", planet.bHangarQueue);
       }
 
-      if (typeof planet.b_hangar_start_time !== "undefined") {
-        query = query.set("b_hangar_start_time", planet.b_hangar_start_time);
+      if (typeof planet.bHangarStartTime !== "undefined") {
+        query = query.set("bHangarStartTime", planet.bHangarStartTime);
       }
 
-      if (typeof planet.b_hangar_plus !== "undefined") {
-        query = query.set("b_hangar_plus", planet.b_hangar_plus);
+      if (typeof planet.bHangarPlus !== "undefined") {
+        query = query.set("bHangarPlus", planet.bHangarPlus);
       }
 
       if (typeof planet.destroyed !== "undefined") {
@@ -181,16 +181,16 @@ export default class PlanetService implements IPlanetService {
       .set("planetID", planet.planetID)
       .set("ownerID", planet.ownerID)
       .set("name", planet.name)
-      .set("pos_galaxy", planet.pos_galaxy)
-      .set("pos_system", planet.pos_system)
-      .set("pos_planet", planet.pos_planet)
-      .set("last_update", planet.last_update)
-      .set("planet_type", planet.planet_type)
+      .set("posGalaxy", planet.posGalaxy)
+      .set("posSystem", planet.posSystem)
+      .set("posPlanet", planet.posPlanet)
+      .set("lastUpdate", planet.lastUpdate)
+      .set("planetType", planet.planetType)
       .set("image", planet.image)
       .set("diameter", planet.diameter)
-      .set("fields_max", planet.fields_max)
-      .set("temp_min", planet.temp_min)
-      .set("temp_max", planet.temp_max)
+      .set("fieldsMax", planet.fieldsMax)
+      .set("tempMin", planet.tempMin)
+      .set("tempMax", planet.tempMax)
       .set("metal", planet.metal)
       .set("crystal", planet.crystal)
       .set("deuterium", planet.deuterium)
@@ -219,10 +219,10 @@ export default class PlanetService implements IPlanetService {
         .field("planetID")
         .field("ownerID")
         .field("name")
-        .field("pos_galaxy")
-        .field("pos_system")
-        .field("pos_planet")
-        .field("planet_type")
+        .field("posGalaxy")
+        .field("posSystem")
+        .field("posPlanet")
+        .field("planetType")
         .field("image");
     }
 
@@ -248,8 +248,8 @@ export default class PlanetService implements IPlanetService {
       .where(
         squel
           .expr()
-          .or(`start_id = ${planetID}`)
-          .or(`end_id = ${planetID}`),
+          .or(`startID = ${planetID}`)
+          .or(`endID = ${planetID}`),
       )
       .toString();
 
@@ -287,10 +287,10 @@ export default class PlanetService implements IPlanetService {
     const query = squel
       .select({ autoQuoteFieldNames: true })
       .from("planets")
-      .where("pos_galaxy = ?", position.pos_galaxy)
-      .where("pos_system = ?", position.pos_system)
-      .where("pos_planet = ?", position.pos_planet)
-      .where("planet_type = ?", position.type)
+      .where("posGalaxy = ?", position.posGalaxy)
+      .where("posSystem = ?", position.posSystem)
+      .where("posPlanet = ?", position.posPlanet)
+      .where("planetType = ?", position.type)
       .toString();
 
     const [[rows]] = await Database.query(query);

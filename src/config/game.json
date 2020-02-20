@@ -1,12 +1,12 @@
 {
     "speed": 1,
-    "metal_start": 500,
-    "crystal_start": 500,
-    "deuterium_start": 500,
-    "startplanet_name": "Homeplanet",
-    "startplanet_diameter": 150000,
-    "startplanet_maxfields": 138,
-    "pos_galaxy_max": 9,
-    "pos_system_max": 100,
-    "pos_planet_max": 15
+    "metalStart": 500,
+    "crystalStart": 500,
+    "deuteriumStart": 500,
+    "startPlanetName": "Homeplanet",
+    "startPlanetDiameter": 150000,
+    "startPlanetMaxFields": 138,
+    "posGalaxyMax": 9,
+    "posSystemMax": 100,
+    "posPlanetMax": 15
 }

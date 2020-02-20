@@ -12,10 +12,10 @@ describe("User-units", function() {
       username: "Testuser",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1234,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1234,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -29,10 +29,10 @@ describe("User-units", function() {
       username: "Testuser",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1234,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1234,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -46,10 +46,10 @@ describe("User-units", function() {
       username: "Hi",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1234,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1234,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -63,10 +63,10 @@ describe("User-units", function() {
       username: "IamWaaaaaaaaaaaaaaaayTooLong",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1234,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1234,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -80,10 +80,10 @@ describe("User-units", function() {
       username: "Testname",
       password: "IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong",
       email: "hello@world.com",
-      last_time_online: 1234,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1234,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -97,10 +97,10 @@ describe("User-units", function() {
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@IamWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaayTooLong.com",
-      last_time_online: 1234,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1234,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -108,16 +108,16 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (last_time_online negative)", function() {
+  it("Should fail (lastTimeOnline negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: -1,
-      current_planet: 45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: -1,
+      currentPlanet: 45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -125,16 +125,16 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (current_planet negative)", function() {
+  it("Should fail (currentPlanet negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1,
-      current_planet: -45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1,
+      currentPlanet: -45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -142,16 +142,16 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (current_planet negative)", function() {
+  it("Should fail (currentPlanet negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1,
-      current_planet: -45312,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1,
+      currentPlanet: -45312,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -159,16 +159,16 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (b_tech_id negative)", function() {
+  it("Should fail (bTechID negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1,
-      current_planet: -45312,
-      b_tech_id: -1,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1,
+      currentPlanet: -45312,
+      bTechID: -1,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -176,16 +176,16 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (b_tech_id too high)", function() {
+  it("Should fail (bTechID too high)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1,
-      current_planet: -45312,
-      b_tech_id: Globals.MAX_TECHNOLOGY_ID + 1,
-      b_tech_endtime: 0,
+      lastTimeOnline: 1,
+      currentPlanet: -45312,
+      bTechID: Globals.MAX_TECHNOLOGY_ID + 1,
+      bTechEndTime: 0,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
@@ -193,16 +193,16 @@ describe("User-units", function() {
     assert.equal(user.isValid(), false);
   });
 
-  it("Should fail (b_tech_endtime negative)", function() {
+  it("Should fail (bTechEndTime negative)", function() {
     const data = {
       userID: 1,
       username: "Testname",
       password: "iAmNotSecure",
       email: "hello@world.com",
-      last_time_online: 1,
-      current_planet: -45312,
-      b_tech_id: 0,
-      b_tech_endtime: -1,
+      lastTimeOnline: 1,
+      currentPlanet: -45312,
+      bTechID: 0,
+      bTechEndTime: -1,
     };
 
     const user: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));

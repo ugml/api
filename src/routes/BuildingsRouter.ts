@@ -100,14 +100,14 @@ export default class BuildingsRouter {
         });
       }
 
-      const buildingKey = Config.getMappings()[planet.b_building_id];
+      const buildingKey = Config.getMappings()[planet.bBuildingId];
 
       const currentLevel = buildings[buildingKey];
 
-      const cost: ICosts = Calculations.getCosts(planet.b_building_id, currentLevel);
+      const cost: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
 
-      planet.b_building_id = 0;
-      planet.b_building_endtime = 0;
+      planet.bBuildingId = 0;
+      planet.bBuildingEndTime = 0;
       planet.metal = planet.metal + cost.metal;
       planet.crystal = planet.crystal + cost.crystal;
       planet.crystal = planet.crystal + cost.crystal;
@@ -176,7 +176,7 @@ export default class BuildingsRouter {
         (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
           buildingID === Globals.Buildings.NANITE_FACTORY ||
           buildingID === Globals.Buildings.SHIPYARD) &&
-        InputValidator.isSet(planet.b_hangar_queue) &&
+        InputValidator.isSet(planet.bHangarQueue) &&
         planet.isBuildingUnits()
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
@@ -231,7 +231,7 @@ export default class BuildingsRouter {
         planet.metal < cost.metal ||
         planet.crystal < cost.crystal ||
         planet.deuterium < cost.deuterium ||
-        planet.energy_used < cost.energy
+        planet.energyUsed < cost.energy
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Not enough resources",
@@ -242,8 +242,8 @@ export default class BuildingsRouter {
       const buildTime: number = Calculations.calculateBuildTimeInSeconds(
         cost.metal,
         cost.crystal,
-        buildings.robotic_factory,
-        buildings.nanite_factory,
+        buildings.roboticFactory,
+        buildings.naniteFactory,
       );
 
       const endTime: number = Math.round(+new Date() / 1000) + buildTime;
@@ -251,8 +251,8 @@ export default class BuildingsRouter {
       planet.metal = planet.metal - cost.metal;
       planet.crystal = planet.crystal - cost.crystal;
       planet.deuterium = planet.deuterium - cost.deuterium;
-      planet.b_building_id = buildingID;
-      planet.b_building_endtime = endTime;
+      planet.bBuildingId = buildingID;
+      planet.bBuildingEndTime = endTime;
 
       await this.planetService.updatePlanet(planet);
 
@@ -319,15 +319,15 @@ export default class BuildingsRouter {
       const buildTime: number = Calculations.calculateBuildTimeInSeconds(
         cost.metal,
         cost.crystal,
-        buildings.robotic_factory,
-        buildings.nanite_factory,
+        buildings.roboticFactory,
+        buildings.naniteFactory,
       );
 
       const endTime: number = Math.round(+new Date() / 1000) + buildTime;
 
-      planet.b_building_id = buildingID;
-      planet.b_building_endtime = endTime;
-      planet.b_building_demolition = true;
+      planet.bBuildingId = buildingID;
+      planet.bBuildingEndTime = endTime;
+      planet.bBuildingDemolition = true;
 
       await this.planetService.updatePlanet(planet);
 

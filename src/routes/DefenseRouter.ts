@@ -124,9 +124,9 @@ export default class DefenseRouter {
       let buildTime = 0;
 
       let freeSiloSlots: number = Calculations.calculateFreeMissileSlots(
-        buildings.missile_silo,
-        defenses.anti_ballistic_missile,
-        defenses.interplanetary_missile,
+        buildings.missileSilo,
+        defenses.antiBallisticMissile,
+        defenses.interplanetaryMissile,
       );
 
       // TODO: put this into a seperate function
@@ -194,7 +194,7 @@ export default class DefenseRouter {
               cost.metal,
               cost.crystal,
               buildings.shipyard,
-              buildings.nanite_factory,
+              buildings.naniteFactory,
             ) * Math.floor(count);
 
           queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
@@ -218,16 +218,16 @@ export default class DefenseRouter {
       let oldBuildOrder;
 
       if (!planet.isBuildingUnits()) {
-        planet.b_hangar_queue = JSON.parse("[]");
-        oldBuildOrder = planet.b_hangar_queue;
-        planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
+        planet.bHangarQueue = JSON.parse("[]");
+        oldBuildOrder = planet.bHangarQueue;
+        planet.bHangarStartTime = Math.floor(Date.now() / 1000);
       } else {
-        oldBuildOrder = JSON.parse(planet.b_hangar_queue);
+        oldBuildOrder = JSON.parse(planet.bHangarQueue);
       }
 
       oldBuildOrder.push(queue);
 
-      planet.b_hangar_queue = JSON.stringify(oldBuildOrder);
+      planet.bHangarQueue = JSON.stringify(oldBuildOrder);
 
       planet.metal = metal;
       planet.crystal = crystal;

@@ -9,54 +9,54 @@ export default class Defenses implements IUnits {
   public planetID: number;
 
   /**
-   * The current amount of rocket_launcher on the planet
+   * The current amount of rocketLauncher on the planet
    */
-  public rocket_launcher: number;
+  public rocketLauncher: number;
 
   /**
-   * The current amount of light_laser on the planet
+   * The current amount of lightLaser on the planet
    */
-  public light_laser: number;
+  public lightLaser: number;
 
   /**
-   * The current amount of heavy_laser on the planet
+   * The current amount of heavyLaser on the planet
    */
-  public heavy_laser: number;
+  public heavyLaser: number;
 
   /**
-   * The current amount of ion_cannon on the planet
+   * The current amount of ionCannon on the planet
    */
-  public ion_cannon: number;
+  public ionCannon: number;
 
   /**
-   * The current amount of gauss_cannon on the planet
+   * The current amount of gaussCannon on the planet
    */
-  public gauss_cannon: number;
+  public gaussCannon: number;
 
   /**
-   * The current amount of plasma_turret on the planet
+   * The current amount of plasmaTurret on the planet
    */
-  public plasma_turret: number;
+  public plasmaTurret: number;
 
   /**
-   * Is true, if the planet has a small_shield_dome
+   * Is true, if the planet has a smallShieldDome
    */
-  public small_shield_dome: boolean;
+  public smallShieldDome: boolean;
 
   /**
-   * Is true, if the planet has a large_shield_dome
+   * Is true, if the planet has a largeShieldDome
    */
-  public large_shield_dome: boolean;
+  public largeShieldDome: boolean;
 
   /**
-   * The current amount of anti_ballistic_missile on the planet
+   * The current amount of antiBallisticMissile on the planet
    */
-  public anti_ballistic_missile: number;
+  public antiBallisticMissile: number;
 
   /**
-   * The current amount of interplanetary_missile on the planet
+   * The current amount of interplanetaryMissile on the planet
    */
-  public interplanetary_missile: number;
+  public interplanetaryMissile: number;
 
   /**
    * Returns, if the contains valid data or not
@@ -64,14 +64,14 @@ export default class Defenses implements IUnits {
   public isValid(): boolean {
     return (
       0 <= this.planetID &&
-      0 <= this.rocket_launcher &&
-      0 <= this.light_laser &&
-      0 <= this.heavy_laser &&
-      0 <= this.ion_cannon &&
-      0 <= this.gauss_cannon &&
-      0 <= this.plasma_turret &&
-      0 <= this.anti_ballistic_missile &&
-      0 <= this.interplanetary_missile
+      0 <= this.rocketLauncher &&
+      0 <= this.lightLaser &&
+      0 <= this.heavyLaser &&
+      0 <= this.ionCannon &&
+      0 <= this.gaussCannon &&
+      0 <= this.plasmaTurret &&
+      0 <= this.antiBallisticMissile &&
+      0 <= this.interplanetaryMissile
     );
   }
 
@@ -80,16 +80,16 @@ export default class Defenses implements IUnits {
   //     const query = squel
   //       .update()
   //       .table("defenses")
-  //       .set("rocket_launcher", this.rocket_launcher)
-  //       .set("light_laser", this.light_laser)
-  //       .set("heavy_laser", this.heavy_laser)
-  //       .set("ion_cannon", this.ion_cannon)
-  //       .set("gauss_cannon", this.gauss_cannon)
-  //       .set("plasma_turret", this.plasma_turret)
-  //       .set("small_shield_dome", this.small_shield_dome)
-  //       .set("large_shield_dome", this.large_shield_dome)
-  //       .set("anti_ballistic_missile", this.anti_ballistic_missile)
-  //       .set("interplanetary_missile", this.interplanetary_missile)
+  //       .set("rocketLauncher", this.rocketLauncher)
+  //       .set("lightLaser", this.lightLaser)
+  //       .set("heavyLaser", this.heavyLaser)
+  //       .set("ionCannon", this.ionCannon)
+  //       .set("gaussCannon", this.gaussCannon)
+  //       .set("plasmaTurret", this.plasmaTurret)
+  //       .set("smallShieldDome", this.smallShieldDome)
+  //       .set("largeShieldDome", this.largeShieldDome)
+  //       .set("antiBallisticMissile", this.antiBallisticMissile)
+  //       .set("interplanetaryMissile", this.interplanetaryMissile)
   //       .where("planetID = ?", this.planetID)
   //       .toString();
   //
@@ -110,16 +110,16 @@ export default class Defenses implements IUnits {
   //       .insert()
   //       .into("defenses")
   //       .set("planetID", this.planetID)
-  //       .set("rocket_launcher", this.rocket_launcher)
-  //       .set("light_laser", this.light_laser)
-  //       .set("heavy_laser", this.heavy_laser)
-  //       .set("ion_cannon", this.ion_cannon)
-  //       .set("gauss_cannon", this.gauss_cannon)
-  //       .set("plasma_turret", this.plasma_turret)
-  //       .set("small_shield_dome", this.small_shield_dome)
-  //       .set("large_shield_dome", this.large_shield_dome)
-  //       .set("anti_ballistic_missile", this.anti_ballistic_missile)
-  //       .set("interplanetary_missile", this.interplanetary_missile)
+  //       .set("rocketLauncher", this.rocketLauncher)
+  //       .set("lightLaser", this.lightLaser)
+  //       .set("heavyLaser", this.heavyLaser)
+  //       .set("ionCannon", this.ionCannon)
+  //       .set("gaussCannon", this.gaussCannon)
+  //       .set("plasmaTurret", this.plasmaTurret)
+  //       .set("smallShieldDome", this.smallShieldDome)
+  //       .set("largeShieldDome", this.largeShieldDome)
+  //       .set("antiBallisticMissile", this.antiBallisticMissile)
+  //       .set("interplanetaryMissile", this.interplanetaryMissile)
   //       .toString();
   //
   //     Database.query(query)

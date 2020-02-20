@@ -40,11 +40,11 @@ describe("galaxyRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.body).to.have.lengthOf(2);
         expect(res.body[0].planetID).to.be.equals(61614);
-        expect(res.body[0].pos_galaxy).to.be.equals(7);
-        expect(res.body[0].pos_system).to.be.equals(5);
+        expect(res.body[0].posGalaxy).to.be.equals(7);
+        expect(res.body[0].posSystem).to.be.equals(5);
         expect(res.body[1].planetID).to.be.equals(87851);
-        expect(res.body[1].pos_galaxy).to.be.equals(7);
-        expect(res.body[1].pos_system).to.be.equals(5);
+        expect(res.body[1].posGalaxy).to.be.equals(7);
+        expect(res.body[1].posSystem).to.be.equals(5);
       });
   });
 

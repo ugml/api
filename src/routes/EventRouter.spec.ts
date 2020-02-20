@@ -39,15 +39,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "pos_galaxy": 9,
-            "pos_system": 54,
-            "pos_planet": 1,
+            "posGalaxy": 9,
+            "posSystem": 54,
+            "posPlanet": 1,
             "type": "planet"
         },
         "destination": {
-            "pos_galaxy": 4,
-            "pos_system": 71,
-            "pos_planet": 2,
+            "posGalaxy": 4,
+            "posSystem": 71,
+            "posPlanet": 2,
             "type": "planet"
         },
         "ships": {
@@ -101,15 +101,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "pos_galaxy": 9,
-            "pos_system": 54,
-            "pos_planet": 1,
+            "posGalaxy": 9,
+            "posSystem": 54,
+            "posPlanet": 1,
             "type": "planet"
         },
         "destination": {
-            "pos_galaxy": 4,
-            "pos_system": 71,
-            "pos_planet": 2,
+            "posGalaxy": 4,
+            "posSystem": 71,
+            "posPlanet": 2,
             "type": "planet"
         }
     }
@@ -133,15 +133,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "pos_galaxy": 9,
-            "pos_system": 54,
-            "pos_planet": 1,
+            "posGalaxy": 9,
+            "posSystem": 54,
+            "posPlanet": 1,
             "type": "planet"
         },
         "destination": {
-            "pos_galaxy": 4,
-            "pos_system": 71,
-            "pos_planet": 2,
+            "posGalaxy": 4,
+            "posSystem": 71,
+            "posPlanet": 2,
             "type": "planet"
         },
         "ships": {
@@ -186,15 +186,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "pos_galaxy": 9,
-            "pos_system": 54,
-            "pos_planet": 1,
+            "posGalaxy": 9,
+            "posSystem": 54,
+            "posPlanet": 1,
             "type": "planet"
         },
         "destination": {
-            "pos_galaxy": 4,
-            "pos_system": 71,
-            "pos_planet": 2,
+            "posGalaxy": 4,
+            "posSystem": 71,
+            "posPlanet": 2,
             "type": "planet"
         },
         "ships": {
@@ -239,15 +239,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "pos_galaxy": 6,
-            "pos_system": 46,
-            "pos_planet": 7,
+            "posGalaxy": 6,
+            "posSystem": 46,
+            "posPlanet": 7,
             "type": "planet"
         },
         "destination": {
-            "pos_galaxy": 4,
-            "pos_system": 71,
-            "pos_planet": 2,
+            "posGalaxy": 4,
+            "posSystem": 71,
+            "posPlanet": 2,
             "type": "planet"
         },
         "ships": {
@@ -292,15 +292,15 @@ describe("eventRouter", () => {
     "holdDuration": 695,
     "data": {
         "origin": {
-            "pos_galaxy": 9,
-            "pos_system": 54,
-            "pos_planet": 1,
+            "posGalaxy": 9,
+            "posSystem": 54,
+            "posPlanet": 1,
             "type": "planet"
         },
         "destination": {
-            "pos_galaxy": 1,
-            "pos_system": 1,
-            "pos_planet": 1,
+            "posGalaxy": 1,
+            "posSystem": 1,
+            "posPlanet": 1,
             "type": "planet"
         },
         "ships": {

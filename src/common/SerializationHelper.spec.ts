@@ -12,10 +12,10 @@ describe("SerializationHelper", function() {
       username: "testname",
       password: "password",
       email: "hello@world.com",
-      last_time_online: 42,
-      current_planet: 1,
-      b_tech_id: 0,
-      b_tech_endtime: 0,
+      lastTimeOnline: 42,
+      currentPlanet: 1,
+      bTechID: 0,
+      bTechEndTime: 0,
     };
     const result: User = SerializationHelper.toInstance(new User(), JSON.stringify(data));
 
@@ -23,8 +23,8 @@ describe("SerializationHelper", function() {
     expect(result.username).to.be.equals(data.username);
     expect(result.password).to.be.equals(data.password);
     expect(result.email).to.be.equals(data.email);
-    expect(result.last_time_online).to.be.equals(data.last_time_online);
-    expect(result.current_planet).to.be.equals(data.current_planet);
+    expect(result.lastTimeOnline).to.be.equals(data.lastTimeOnline);
+    expect(result.currentPlanet).to.be.equals(data.currentPlanet);
     expect(result.isValid()).to.be.equals(true);
   });
 });

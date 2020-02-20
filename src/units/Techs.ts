@@ -9,79 +9,79 @@ export default class Techs implements IUnits {
   public userID: number;
 
   /**
-   * The current espionage_tech level
+   * The current espionageTech level
    */
-  public espionage_tech: number;
+  public espionageTech: number;
 
   /**
-   * The current computer_tech level
+   * The current computerTech level
    */
-  public computer_tech: number;
+  public computerTech: number;
 
   /**
-   * The current weapon_tech level
+   * The current weaponTech level
    */
-  public weapon_tech: number;
+  public weaponTech: number;
 
   /**
-   * The current armour_tech level
+   * The current armourTech level
    */
-  public armour_tech: number;
+  public armourTech: number;
 
   /**
-   * The current shielding_tech level
+   * The current shieldingTech level
    */
-  public shielding_tech: number;
+  public shieldingTech: number;
 
   /**
-   * The current energy_tech level
+   * The current energyTech level
    */
-  public energy_tech: number;
+  public energyTech: number;
 
   /**
-   * The current hyperspace_tech level
+   * The current hyperspaceTech level
    */
-  public hyperspace_tech: number;
+  public hyperspaceTech: number;
 
   /**
-   * The current combustion_drive_tech level
+   * The current combustionDriveTech level
    */
-  public combustion_drive_tech: number;
+  public combustionDriveTech: number;
 
   /**
-   * The current impulse_drive_tech level
+   * The current impulseDriveTech level
    */
-  public impulse_drive_tech: number;
+  public impulseDriveTech: number;
 
   /**
-   * The current hyperspace_drive_tech level
+   * The current hyperspaceDriveTech level
    */
-  public hyperspace_drive_tech: number;
+  public hyperspaceDriveTech: number;
 
   /**
-   * The current laser_tech level
+   * The current laserTech level
    */
-  public laser_tech: number;
+  public laserTech: number;
 
   /**
-   * The current ion_tech level
+   * The current ionTech level
    */
-  public ion_tech: number;
+  public ionTech: number;
 
   /**
-   * The current plasma_tech level
+   * The current plasmaTech level
    */
-  public plasma_tech: number;
+  public plasmaTech: number;
 
   /**
-   * The current intergalactic_research_tech level
+   * The current intergalacticResearchTech level
    */
-  public intergalactic_research_tech: number;
+  public intergalacticResearchTech: number;
 
   /**
-   * The current graviton_tech level
+   * The current gravitonTech level
    */
-  public graviton_tech: number;
+  public gravitonTech: number;
 
   /**
    * Returns, if the contains valid data or not
@@ -89,21 +89,21 @@ export default class Techs implements IUnits {
   public isValid(): boolean {
     return (
       0 < this.userID &&
-      0 <= this.espionage_tech &&
-      0 <= this.computer_tech &&
-      0 <= this.weapon_tech &&
-      0 <= this.armour_tech &&
-      0 <= this.shielding_tech &&
-      0 <= this.energy_tech &&
-      0 <= this.hyperspace_tech &&
-      0 <= this.combustion_drive_tech &&
-      0 <= this.impulse_drive_tech &&
-      0 <= this.hyperspace_drive_tech &&
-      0 <= this.laser_tech &&
-      0 <= this.ion_tech &&
-      0 <= this.plasma_tech &&
-      0 <= this.intergalactic_research_tech &&
-      0 <= this.graviton_tech
+      0 <= this.espionageTech &&
+      0 <= this.computerTech &&
+      0 <= this.weaponTech &&
+      0 <= this.armourTech &&
+      0 <= this.shieldingTech &&
+      0 <= this.energyTech &&
+      0 <= this.hyperspaceTech &&
+      0 <= this.combustionDriveTech &&
+      0 <= this.impulseDriveTech &&
+      0 <= this.hyperspaceDriveTech &&
+      0 <= this.laserTech &&
+      0 <= this.ionTech &&
+      0 <= this.plasmaTech &&
+      0 <= this.intergalacticResearchTech &&
+      0 <= this.gravitonTech
     );
   }
 
@@ -112,21 +112,21 @@ export default class Techs implements IUnits {
   //     const query = squel
   //       .update()
   //       .table("techs")
-  //       .set("espionage_tech", this.espionage_tech)
-  //       .set("computer_tech", this.computer_tech)
-  //       .set("weapon_tech", this.weapon_tech)
-  //       .set("armour_tech", this.armour_tech)
-  //       .set("shielding_tech", this.shielding_tech)
-  //       .set("energy_tech", this.energy_tech)
-  //       .set("hyperspace_tech", this.hyperspace_tech)
-  //       .set("combustion_drive_tech", this.combustion_drive_tech)
-  //       .set("impulse_drive_tech", this.impulse_drive_tech)
-  //       .set("hyperspace_drive_tech", this.hyperspace_drive_tech)
-  //       .set("laser_tech", this.laser_tech)
-  //       .set("ion_tech", this.ion_tech)
-  //       .set("plasma_tech", this.plasma_tech)
-  //       .set("intergalactic_research_tech", this.intergalactic_research_tech)
-  //       .set("graviton_tech", this.graviton_tech)
+  //       .set("espionageTech", this.espionageTech)
+  //       .set("computerTech", this.computerTech)
+  //       .set("weaponTech", this.weaponTech)
+  //       .set("armourTech", this.armourTech)
+  //       .set("shieldingTech", this.shieldingTech)
+  //       .set("energyTech", this.energyTech)
+  //       .set("hyperspaceTech", this.hyperspaceTech)
+  //       .set("combustionDriveTech", this.combustionDriveTech)
+  //       .set("impulseDriveTech", this.impulseDriveTech)
+  //       .set("hyperspaceDriveTech", this.hyperspaceDriveTech)
+  //       .set("laserTech", this.laserTech)
+  //       .set("ionTech", this.ionTech)
+  //       .set("plasmaTech", this.plasmaTech)
+  //       .set("intergalacticResearchTech", this.intergalacticResearchTech)
+  //       .set("gravitonTech", this.gravitonTech)
   //       .where("userID = ?", this.userID)
   //       .toString();
   //
@@ -147,21 +147,21 @@ export default class Techs implements IUnits {
   //       .insert()
   //       .into("techs")
   //       .set("userID", this.userID)
-  //       .set("espionage_tech", this.espionage_tech)
-  //       .set("computer_tech", this.computer_tech)
-  //       .set("weapon_tech", this.weapon_tech)
-  //       .set("armour_tech", this.armour_tech)
-  //       .set("shielding_tech", this.shielding_tech)
-  //       .set("energy_tech", this.energy_tech)
-  //       .set("hyperspace_tech", this.hyperspace_tech)
-  //       .set("combustion_drive_tech", this.combustion_drive_tech)
-  //       .set("impulse_drive_tech", this.impulse_drive_tech)
-  //       .set("hyperspace_drive_tech", this.hyperspace_drive_tech)
-  //       .set("laser_tech", this.laser_tech)
-  //       .set("ion_tech", this.ion_tech)
-  //       .set("plasma_tech", this.plasma_tech)
-  //       .set("intergalactic_research_tech", this.intergalactic_research_tech)
-  //       .set("graviton_tech", this.graviton_tech)
+  //       .set("espionageTech", this.espionageTech)
+  //       .set("computerTech", this.computerTech)
+  //       .set("weaponTech", this.weaponTech)
+  //       .set("armourTech", this.armourTech)
+  //       .set("shieldingTech", this.shieldingTech)
+  //       .set("energyTech", this.energyTech)
+  //       .set("hyperspaceTech", this.hyperspaceTech)
+  //       .set("combustionDriveTech", this.combustionDriveTech)
+  //       .set("impulseDriveTech", this.impulseDriveTech)
+  //       .set("hyperspaceDriveTech", this.hyperspaceDriveTech)
+  //       .set("laserTech", this.laserTech)
+  //       .set("ionTech", this.ionTech)
+  //       .set("plasmaTech", this.plasmaTech)
+  //       .set("intergalacticResearchTech", this.intergalacticResearchTech)
+  //       .set("gravitonTech", this.gravitonTech)
   //       .toString();
   //
   //     Database.query(query)

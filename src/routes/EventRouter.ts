@@ -89,16 +89,16 @@ export default class EventRouter {
       }
 
       const positionOrigin: ICoordinates = {
-        pos_galaxy: eventData.data.origin.pos_galaxy,
-        pos_system: eventData.data.origin.pos_system,
-        pos_planet: eventData.data.origin.pos_planet,
+        posGalaxy: eventData.data.origin.posGalaxy,
+        posSystem: eventData.data.origin.posSystem,
+        posPlanet: eventData.data.origin.posPlanet,
         type: this.getDestinationTypeByName(eventData.data.origin.type),
       };
 
       const positionDestination: ICoordinates = {
-        pos_galaxy: eventData.data.destination.pos_galaxy,
-        pos_system: eventData.data.destination.pos_system,
-        pos_planet: eventData.data.destination.pos_planet,
+        posGalaxy: eventData.data.destination.posGalaxy,
+        posSystem: eventData.data.destination.posSystem,
+        posPlanet: eventData.data.destination.posPlanet,
         type: this.getDestinationTypeByName(eventData.data.destination.type),
       };
 
@@ -138,15 +138,15 @@ export default class EventRouter {
       event.ownerID = eventData.ownerID;
       event.mission = this.getMissionTypeID(eventData.mission);
       event.fleetlist = JSON.stringify(eventData.data.ships);
-      event.start_id = startPlanet.planetID;
-      event.start_type = this.getDestinationTypeByName(eventData.data.origin.type);
-      event.start_time = Math.round(+new Date() / 1000);
-      event.end_id = destinationPlanet.planetID;
-      event.end_type = this.getDestinationTypeByName(eventData.data.destination.type);
-      event.end_time = Math.round(event.start_time + timeOfFlight);
-      event.loaded_metal = eventData.data.loadedRessources.metal;
-      event.loaded_crystal = eventData.data.loadedRessources.crystal;
-      event.loaded_deuterium = eventData.data.loadedRessources.deuterium;
+      event.startID = startPlanet.planetID;
+      event.startType = this.getDestinationTypeByName(eventData.data.origin.type);
+      event.startTime = Math.round(+new Date() / 1000);
+      event.endID = destinationPlanet.planetID;
+      event.endType = this.getDestinationTypeByName(eventData.data.destination.type);
+      event.endTime = Math.round(event.startTime + timeOfFlight);
+      event.loadedMetal = eventData.data.loadedRessources.metal;
+      event.loadedCrystal = eventData.data.loadedRessources.crystal;
+      event.loadedDeuterium = eventData.data.loadedRessources.deuterium;
       event.returning = false;
       event.processed = false;
 
@@ -155,7 +155,7 @@ export default class EventRouter {
       event.eventID = parseInt(result.insertId, 10);
 
       // insert into redis
-      Redis.getConnection().zadd("eventQueue", event.end_time, event.eventID);
+      Redis.getConnection().zadd("eventQueue", event.endTime, event.eventID);
 
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json(event);
@@ -195,16 +195,16 @@ export default class EventRouter {
       }
 
       // (time passed from start until cancel) + (time now)
-      event.end_time = Math.round(+new Date() / 1000) - event.start_time + Math.round(+new Date() / 1000);
-      event.start_time = Math.round(+new Date() / 1000);
+      event.endTime = Math.round(+new Date() / 1000) - event.startTime + Math.round(+new Date() / 1000);
+      event.startTime = Math.round(+new Date() / 1000);
 
       await this.eventService.cancelEvent(event);
 
       // remove the event from the redis-queue
-      Redis.getConnection().zremrangebyscore("eventQueue", event.end_time, event.eventID);
+      Redis.getConnection().zremrangebyscore("eventQueue", event.endTime, event.eventID);
 
       // add the event with the new endtime
-      Redis.getConnection().zadd("eventQueue", event.end_time, request.body.eventID);
+      Redis.getConnection().zadd("eventQueue", event.endTime, request.body.eventID);
 
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json();

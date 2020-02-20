@@ -9,16 +9,16 @@ describe("Defenses-units", function() {
   it("defenses should be valid", function() {
     const data = {
       planetID: 1,
-      rocket_launcher: 1,
-      light_laser: 1,
-      heavy_laser: 1,
-      ion_cannon: 1,
-      gauss_cannon: 1,
-      plasma_turret: 1,
-      small_shield_dome: true,
-      large_shield_dome: true,
-      anti_ballistic_missile: 1,
-      interplanetary_missile: 1,
+      rocketLauncher: 1,
+      lightLaser: 1,
+      heavyLaser: 1,
+      ionCannon: 1,
+      gaussCannon: 1,
+      plasmaTurret: 1,
+      smallShieldDome: true,
+      largeShieldDome: true,
+      antiBallisticMissile: 1,
+      interplanetaryMissile: 1,
     };
 
     const defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
@@ -29,16 +29,16 @@ describe("Defenses-units", function() {
   it("Should fail (negative amount)", function() {
     const data = {
       planetID: 1,
-      rocket_launcher: -1,
-      light_laser: 1,
-      heavy_laser: 1,
-      ion_cannon: 1,
-      gauss_cannon: 1,
-      plasma_turret: 1,
-      small_shield_dome: true,
-      large_shield_dome: true,
-      anti_ballistic_missile: 1,
-      interplanetary_missile: 1,
+      rocketLauncher: -1,
+      lightLaser: 1,
+      heavyLaser: 1,
+      ionCannon: 1,
+      gaussCannon: 1,
+      plasmaTurret: 1,
+      smallShieldDome: true,
+      largeShieldDome: true,
+      antiBallisticMissile: 1,
+      interplanetaryMissile: 1,
     };
 
     const defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));
@@ -49,15 +49,15 @@ describe("Defenses-units", function() {
   it("Should fail (missing value)", function() {
     const data = {
       planetID: 1,
-      rocket_launcher: 1,
-      heavy_laser: 1,
-      ion_cannon: 1,
-      gauss_cannon: 1,
-      plasma_turret: 1,
-      small_shield_dome: true,
-      large_shield_dome: true,
-      anti_ballistic_missile: 1,
-      interplanetary_missile: 1,
+      rocketLauncher: 1,
+      heavyLaser: 1,
+      ionCannon: 1,
+      gaussCannon: 1,
+      plasmaTurret: 1,
+      smallShieldDome: true,
+      largeShieldDome: true,
+      antiBallisticMissile: 1,
+      interplanetaryMissile: 1,
     };
 
     const defenses: Defenses = SerializationHelper.toInstance(new Defenses(), JSON.stringify(data));

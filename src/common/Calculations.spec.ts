@@ -126,16 +126,16 @@ describe("Calculations", function() {
 
   it("Calculate distance 1", function() {
     const origin: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Planet,
     };
 
     const destination: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Moon,
     };
 
@@ -144,16 +144,16 @@ describe("Calculations", function() {
 
   it("Calculate distance 2", function() {
     const origin: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Planet,
     };
 
     const destination: ICoordinates = {
-      pos_galaxy: 2,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 2,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Moon,
     };
 
@@ -162,16 +162,16 @@ describe("Calculations", function() {
 
   it("Calculate distance 3", function() {
     const origin: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Planet,
     };
 
     const destination: ICoordinates = {
-      pos_galaxy: 3,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 3,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Moon,
     };
 
@@ -180,16 +180,16 @@ describe("Calculations", function() {
 
   it("Calculate distance 4", function() {
     const origin: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Planet,
     };
 
     const destination: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 2,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 2,
+      posPlanet: 1,
       type: PlanetType.Moon,
     };
 
@@ -198,16 +198,16 @@ describe("Calculations", function() {
 
   it("Calculate distance 5", function() {
     const origin: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 1,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 1,
       type: PlanetType.Planet,
     };
 
     const destination: ICoordinates = {
-      pos_galaxy: 1,
-      pos_system: 1,
-      pos_planet: 2,
+      posGalaxy: 1,
+      posSystem: 1,
+      posPlanet: 2,
       type: PlanetType.Moon,
     };
 
@@ -216,16 +216,16 @@ describe("Calculations", function() {
 
   it("Calculate distance 6", function() {
     const origin: ICoordinates = {
-      pos_galaxy: 9,
-      pos_system: 3,
-      pos_planet: 1,
+      posGalaxy: 9,
+      posSystem: 3,
+      posPlanet: 1,
       type: PlanetType.Planet,
     };
 
     const destination: ICoordinates = {
-      pos_galaxy: 3,
-      pos_system: 8,
-      pos_planet: 5,
+      posGalaxy: 3,
+      posSystem: 8,
+      posPlanet: 5,
       type: PlanetType.Moon,
     };
 

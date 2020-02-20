@@ -87,9 +87,9 @@ describe("planetsRouter", () => {
         expect(res.type).to.eql("application/json");
         expect(res.body[0].planetID).to.be.equals(167546850);
         expect(res.body[0].ownerID).to.be.equals(1);
-        expect(res.body[0].pos_galaxy).to.be.equals(9);
-        expect(res.body[0].pos_system).to.be.equals(54);
-        expect(res.body[0].pos_planet).to.be.equals(1);
+        expect(res.body[0].posGalaxy).to.be.equals(9);
+        expect(res.body[0].posSystem).to.be.equals(54);
+        expect(res.body[0].posPlanet).to.be.equals(1);
         expect(res.body[0].metal).to.be.greaterThan(0);
         expect(res.body[0].crystal).to.be.greaterThan(0);
         expect(res.body[0].deuterium).to.be.greaterThan(0);
@@ -105,9 +105,9 @@ describe("planetsRouter", () => {
         expect(res.type).to.eql("application/json");
         expect(res.body[0].planetID).to.be.equals(93133);
         expect(res.body[0].ownerID).to.be.equals(35);
-        expect(res.body[0].pos_galaxy).to.be.equals(4);
-        expect(res.body[0].pos_system).to.be.equals(71);
-        expect(res.body[0].pos_planet).to.be.equals(2);
+        expect(res.body[0].posGalaxy).to.be.equals(4);
+        expect(res.body[0].posSystem).to.be.equals(71);
+        expect(res.body[0].posPlanet).to.be.equals(2);
         expect(res.body[0].metal).to.be.equals(undefined);
         expect(res.body[0].crystal).to.be.equals(undefined);
         expect(res.body[0].deuterium).to.be.equals(undefined);
@@ -136,9 +136,9 @@ describe("planetsRouter", () => {
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).to.be.equals(planetID);
         expect(res.body.ownerID).to.be.equals(1);
-        expect(res.body.pos_galaxy).to.be.equals(9);
-        expect(res.body.pos_system).to.be.equals(54);
-        expect(res.body.pos_planet).to.be.equals(1);
+        expect(res.body.posGalaxy).to.be.equals(9);
+        expect(res.body.posSystem).to.be.equals(54);
+        expect(res.body.posPlanet).to.be.equals(1);
         expect(res.body.metal).to.be.greaterThan(0);
         expect(res.body.crystal).to.be.greaterThan(0);
         expect(res.body.deuterium).to.be.greaterThan(0);

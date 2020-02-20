@@ -41,7 +41,7 @@ describe("techsRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.userID).to.be.equals(1);
-        expect(res.body.graviton_tech).to.be.equals(1);
+        expect(res.body.gravitonTech).to.be.equals(1);
       });
   });
 
@@ -138,8 +138,8 @@ describe("techsRouter", () => {
     const planetBackup: Planet = await container.planetService.getPlanet(1, planetID, true);
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-    planet.b_building_id = Globals.Buildings.RESEARCH_LAB;
-    planet.b_building_endtime = 1;
+    planet.bBuildingId = Globals.Buildings.RESEARCH_LAB;
+    planet.bBuildingEndTime = 1;
 
     await container.planetService.updatePlanet(planet);
 

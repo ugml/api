@@ -68,11 +68,7 @@ npm run watch
 **Example:**
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "token": "JWT-TOKEN"
-    }
+    "token": "JWT-TOKEN"
 }
 ```
 
@@ -154,20 +150,16 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "planetID": 333,
-        "ownerID": 76487,
-        "name": "Homeplanet",
-        "posGalaxy": 1,
-        "posSystem": 16,
-        "posPlanet": 11,
-        "lastUpdate": 1521056629,
-        "planetType": 1,
-        "image": "trockenplanet08",
-        "destroyed": 0
-    }
+    "planetID": 333,
+    "ownerID": 76487,
+    "name": "Homeplanet",
+    "posGalaxy": 1,
+    "posSystem": 16,
+    "posPlanet": 11,
+    "lastUpdate": 1521056629,
+    "planetType": 1,
+    "image": "trockenplanet08",
+    "destroyed": 0
 }
 ```
 
@@ -190,25 +182,21 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "planetID": 60881,
-        "ownerID": 1,
-        "name": "test123",
-        "posGalaxy": 1,
-        "posSystem": 4,
-        "posPlanet": 3,
-        "lastUpdate": 1521057636,
-        "planetType": 1,
-        "image": "trockenplanet08",
-        "diameter": 11188,
-        "fieldsCurrent": 0,
-        "fieldsMax": 125,
-        .
-        .
-        .
-    }
+    "planetID": 60881,
+    "ownerID": 1,
+    "name": "test123",
+    "posGalaxy": 1,
+    "posSystem": 4,
+    "posPlanet": 3,
+    "lastUpdate": 1521057636,
+    "planetType": 1,
+    "image": "trockenplanet08",
+    "diameter": 11188,
+    "fieldsCurrent": 0,
+    "fieldsMax": 125,
+    .
+    .
+    .
 }
 ```
 
@@ -224,28 +212,24 @@ npm run watch
 
 **Example:**
 ```
-{
-    "status": 200,
-    "message": "Success",
-    "data": [
-        {
-            "planetID": 60881,
-            "ownerID": 1,
-            "name": "Homeplanet",
-            .
-            .
-            .
-        },
-        {
-            "planetID": 167546850,
-            "ownerID": 1,
-            "name": "Planet",
-            .
-            .
-            .
-        }
-    ]
-}
+[
+    {
+        "planetID": 60881,
+        "ownerID": 1,
+        "name": "Homeplanet",
+        .
+        .
+        .
+    },
+    {
+        "planetID": 167546850,
+        "ownerID": 1,
+        "name": "Planet",
+        .
+        .
+        .
+    }
+]
 ```
 
 #### Set the current planet
@@ -260,16 +244,7 @@ npm run watch
 |-------------|----------------------------------|----------|
 | planetID    | The ID of the new current planet |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 #### Destroy a planet
 ```
@@ -283,16 +258,7 @@ npm run watch
 |-------------|----------------------------------|----------|
 | planetID    | The ID of the new current planet |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 #### Rename a planet
 ```
@@ -307,16 +273,7 @@ npm run watch
 | planetID    | The ID of the new current planet |    Yes   |
 | name        | The new name for the planet      |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 ### Users
 
@@ -334,15 +291,11 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "userID": 1,
-        "username": "admin",
-        "email": "xxx@xxx.xx",
-        "lastTimeOnline": "1548524754",
-        "currentPlanet": 167546850
-    }
+    "userID": 1,
+    "username": "admin",
+    "email": "xxx@xxx.xx",
+    "lastTimeOnline": "1548524754",
+    "currentPlanet": 167546850
 }
 ```
 
@@ -364,12 +317,8 @@ npm run watch
 **Example:**
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "userID": 1,
-        "username": "xxx"
-    }
+    "userID": 1,
+    "username": "xxx"
 }
 ```
 
@@ -387,16 +336,7 @@ npm run watch
 | email       | The email for the new user    |    Yes   |
 | password    | The password for the new user |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 #### Update an user
 ```
@@ -412,16 +352,7 @@ npm run watch
 | email       | The email for the new user    |    No    |
 | password    | The password for the new user |    No    |
 
-**Returns:** Success or error
-
-**Example:**
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 ### Buildings
 
@@ -443,27 +374,23 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "ownerID": 1,
-        "planetID": 60881,
-        "metalMine": 1,
-        "crystalMine": 1,
-        "deuteriumSynthesizer": 4,
-        "solarPlant": 1,
-        "fusionReactor": 0,
-        "roboticFactory": 3,
-        "naniteFactory": 0,
-        "shipyard": 8,
-        "metalStorage": 2,
-        "crystalStorage": 3,
-        "deuteriumStorage": 2,
-        "researchLab": 1,
-        "terraformer": 0,
-        "allianceDepot": 0,
-        "missileSilo": 0
-    }
+    "ownerID": 1,
+    "planetID": 60881,
+    "metalMine": 1,
+    "crystalMine": 1,
+    "deuteriumSynthesizer": 4,
+    "solarPlant": 1,
+    "fusionReactor": 0,
+    "roboticFactory": 3,
+    "naniteFactory": 0,
+    "shipyard": 8,
+    "metalStorage": 2,
+    "crystalStorage": 3,
+    "deuteriumStorage": 2,
+    "researchLab": 1,
+    "terraformer": 0,
+    "allianceDepot": 0,
+    "missileSilo": 0
 }
 ```
 
@@ -487,21 +414,15 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Job started",
-    "data": {
-        "planet": {
-            "planetID": 60881,
-            "ownerID": 1,
-            "name": "Sampleplanet",
-            "posGalaxy": 1,
-            "posSystem": 4,
-            "posPlanet": 3,
-            .
-            .
-            .
-        }
-    }
+    "planetID": 60881,
+    "ownerID": 1,
+    "name": "Sampleplanet",
+    "posGalaxy": 1,
+    "posSystem": 4,
+    "posPlanet": 3,
+    .
+    .
+    .
 }
 ```
 
@@ -525,21 +446,15 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Job started",
-    "data": {
-        "planet": {
-            "planetID": 60881,
-            "ownerID": 1,
-            "name": "Sampleplanet",
-            "posGalaxy": 1,
-            "posSystem": 4,
-            "posPlanet": 3,
-            .
-            .
-            .
-        }
-    }
+    "planetID": 60881,
+    "ownerID": 1,
+    "name": "Sampleplanet",
+    "posGalaxy": 1,
+    "posSystem": 4,
+    "posPlanet": 3,
+    .
+    .
+    .
 }
 ```
 
@@ -563,26 +478,22 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "ownerID": 1,
-        "planetID": 60881,
-        "smallCargoShip": 0,
-        "largeCargoShip": 0,
-        "lightFighter": 0,
-        "heavyFighter": 0,
-        "cruiser": 0,
-        "battleship": 0,
-        "colonyShip": 0,
-        "recycler": 0,
-        "espionageProbe": 0,
-        "bomber": 0,
-        "solarSatellite": 0,
-        "destroyer": 0,
-        "battlecruiser": 0,
-        "deathstar": 0
-    }
+    "ownerID": 1,
+    "planetID": 60881,
+    "smallCargoShip": 0,
+    "largeCargoShip": 0,
+    "lightFighter": 0,
+    "heavyFighter": 0,
+    "cruiser": 0,
+    "battleship": 0,
+    "colonyShip": 0,
+    "recycler": 0,
+    "espionageProbe": 0,
+    "bomber": 0,
+    "solarSatellite": 0,
+    "destroyer": 0,
+    "battlecruiser": 0,
+    "deathstar": 0
 }
 ```
 
@@ -600,17 +511,7 @@ npm run watch
 | buildOrder| A JSON-string with key-value pairs. {unitID: amount, ...}    |    Yes   |
 
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 ### Defenses
 
@@ -632,22 +533,18 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "ownerID": 1,
-        "planetID": 60881,
-        "rocketLauncher": 0,
-        "lightLaser": 0,
-        "heavyLaser": 0,
-        "ionCannon": 0,
-        "gaussCannon": 0,
-        "plasmaTurret": 0,
-        "smallShieldDome": 0,
-        "largeShieldDome": 0,
-        "antiBallisticMissile": 0,
-        "interplanetaryMissile": 0
-    }
+    "ownerID": 1,
+    "planetID": 60881,
+    "rocketLauncher": 0,
+    "lightLaser": 0,
+    "heavyLaser": 0,
+    "ionCannon": 0,
+    "gaussCannon": 0,
+    "plasmaTurret": 0,
+    "smallShieldDome": 0,
+    "largeShieldDome": 0,
+    "antiBallisticMissile": 0,
+    "interplanetaryMissile": 0
 }
 ```
 
@@ -665,19 +562,7 @@ npm run watch
 | buildOrder| A JSON-string with key-value pairs. {unitID: amount, ...}    |    Yes   |
 
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
-
-
+**Returns:** Success or Error as HTTP status code
 
 ### Technologies
 
@@ -695,28 +580,22 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": [
-        {
-            "userID": 1,
-            "espionageTech": 0,
-            "computerTech": 0,
-            "weaponTech": 0,
-            "armourTech": 0,
-            "shieldingTech": 0,
-            "energyTech": 0,
-            "hyperspaceTech": 0,
-            "combustionDriveTech": 0,
-            "impulseDriveTech": 0,
-            "hyperspaceDriveTech": 0,
-            "laserTech": 0,
-            "ionTech": 0,
-            "plasmaTech": 0,
-            "intergalacticResearchTech": 0,
-            "gravitonTech": 0
-        }
-    ]
+    "userID": 1,
+    "espionageTech": 0,
+    "computerTech": 0,
+    "weaponTech": 0,
+    "armourTech": 0,
+    "shieldingTech": 0,
+    "energyTech": 0,
+    "hyperspaceTech": 0,
+    "combustionDriveTech": 0,
+    "impulseDriveTech": 0,
+    "hyperspaceDriveTech": 0,
+    "laserTech": 0,
+    "ionTech": 0,
+    "plasmaTech": 0,
+    "intergalacticResearchTech": 0,
+    "gravitonTech": 0
 }
 ```
 
@@ -733,17 +612,7 @@ npm run watch
 | planetID  | The ID of the planet     |    Yes   |
 | techID    | The ID of the technology |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 #### Cancel a technology
 ```
@@ -758,17 +627,7 @@ npm run watch
 | planetID  | The ID of the planet     |    Yes   |
 
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 ### Galaxy
 
@@ -790,35 +649,31 @@ npm run watch
 **Example:**
 
 ```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "0": {
-            "planetID": 1476777762,
-            "ownerID": 751782555,
-            "username": "Testuser",
-            "name": "Homeplanet",
-            "posGalaxy": 4,
-            "posSystem": 88,
-            "posPlanet": 6,
-            "lastUpdate": 1558452853,
-            "planetType": 1,
-            "image": "normal3.png",
-            "debrisMetal": 0,
-            "debrisCrystal": 0,
-            "destroyed": 0
-        },
-        "1": {
-            .
-            .
-            .
-        },
+[
+    {
+        "planetID": 1476777762,
+        "ownerID": 751782555,
+        "username": "Testuser",
+        "name": "Homeplanet",
+        "posGalaxy": 4,
+        "posSystem": 88,
+        "posPlanet": 6,
+        "lastUpdate": 1558452853,
+        "planetType": 1,
+        "image": "normal3.png",
+        "debrisMetal": 0,
+        "debrisCrystal": 0,
+        "destroyed": 0
+    },
+    {
         .
         .
         .
-    }
-}
+    },
+    .
+    .
+    .
+]
 ```
 
 ### Messages
@@ -836,30 +691,26 @@ npm run watch
 **Example:**
 
 ```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "0": {
-            "messageID": 6,
-            "senderID": 1,
-            "receiverID": 1,
-            "sendtime": 1558030571,
-            "type": 1,
-            "subject": "test1",
-            "body": "test1"
-        },
-        "1": {
-            "messageID": 5,
-            "senderID": 1,
-            "receiverID": 1,
-            "sendtime": 1558030570,
-            "type": 1,
-            "subject": "test2",
-            "body": "test2"
-        }
+[
+    {
+        "messageID": 6,
+        "senderID": 1,
+        "receiverID": 1,
+        "sendtime": 1558030571,
+        "type": 1,
+        "subject": "test1",
+        "body": "test1"
+    },
+    {
+        "messageID": 5,
+        "senderID": 1,
+        "receiverID": 1,
+        "sendtime": 1558030570,
+        "type": 1,
+        "subject": "test2",
+        "body": "test2"
     }
-}
+]
 ```
 
 #### Get a specific message
@@ -880,17 +731,13 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "messageID": 5,
-        "senderID": 1,
-        "receiverID": 1,
-        "sendtime": 1558030570,
-        "type": 1,
-        "subject": "test",
-        "body": "test"
-    }
+    "messageID": 5,
+    "senderID": 1,
+    "receiverID": 1,
+    "sendtime": 1558030570,
+    "type": 1,
+    "subject": "test",
+    "body": "test"
 }
 ```
 
@@ -908,17 +755,7 @@ npm run watch
 | subject    | The subject of the message |    Yes   |
 | body       | The body of the message    |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 #### Delete a message
 ```
@@ -932,17 +769,7 @@ npm run watch
 |-----------|--------------------------|----------|
 | messageID | The ID of the message    |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 ### Events
 
@@ -966,51 +793,47 @@ npm run watch
 
 ```
 {
-    "status": 200,
-    "message": "Event successfully created.",
+    "eventID": 15,
+    "ownerID": 1,
+    "mission": "attack",
+    "speed": 30,
     "data": {
-        "eventID": 15,
-        "ownerID": 1,
-        "mission": "attack",
-        "speed": 30,
-        "data": {
-            "origin": {
-                "posGalaxy": 1,
-                "posSystem": 4,
-                "posPlanet": 3,
-                "type": "planet"
-            },
-            "destination": {
-                "posGalaxy": 9,
-                "posSystem": 84,
-                "posPlanet": 14,
-                "type": "planet"
-            },
-            "ships": {
-                "201": 612,
-                "202": 357,
-                "203": 617,
-                "204": 800,
-                "205": 709,
-                "206": 204,
-                "207": 703,
-                "208": 85,
-                "209": 631,
-                "210": 388,
-                "211": 0,
-                "212": 723,
-                "213": 557,
-                "214": 106
-            },
-            "loadedRessources": {
-                "metal": 443,
-                "crystal": 980,
-                "deuterium": 220
-            }
+        "origin": {
+            "posGalaxy": 1,
+            "posSystem": 4,
+            "posPlanet": 3,
+            "type": "planet"
         },
-        "starttime": 1558456480,
-        "endtime": 1558470153
-    }
+        "destination": {
+            "posGalaxy": 9,
+            "posSystem": 84,
+            "posPlanet": 14,
+            "type": "planet"
+        },
+        "ships": {
+            "201": 612,
+            "202": 357,
+            "203": 617,
+            "204": 800,
+            "205": 709,
+            "206": 204,
+            "207": 703,
+            "208": 85,
+            "209": 631,
+            "210": 388,
+            "211": 0,
+            "212": 723,
+            "213": 557,
+            "214": 106
+        },
+        "loadedRessources": {
+            "metal": 443,
+            "crystal": 980,
+            "deuterium": 220
+        }
+    },
+    "starttime": 1558456480,
+    "endtime": 1558470153
 }
 ```
 
@@ -1026,17 +849,7 @@ npm run watch
 |------------|---------------------------------|----------|
 | eventID    | The ID of the event             |    Yes   |
 
-**Returns:** Success or error
-
-**Example:**
-
-```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {}
-}
-```
+**Returns:** Success or Error as HTTP status code
 
 #### Get all events on a planet
 ```
@@ -1055,31 +868,31 @@ npm run watch
 **Example:**
 
 ```
-{
-    "status": 200,
-    "message": "Success",
-    "data": {
-        "0": {
-            "eventID": 1,
-            "ownerID": 1,
-            "mission": 2,
-            "fleetlist": "{\"201\":612,\"202\":357,\"203\":617,\"204\":800,\"205\":709,\"206\":204,\"207\":703,\"208\":85,\"209\":631,\"210\":388,\"211\":0,\"212\":723,\"213\":557,\"214\":106}",
-            "startID": 60881,
-            "startType": 1,
-            "startTime": 1558449681,
-            "endID": 18341,
-            "endType": 1,
-            "endTime": 1558450681,
-            "loadedMetal": 443,
-            "loadedCrystal": 980,
-            "loadedDeuterium": 220,
-            "returning": 0
-        },
+[
+    {
+        "eventID": 1,
+        "ownerID": 1,
+        "mission": 2,
+        "fleetlist": "{\"201\":612,\"202\":357,\"203\":617,\"204\":800,\"205\":709,\"206\":204,\"207\":703,\"208\":85,\"209\":631,\"210\":388,\"211\":0,\"212\":723,\"213\":557,\"214\":106}",
+        "startID": 60881,
+        "startType": 1,
+        "startTime": 1558449681,
+        "endID": 18341,
+        "endType": 1,
+        "endTime": 1558450681,
+        "loadedMetal": 443,
+        "loadedCrystal": 980,
+        "loadedDeuterium": 220,
+        "returning": 0
+    },
+    {
+        "eventID": 1,
+        "ownerID": 1,
         .
         .
         .
     }
-}
+]
 ```
 
 # Support / Questions

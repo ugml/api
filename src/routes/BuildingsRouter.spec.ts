@@ -275,7 +275,7 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID })
         .then(res => {
           expect(res.body.planetID).equals(planetID);
-          expect(res.body.b_building_id).equals(buildingID);
+          expect(res.body.bBuildingId).equals(buildingID);
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
         });
     });
@@ -316,8 +316,8 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID })
         .then(res => {
           expect(res.body.planetID).to.be.equals(planetID);
-          expect(res.body.b_building_id).to.be.equals(0);
-          expect(res.body.b_building_endtime).to.be.equals(0);
+          expect(res.body.bBuildingId).to.be.equals(0);
+          expect(res.body.bBuildingEndTime).to.be.equals(0);
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
         });
     });
@@ -353,10 +353,10 @@ describe("buildingsRoute", () => {
 
       const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-      const valueBefore = planet.b_hangar_start_time;
+      const valueBefore = planet.bHangarStartTime;
 
-      planet.b_hangar_queue = "[ { test: 1234 } ]";
-      planet.b_hangar_start_time = 1;
+      planet.bHangarQueue = "[ { test: 1234 } ]";
+      planet.bHangarStartTime = 1;
 
       await container.planetService.updatePlanet(planet);
 
@@ -369,7 +369,7 @@ describe("buildingsRoute", () => {
           expect(res.status).equals(Globals.Statuscode.SUCCESS);
 
           // reset planet
-          planet.b_hangar_start_time = valueBefore;
+          planet.bHangarStartTime = valueBefore;
           await container.planetService.updatePlanet(planet);
         });
     });
@@ -380,11 +380,11 @@ describe("buildingsRoute", () => {
       const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
       const user: User = await container.userService.getAuthenticatedUser(planet.ownerID);
 
-      const techIDold = user.b_tech_id;
-      const endtime = user.b_tech_endtime;
+      const techIDold = user.bTechID;
+      const endtime = user.bTechEndTime;
 
-      user.b_tech_endtime = 1;
-      user.b_tech_id = 109;
+      user.bTechEndTime = 1;
+      user.bTechID = 109;
 
       await container.userService.updateUserData(user);
 
@@ -396,8 +396,8 @@ describe("buildingsRoute", () => {
           expect(res.body.error).to.be.equal("Can't build this building while it is in use");
           expect(res.status).equals(Globals.Statuscode.SUCCESS);
 
-          user.b_tech_endtime = techIDold;
-          user.b_tech_id = endtime;
+          user.bTechEndTime = techIDold;
+          user.bTechID = endtime;
 
           await container.userService.updateUserData(user);
         });
@@ -526,9 +526,9 @@ describe("buildingsRoute", () => {
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
         expect(res.body.planetID).equals(planetID);
-        expect(res.body.b_building_id).greaterThan(0);
-        expect(res.body.b_building_endtime).greaterThan(0);
-        expect(res.body.b_building_demolition).equals(true);
+        expect(res.body.bBuildingId).greaterThan(0);
+        expect(res.body.bBuildingEndTime).greaterThan(0);
+        expect(res.body.bBuildingDemolition).equals(true);
         expect(res.status).equals(Globals.Statuscode.SUCCESS);
 
         // reset
@@ -541,9 +541,9 @@ describe("buildingsRoute", () => {
 
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-    planet.b_building_id = 1;
-    planet.b_building_endtime = 1234;
-    planet.b_building_demolition = true;
+    planet.bBuildingId = 1;
+    planet.bBuildingEndTime = 1234;
+    planet.bBuildingDemolition = true;
 
     await container.planetService.updatePlanet(planet);
 
@@ -556,9 +556,9 @@ describe("buildingsRoute", () => {
         expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
 
         // reset
-        planet.b_building_id = 0;
-        planet.b_building_endtime = 0;
-        planet.b_building_demolition = false;
+        planet.bBuildingId = 0;
+        planet.bBuildingEndTime = 0;
+        planet.bBuildingDemolition = false;
         await container.planetService.updatePlanet(planet);
       });
   });

@@ -100,9 +100,9 @@ npm run watch
     "startplanet_name": "Homeplanet",
     "startplanet_diameter": 150000,
     "startplanet_maxfields": 138,
-    "pos_galaxy_max": 9,
-    "pos_system_max": 100,
-    "pos_planet_max": 15
+    "posGalaxy_max": 9,
+    "posSystem_max": 100,
+    "posPlanet_max": 15
 }
 ```
 
@@ -160,11 +160,11 @@ npm run watch
         "planetID": 333,
         "ownerID": 76487,
         "name": "Homeplanet",
-        "pos_galaxy": 1,
-        "pos_system": 16,
-        "pos_planet": 11,
-        "last_update": 1521056629,
-        "planet_type": 1,
+        "posGalaxy": 1,
+        "posSystem": 16,
+        "posPlanet": 11,
+        "lastUpdate": 1521056629,
+        "planetType": 1,
         "image": "trockenplanet08",
         "destroyed": 0
     }
@@ -196,15 +196,15 @@ npm run watch
         "planetID": 60881,
         "ownerID": 1,
         "name": "test123",
-        "pos_galaxy": 1,
-        "pos_system": 4,
-        "pos_planet": 3,
-        "last_update": 1521057636,
-        "planet_type": 1,
+        "posGalaxy": 1,
+        "posSystem": 4,
+        "posPlanet": 3,
+        "lastUpdate": 1521057636,
+        "planetType": 1,
         "image": "trockenplanet08",
         "diameter": 11188,
-        "fields_current": 0,
-        "fields_max": 125,
+        "fieldsCurrent": 0,
+        "fieldsMax": 125,
         .
         .
         .
@@ -340,8 +340,8 @@ npm run watch
         "userID": 1,
         "username": "admin",
         "email": "xxx@xxx.xx",
-        "last_time_online": "1548524754",
-        "current_planet": 167546850
+        "lastTimeOnline": "1548524754",
+        "currentPlanet": 167546850
     }
 }
 ```
@@ -448,21 +448,21 @@ npm run watch
     "data": {
         "ownerID": 1,
         "planetID": 60881,
-        "metal_mine": 1,
-        "crystal_mine": 1,
-        "deuterium_synthesizer": 4,
-        "solar_plant": 1,
-        "fusion_reactor": 0,
-        "robotic_factory": 3,
-        "nanite_factory": 0,
+        "metalMine": 1,
+        "crystalMine": 1,
+        "deuteriumSynthesizer": 4,
+        "solarPlant": 1,
+        "fusionReactor": 0,
+        "roboticFactory": 3,
+        "naniteFactory": 0,
         "shipyard": 8,
-        "metal_storage": 2,
-        "crystal_storage": 3,
-        "deuterium_storage": 2,
-        "research_lab": 1,
+        "metalStorage": 2,
+        "crystalStorage": 3,
+        "deuteriumStorage": 2,
+        "researchLab": 1,
         "terraformer": 0,
-        "alliance_depot": 0,
-        "missile_silo": 0
+        "allianceDepot": 0,
+        "missileSilo": 0
     }
 }
 ```
@@ -494,9 +494,9 @@ npm run watch
             "planetID": 60881,
             "ownerID": 1,
             "name": "Sampleplanet",
-            "pos_galaxy": 1,
-            "pos_system": 4,
-            "pos_planet": 3,
+            "posGalaxy": 1,
+            "posSystem": 4,
+            "posPlanet": 3,
             .
             .
             .
@@ -532,9 +532,9 @@ npm run watch
             "planetID": 60881,
             "ownerID": 1,
             "name": "Sampleplanet",
-            "pos_galaxy": 1,
-            "pos_system": 4,
-            "pos_planet": 3,
+            "posGalaxy": 1,
+            "posSystem": 4,
+            "posPlanet": 3,
             .
             .
             .
@@ -568,17 +568,17 @@ npm run watch
     "data": {
         "ownerID": 1,
         "planetID": 60881,
-        "small_cargo_ship": 0,
-        "large_cargo_ship": 0,
-        "light_fighter": 0,
-        "heavy_fighter": 0,
+        "smallCargoShip": 0,
+        "largeCargoShip": 0,
+        "lightFighter": 0,
+        "heavyFighter": 0,
         "cruiser": 0,
         "battleship": 0,
-        "colony_ship": 0,
+        "colonyShip": 0,
         "recycler": 0,
-        "espionage_probe": 0,
+        "espionageProbe": 0,
         "bomber": 0,
-        "solar_satellite": 0,
+        "solarSatellite": 0,
         "destroyer": 0,
         "battlecruiser": 0,
         "deathstar": 0
@@ -637,16 +637,16 @@ npm run watch
     "data": {
         "ownerID": 1,
         "planetID": 60881,
-        "rocket_launcher": 0,
-        "light_laser": 0,
-        "heavy_laser": 0,
-        "ion_cannon": 0,
-        "gauss_cannon": 0,
-        "plasma_turret": 0,
-        "small_shield_dome": 0,
-        "large_shield_dome": 0,
-        "anti_ballistic_missile": 0,
-        "interplanetary_missile": 0
+        "rocketLauncher": 0,
+        "lightLaser": 0,
+        "heavyLaser": 0,
+        "ionCannon": 0,
+        "gaussCannon": 0,
+        "plasmaTurret": 0,
+        "smallShieldDome": 0,
+        "largeShieldDome": 0,
+        "antiBallisticMissile": 0,
+        "interplanetaryMissile": 0
     }
 }
 ```
@@ -700,21 +700,21 @@ npm run watch
     "data": [
         {
             "userID": 1,
-            "espionage_tech": 0,
-            "computer_tech": 0,
-            "weapon_tech": 0,
-            "armour_tech": 0,
-            "shielding_tech": 0,
-            "energy_tech": 0,
-            "hyperspace_tech": 0,
-            "combustion_drive_tech": 0,
-            "impulse_drive_tech": 0,
-            "hyperspace_drive_tech": 0,
-            "laser_tech": 0,
-            "ion_tech": 0,
-            "plasma_tech": 0,
-            "intergalactic_research_tech": 0,
-            "graviton_tech": 0
+            "espionageTech": 0,
+            "computerTech": 0,
+            "weaponTech": 0,
+            "armourTech": 0,
+            "shieldingTech": 0,
+            "energyTech": 0,
+            "hyperspaceTech": 0,
+            "combustionDriveTech": 0,
+            "impulseDriveTech": 0,
+            "hyperspaceDriveTech": 0,
+            "laserTech": 0,
+            "ionTech": 0,
+            "plasmaTech": 0,
+            "intergalacticResearchTech": 0,
+            "gravitonTech": 0
         }
     ]
 }
@@ -774,7 +774,7 @@ npm run watch
 
 #### Get information for a given galaxy and system
 ```
-/v1/galaxy/{pos_galaxy}/{pos_system}
+/v1/galaxy/{posGalaxy}/{posSystem}
 ```
 **Request-Type:** GET
 
@@ -782,8 +782,8 @@ npm run watch
 
 | Parameter | Description              | Required |
 |-----------|--------------------------|----------|
-| pos_galaxy    | The galaxy-position      |    Yes   |
-| pos_system    | The system-position      |    Yes   |
+| posGalaxy    | The galaxy-position      |    Yes   |
+| posSystem    | The system-position      |    Yes   |
 
 **Returns:** Information about the galaxy
 
@@ -799,14 +799,14 @@ npm run watch
             "ownerID": 751782555,
             "username": "Testuser",
             "name": "Homeplanet",
-            "pos_galaxy": 4,
-            "pos_system": 88,
-            "pos_planet": 6,
-            "last_update": 1558452853,
-            "planet_type": 1,
+            "posGalaxy": 4,
+            "posSystem": 88,
+            "posPlanet": 6,
+            "lastUpdate": 1558452853,
+            "planetType": 1,
             "image": "normal3.png",
-            "debris_metal": 0,
-            "debris_crystal": 0,
+            "debrisMetal": 0,
+            "debrisCrystal": 0,
             "destroyed": 0
         },
         "1": {
@@ -975,15 +975,15 @@ npm run watch
         "speed": 30,
         "data": {
             "origin": {
-                "pos_galaxy": 1,
-                "pos_system": 4,
-                "pos_planet": 3,
+                "posGalaxy": 1,
+                "posSystem": 4,
+                "posPlanet": 3,
                 "type": "planet"
             },
             "destination": {
-                "pos_galaxy": 9,
-                "pos_system": 84,
-                "pos_planet": 14,
+                "posGalaxy": 9,
+                "posSystem": 84,
+                "posPlanet": 14,
                 "type": "planet"
             },
             "ships": {
@@ -1064,15 +1064,15 @@ npm run watch
             "ownerID": 1,
             "mission": 2,
             "fleetlist": "{\"201\":612,\"202\":357,\"203\":617,\"204\":800,\"205\":709,\"206\":204,\"207\":703,\"208\":85,\"209\":631,\"210\":388,\"211\":0,\"212\":723,\"213\":557,\"214\":106}",
-            "start_id": 60881,
-            "start_type": 1,
-            "start_time": 1558449681,
-            "end_id": 18341,
-            "end_type": 1,
-            "end_time": 1558450681,
-            "loaded_metal": 443,
-            "loaded_crystal": 980,
-            "loaded_deuterium": 220,
+            "startID": 60881,
+            "startType": 1,
+            "startTime": 1558449681,
+            "endID": 18341,
+            "endType": 1,
+            "endTime": 1558450681,
+            "loadedMetal": 443,
+            "loadedCrystal": 980,
+            "loadedDeuterium": 220,
             "returning": 0
         },
         .

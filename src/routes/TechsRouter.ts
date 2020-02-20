@@ -92,23 +92,23 @@ export default class TechsRouter {
       }
 
       // 1. check if there is already a build-job on the planet
-      if (user.b_tech_id === 0 && user.b_tech_endtime === 0) {
+      if (user.bTechID === 0 && user.bTechEndTime === 0) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Planet has no build-job",
         });
       }
 
-      const techKey = Config.getMappings()[user.b_tech_id];
+      const techKey = Config.getMappings()[user.bTechID];
 
       const currentLevel = techs[techKey];
 
-      const cost: ICosts = Calculations.getCosts(user.b_tech_id, currentLevel);
+      const cost: ICosts = Calculations.getCosts(user.bTechID, currentLevel);
 
       planet.metal += cost.metal;
       planet.crystal += cost.crystal;
       planet.deuterium += cost.deuterium;
-      user.b_tech_id = 0;
-      user.b_tech_endtime = 0;
+      user.bTechID = 0;
+      user.bTechEndTime = 0;
 
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
@@ -178,7 +178,7 @@ export default class TechsRouter {
 
       // can't build research lab while they are researching... poor scientists :(
       // if(request.body.techID === Globals.Buildings.RESEARCH_LAB &&
-      //     (planet.b_tech_id > 0 || planet.b_tech_endtime > 0)) {
+      //     (planet.bTechID > 0 || planet.bTechEndTime > 0)) {
       //
       //     response.status(Globals.Statuscode.SUCCESS).json({
       //         status: Globals.Statuscode.SUCCESS,
@@ -229,7 +229,7 @@ export default class TechsRouter {
         planet.metal < cost.metal ||
         planet.crystal < cost.crystal ||
         planet.deuterium < cost.deuterium ||
-        planet.energy_max < cost.energy
+        planet.energyMax < cost.energy
       ) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Not enough resources",
@@ -237,15 +237,15 @@ export default class TechsRouter {
       }
 
       // 4. start the build-job
-      const buildTime = Calculations.calculateResearchTimeInSeconds(cost.metal, cost.crystal, buildings.research_lab);
+      const buildTime = Calculations.calculateResearchTimeInSeconds(cost.metal, cost.crystal, buildings.researchLab);
 
       const endTime = Math.round(+new Date() / 1000) + buildTime;
 
       planet.metal = planet.metal - cost.metal;
       planet.crystal = planet.crystal - cost.crystal;
       planet.deuterium = planet.deuterium - cost.deuterium;
-      user.b_tech_id = techID;
-      user.b_tech_endtime = endTime;
+      user.bTechID = techID;
+      user.bTechEndTime = endTime;
 
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);

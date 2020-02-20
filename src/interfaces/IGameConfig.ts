@@ -6,7 +6,7 @@ export default interface IGameConfig {
   startplanet_name: string;
   startplanet_diameter: number;
   startplanet_maxfields: number;
-  pos_galaxy_max: number;
-  pos_system_max: number;
-  pos_planet_max: number;
+  posGalaxy_max: number;
+  posSystem_max: number;
+  posPlanet_max: number;
 }

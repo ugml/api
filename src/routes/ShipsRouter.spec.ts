@@ -140,9 +140,9 @@ describe("shipsRouter", () => {
 
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-    const valueBefore = planet.b_hangar_plus;
+    const valueBefore = planet.bHangarPlus;
 
-    planet.b_hangar_plus = true;
+    planet.bHangarPlus = true;
 
     await container.planetService.updatePlanet(planet);
 
@@ -157,7 +157,7 @@ describe("shipsRouter", () => {
         expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
         // reset
-        planet.b_hangar_plus = valueBefore;
+        planet.bHangarPlus = valueBefore;
         await container.planetService.updatePlanet(planet);
       });
     /* eslint-enable quotes */
@@ -175,7 +175,7 @@ describe("shipsRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).to.be.equals(planetID);
-        const buildOrders = JSON.parse(res.body.b_hangar_queue);
+        const buildOrders = JSON.parse(res.body.bHangarQueue);
         expect(buildOrders.length).to.be.equals(1);
       });
     /* eslint-enable quotes */

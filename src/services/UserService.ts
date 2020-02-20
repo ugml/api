@@ -123,8 +123,8 @@ export default class UserService implements IUserService {
       .set("username", user.username)
       .set("password", user.password)
       .set("email", user.email)
-      .set("last_time_online", user.last_time_online)
-      .set("current_planet", user.current_planet)
+      .set("lastTimeOnline", user.lastTimeOnline)
+      .set("currentPlanet", user.currentPlanet)
       .toString();
 
     if (connection === null) {
@@ -159,20 +159,20 @@ export default class UserService implements IUserService {
       query = query.set("email", user.email);
     }
 
-    if (typeof user.last_time_online !== "undefined") {
-      query = query.set("last_time_online", user.last_time_online);
+    if (typeof user.lastTimeOnline !== "undefined") {
+      query = query.set("lastTimeOnline", user.lastTimeOnline);
     }
 
-    if (typeof user.current_planet !== "undefined") {
-      query = query.set("current_planet", user.current_planet);
+    if (typeof user.currentPlanet !== "undefined") {
+      query = query.set("currentPlanet", user.currentPlanet);
     }
 
-    if (typeof user.b_tech_id !== "undefined") {
-      query = query.set("b_tech_id", user.b_tech_id);
+    if (typeof user.bTechID !== "undefined") {
+      query = query.set("bTechID", user.bTechID);
     }
 
-    if (typeof user.b_tech_endtime !== "undefined") {
-      query = query.set("b_tech_endtime", user.b_tech_endtime);
+    if (typeof user.bTechEndTime !== "undefined") {
+      query = query.set("bTechEndTime", user.bTechEndTime);
     }
 
     query = query.where("userID = ?", user.userID);

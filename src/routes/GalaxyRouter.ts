@@ -19,7 +19,7 @@ export default class GalaxyRouter {
    */
   public constructor(container) {
     this.galaxyService = container.galaxyService;
-    this.router.get("/:pos_galaxy/:pos_system", this.getGalaxyInformation);
+    this.router.get("/:posGalaxy/:posSystem", this.getGalaxyInformation);
   }
 
   /**
@@ -32,26 +32,26 @@ export default class GalaxyRouter {
     try {
       // validate parameters
       if (
-        !InputValidator.isSet(request.params.pos_galaxy) ||
-        !InputValidator.isValidInt(request.params.pos_galaxy) ||
-        !InputValidator.isSet(request.params.pos_system) ||
-        !InputValidator.isValidInt(request.params.pos_system)
+        !InputValidator.isSet(request.params.posGalaxy) ||
+        !InputValidator.isValidInt(request.params.posGalaxy) ||
+        !InputValidator.isSet(request.params.posSystem) ||
+        !InputValidator.isValidInt(request.params.posSystem)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
 
-      const pos_galaxy = parseInt(request.params.pos_galaxy, 10);
-      const pos_system = parseInt(request.params.pos_system, 10);
+      const posGalaxy = parseInt(request.params.posGalaxy, 10);
+      const posSystem = parseInt(request.params.posSystem, 10);
 
-      if (!InputValidator.isValidPosition(pos_galaxy, pos_system)) {
+      if (!InputValidator.isValidPosition(posGalaxy, posSystem)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
 
-      const galaxyData = await this.galaxyService.getGalaxyInfo(pos_galaxy, pos_system);
+      const galaxyData = await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
 
       return response.status(Globals.Statuscode.SUCCESS).json(galaxyData);
     } catch (error) {

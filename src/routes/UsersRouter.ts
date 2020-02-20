@@ -183,27 +183,27 @@ export default class UsersRouter {
       newUser.userID = userID;
       newPlanet.ownerID = userID;
       newUser.password = hashedPassword;
-      newPlanet.planet_type = PlanetType.Planet;
+      newPlanet.planetType = PlanetType.Planet;
 
       Logger.info("Getting a new planetID");
 
       const planetID = await await this.planetService.getNewId();
 
-      newUser.current_planet = planetID;
+      newUser.currentPlanet = planetID;
       newPlanet.planetID = planetID;
 
       Logger.info("Finding free position for new planet");
 
       const galaxyData = await this.galaxyService.getFreePosition(
-        gameConfig.pos_galaxy_max,
-        gameConfig.pos_system_max,
+        gameConfig.posGalaxy_max,
+        gameConfig.posSystem_max,
         4,
         12,
       );
 
-      newPlanet.pos_galaxy = galaxyData.pos_galaxy;
-      newPlanet.pos_system = galaxyData.pos_system;
-      newPlanet.pos_planet = galaxyData.pos_planet;
+      newPlanet.posGalaxy = galaxyData.posGalaxy;
+      newPlanet.posSystem = galaxyData.posSystem;
+      newPlanet.posPlanet = galaxyData.posPlanet;
 
       Logger.info("Creating a new user");
 
@@ -212,17 +212,17 @@ export default class UsersRouter {
       Logger.info("Creating a new planet");
 
       newPlanet.name = gameConfig.startplanet_name;
-      newPlanet.last_update = Math.floor(Date.now() / 1000);
+      newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
       newPlanet.diameter = gameConfig.startplanet_diameter;
-      newPlanet.fields_max = gameConfig.startplanet_maxfields;
+      newPlanet.fieldsMax = gameConfig.startplanet_maxfields;
       newPlanet.metal = gameConfig.metal_start;
       newPlanet.crystal = gameConfig.crystal_start;
       newPlanet.deuterium = gameConfig.deuterium_start;
 
       switch (true) {
-        case newPlanet.pos_planet <= 5: {
-          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
-          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.posPlanet <= 5: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["desert", "dry"];
 
@@ -231,9 +231,9 @@ export default class UsersRouter {
 
           break;
         }
-        case newPlanet.pos_planet <= 10: {
-          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
-          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.posPlanet <= 10: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["normal", "jungle", "gas"];
 
@@ -242,9 +242,9 @@ export default class UsersRouter {
 
           break;
         }
-        case newPlanet.pos_planet <= 15: {
-          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
-          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.posPlanet <= 15: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["ice", "water"];
 
@@ -271,9 +271,9 @@ export default class UsersRouter {
 
       await this.galaxyService.createGalaxyRow(
         newPlanet.planetID,
-        newPlanet.pos_galaxy,
-        newPlanet.pos_system,
-        newPlanet.pos_planet,
+        newPlanet.posGalaxy,
+        newPlanet.posSystem,
+        newPlanet.posPlanet,
         connection,
       );
 
@@ -391,7 +391,7 @@ export default class UsersRouter {
 
       const user: User = await this.userService.getUserById(userID);
 
-      user.current_planet = planetID;
+      user.currentPlanet = planetID;
 
       await this.userService.updateUserData(user);
 

@@ -29,29 +29,29 @@ export default class User implements IUnits {
   /**
    * The unix-timestamp of the last time the user was online
    */
-  public last_time_online: number;
+  public lastTimeOnline: number;
 
   /**
    * The current planet of the user
    */
-  public current_planet: number;
+  public currentPlanet: number;
 
   /**
    * The ID of the technology which is currently being researched.
    * This value is 0 if no technology is currently being researched.
    */
-  public b_tech_id: number;
+  public bTechID: number;
 
   /**
    * The time, at which the research will be completed
    */
-  public b_tech_endtime: number;
+  public bTechEndTime: number;
 
   /**
    *  Checks, if the planet is currently researching
    */
   public isResearching(): boolean {
-    return this.b_tech_id > 0 && this.b_tech_endtime > 0;
+    return this.bTechID > 0 && this.bTechEndTime > 0;
   }
 
   /**
@@ -74,19 +74,19 @@ export default class User implements IUnits {
       return false;
     }
 
-    if (!InputValidator.isSet(this.last_time_online) || this.last_time_online <= 0) {
+    if (!InputValidator.isSet(this.lastTimeOnline) || this.lastTimeOnline <= 0) {
       return false;
     }
 
-    if (!InputValidator.isSet(this.current_planet) || this.current_planet <= 0) {
+    if (!InputValidator.isSet(this.currentPlanet) || this.currentPlanet <= 0) {
       return false;
     }
 
-    if (!InputValidator.isSet(this.b_tech_id) || this.b_tech_id < 0 || this.b_tech_id > Globals.MAX_TECHNOLOGY_ID) {
+    if (!InputValidator.isSet(this.bTechID) || this.bTechID < 0 || this.bTechID > Globals.MAX_TECHNOLOGY_ID) {
       return false;
     }
 
-    if (!InputValidator.isSet(this.b_tech_endtime) || this.b_tech_endtime < 0) {
+    if (!InputValidator.isSet(this.bTechEndTime) || this.bTechEndTime < 0) {
       return false;
     }
 

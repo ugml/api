@@ -177,9 +177,9 @@ describe("defenseRoute", () => {
 
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-    const valueBefore = planet.b_hangar_plus;
+    const valueBefore = planet.bHangarPlus;
 
-    planet.b_hangar_plus = true;
+    planet.bHangarPlus = true;
 
     await container.planetService.updatePlanet(planet);
 
@@ -193,7 +193,7 @@ describe("defenseRoute", () => {
           expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
           expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
-          planet.b_hangar_plus = valueBefore;
+          planet.bHangarPlus = valueBefore;
           await container.planetService.updatePlanet(planet);
         })
     );

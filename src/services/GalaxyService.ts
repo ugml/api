@@ -12,30 +12,30 @@ import squel = require("safe-squel");
 export default class GalaxyService implements IGalaxyService {
   /**
    * Returns all information for a given galaxy-position
-   * @param pos_galaxy the galaxy
-   * @param pos_system the system
+   * @param posGalaxy the galaxy
+   * @param posSystem the system
    */
-  public async getGalaxyInfo(pos_galaxy: number, pos_system: number) {
+  public async getGalaxyInfo(posGalaxy: number, posSystem: number) {
     const query: string = squel
       .select()
       .field("p.planetID")
       .field("p.ownerID")
       .field("u.username")
       .field("p.name")
-      .field("p.pos_galaxy")
-      .field("p.pos_system")
-      .field("p.pos_planet")
-      .field("p.last_update")
-      .field("p.planet_type")
+      .field("p.posGalaxy")
+      .field("p.posSystem")
+      .field("p.posPlanet")
+      .field("p.lastUpdate")
+      .field("p.planetType")
       .field("p.image")
-      .field("g.debris_metal")
-      .field("g.debris_crystal")
+      .field("g.debrisMetal")
+      .field("g.debrisCrystal")
       .field("p.destroyed")
       .from("galaxy", "g")
       .left_join("planets", "p", "g.planetID = p.planetID")
       .left_join("users", "u", "u.userID = p.ownerID")
-      .where("p.pos_galaxy = ?", pos_galaxy)
-      .where("p.pos_system = ?", pos_system)
+      .where("p.posGalaxy = ?", posGalaxy)
+      .where("p.posSystem = ?", posSystem)
       .toString();
 
     const [rows] = await Database.query(query);
@@ -62,9 +62,9 @@ export default class GalaxyService implements IGalaxyService {
     const [[[result]]] = await Database.query(queryUser);
 
     return {
-      pos_galaxy: result.pos_galaxy,
-      pos_system: result.pos_system,
-      pos_planet: result.pos_planet,
+      posGalaxy: result.posGalaxy,
+      posSystem: result.posSystem,
+      posPlanet: result.posPlanet,
       type: PlanetType.Planet,
     };
   }
@@ -72,21 +72,21 @@ export default class GalaxyService implements IGalaxyService {
   /**
    * Creates a new row in the database.
    * @param planetID the ID of the planet
-   * @param pos_galaxy the galaxy-position
-   * @param pos_system the system-position
-   * @param pos_planet the planet-position
+   * @param posGalaxy the galaxy-position
+   * @param posSystem the system-position
+   * @param posPlanet the planet-position
    * @param connection a connection from the connection-pool, if this query should be executed within a transaction
    */
   public async createGalaxyRow(
     planetID: number,
-    pos_galaxy: number,
-    pos_system: number,
-    pos_planet: number,
+    posGalaxy: number,
+    posSystem: number,
+    posPlanet: number,
     connection = null,
   ) {
     /* tslint:disable:max-line-length*/
     // eslint-disable-next-line max-len
-    const query = `INSERT INTO galaxy(\`planetID\`, \`pos_galaxy\`, \`pos_system\`, \`pos_planet\`) VALUES (${planetID}, ${pos_galaxy}, ${pos_system}, ${pos_planet});`;
+    const query = `INSERT INTO galaxy(\`planetID\`, \`posGalaxy\`, \`posSystem\`, \`posPlanet\`) VALUES (${planetID}, ${posGalaxy}, ${posSystem}, ${posPlanet});`;
     /* tslint:enable:max-line-length*/
 
     if (connection === null) {

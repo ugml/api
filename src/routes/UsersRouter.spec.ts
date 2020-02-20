@@ -40,9 +40,9 @@ describe("User Routes", () => {
 
     container.galaxyService.getFreePosition = function() {
       return {
-        pos_galaxy: 1,
-        pos_system: 1,
-        pos_planet: 1,
+        posGalaxy: 1,
+        posSystem: 1,
+        posPlanet: 1,
         type: 1,
       };
     };
@@ -138,8 +138,8 @@ describe("User Routes", () => {
     expect(body.userID).to.be.equals(1);
     expect(body.username).to.not.be.equals(null);
     expect(body.email).to.not.be.equals(null);
-    expect(body.last_time_online).to.not.be.equals(null);
-    expect(body.current_planet).to.not.be.equals(null);
+    expect(body.lastTimeOnline).to.not.be.equals(null);
+    expect(body.currentPlanet).to.not.be.equals(null);
   });
 
   it("should return a user", async () => {
@@ -150,8 +150,8 @@ describe("User Routes", () => {
     expect(body.userID).to.be.equals(41);
     expect(body.username).to.not.be.equals(null);
     expect(body.email).to.be.equals(undefined);
-    expect(body.last_time_online).to.be.equals(undefined);
-    expect(body.current_planet).to.be.equals(undefined);
+    expect(body.lastTimeOnline).to.be.equals(undefined);
+    expect(body.currentPlanet).to.be.equals(undefined);
   });
 
   it("should fail (invalid userID)", async () => {

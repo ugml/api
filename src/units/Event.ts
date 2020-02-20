@@ -11,15 +11,15 @@ export default class Event implements IUnits {
   public ownerID: number;
   public mission: number;
   public fleetlist: string;
-  public start_id: number;
-  public start_type: PlanetType;
-  public start_time: number;
-  public end_id: number;
-  public end_type: PlanetType;
-  public end_time: number;
-  public loaded_metal: number;
-  public loaded_crystal: number;
-  public loaded_deuterium: number;
+  public startID: number;
+  public startType: PlanetType;
+  public startTime: number;
+  public endID: number;
+  public endType: PlanetType;
+  public endTime: number;
+  public loadedMetal: number;
+  public loadedCrystal: number;
+  public loadedDeuterium: number;
   public returning: boolean;
   public processed: boolean;
 
@@ -40,39 +40,39 @@ export default class Event implements IUnits {
     if (!InputValidator.isSet(this.fleetlist) || this.fleetlist.length === 0) {
       return false;
     }
-    if (!InputValidator.isSet(this.start_id) || this.start_id < 0) {
+    if (!InputValidator.isSet(this.startID) || this.startID < 0) {
       return false;
     }
     if (
-      this.start_type !== PlanetType.Planet &&
-      this.start_type !== PlanetType.Moon &&
-      this.start_type !== PlanetType.Debris
+      this.startType !== PlanetType.Planet &&
+      this.startType !== PlanetType.Moon &&
+      this.startType !== PlanetType.Debris
     ) {
       return false;
     }
-    if (!InputValidator.isSet(this.start_time) || this.start_time < 0) {
+    if (!InputValidator.isSet(this.startTime) || this.startTime < 0) {
       return false;
     }
-    if (!InputValidator.isSet(this.end_id) || this.end_id < 0) {
+    if (!InputValidator.isSet(this.endID) || this.endID < 0) {
       return false;
     }
     if (
-      this.end_type !== PlanetType.Planet &&
-      this.end_type !== PlanetType.Moon &&
-      this.end_type !== PlanetType.Debris
+      this.endType !== PlanetType.Planet &&
+      this.endType !== PlanetType.Moon &&
+      this.endType !== PlanetType.Debris
     ) {
       return false;
     }
-    if (!InputValidator.isSet(this.end_time) || this.end_time < 0) {
+    if (!InputValidator.isSet(this.endTime) || this.endTime < 0) {
       return false;
     }
-    if (!InputValidator.isSet(this.loaded_metal) || this.loaded_metal < 0) {
+    if (!InputValidator.isSet(this.loadedMetal) || this.loadedMetal < 0) {
       return false;
     }
-    if (!InputValidator.isSet(this.loaded_crystal) || this.loaded_crystal < 0) {
+    if (!InputValidator.isSet(this.loadedCrystal) || this.loadedCrystal < 0) {
       return false;
     }
-    if (!InputValidator.isSet(this.loaded_deuterium) || this.loaded_deuterium < 0) {
+    if (!InputValidator.isSet(this.loadedDeuterium) || this.loadedDeuterium < 0) {
       return false;
     }
 

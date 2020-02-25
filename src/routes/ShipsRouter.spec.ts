@@ -26,7 +26,7 @@ describe("shipsRouter", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
-        authToken = res.body.data.token;
+        authToken = res.body.token;
       });
   });
 
@@ -45,9 +45,9 @@ describe("shipsRouter", () => {
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).to.be.equals(planetID);
+        expect(res.body.planetID).to.be.equals(planetID);
       });
   });
 
@@ -57,9 +57,9 @@ describe("shipsRouter", () => {
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -69,9 +69,9 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: "sadf", buildOrder: { 201: 3 } })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -83,9 +83,9 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: { hallo: 3 } })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -97,9 +97,9 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: { 201: "asdf" } })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 
@@ -112,9 +112,9 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "301": 3000 }' })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).to.be.equals("Invalid parameter");
       });
     /* eslint-enable quotes */
   });
@@ -128,9 +128,9 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("The player does not own the planet");
+        expect(res.body.error).to.be.equals("The player does not own the planet");
       });
     /* eslint-enable quotes */
   });
@@ -140,9 +140,9 @@ describe("shipsRouter", () => {
 
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-    const valueBefore = planet.b_hangar_plus;
+    const valueBefore = planet.bHangarPlus;
 
-    planet.b_hangar_plus = true;
+    planet.bHangarPlus = true;
 
     await container.planetService.updatePlanet(planet);
 
@@ -152,12 +152,12 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(async res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.message).to.be.equals("Shipyard is currently upgrading");
+        expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
         // reset
-        planet.b_hangar_plus = valueBefore;
+        planet.bHangarPlus = valueBefore;
         await container.planetService.updatePlanet(planet);
       });
     /* eslint-enable quotes */
@@ -172,10 +172,10 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 4 }' })
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.planetID).to.be.equals(planetID);
-        const buildOrders = JSON.parse(res.body.data.b_hangar_queue);
+        expect(res.body.planetID).to.be.equals(planetID);
+        const buildOrders = JSON.parse(res.body.bHangarQueue);
         expect(buildOrders.length).to.be.equals(1);
       });
     /* eslint-enable quotes */

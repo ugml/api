@@ -9,24 +9,24 @@ export default class Ships implements IUnits {
   public planetID: number;
 
   /**
-   * The current amount of small_cargo_ship
+   * The current amount of smallCargoShip
    */
-  public small_cargo_ship: number;
+  public smallCargoShip: number;
 
   /**
-   * The current amount of large_cargo_ship
+   * The current amount of largeCargoShip
    */
-  public large_cargo_ship: number;
+  public largeCargoShip: number;
 
   /**
-   * The current amount of light_fighter
+   * The current amount of lightFighter
    */
-  public light_fighter: number;
+  public lightFighter: number;
 
   /**
-   * The current amount of heavy_fighter
+   * The current amount of heavyFighter
    */
-  public heavy_fighter: number;
+  public heavyFighter: number;
 
   /**
    * The current amount of cruiser
@@ -39,9 +39,9 @@ export default class Ships implements IUnits {
   public battleship: number;
 
   /**
-   * The current amount of colony_ship
+   * The current amount of colonyShip
    */
-  public colony_ship: number;
+  public colonyShip: number;
 
   /**
    * The current amount of recycler
@@ -49,9 +49,9 @@ export default class Ships implements IUnits {
   public recycler: number;
 
   /**
-   * The current amount of espionage_probe
+   * The current amount of espionageProbe
    */
-  public espionage_probe: number;
+  public espionageProbe: number;
 
   /**
    * The current amount of bomber
@@ -59,9 +59,9 @@ export default class Ships implements IUnits {
   public bomber: number;
 
   /**
-   * The current amount of solar_satellite
+   * The current amount of solarSatellite
    */
-  public solar_satellite: number;
+  public solarSatellite: number;
 
   /**
    * The current amount of destroyer
@@ -84,17 +84,17 @@ export default class Ships implements IUnits {
   public isValid(): boolean {
     return (
       0 < this.planetID &&
-      0 <= this.small_cargo_ship &&
-      0 <= this.large_cargo_ship &&
-      0 <= this.light_fighter &&
-      0 <= this.heavy_fighter &&
+      0 <= this.smallCargoShip &&
+      0 <= this.largeCargoShip &&
+      0 <= this.lightFighter &&
+      0 <= this.heavyFighter &&
       0 <= this.cruiser &&
       0 <= this.battleship &&
-      0 <= this.colony_ship &&
+      0 <= this.colonyShip &&
       0 <= this.recycler &&
-      0 <= this.espionage_probe &&
+      0 <= this.espionageProbe &&
       0 <= this.bomber &&
-      0 <= this.solar_satellite &&
+      0 <= this.solarSatellite &&
       0 <= this.destroyer &&
       0 <= this.battlecruiser &&
       0 <= this.deathstar
@@ -106,17 +106,17 @@ export default class Ships implements IUnits {
   //     const query = squel
   //       .update()
   //       .table("ships")
-  //       .set("small_cargo_ship", this.small_cargo_ship)
-  //       .set("large_cargo_ship", this.large_cargo_ship)
-  //       .set("light_fighter", this.light_fighter)
-  //       .set("heavy_fighter", this.heavy_fighter)
+  //       .set("smallCargoShip", this.smallCargoShip)
+  //       .set("largeCargoShip", this.largeCargoShip)
+  //       .set("lightFighter", this.lightFighter)
+  //       .set("heavyFighter", this.heavyFighter)
   //       .set("cruiser", this.cruiser)
   //       .set("battleship", this.battleship)
-  //       .set("colony_ship", this.colony_ship)
+  //       .set("colonyShip", this.colonyShip)
   //       .set("recycler", this.recycler)
-  //       .set("espionage_probe", this.espionage_probe)
+  //       .set("espionageProbe", this.espionageProbe)
   //       .set("bomber", this.bomber)
-  //       .set("solar_satellite", this.solar_satellite)
+  //       .set("solarSatellite", this.solarSatellite)
   //       .set("destroyer", this.destroyer)
   //       .set("battlecruiser", this.battlecruiser)
   //       .set("deathstar", this.deathstar)
@@ -140,17 +140,17 @@ export default class Ships implements IUnits {
   //       .insert()
   //       .into("ships")
   //       .set("planetID", this.planetID)
-  //       .set("small_cargo_ship", this.small_cargo_ship)
-  //       .set("large_cargo_ship", this.large_cargo_ship)
-  //       .set("light_fighter", this.light_fighter)
-  //       .set("heavy_fighter", this.heavy_fighter)
+  //       .set("smallCargoShip", this.smallCargoShip)
+  //       .set("largeCargoShip", this.largeCargoShip)
+  //       .set("lightFighter", this.lightFighter)
+  //       .set("heavyFighter", this.heavyFighter)
   //       .set("cruiser", this.cruiser)
   //       .set("battleship", this.battleship)
-  //       .set("colony_ship", this.colony_ship)
+  //       .set("colonyShip", this.colonyShip)
   //       .set("recycler", this.recycler)
-  //       .set("espionage_probe", this.espionage_probe)
+  //       .set("espionageProbe", this.espionageProbe)
   //       .set("bomber", this.bomber)
-  //       .set("solar_satellite", this.solar_satellite)
+  //       .set("solarSatellite", this.solarSatellite)
   //       .set("destroyer", this.destroyer)
   //       .set("battlecruiser", this.battlecruiser)
   //       .set("deathstar", this.deathstar)

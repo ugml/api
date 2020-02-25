@@ -23,27 +23,27 @@ export default class Planet implements IUnits {
   /**
    * The galaxy-position in the universe
    */
-  public pos_galaxy: number;
+  public posGalaxy: number;
 
   /**
    * The system-position in the universe
    */
-  public pos_system: number;
+  public posSystem: number;
 
   /**
    * the planet-position in the universe
    */
-  public pos_planet: number;
+  public posPlanet: number;
 
   /**
    * The unix-timestamp the planet was last updated
    */
-  public last_update: number;
+  public lastUpdate: number;
 
   /**
    * The type of the planet
    */
-  public planet_type: Globals.PlanetType;
+  public planetType: Globals.PlanetType;
 
   /**
    * The image of the planet
@@ -58,22 +58,22 @@ export default class Planet implements IUnits {
   /**
    * The currently populated fields on the planet
    */
-  public fields_current: number;
+  public fieldsCurrent: number;
 
   /**
    * The maximum fields on the planet
    */
-  public fields_max: number;
+  public fieldsMax: number;
 
   /**
    * The minimum temperature on the planet
    */
-  public temp_min: number;
+  public tempMin: number;
 
   /**
    * The maximum temperature on the planet
    */
-  public temp_max: number;
+  public tempMax: number;
 
   /**
    * The current amount of metal on the planet
@@ -93,74 +93,74 @@ export default class Planet implements IUnits {
   /**
    * The current amount of energy used on the planet
    */
-  public energy_used: number;
+  public energyUsed: number;
 
   /**
    * The maximum amount of energy on the planet
    */
-  public energy_max: number;
+  public energyMax: number;
 
   /**
    * The percentage of production metal-mine
    */
-  public metal_mine_percent: number;
+  public metalMinePercent: number;
 
   /**
    * The percentage of production of the crystal-mine
    */
-  public crystal_mine_percent: number;
+  public crystalMinePercent: number;
 
   /**
    * The percentage of production deuterium-synthesizer
    */
-  public deuterium_synthesizer_percent: number;
+  public deuteriumSynthesizerPercent: number;
 
   /**
    * The percentage of production solar-planet
    */
-  public solar_plant_percent: number;
+  public solarPlantPercent: number;
 
   /**
    * The percentage of production fusion-reactor
    */
-  public fusion_reactor_percent: number;
+  public fusionReactorPercent: number;
 
   /**
    * The percentage of production solar-sattelite
    */
-  public solar_satellite_percent: number;
+  public solarSatellitePercent: number;
 
   /**
    * The ID of the building currently upgrading.
    * This value is 0 if no building is currently upgrading.
    */
-  public b_building_id: number;
+  public bBuildingId: number;
 
   /**
    * The time, at which the upgrade will be completed
    */
-  public b_building_endtime: number;
+  public bBuildingEndTime: number;
 
   /**
    * True, if the current build-order is a demolition job
    */
-  public b_building_demolition: boolean;
+  public bBuildingDemolition: boolean;
 
   /**
    * The curreny queue of the hangar
    */
-  public b_hangar_queue: string;
+  public bHangarQueue: string;
 
   /**
    * The time, the queue was started
    */
-  public b_hangar_start_time: number;
+  public bHangarStartTime: number;
 
   // TODO: obsolete?
   /**
    * True, if the hangar is currently upgraded
    */
-  public b_hangar_plus: boolean;
+  public bHangarPlus: boolean;
 
   /**
    * Indicates, if the planet is destroyed
@@ -171,21 +171,21 @@ export default class Planet implements IUnits {
    * Checks, if the planet is currently upgrading a building
    */
   public isUpgradingBuilding(): boolean {
-    return this.b_building_id > 0 && this.b_building_endtime > 0;
+    return this.bBuildingId > 0 && this.bBuildingEndTime > 0;
   }
 
   /**
    * Checks, if the planet is currently upgrading its hangar
    */
   public isUpgradingHangar(): boolean {
-    return this.b_hangar_plus;
+    return this.bHangarPlus;
   }
 
   /**
    *  Checks, if the planet is currently upgrading the research-lab
    */
   public isUpgradingResearchLab(): boolean {
-    return this.b_building_id === Globals.Buildings.RESEARCH_LAB && this.b_building_endtime > 0;
+    return this.bBuildingId === Globals.Buildings.RESEARCH_LAB && this.bBuildingEndTime > 0;
   }
 
   /**
@@ -193,10 +193,10 @@ export default class Planet implements IUnits {
    */
   public isBuildingUnits(): boolean {
     return (
-      this.b_hangar_queue !== undefined &&
-      this.b_hangar_queue !== null &&
-      this.b_hangar_queue.length > 0 &&
-      this.b_hangar_start_time > 0
+      this.bHangarQueue !== undefined &&
+      this.bHangarQueue !== null &&
+      this.bHangarQueue.length > 0 &&
+      this.bHangarStartTime > 0
     );
   }
 
@@ -209,44 +209,44 @@ export default class Planet implements IUnits {
       0 < this.ownerID &&
       5 <= this.name.length &&
       this.name.length < 45 &&
-      0 < this.pos_galaxy &&
-      this.pos_galaxy <= Config.getGameConfig().pos_galaxy_max &&
-      0 < this.pos_system &&
-      this.pos_system <= Config.getGameConfig().pos_system_max &&
-      0 < this.pos_planet &&
-      this.pos_planet <= Config.getGameConfig().pos_planet_max &&
-      0 < this.last_update &&
+      0 < this.posGalaxy &&
+      this.posGalaxy <= Config.getGameConfig().posGalaxyMax &&
+      0 < this.posSystem &&
+      this.posSystem <= Config.getGameConfig().posSystemMax &&
+      0 < this.posPlanet &&
+      this.posPlanet <= Config.getGameConfig().posPlanetMax &&
+      0 < this.lastUpdate &&
       0 < this.diameter &&
-      0 <= this.fields_current &&
-      0 < this.fields_max &&
-      this.fields_current <= this.fields_max &&
-      this.temp_min <= this.temp_max &&
+      0 <= this.fieldsCurrent &&
+      0 < this.fieldsMax &&
+      this.fieldsCurrent <= this.fieldsMax &&
+      this.tempMin <= this.tempMax &&
       0 <= this.metal &&
       0 <= this.crystal &&
       0 <= this.deuterium &&
-      0 <= this.energy_used &&
-      0 <= this.energy_max &&
-      0 <= this.metal_mine_percent &&
-      this.metal_mine_percent <= 100 &&
-      this.metal_mine_percent % 10 === 0 &&
-      0 <= this.crystal_mine_percent &&
-      this.crystal_mine_percent <= 100 &&
-      this.crystal_mine_percent % 10 === 0 &&
-      0 <= this.deuterium_synthesizer_percent &&
-      this.deuterium_synthesizer_percent <= 100 &&
-      this.deuterium_synthesizer_percent % 10 === 0 &&
-      0 <= this.solar_plant_percent &&
-      this.solar_plant_percent <= 100 &&
-      this.solar_plant_percent % 10 === 0 &&
-      0 <= this.fusion_reactor_percent &&
-      this.fusion_reactor_percent <= 100 &&
-      this.fusion_reactor_percent % 10 === 0 &&
-      0 <= this.solar_satellite_percent &&
-      this.solar_satellite_percent <= 100 &&
-      this.solar_satellite_percent % 10 === 0 &&
-      0 <= this.b_building_id &&
-      0 <= this.b_building_endtime &&
-      0 <= this.b_hangar_start_time
+      0 <= this.energyUsed &&
+      0 <= this.energyMax &&
+      0 <= this.metalMinePercent &&
+      this.metalMinePercent <= 100 &&
+      this.metalMinePercent % 10 === 0 &&
+      0 <= this.crystalMinePercent &&
+      this.crystalMinePercent <= 100 &&
+      this.crystalMinePercent % 10 === 0 &&
+      0 <= this.deuteriumSynthesizerPercent &&
+      this.deuteriumSynthesizerPercent <= 100 &&
+      this.deuteriumSynthesizerPercent % 10 === 0 &&
+      0 <= this.solarPlantPercent &&
+      this.solarPlantPercent <= 100 &&
+      this.solarPlantPercent % 10 === 0 &&
+      0 <= this.fusionReactorPercent &&
+      this.fusionReactorPercent <= 100 &&
+      this.fusionReactorPercent % 10 === 0 &&
+      0 <= this.solarSatellitePercent &&
+      this.solarSatellitePercent <= 100 &&
+      this.solarSatellitePercent % 10 === 0 &&
+      0 <= this.bBuildingId &&
+      0 <= this.bBuildingEndTime &&
+      0 <= this.bHangarStartTime
     );
   }
 }

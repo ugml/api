@@ -10,39 +10,39 @@ export default class Buildings implements IUnits {
   public planetID: number;
 
   /**
-   * Current metal_mine level
+   * Current metalMine level
    */
-  public metal_mine: number;
+  public metalMine: number;
 
   /**
-   * Current crystal_mine level
+   * Current crystalMine level
    */
-  public crystal_mine: number;
+  public crystalMine: number;
 
   /**
-   * Current deuterium_synthesizer level
+   * Current deuteriumSynthesizer level
    */
-  public deuterium_synthesizer: number;
+  public deuteriumSynthesizer: number;
 
   /**
-   * Current solar_plant level
+   * Current solarPlant level
    */
-  public solar_plant: number;
+  public solarPlant: number;
 
   /**
-   * Current fusion_reactor level
+   * Current fusionReactor level
    */
-  public fusion_reactor: number;
+  public fusionReactor: number;
 
   /**
-   * Current robotic_factory level
+   * Current roboticFactory level
    */
-  public robotic_factory: number;
+  public roboticFactory: number;
 
   /**
-   * Current nanite_factory level
+   * Current naniteFactory level
    */
-  public nanite_factory: number;
+  public naniteFactory: number;
 
   /**
    * Current shipyard level
@@ -50,24 +50,24 @@ export default class Buildings implements IUnits {
   public shipyard: number;
 
   /**
-   * Current metal_storage level
+   * Current metalStorage level
    */
-  public metal_storage: number;
+  public metalStorage: number;
 
   /**
-   * Current crystal_storage level
+   * Current crystalStorage level
    */
-  public crystal_storage: number;
+  public crystalStorage: number;
 
   /**
-   * Current deuterium_storage level
+   * Current deuteriumStorage level
    */
-  public deuterium_storage: number;
+  public deuteriumStorage: number;
 
   /**
-   * Current research_lab level
+   * Current researchLab level
    */
-  public research_lab: number;
+  public researchLab: number;
 
   /**
    * Current terraformer level
@@ -75,14 +75,14 @@ export default class Buildings implements IUnits {
   public terraformer: number;
 
   /**
-   * Current alliance_depot level
+   * Current allianceDepot level
    */
-  public alliance_depot: number;
+  public allianceDepot: number;
 
   /**
-   * Current missile_silo level
+   * Current missileSilo level
    */
-  public missile_silo: number;
+  public missileSilo: number;
 
   /**
    * Returns, if the contains valid data or not
@@ -90,21 +90,21 @@ export default class Buildings implements IUnits {
   public isValid(): boolean {
     return (
       0 <= this.planetID &&
-      0 <= this.metal_mine &&
-      0 <= this.crystal_mine &&
-      0 <= this.deuterium_synthesizer &&
-      0 <= this.solar_plant &&
-      0 <= this.fusion_reactor &&
-      0 <= this.robotic_factory &&
-      0 <= this.nanite_factory &&
+      0 <= this.metalMine &&
+      0 <= this.crystalMine &&
+      0 <= this.deuteriumSynthesizer &&
+      0 <= this.solarPlant &&
+      0 <= this.fusionReactor &&
+      0 <= this.roboticFactory &&
+      0 <= this.naniteFactory &&
       0 <= this.shipyard &&
-      0 <= this.metal_storage &&
-      0 <= this.crystal_storage &&
-      0 <= this.deuterium_storage &&
-      0 <= this.research_lab &&
+      0 <= this.metalStorage &&
+      0 <= this.crystalStorage &&
+      0 <= this.deuteriumStorage &&
+      0 <= this.researchLab &&
       0 <= this.terraformer &&
-      0 <= this.alliance_depot &&
-      0 <= this.missile_silo
+      0 <= this.allianceDepot &&
+      0 <= this.missileSilo
     );
   }
 
@@ -113,21 +113,21 @@ export default class Buildings implements IUnits {
   //     const query = squel
   //       .update()
   //       .table("buildings")
-  //       .set("metal_mine", this.metal_mine)
-  //       .set("crystal_mine", this.crystal_mine)
-  //       .set("deuterium_synthesizer", this.deuterium_synthesizer)
-  //       .set("solar_plant", this.solar_plant)
-  //       .set("fusion_reactor", this.fusion_reactor)
-  //       .set("robotic_factory", this.robotic_factory)
-  //       .set("nanite_factory", this.nanite_factory)
+  //       .set("metalMine", this.metalMine)
+  //       .set("crystalMine", this.crystalMine)
+  //       .set("deuteriumSynthesizer", this.deuteriumSynthesizer)
+  //       .set("solarPlant", this.solarPlant)
+  //       .set("fusionReactor", this.fusionReactor)
+  //       .set("roboticFactory", this.roboticFactory)
+  //       .set("naniteFactory", this.naniteFactory)
   //       .set("shipyard", this.shipyard)
-  //       .set("metal_storage", this.metal_storage)
-  //       .set("crystal_storage", this.crystal_storage)
-  //       .set("deuterium_storage", this.deuterium_storage)
-  //       .set("research_lab", this.research_lab)
+  //       .set("metalStorage", this.metalStorage)
+  //       .set("crystalStorage", this.crystalStorage)
+  //       .set("deuteriumStorage", this.deuteriumStorage)
+  //       .set("researchLab", this.researchLab)
   //       .set("terraformer", this.terraformer)
-  //       .set("alliance_depot", this.alliance_depot)
-  //       .set("missile_silo", this.missile_silo)
+  //       .set("allianceDepot", this.allianceDepot)
+  //       .set("missileSilo", this.missileSilo)
   //       .where("planetID = ?", this.planetID)
   //       .toString();
   //
@@ -148,21 +148,21 @@ export default class Buildings implements IUnits {
   //       .insert()
   //       .into("buildings")
   //       .set("planetID", this.planetID)
-  //       .set("metal_mine", this.metal_mine)
-  //       .set("crystal_mine", this.crystal_mine)
-  //       .set("deuterium_synthesizer", this.deuterium_synthesizer)
-  //       .set("solar_plant", this.solar_plant)
-  //       .set("fusion_reactor", this.fusion_reactor)
-  //       .set("robotic_factory", this.robotic_factory)
-  //       .set("nanite_factory", this.nanite_factory)
+  //       .set("metalMine", this.metalMine)
+  //       .set("crystalMine", this.crystalMine)
+  //       .set("deuteriumSynthesizer", this.deuteriumSynthesizer)
+  //       .set("solarPlant", this.solarPlant)
+  //       .set("fusionReactor", this.fusionReactor)
+  //       .set("roboticFactory", this.roboticFactory)
+  //       .set("naniteFactory", this.naniteFactory)
   //       .set("shipyard", this.shipyard)
-  //       .set("metal_storage", this.metal_storage)
-  //       .set("crystal_storage", this.crystal_storage)
-  //       .set("deuterium_storage", this.deuterium_storage)
-  //       .set("research_lab", this.research_lab)
+  //       .set("metalStorage", this.metalStorage)
+  //       .set("crystalStorage", this.crystalStorage)
+  //       .set("deuteriumStorage", this.deuteriumStorage)
+  //       .set("researchLab", this.researchLab)
   //       .set("terraformer", this.terraformer)
-  //       .set("alliance_depot", this.alliance_depot)
-  //       .set("missile_silo", this.missile_silo)
+  //       .set("allianceDepot", this.allianceDepot)
+  //       .set("missileSilo", this.missileSilo)
   //       .toString();
   //
   //     Database.query(query)

@@ -24,7 +24,7 @@ describe("techsRouter", () => {
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
-        authToken = res.body.data.token;
+        authToken = res.body.token;
       });
   });
 
@@ -38,10 +38,10 @@ describe("techsRouter", () => {
       .get("/v1/techs/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.body.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body.data.userID).to.be.equals(1);
-        expect(res.body.data.graviton_tech).to.be.equals(1);
+        expect(res.body.userID).to.be.equals(1);
+        expect(res.body.gravitonTech).to.be.equals(1);
       });
   });
 
@@ -53,9 +53,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -65,9 +64,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ techID: 1 })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -79,9 +77,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, techID: -1 })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -93,9 +90,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, techID: 500 })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -105,9 +101,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: 1234, techID: 101 })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -119,9 +114,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, techID: 101 })
       .then(res => {
-        expect(res.body.message).equals("Job started");
         expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-        expect(res.body.data.planet.planetID).to.be.equals(planetID);
+        expect(res.body.planetID).to.be.equals(planetID);
       });
   });
 
@@ -133,9 +127,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
-        expect(res.body.message).equals("Planet already has a build-job");
-        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).equals("Planet already has a build-job");
+        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
 
@@ -145,8 +138,8 @@ describe("techsRouter", () => {
     const planetBackup: Planet = await container.planetService.getPlanet(1, planetID, true);
     const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
 
-    planet.b_building_id = Globals.Buildings.RESEARCH_LAB;
-    planet.b_building_endtime = 1;
+    planet.bBuildingId = Globals.Buildings.RESEARCH_LAB;
+    planet.bBuildingEndTime = 1;
 
     await container.planetService.updatePlanet(planet);
 
@@ -155,9 +148,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(async res => {
-        expect(res.body.message).equals("Planet is upgrading the research-lab");
-        expect(res.body.status).equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).equals("Planet is upgrading the research-lab");
+        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
 
         // reset
         await container.planetService.updatePlanet(planetBackup);
@@ -172,9 +164,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -186,8 +177,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
-        expect(res.body.message).equals("Tech canceled");
         expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+        expect(res.body.planetID).to.equals(planetID);
       });
   });
 
@@ -199,9 +190,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "1101" })
       .then(res => {
-        expect(res.body.message).equals("Invalid parameter");
+        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.data).to.be.eql({});
       });
   });
 
@@ -213,9 +203,8 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "1" })
       .then(res => {
-        expect(res.body.message).equals("Planet has no build-job");
-        expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-        expect(res.body.data).to.be.eql({});
+        expect(res.body.error).equals("Planet has no build-job");
+        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
       });
   });
 });

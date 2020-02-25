@@ -40,18 +40,12 @@ export default class MessagesRouter {
 
       const messages = await this.messageService.getAllMessages(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: messages,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(messages);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -66,9 +60,7 @@ export default class MessagesRouter {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -76,18 +68,12 @@ export default class MessagesRouter {
       const messageID = parseInt(request.params.messageID, 10);
       const message = await this.messageService.getMessageById(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: message || {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(message);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -102,9 +88,7 @@ export default class MessagesRouter {
     try {
       if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -113,18 +97,12 @@ export default class MessagesRouter {
 
       await this.messageService.deleteMessage(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "The message was deleted.",
-        data: {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -144,9 +122,7 @@ export default class MessagesRouter {
         !InputValidator.isSet(request.body.body)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -158,27 +134,19 @@ export default class MessagesRouter {
       const receiver = await this.userService.getUserById(receiverID);
 
       if (!InputValidator.isSet(receiver)) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "The receiver does not exist",
-          data: {},
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "The receiver does not exist",
         });
       }
 
       await this.messageService.sendMessage(userID, receiverID, subject, messageText);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Message sent",
-        data: {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };

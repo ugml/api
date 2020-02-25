@@ -46,9 +46,7 @@ export default class ShipsRouter {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -57,18 +55,12 @@ export default class ShipsRouter {
 
       const ships = await this.shipService.getShips(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: ships,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(ships);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -88,9 +80,7 @@ export default class ShipsRouter {
         !InputValidator.isValidJson(request.body.buildOrder)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -99,9 +89,7 @@ export default class ShipsRouter {
       // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.SHIP)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -115,17 +103,13 @@ export default class ShipsRouter {
 
       if (planet === null) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "The player does not own the planet",
-          data: {},
+          error: "The player does not own the planet",
         });
       }
 
-      if (planet.b_hangar_plus) {
+      if (planet.bHangarPlus) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Shipyard is currently upgrading",
-          data: {},
+          error: "Shipyard is currently upgrading",
         });
       }
 
@@ -183,7 +167,7 @@ export default class ShipsRouter {
             cost.metal,
             cost.crystal,
             buildings.shipyard,
-            buildings.nanite_factory,
+            buildings.naniteFactory,
           ) * Math.floor(count);
 
         queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
@@ -202,19 +186,19 @@ export default class ShipsRouter {
 
       let oldBuildOrder;
 
-      if (!InputValidator.isSet(planet.b_hangar_queue)) {
-        planet.b_hangar_queue = JSON.parse("[]");
-        oldBuildOrder = planet.b_hangar_queue;
+      if (!InputValidator.isSet(planet.bHangarQueue)) {
+        planet.bHangarQueue = JSON.parse("[]");
+        oldBuildOrder = planet.bHangarQueue;
       } else {
-        oldBuildOrder = JSON.parse(planet.b_hangar_queue);
+        oldBuildOrder = JSON.parse(planet.bHangarQueue);
       }
 
       oldBuildOrder.push(queue);
 
-      planet.b_hangar_queue = JSON.stringify(oldBuildOrder);
+      planet.bHangarQueue = JSON.stringify(oldBuildOrder);
 
-      if (planet.b_hangar_start_time === 0) {
-        planet.b_hangar_start_time = Math.floor(Date.now() / 1000);
+      if (planet.bHangarStartTime === 0) {
+        planet.bHangarStartTime = Math.floor(Date.now() / 1000);
       }
 
       planet.metal = metal;
@@ -223,18 +207,12 @@ export default class ShipsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: planet,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };

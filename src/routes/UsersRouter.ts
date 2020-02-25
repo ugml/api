@@ -84,26 +84,18 @@ export default class UsersRouter {
       // validate parameters
       if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
       const data = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(data);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -119,9 +111,7 @@ export default class UsersRouter {
       // validate parameters
       if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -129,18 +119,13 @@ export default class UsersRouter {
 
       const user = await this.userService.getUserById(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: user || {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(user);
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };
@@ -158,9 +143,7 @@ export default class UsersRouter {
       !InputValidator.isSet(request.body.email)
     ) {
       return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        status: Globals.Statuscode.BAD_REQUEST,
-        message: "Invalid parameter",
-        data: {},
+        error: "Invalid parameter",
       });
     }
 
@@ -200,27 +183,27 @@ export default class UsersRouter {
       newUser.userID = userID;
       newPlanet.ownerID = userID;
       newUser.password = hashedPassword;
-      newPlanet.planet_type = PlanetType.Planet;
+      newPlanet.planetType = PlanetType.Planet;
 
       Logger.info("Getting a new planetID");
 
       const planetID = await await this.planetService.getNewId();
 
-      newUser.current_planet = planetID;
+      newUser.currentPlanet = planetID;
       newPlanet.planetID = planetID;
 
       Logger.info("Finding free position for new planet");
 
       const galaxyData = await this.galaxyService.getFreePosition(
-        gameConfig.pos_galaxy_max,
-        gameConfig.pos_system_max,
+        gameConfig.posGalaxyMax,
+        gameConfig.posSystemMax,
         4,
         12,
       );
 
-      newPlanet.pos_galaxy = galaxyData.pos_galaxy;
-      newPlanet.pos_system = galaxyData.pos_system;
-      newPlanet.pos_planet = galaxyData.pos_planet;
+      newPlanet.posGalaxy = galaxyData.posGalaxy;
+      newPlanet.posSystem = galaxyData.posSystem;
+      newPlanet.posPlanet = galaxyData.posPlanet;
 
       Logger.info("Creating a new user");
 
@@ -228,18 +211,18 @@ export default class UsersRouter {
 
       Logger.info("Creating a new planet");
 
-      newPlanet.name = gameConfig.startplanet_name;
-      newPlanet.last_update = Math.floor(Date.now() / 1000);
-      newPlanet.diameter = gameConfig.startplanet_diameter;
-      newPlanet.fields_max = gameConfig.startplanet_maxfields;
-      newPlanet.metal = gameConfig.metal_start;
-      newPlanet.crystal = gameConfig.crystal_start;
-      newPlanet.deuterium = gameConfig.deuterium_start;
+      newPlanet.name = gameConfig.startPlanetName;
+      newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
+      newPlanet.diameter = gameConfig.startPlanetDiameter;
+      newPlanet.fieldsMax = gameConfig.startPlanetMaxFields;
+      newPlanet.metal = gameConfig.metalStart;
+      newPlanet.crystal = gameConfig.crystalStart;
+      newPlanet.deuterium = gameConfig.deuteriumStart;
 
       switch (true) {
-        case newPlanet.pos_planet <= 5: {
-          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
-          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.posPlanet <= 5: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["desert", "dry"];
 
@@ -248,9 +231,9 @@ export default class UsersRouter {
 
           break;
         }
-        case newPlanet.pos_planet <= 10: {
-          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
-          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.posPlanet <= 10: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["normal", "jungle", "gas"];
 
@@ -259,9 +242,9 @@ export default class UsersRouter {
 
           break;
         }
-        case newPlanet.pos_planet <= 15: {
-          newPlanet.temp_min = Math.random() * (130 - 40) + 40;
-          newPlanet.temp_max = Math.random() * (150 - 240) + 240;
+        case newPlanet.posPlanet <= 15: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
 
           const images: string[] = ["ice", "water"];
 
@@ -288,9 +271,9 @@ export default class UsersRouter {
 
       await this.galaxyService.createGalaxyRow(
         newPlanet.planetID,
-        newPlanet.pos_galaxy,
-        newPlanet.pos_system,
-        newPlanet.pos_planet,
+        newPlanet.posGalaxy,
+        newPlanet.posSystem,
+        newPlanet.posPlanet,
         connection,
       );
 
@@ -309,28 +292,20 @@ export default class UsersRouter {
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: `There was an error while handling the request: ${error.message}`,
-          data: {},
+          error: `There was an error while handling the request: ${error.message}`,
         });
       }
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     } finally {
       await connection.release();
     }
 
     return response.status(Globals.Statuscode.SUCCESS).json({
-      status: Globals.Statuscode.SUCCESS,
-      message: "Success",
-      data: {
-        userID: newUser.userID,
-        token: JwtHelper.generateToken(newUser.userID),
-      },
+      userID: newUser.userID,
+      token: JwtHelper.generateToken(newUser.userID),
     });
   };
 
@@ -349,15 +324,14 @@ export default class UsersRouter {
         !InputValidator.isSet(request.body.email)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "No parameters were passed",
-          data: {},
+          error: "No parameters were passed",
         });
       }
 
       const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
+        // TODO: Check if username already exists
         user.username = InputValidator.sanitizeString(request.body.username);
       }
 
@@ -373,25 +347,17 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: user,
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json(user);
     } catch (error) {
       Logger.error(error);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: `There was an error while handling the request: ${error.message}`,
-          data: {},
+          error: `There was an error while handling the request: ${error.message}`,
         });
       } else {
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
-          message: "There was an error while handling the request.",
-          data: {},
+          error: "There was an error while handling the request.",
         });
       }
     }
@@ -408,9 +374,7 @@ export default class UsersRouter {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "Invalid parameter",
-          data: {},
+          error: "Invalid parameter",
         });
       }
 
@@ -421,30 +385,22 @@ export default class UsersRouter {
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          status: Globals.Statuscode.BAD_REQUEST,
-          message: "The player does not own the planet",
-          data: {},
+          error: "The player does not own the planet",
         });
       }
 
       const user: User = await this.userService.getUserById(userID);
 
-      user.current_planet = planetID;
+      user.currentPlanet = planetID;
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        status: Globals.Statuscode.SUCCESS,
-        message: "Success",
-        data: {},
-      });
+      return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
       Logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
-        message: "There was an error while handling the request.",
-        data: {},
+        error: "There was an error while handling the request.",
       });
     }
   };

@@ -25,8 +25,7 @@ jobs:
   include:
     - stage: audit
       if: type = pull_request
-      #script: audit-ci --low --report-type full
-      script: echo "I am disabled"
+      script: audit-ci --low --report-type full
     - &build
       stage: build
       script: npm run-script build
@@ -44,9 +43,9 @@ jobs:
         - npm run-script test-coverage
         - "cat ./coverage/lcov.info | codacy-coverage -p ."
     - stage: lint
-      script:
-        - npm run-script lint
-        - npm run-script tslint
+      script: npm run-script lint
+    -
+      script: npm run-script tslint
     - stage: documentation
       if: branch = master
       script:

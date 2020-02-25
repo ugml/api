@@ -1,6 +1,6 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import Logger from "../common/Logger";
+import RequestLogger from "../common/RequestLogger";
 import SerializationHelper from "../common/SerializationHelper";
 import IBuildingService from "../interfaces/IBuildingService";
 import Buildings from "../units/Buildings";
@@ -31,7 +31,7 @@ export default class BuildingService implements IBuildingService {
 
       return SerializationHelper.toInstance(new Buildings(), JSON.stringify(rows[0]));
     } catch (error) {
-      Logger.error(error);
+      RequestLogger.error(error);
       return null;
     }
   }

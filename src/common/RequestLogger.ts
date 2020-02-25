@@ -19,7 +19,7 @@ if (!fs.existsSync(path)) {
 /* tslint:enable:no-empty*/
 
 /* tslint:disable: variable-name */
-const Logger = createLogger({
+const RequestLogger = createLogger({
   /* tslint:enable */
   format: combine(
     format.timestamp({
@@ -34,8 +34,8 @@ const Logger = createLogger({
   ],
 });
 
-Logger.getPath = function() {
+RequestLogger.getPath = function() {
   return path;
 };
 
-export default Logger;
+export default RequestLogger;

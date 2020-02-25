@@ -7,6 +7,8 @@ import Redis from "./common/Redis";
 import IAuthorizedRequest from "./interfaces/IAuthorizedRequest";
 import { Globals } from "./common/Globals";
 import IJwt from "./interfaces/IJwt";
+import ILogger from "./interfaces/ILogger";
+import RequestLogger from "./common/RequestLogger";
 import InputValidator from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -33,8 +35,6 @@ const expressWinston = require("express-winston");
 const { format } = winston;
 const { combine, printf } = format;
 
-import Logger from "./common/Logger";
-
 const logFormat = printf(({ message, timestamp }) => {
   return `${timestamp} [REQUEST] ${message}`;
 });
@@ -48,12 +48,15 @@ export default class App {
   public express: express.Application;
   public userID: string;
   public container;
+  private logger: ILogger;
 
   /**
    * Creates and configures a new App-instance
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
+    this.logger = logger;
     this.container = container;
     this.express = express();
     this.middleware();
@@ -66,7 +69,7 @@ export default class App {
    * Loads all events from the database into the eventqueue
    */
   private async loadEventsIntoQueue(): Promise<void> {
-    Logger.info("Loading unprocessed events into Queue");
+    this.logger.info("Loading unprocessed events into Queue");
 
     const eventService = this.container.eventService;
 
@@ -76,7 +79,7 @@ export default class App {
       Redis.getConnection().zadd("eventQueue", event.endTime, event.eventID);
     }
 
-    Logger.info(`Finished loading ${eventList.length} events into Queue`);
+    this.logger.info(`Finished loading ${eventList.length} events into Queue`);
   }
 
   /**
@@ -126,6 +129,8 @@ export default class App {
 
     this.express.use("/*", (request, response, next) => {
       try {
+        this.logger.info("Hello");
+
         // if the user tries to authenticate, we don't have a token yet
         if (
           !request.originalUrl.toString().includes("/auth/") &&
@@ -139,9 +144,7 @@ export default class App {
             !authString.match("([a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+\\.[a-zA-Z0-9\\-\\_]+)")
           ) {
             return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-              status: Globals.Statuscode.NOT_AUTHORIZED,
               error: "Authentication failed",
-
             });
           }
 
@@ -155,30 +158,24 @@ export default class App {
             // check if userID is a valid integer
             if (isNaN(parseInt(self.userID, 10))) {
               return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-                status: Globals.Statuscode.NOT_AUTHORIZED,
-                error: "Invalid parameter2",
-
+                error: "Invalid parameter",
               });
             } else {
               next();
             }
           } else {
             return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-              status: Globals.Statuscode.NOT_AUTHORIZED,
               error: "Authentication failed",
-
             });
           }
         } else {
           next();
         }
       } catch (e) {
-        Logger.error(e);
+        this.logger.error(e);
 
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
-          status: Globals.Statuscode.SERVER_ERROR,
           error: "Internal server error",
-
         });
       }
     });
@@ -190,7 +187,7 @@ export default class App {
       expressWinston.logger({
         transports: [
           new winston.transports.Console(),
-          new winston.transports.File({ filename: `${Logger.getPath()}access.log` }),
+          new winston.transports.File({ filename: `${RequestLogger.getPath()}access.log` }),
         ],
         format: combine(
           format.timestamp({
@@ -213,37 +210,35 @@ export default class App {
       }),
     );
 
-    this.register("/v1/config", new ConfigRouter().router);
+    this.register("/v1/config", new ConfigRouter(this.logger).router);
 
-    this.register("/v1/auth", new AuthRouter(this.container).router);
+    this.register("/v1/auth", new AuthRouter(this.container, this.logger).router);
 
-    this.register("/v1/user", new UsersRouter(this.container).router);
+    this.register("/v1/user", new UsersRouter(this.container, this.logger).router);
 
-    this.register("/v1/users", new UsersRouter(this.container).router);
+    this.register("/v1/users", new UsersRouter(this.container, this.logger).router);
 
-    this.register("/v1/planet", new PlanetRouter(this.container).router);
+    this.register("/v1/planet", new PlanetRouter(this.container, this.logger).router);
 
-    this.register("/v1/planets", new PlanetRouter(this.container).router);
+    this.register("/v1/planets", new PlanetRouter(this.container, this.logger).router);
 
-    this.register("/v1/buildings", new BuildingRouter(this.container).router);
+    this.register("/v1/buildings", new BuildingRouter(this.container, this.logger).router);
 
-    this.register("/v1/techs", new TechsRouter(this.container).router);
+    this.register("/v1/techs", new TechsRouter(this.container, this.logger).router);
 
-    this.register("/v1/ships", new ShipsRouter(this.container).router);
+    this.register("/v1/ships", new ShipsRouter(this.container, this.logger).router);
 
-    this.register("/v1/defenses", new DefenseRouter(this.container).router);
+    this.register("/v1/defenses", new DefenseRouter(this.container, this.logger).router);
 
-    this.register("/v1/events", new EventRouter(this.container).router);
+    this.register("/v1/events", new EventRouter(this.container, this.logger).router);
 
-    this.register("/v1/galaxy", new GalaxyRouter(this.container).router);
+    this.register("/v1/galaxy", new GalaxyRouter(this.container, this.logger).router);
 
-    this.register("/v1/messages", new MessagesRouter(this.container).router);
+    this.register("/v1/messages", new MessagesRouter(this.container, this.logger).router);
 
     this.express.use(function(request, response) {
       return response.status(Globals.Statuscode.NOT_FOUND).json({
-        status: Globals.Statuscode.NOT_FOUND,
         error: "The route does not exist",
-
       });
     });
   }

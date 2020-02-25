@@ -1,5 +1,5 @@
 import mysql = require("mysql2/promise");
-import Logger from "./Logger";
+import RequestLogger from "./RequestLogger";
 import dotenv = require("dotenv");
 
 dotenv.config();
@@ -21,7 +21,7 @@ export default class Database {
    * @param args optional arguments
    */
   public static query(sql: string, args: object = null): Promise<any> {
-    Logger.info(sql);
+    RequestLogger.info(sql);
     return this.pool.query(sql);
   }
 
@@ -40,6 +40,6 @@ export default class Database {
       queueLimit: 0,
     })
     .on("error", function(err) {
-      Logger.error(err);
+      RequestLogger.error(err);
     });
 }

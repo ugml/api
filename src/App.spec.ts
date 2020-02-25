@@ -4,10 +4,13 @@ import chaiHttp = require("chai-http");
 import App from "./App";
 import { Globals } from "./common/Globals";
 import JwtHelper from "./common/JwtHelper";
+import SimpleLogger from "./common/SimpleLogger";
 
 const createContainer = require("./ioc/createContainer");
 
-const app = new App(createContainer()).express;
+const logger = new SimpleLogger();
+
+const app = new App(createContainer(), logger).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;

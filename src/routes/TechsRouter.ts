@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -6,7 +6,6 @@ import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/IBuildingService";
 import ICosts from "../interfaces/ICosts";
-import Logger from "../common/Logger";
 import IPlanetService from "../interfaces/IPlanetService";
 import ITechService from "../interfaces/ITechService";
 import Buildings from "../units/Buildings";
@@ -14,12 +13,15 @@ import Planet from "../units/Planet";
 import Techs from "../units/Techs";
 import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for technology-data
  */
 export default class TechsRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private userService: IUserService;
   private planetService: IPlanetService;
@@ -29,8 +31,9 @@ export default class TechsRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
@@ -39,6 +42,8 @@ export default class TechsRouter {
     this.router.get("/", this.getTechs);
     this.router.post("/build/", this.buildTech);
     this.router.post("/cancel/", this.cancelTech);
+
+    this.logger = logger;
   }
 
   /**
@@ -55,7 +60,7 @@ export default class TechsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(techs);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -115,7 +120,7 @@ export default class TechsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -252,7 +257,7 @@ export default class TechsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,

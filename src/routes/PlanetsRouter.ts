@@ -1,30 +1,35 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import Logger from "../common/Logger";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for planet-data
  */
 export default class PlanetsRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private planetService: IPlanetService;
 
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
 
     this.router.get("/movement/:planetID", this.getMovement);
     this.router.post("/destroy/", this.destroyPlanet);
     this.router.post("/rename/", this.renamePlanet);
     this.router.get("/:planetID", this.getPlanetByID);
+
+    this.logger = logger;
   }
 
   /**
@@ -42,7 +47,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planetList);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         error: "There was an error while handling the request.",
@@ -65,7 +70,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planetList);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         error: "There was an error while handling the request.",
@@ -95,7 +100,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -125,7 +130,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(movement);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -164,7 +169,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -211,7 +216,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -241,7 +246,7 @@ export default class PlanetsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

@@ -1,20 +1,24 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
-import Logger from "../common/Logger";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes to get the config-files
  */
 export default class ConfigRouter {
-  public router: Router;
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   /**
    * Initialize the Router
+   * @param logger Instance of an ILogger-object
    */
-  public constructor() {
-    this.router = Router();
+  public constructor(logger: ILogger) {
     this.router.get("/game", this.getGameConfig);
     this.router.get("/units", this.getUnitsConfig);
+
+    this.logger = logger;
   }
 
   /**
@@ -29,7 +33,7 @@ export default class ConfigRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(data);
     } catch (err) {
-      Logger.error(err);
+      this.logger.error(err);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
@@ -50,7 +54,7 @@ export default class ConfigRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(data);
     } catch (err) {
-      Logger.error(err);
+      this.logger.error(err);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,

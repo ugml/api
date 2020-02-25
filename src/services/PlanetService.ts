@@ -1,6 +1,6 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import Logger from "../common/Logger";
+import RequestLogger from "../common/RequestLogger";
 import SerializationHelper from "../common/SerializationHelper";
 import ICoordinates from "../interfaces/ICoordinates";
 import IPlanetService from "../interfaces/IPlanetService";
@@ -152,7 +152,7 @@ export default class PlanetService implements IPlanetService {
 
       return planet;
     } catch (error) {
-      Logger.error(error);
+      RequestLogger.error(error);
 
       return null;
     }

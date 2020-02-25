@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import Database from "../common/Database";
@@ -9,10 +9,8 @@ import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
 import IEventService from "../interfaces/IEventService";
 import IPlanetService from "../interfaces/IPlanetService";
-import squel = require("safe-squel");
-import Logger from "../common/Logger";
-import EventService from "../services/EventService";
 import Event from "../units/Event";
+import ILogger from "../interfaces/ILogger";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
@@ -28,7 +26,9 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
  * Defines routes for event-creation and cancellation
  */
 export default class EventRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private planetService: IPlanetService;
   private eventService: IEventService;
@@ -36,13 +36,16 @@ export default class EventRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.eventService = container.eventService;
 
     this.router.post("/create/", this.createEvent);
     this.router.post("/cancel/", this.cancelEvent);
+
+    this.logger = logger;
   }
 
   /**
@@ -160,7 +163,7 @@ export default class EventRouter {
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json(event);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
@@ -209,7 +212,7 @@ export default class EventRouter {
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json();
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,

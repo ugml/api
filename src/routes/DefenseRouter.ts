@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
@@ -6,19 +6,21 @@ import Queue from "../common/Queue";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/IBuildingService";
 import ICosts from "../interfaces/ICosts";
-import Logger from "../common/Logger";
 import IDefenseService from "../interfaces/IDefenseService";
 import IPlanetService from "../interfaces/IPlanetService";
 import Buildings from "../units/Buildings";
 import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
 import QueueItem from "../common/QueueItem";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for defense-data
  */
 export default class DefenseRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
@@ -27,14 +29,17 @@ export default class DefenseRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
     this.defenseService = container.defenseService;
 
     this.router.get("/:planetID", this.getAllDefensesOnPlanet);
     this.router.post("/build/", this.buildDefense);
+
+    this.logger = logger;
   }
 
   /**
@@ -58,7 +63,7 @@ export default class DefenseRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(defenses);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,
@@ -237,7 +242,7 @@ export default class DefenseRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         status: Globals.Statuscode.SERVER_ERROR,

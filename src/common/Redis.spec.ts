@@ -5,6 +5,6 @@ const expect = chai.expect;
 
 describe("Redis", function() {
   it("Get connection", function() {
-    expect(Redis.getConnection()).not.to.be.equals(null);
+    expect(Redis.getClient()).not.to.be.equals(null);
   });
 });

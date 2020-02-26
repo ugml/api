@@ -10,7 +10,7 @@ export default class Redis {
   /**
    * Returns the connection-object to the redis-instance
    */
-  public static getConnection() {
+  public static getClient() {
     return Redis.client;
   }
   private static client = redis.createClient({

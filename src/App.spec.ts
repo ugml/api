@@ -4,7 +4,7 @@ import chaiHttp = require("chai-http");
 import App from "./App";
 import { Globals } from "./common/Globals";
 import JwtHelper from "./common/JwtHelper";
-import SimpleLogger from "./common/SimpleLogger";
+import SimpleLogger from "./loggers/SimpleLogger";
 
 const createContainer = require("./ioc/createContainer");
 

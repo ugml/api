@@ -8,7 +8,7 @@ import IAuthorizedRequest from "./interfaces/IAuthorizedRequest";
 import { Globals } from "./common/Globals";
 import IJwt from "./interfaces/IJwt";
 import ILogger from "./interfaces/ILogger";
-import RequestLogger from "./common/RequestLogger";
+import RequestLogger from "./loggers/RequestLogger";
 import InputValidator from "./common/InputValidator";
 import AuthRouter from "./routes/AuthRouter";
 import BuildingRouter from "./routes/BuildingsRouter";
@@ -76,7 +76,7 @@ export default class App {
     const eventList = await eventService.getAllUnprocessedEvents();
 
     for (const event of eventList) {
-      Redis.getConnection().zadd("eventQueue", event.endTime, event.eventID);
+      Redis.getClient().zadd("eventQueue", event.endTime, event.eventID);
     }
 
     this.logger.info(`Finished loading ${eventList.length} events into Queue`);
@@ -127,9 +127,20 @@ export default class App {
   private routes(): void {
     const self = this;
 
-    this.express.use("/*", (request, response, next) => {
+    this.express.use("/*", (request: IAuthorizedRequest, response, next) => {
       try {
-        this.logger.info("Hello");
+        this.logger.info(
+          "{" +
+            `'ip': '${request.headers["x-real-ip"] || request.connection.remoteAddress}', ` +
+            `'method': '${request.method}', ` +
+            `'url': '${request.url}', ` +
+            `'userID': '${request.userID}', ` +
+            "'params': { " +
+            `'query:': ${JSON.stringify(request.params || {}).replace(/(,\"password\":)(\")(.*)(\")/g, "")}, ` +
+            `'body': ${JSON.stringify(request.body || {}).replace(/(,\"password\":)(\")(.*)(\")/g, "")}` +
+            "}" +
+            "}",
+        );
 
         // if the user tries to authenticate, we don't have a token yet
         if (
@@ -171,8 +182,8 @@ export default class App {
         } else {
           next();
         }
-      } catch (e) {
-        this.logger.error(e);
+      } catch (error) {
+        this.logger.error(error, error.stack);
 
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
           error: "Internal server error",

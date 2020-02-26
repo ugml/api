@@ -115,6 +115,7 @@
     "express": "^4.16.4",
     "express-ip": "^1.0.3",
     "express-winston": "^3.1.0",
+    "gelf": "^2.0.1",
     "gulp": "^4.0.0",
     "gulp-nodemon": "^2.4.2",
     "gulp-typedoc": "^2.2.2",
@@ -127,6 +128,7 @@
     "node-pre-gyp": "^0.14.0",
     "redis": "^2.8.0",
     "safe-squel": "^5.12.4",
+    "ts-graylog": "^1.0.2",
     "winston": "^3.1.0"
   }
 }

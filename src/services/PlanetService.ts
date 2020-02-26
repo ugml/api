@@ -1,11 +1,11 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import RequestLogger from "../common/RequestLogger";
 import SerializationHelper from "../common/SerializationHelper";
 import ICoordinates from "../interfaces/ICoordinates";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
 import squel = require("safe-squel");
+import EntityInvalidException from "../exceptions/EntityInvalidException";
 
 /**
  * This class defines a service to interact with the planets-table in the database
@@ -50,112 +50,105 @@ export default class PlanetService implements IPlanetService {
    * @param planet the planet with changed data
    */
   public async updatePlanet(planet: Planet): Promise<Planet> {
-    try {
-      let query = squel.update().table("planets");
+    let query = squel.update().table("planets");
 
-      if (!planet.isValid()) {
-        // TODO: throw exception
-        return null;
-      }
-
-      if (typeof planet.name !== "undefined") {
-        query = query.set("name", planet.name);
-      }
-
-      if (typeof planet.lastUpdate !== "undefined") {
-        query = query.set("lastUpdate", planet.lastUpdate);
-      }
-
-      if (typeof planet.fieldsCurrent !== "undefined") {
-        query = query.set("fieldsCurrent", planet.fieldsCurrent);
-      }
-
-      if (typeof planet.fieldsMax !== "undefined") {
-        query = query.set("fieldsMax", planet.fieldsMax);
-      }
-
-      if (typeof planet.metal !== "undefined") {
-        query = query.set("metal", planet.metal);
-      }
-
-      if (typeof planet.crystal !== "undefined") {
-        query = query.set("crystal", planet.crystal);
-      }
-
-      if (typeof planet.deuterium !== "undefined") {
-        query = query.set("deuterium", planet.deuterium);
-      }
-
-      if (typeof planet.energyUsed !== "undefined") {
-        query = query.set("energyUsed", planet.energyUsed);
-      }
-
-      if (typeof planet.energyMax !== "undefined") {
-        query = query.set("energyMax", planet.energyMax);
-      }
-
-      if (typeof planet.metalMinePercent !== "undefined") {
-        query = query.set("metalMinePercent", planet.metalMinePercent);
-      }
-
-      if (typeof planet.crystalMinePercent !== "undefined") {
-        query = query.set("crystalMinePercent", planet.crystalMinePercent);
-      }
-
-      if (typeof planet.deuteriumSynthesizerPercent !== "undefined") {
-        query = query.set("deuteriumSynthesizerPercent", planet.deuteriumSynthesizerPercent);
-      }
-
-      if (typeof planet.solarPlantPercent !== "undefined") {
-        query = query.set("solarPlantPercent", planet.solarPlantPercent);
-      }
-
-      if (typeof planet.fusionReactorPercent !== "undefined") {
-        query = query.set("fusionReactorPercent", planet.fusionReactorPercent);
-      }
-
-      if (typeof planet.solarSatellitePercent !== "undefined") {
-        query = query.set("solarSatellitePercent", planet.solarSatellitePercent);
-      }
-
-      if (typeof planet.bBuildingId !== "undefined") {
-        query = query.set("bBuildingId", planet.bBuildingId);
-      }
-
-      if (typeof planet.bBuildingEndTime !== "undefined") {
-        query = query.set("bBuildingEndTime", planet.bBuildingEndTime);
-      }
-
-      if (typeof planet.bBuildingDemolition !== "undefined") {
-        query = query.set("bBuildingDemolition", planet.bBuildingDemolition);
-      }
-
-      if (typeof planet.bHangarQueue !== "undefined") {
-        query = query.set("bHangarQueue", planet.bHangarQueue);
-      }
-
-      if (typeof planet.bHangarStartTime !== "undefined") {
-        query = query.set("bHangarStartTime", planet.bHangarStartTime);
-      }
-
-      if (typeof planet.bHangarPlus !== "undefined") {
-        query = query.set("bHangarPlus", planet.bHangarPlus);
-      }
-
-      if (typeof planet.destroyed !== "undefined") {
-        query = query.set("destroyed", planet.destroyed);
-      }
-
-      query = query.where("planetID = ?", planet.planetID);
-
-      await Database.query(query.toString());
-
-      return planet;
-    } catch (error) {
-      RequestLogger.error(error);
-
-      return null;
+    if (!planet.isValid()) {
+      throw new EntityInvalidException("Invalid entity");
     }
+
+    if (typeof planet.name !== "undefined") {
+      query = query.set("name", planet.name);
+    }
+
+    if (typeof planet.lastUpdate !== "undefined") {
+      query = query.set("lastUpdate", planet.lastUpdate);
+    }
+
+    if (typeof planet.fieldsCurrent !== "undefined") {
+      query = query.set("fieldsCurrent", planet.fieldsCurrent);
+    }
+
+    if (typeof planet.fieldsMax !== "undefined") {
+      query = query.set("fieldsMax", planet.fieldsMax);
+    }
+
+    if (typeof planet.metal !== "undefined") {
+      query = query.set("metal", planet.metal);
+    }
+
+    if (typeof planet.crystal !== "undefined") {
+      query = query.set("crystal", planet.crystal);
+    }
+
+    if (typeof planet.deuterium !== "undefined") {
+      query = query.set("deuterium", planet.deuterium);
+    }
+
+    if (typeof planet.energyUsed !== "undefined") {
+      query = query.set("energyUsed", planet.energyUsed);
+    }
+
+    if (typeof planet.energyMax !== "undefined") {
+      query = query.set("energyMax", planet.energyMax);
+    }
+
+    if (typeof planet.metalMinePercent !== "undefined") {
+      query = query.set("metalMinePercent", planet.metalMinePercent);
+    }
+
+    if (typeof planet.crystalMinePercent !== "undefined") {
+      query = query.set("crystalMinePercent", planet.crystalMinePercent);
+    }
+
+    if (typeof planet.deuteriumSynthesizerPercent !== "undefined") {
+      query = query.set("deuteriumSynthesizerPercent", planet.deuteriumSynthesizerPercent);
+    }
+
+    if (typeof planet.solarPlantPercent !== "undefined") {
+      query = query.set("solarPlantPercent", planet.solarPlantPercent);
+    }
+
+    if (typeof planet.fusionReactorPercent !== "undefined") {
+      query = query.set("fusionReactorPercent", planet.fusionReactorPercent);
+    }
+
+    if (typeof planet.solarSatellitePercent !== "undefined") {
+      query = query.set("solarSatellitePercent", planet.solarSatellitePercent);
+    }
+
+    if (typeof planet.bBuildingId !== "undefined") {
+      query = query.set("bBuildingId", planet.bBuildingId);
+    }
+
+    if (typeof planet.bBuildingEndTime !== "undefined") {
+      query = query.set("bBuildingEndTime", planet.bBuildingEndTime);
+    }
+
+    if (typeof planet.bBuildingDemolition !== "undefined") {
+      query = query.set("bBuildingDemolition", planet.bBuildingDemolition);
+    }
+
+    if (typeof planet.bHangarQueue !== "undefined") {
+      query = query.set("bHangarQueue", planet.bHangarQueue);
+    }
+
+    if (typeof planet.bHangarStartTime !== "undefined") {
+      query = query.set("bHangarStartTime", planet.bHangarStartTime);
+    }
+
+    if (typeof planet.bHangarPlus !== "undefined") {
+      query = query.set("bHangarPlus", planet.bHangarPlus);
+    }
+
+    if (typeof planet.destroyed !== "undefined") {
+      query = query.set("destroyed", planet.destroyed);
+    }
+
+    query = query.where("planetID = ?", planet.planetID);
+
+    await Database.query(query.toString());
+
+    return planet;
   }
 
   /**

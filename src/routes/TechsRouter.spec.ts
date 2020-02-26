@@ -5,7 +5,7 @@ import App from "../App";
 import { Globals } from "../common/Globals";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
-import SimpleLogger from "../common/SimpleLogger";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 

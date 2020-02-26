@@ -61,12 +61,11 @@ export default class DefenseRouter {
 
       const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(defenses);
+      return response.status(Globals.Statuscode.SUCCESS).json(defenses ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -240,12 +239,11 @@ export default class DefenseRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

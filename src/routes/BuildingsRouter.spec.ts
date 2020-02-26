@@ -5,7 +5,7 @@ import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import User from "../units/User";
-import SimpleLogger from "../common/SimpleLogger";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -60,7 +60,7 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .then(res => {
           expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-          expect(res.body).to.be.equals(null);
+          expect(res.body).to.be.empty;
         });
     });
 

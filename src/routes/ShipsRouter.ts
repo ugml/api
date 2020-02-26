@@ -60,9 +60,9 @@ export default class ShipsRouter {
 
       const ships = await this.shipService.getShips(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(ships);
+      return response.status(Globals.Statuscode.SUCCESS).json(ships ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -212,9 +212,9 @@ export default class ShipsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

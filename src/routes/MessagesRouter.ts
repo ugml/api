@@ -45,9 +45,9 @@ export default class MessagesRouter {
 
       const messages = await this.messageService.getAllMessages(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(messages);
+      return response.status(Globals.Statuscode.SUCCESS).json(messages ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -73,9 +73,9 @@ export default class MessagesRouter {
       const messageID = parseInt(request.params.messageID, 10);
       const message = await this.messageService.getMessageById(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(message);
+      return response.status(Globals.Statuscode.SUCCESS).json(message ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -102,9 +102,9 @@ export default class MessagesRouter {
 
       await this.messageService.deleteMessage(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -146,9 +146,9 @@ export default class MessagesRouter {
 
       await this.messageService.sendMessage(userID, receiverID, subject, messageText);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

@@ -65,11 +65,10 @@ export default class AuthRouter {
       return response.status(Globals.Statuscode.SUCCESS).json({
         token: JwtHelper.generateToken(data.userID),
       });
-    } catch (err) {
-      this.logger.error(err);
+    } catch (error) {
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

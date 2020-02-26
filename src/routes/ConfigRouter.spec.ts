@@ -2,7 +2,7 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
 import App from "../App";
-import SimpleLogger from "../common/SimpleLogger";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 

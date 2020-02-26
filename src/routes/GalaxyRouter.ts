@@ -58,12 +58,11 @@ export default class GalaxyRouter {
 
       const galaxyData = await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(galaxyData);
+      return response.status(Globals.Statuscode.SUCCESS).json(galaxyData ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

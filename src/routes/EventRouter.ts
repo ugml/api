@@ -158,15 +158,14 @@ export default class EventRouter {
       event.eventID = parseInt(result.insertId, 10);
 
       // insert into redis
-      Redis.getConnection().zadd("eventQueue", event.endTime, event.eventID);
+      Redis.getClient().zadd("eventQueue", event.endTime, event.eventID);
 
       // all done
-      return response.status(Globals.Statuscode.SUCCESS).json(event);
+      return response.status(Globals.Statuscode.SUCCESS).json(event ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -204,18 +203,17 @@ export default class EventRouter {
       await this.eventService.cancelEvent(event);
 
       // remove the event from the redis-queue
-      Redis.getConnection().zremrangebyscore("eventQueue", event.endTime, event.eventID);
+      Redis.getClient().zremrangebyscore("eventQueue", event.endTime, event.eventID);
 
       // add the event with the new endtime
-      Redis.getConnection().zadd("eventQueue", event.endTime, request.body.eventID);
+      Redis.getClient().zadd("eventQueue", event.endTime, request.body.eventID);
 
       // all done
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

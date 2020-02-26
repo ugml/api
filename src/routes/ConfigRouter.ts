@@ -31,12 +31,11 @@ export default class ConfigRouter {
     try {
       const data = require("../config/game.json");
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data);
-    } catch (err) {
-      this.logger.error(err);
+      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+    } catch (error) {
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -52,12 +51,11 @@ export default class ConfigRouter {
     try {
       const data = require("../config/units.json");
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data);
-    } catch (err) {
-      this.logger.error(err);
+      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+    } catch (error) {
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

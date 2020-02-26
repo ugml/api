@@ -3,7 +3,7 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import SimpleLogger from "../common/SimpleLogger";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 
@@ -82,7 +82,7 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.oneOf([null, undefined, ""]);
+        expect(res.body).to.be.empty;
       });
   });
 
@@ -94,7 +94,7 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.oneOf([null, undefined, ""]);
+        expect(res.body).to.be.empty;
       });
   });
 
@@ -154,7 +154,7 @@ describe("messagesRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.oneOf([null, undefined, ""]);
+        expect(res.body).to.be.empty;
       });
   });
 

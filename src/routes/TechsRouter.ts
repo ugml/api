@@ -58,9 +58,9 @@ export default class TechsRouter {
 
       const techs: Techs = await this.techService.getTechs(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(techs);
+      return response.status(Globals.Statuscode.SUCCESS).json(techs ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -118,9 +118,9 @@ export default class TechsRouter {
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -255,12 +255,11 @@ export default class TechsRouter {
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

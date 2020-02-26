@@ -95,9 +95,9 @@ export default class UsersRouter {
 
       const data = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data);
+      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -113,7 +113,6 @@ export default class UsersRouter {
    */
   public getUserByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
-      // validate parameters
       if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
@@ -124,12 +123,11 @@ export default class UsersRouter {
 
       const user = await this.userService.getUserById(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(user);
+      return response.status(Globals.Statuscode.SUCCESS).json(user ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -258,7 +256,7 @@ export default class UsersRouter {
         }
       }
 
-      await await this.planetService.createNewPlanet(newPlanet, connection);
+      await this.planetService.createNewPlanet(newPlanet, connection);
 
       this.logger.info("Creating entry in buildings-table");
 
@@ -293,7 +291,7 @@ export default class UsersRouter {
       await connection.commit();
     } catch (error) {
       await connection.rollback();
-      this.logger.error(error);
+      this.logger.error(error, error);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -352,9 +350,9 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(user);
+      return response.status(Globals.Statuscode.SUCCESS).json(user ?? {});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -400,9 +398,9 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

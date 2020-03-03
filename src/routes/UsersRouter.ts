@@ -473,7 +473,15 @@ export default class UsersRouter {
 
       await this.resetTokenService.setTokenUsed(matchingResetToken.resetToken, currentTimestamp);
 
-      // TODO: send mail stating, that the password was reset
+      const fs = require("fs");
+
+      const messageBody = fs
+        .readFileSync("dist/templates/mail/resetPasswordSuccess.html", "utf-8")
+        .toString()
+        .replace("{{USERNAME}}", user.username)
+        .replace("{{SUPPORT_MAIL}}", process.env.MAIL_SUPPORT);
+
+      await MailSender.sendMail(user.email, "Your ugamela password has been reset", messageBody);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {

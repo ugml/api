@@ -11,14 +11,14 @@ export default class MailSender {
   /**
    * Sends a mail to the given address
    * @param recipient
-   * @param subject
+   * @param subjectText
    * @param body
    */
-  public static async sendMail(recipient: string, subject: string, body: string): Promise<void> {
+  public static async sendMail(recipient: string, subjectText: string, body: string): Promise<void> {
     const mailOptions = {
       from: process.env.MAIL_FROM,
       to: recipient,
-      subject: subject,
+      subject: subjectText,
       replyTo: process.env.SUPPORT_MAIL,
       html: body,
     };

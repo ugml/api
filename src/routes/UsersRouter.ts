@@ -24,6 +24,9 @@ import IResetTokenService from "../interfaces/IResetTokenService";
 import ResetToken from "../units/ResetToken";
 import EntityInvalidException from "../exceptions/EntityInvalidException";
 import MailSender from "../common/MailSender";
+import dotenv = require("dotenv");
+
+dotenv.config();
 
 /**
  * Defines routes for user-data
@@ -525,8 +528,14 @@ export default class UsersRouter {
 
       await this.resetTokenService.storeResetToken(token);
 
-      // TODO: make this a template
-      const messageBody = `<html> <!DOCTYPE html> <head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> </head> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="format-detection" content="telephone=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="x-apple-disable-message-reformatting"> <link href='https://fonts.googleapis.com/css?family=Amiko|Ramabhadra' rel='stylesheet' type='text/css'> <style type="text/css"> * { font-family: "Amiko", sans-serif; } body { color: black; margin:0; font-size: 16pt; } </style> </head>  <body> <div style="margin-left: auto; margin-right:auto; padding: 2%; width: 600px;"> <center><img src="https://ugamela.org/images/logo.png" /></center><br />  Hello ${user.username},<br /><br /> a request has been made to reset your password.<br /><br />  To reset your password, <a href="https://ugamela.org/resetPassword?token=${token.resetToken}">click here</a>.<br /><br />  If you did not request this reset of your password, ignore this mail. If this occures often, please contact the support.<br /><br />  You can reach the support by sending a mail to <a href="mailto:support@ugamela.org">support@ugamela.org</a> or join our discord-server.<br /><br /><br />  </div> </body> </html>`;
+      const fs = require("fs");
+
+      const messageBody = fs
+        .readFileSync("dist/templates/mail/resetPasswordRequest.html", "utf-8")
+        .toString()
+        .replace("{{USERNAME}}", user.username)
+        .replace("{{TOKEN}}", token.resetToken)
+        .replace("{{SUPPORT_MAIL}}", process.env.MAIL_SUPPORT);
 
       await MailSender.sendMail(token.email, "Reset your ugamela password", messageBody);
 

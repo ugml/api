@@ -126,6 +126,7 @@
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
     "node-pre-gyp": "^0.14.0",
+    "nodemailer": "^6.4.4",
     "redis": "^2.8.0",
     "safe-squel": "^5.12.4",
     "ts-graylog": "^1.0.2",

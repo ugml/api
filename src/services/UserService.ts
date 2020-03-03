@@ -4,7 +4,6 @@ import SerializationHelper from "../common/SerializationHelper";
 import IUserService from "../interfaces/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");
-import EntityInvalidException from "../exceptions/EntityInvalidException";
 
 /**
  * This class defines a service to interact with the users-table in the database
@@ -41,6 +40,31 @@ export default class UserService implements IUserService {
       .field("username")
       .from("users")
       .where("userID = ?", userID)
+      .toString();
+
+    const [result] = await Database.query(query);
+
+    if (!InputValidator.isSet(result)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
+  }
+
+  /**
+   * Returns information about a user.
+   * This information does not contain sensible data (like email or passwords).
+   * @param email
+   */
+  public async getUserByMail(email: string): Promise<User> {
+    const query: string = squel
+      .select()
+      .distinct()
+      .field("userID")
+      .field("username")
+      .field("email")
+      .from("users")
+      .where("email = ?", email)
       .toString();
 
     const [result] = await Database.query(query);

@@ -23,6 +23,7 @@ import ILogger from "../interfaces/ILogger";
 import IResetTokenService from "../interfaces/IResetTokenService";
 import ResetToken from "../units/ResetToken";
 import EntityInvalidException from "../exceptions/EntityInvalidException";
+import MailSender from "../common/MailSender";
 
 /**
  * Defines routes for user-data
@@ -494,6 +495,14 @@ export default class UsersRouter {
 
       token.email = InputValidator.sanitizeString(request.body.email);
 
+      const user = await this.userService.getUserByMail(token.email);
+
+      if (!InputValidator.isSet(user)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
       // all tokens, which are older than 24h are invalid
       const lastValidTimestamp = Math.round(+new Date() / 1000) - 24 * 60 * 60;
 
@@ -516,7 +525,10 @@ export default class UsersRouter {
 
       await this.resetTokenService.storeResetToken(token);
 
-      // TODO: send mail if the given mail is connected to a account
+      // TODO: make this a template
+      const messageBody = `<html> <!DOCTYPE html> <head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> </head> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="format-detection" content="telephone=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="x-apple-disable-message-reformatting"> <link href='https://fonts.googleapis.com/css?family=Amiko|Ramabhadra' rel='stylesheet' type='text/css'> <style type="text/css"> * { font-family: "Amiko", sans-serif; } body { color: black; margin:0; font-size: 16pt; } </style> </head>  <body> <div style="margin-left: auto; margin-right:auto; padding: 2%; width: 600px;"> <center><img src="https://ugamela.org/images/logo.png" /></center><br />  Hello ${user.username},<br /><br /> a request has been made to reset your password.<br /><br />  To reset your password, <a href="https://ugamela.org/resetPassword?token=${token.resetToken}">click here</a>.<br /><br />  If you did not request this reset of your password, ignore this mail. If this occures often, please contact the support.<br /><br />  You can reach the support by sending a mail to <a href="mailto:support@ugamela.org">support@ugamela.org</a> or join our discord-server.<br /><br /><br />  </div> </body> </html>`;
+
+      await MailSender.sendMail(token.email, "Reset your ugamela password", messageBody);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {

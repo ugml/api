@@ -288,6 +288,18 @@ CREATE TABLE `techs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `resetTokens`
+--
+
+CREATE TABLE `resetTokens` (
+  `email` varchar(64) NOT NULL,
+  `ipRequested` varchar(45) NOT NULL,
+  `resetToken` varchar(64) NOT NULL,
+  `requestedAt` int(10) NOT NULL,
+  `usedAt` int(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 -- -----------------------------------------------------
 -- procedure getFreePosition
 -- -----------------------------------------------------

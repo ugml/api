@@ -148,7 +148,8 @@ export default class App {
           !request.originalUrl.toString().includes("/auth/") &&
           !request.originalUrl.toString().includes("/users/create/") &&
           !request.originalUrl.toString().includes("/config/") &&
-          !request.originalUrl.toString().includes("/user/forgot")
+          !request.originalUrl.toString().includes("/user/forgot") &&
+          !request.originalUrl.toString().includes("/user/resetPassword")
         ) {
           const authString = request.header("authorization");
 

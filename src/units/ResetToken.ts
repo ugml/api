@@ -26,6 +26,12 @@ export default class ResetToken implements IUnits {
   public requestedAt: number;
 
   /**
+   * The timestamp, at which the token was used
+   * Default is set to null
+   */
+  public usedAt: number;
+
+  /**
    * Returns, if the contains valid data or not
    */
   public isValid(): boolean {
@@ -42,6 +48,10 @@ export default class ResetToken implements IUnits {
     }
 
     if (!InputValidator.isSet(this.requestedAt) || this.requestedAt <= 0) {
+      return false;
+    }
+
+    if (InputValidator.isSet(this.usedAt) && this.requestedAt <= 0) {
       return false;
     }
 

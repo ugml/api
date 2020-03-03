@@ -4,6 +4,7 @@ import SerializationHelper from "../common/SerializationHelper";
 import IUserService from "../interfaces/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");
+import EntityInvalidException from "../exceptions/EntityInvalidException";
 
 /**
  * This class defines a service to interact with the users-table in the database
@@ -141,11 +142,6 @@ export default class UserService implements IUserService {
    */
   public async updateUserData(user: User, connection = null) {
     let query = squel.update().table("users");
-
-    if (!user.isValid()) {
-      // TODO: throw exception
-      return null;
-    }
 
     if (typeof user.username !== "undefined") {
       query = query.set("username", user.username);

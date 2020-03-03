@@ -22,7 +22,7 @@ import PlanetType = Globals.PlanetType;
 import ILogger from "../interfaces/ILogger";
 import IResetTokenService from "../interfaces/IResetTokenService";
 import ResetToken from "../units/ResetToken";
-import { showRuleCrashWarning } from "tslint/lib/error";
+import EntityInvalidException from "../exceptions/EntityInvalidException";
 
 /**
  * Defines routes for user-data
@@ -74,11 +74,14 @@ export default class UsersRouter {
     // /user/currentplanet/set/:planetID
     this.router.post("/currentplanet/set", this.setCurrentPlanet);
 
-    // /user/currentplanet/set/:planetID
-    this.router.post("/forgot", this.forgotPassword);
-
     // /users/:userID
     this.router.get("/:userID", this.getUserByID);
+
+    // /user/forgot
+    this.router.post("/forgot", this.forgotPassword);
+
+    // /user/reset
+    this.router.post("/resetPassword", this.resetPassword);
 
     // /user
     this.router.get("/", this.getUserSelf);
@@ -416,6 +419,68 @@ export default class UsersRouter {
     }
   };
 
+  public resetPassword = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (
+        !InputValidator.isSet(request.body.token) ||
+        !InputValidator.isSet(request.body.email) ||
+        !InputValidator.isSet(request.body.newPassword)
+      ) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
+      const token = InputValidator.sanitizeString(request.body.token);
+      const email = InputValidator.sanitizeString(request.body.email);
+
+      // all tokens, which are older than 24h are invalid
+      const lastValidTimestamp = Math.round(+new Date() / 1000) - 24 * 60 * 60;
+
+      const matchingResetToken = await this.resetTokenService.getTokenFromMail(email);
+
+      if (!InputValidator.isSet(matchingResetToken) || matchingResetToken.resetToken !== token) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid token",
+        });
+      }
+
+      if (matchingResetToken.requestedAt < lastValidTimestamp) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          error: "Token is not valid anymore",
+        });
+      }
+
+      if (InputValidator.isSet(matchingResetToken.usedAt)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Token was already used",
+        });
+      }
+
+      const newPassword = InputValidator.sanitizeString(request.body.newPassword);
+
+      const user = await this.userService.getUserForAuthentication(email);
+
+      user.password = await Encryption.hash(newPassword);
+
+      await this.userService.updateUserData(user);
+
+      const currentTimestamp: number = Math.round(+new Date() / 1000);
+
+      await this.resetTokenService.setTokenUsed(matchingResetToken.resetToken, currentTimestamp);
+
+      // TODO: send mail stating, that the password was reset
+
+      return response.status(Globals.Statuscode.SUCCESS).json({});
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        error: "There was an error while handling the request.",
+      });
+    }
+  };
+
   public forgotPassword = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       // validate parameters
@@ -429,7 +494,10 @@ export default class UsersRouter {
 
       token.email = InputValidator.sanitizeString(request.body.email);
 
-      if (await this.resetTokenService.checkIfResetAlreadyRequested(token.email)) {
+      // all tokens, which are older than 24h are invalid
+      const lastValidTimestamp = Math.round(+new Date() / 1000) - 24 * 60 * 60;
+
+      if (await this.resetTokenService.checkIfResetAlreadyRequested(token.email, lastValidTimestamp)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "A request for this mail-address was already made.",
         });
@@ -437,13 +505,20 @@ export default class UsersRouter {
 
       token.ipRequested = request.ip;
       token.requestedAt = Math.round(+new Date() / 1000);
-      token.resetToken = (await Encryption.generateToken()).substr(0, 64);
+
+      const generatedToken = await Encryption.generateToken();
+
+      token.resetToken = InputValidator.sanitizeString(generatedToken).substr(0, 64);
+
+      if (!token.isValid()) {
+        throw new EntityInvalidException("The resetToken-entity is invalid.");
+      }
 
       await this.resetTokenService.storeResetToken(token);
 
       // TODO: send mail if the given mail is connected to a account
 
-      return response.status(Globals.Statuscode.SUCCESS).json(token);
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
       this.logger.error(error, error.stack);
 

@@ -304,8 +304,19 @@ INSERT INTO `stats` VALUES (1,2220584795,1,1);
 INSERT INTO `techs` VALUES (1,1,23,23,23,23,23,23,23,23,23,23,23,23,21,1),(35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),(74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 INSERT INTO `events` VALUES (1, 1, 2, '{"201":612,"202":357,"203":617,"204":800,"205":709,"206":204,"207":703,"208":85,"209":631,"210":388,"211":0,"212":723,"213":557,"214":106}', 167546850, 1, 1563979907, 93133, 1, 1565146584, 443, 980, 220, 0, 0);
 
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+--
+-- Table structure for table `resetTokens`
+--
+
+CREATE TABLE `resetTokens` (
+  `email` varchar(64) NOT NULL,
+  `ipRequested` varchar(45) NOT NULL,
+  `resetToken` varchar(64) NOT NULL,
+  `requestedAt` int(10) NOT NULL,
+  `usedAt` int(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DELIMITER //

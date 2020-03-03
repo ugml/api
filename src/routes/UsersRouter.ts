@@ -20,6 +20,9 @@ import PlanetsRouter from "./PlanetsRouter";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 import ILogger from "../interfaces/ILogger";
+import IResetTokenService from "../interfaces/IResetTokenService";
+import ResetToken from "../units/ResetToken";
+import { showRuleCrashWarning } from "tslint/lib/error";
 
 /**
  * Defines routes for user-data
@@ -36,6 +39,7 @@ export default class UsersRouter {
   private defenseService: IDefenseService;
   private shipService: IShipService;
   private techService: ITechService;
+  private resetTokenService: IResetTokenService;
 
   /**
    * Registers the routes and needed services
@@ -50,6 +54,7 @@ export default class UsersRouter {
     this.defenseService = container.defenseService;
     this.shipService = container.shipService;
     this.techService = container.techService;
+    this.resetTokenService = container.resetTokenService;
 
     // /user/create/
     this.router.post("/create", this.createUser);
@@ -68,6 +73,9 @@ export default class UsersRouter {
 
     // /user/currentplanet/set/:planetID
     this.router.post("/currentplanet/set", this.setCurrentPlanet);
+
+    // /user/currentplanet/set/:planetID
+    this.router.post("/forgot", this.forgotPassword);
 
     // /users/:userID
     this.router.get("/:userID", this.getUserByID);
@@ -399,6 +407,43 @@ export default class UsersRouter {
       await this.userService.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        error: "There was an error while handling the request.",
+      });
+    }
+  };
+
+  public forgotPassword = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.body.email)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
+      const token: ResetToken = new ResetToken();
+
+      token.email = InputValidator.sanitizeString(request.body.email);
+
+      if (await this.resetTokenService.checkIfResetAlreadyRequested(token.email)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "A request for this mail-address was already made.",
+        });
+      }
+
+      token.ipRequested = request.ip;
+      token.requestedAt = Math.round(+new Date() / 1000);
+      token.resetToken = (await Encryption.generateToken()).substr(0, 64);
+
+      await this.resetTokenService.storeResetToken(token);
+
+      // TODO: send mail if the given mail is connected to a account
+
+      return response.status(Globals.Statuscode.SUCCESS).json(token);
     } catch (error) {
       this.logger.error(error, error.stack);
 

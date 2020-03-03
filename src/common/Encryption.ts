@@ -1,4 +1,6 @@
 const SALT_WORK_FACTOR = 10;
+const crypto = require("crypto");
+
 let bcrypt;
 try {
   bcrypt = require("bcrypt");
@@ -25,5 +27,21 @@ export default class Encryption {
    */
   public static async compare(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
+  }
+
+  /**
+   * Generates a random token
+   * @param byteLength the length of the generated token
+   */
+  public static async generateToken(byteLength = 128): Promise<string> {
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(byteLength, (err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffer.toString("base64"));
+        }
+      });
+    });
   }
 }

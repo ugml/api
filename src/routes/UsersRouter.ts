@@ -81,10 +81,10 @@ export default class UsersRouter {
     // /users/:userID
     this.router.get("/:userID", this.getUserByID);
 
-    // /user/forgot
-    this.router.post("/forgot", this.forgotPassword);
+    // /user/forgotPassword
+    this.router.post("/forgotPassword", this.forgotPassword);
 
-    // /user/reset
+    // /user/resetPassword
     this.router.post("/resetPassword", this.resetPassword);
 
     // /user

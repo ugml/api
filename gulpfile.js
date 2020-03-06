@@ -5,6 +5,7 @@ const JSON_FILES = ["src/*.json", "src/**/*.json"];
 const TEST_FILES = ["src/**/*.spec.ts", "src/**/*.test.ts"];
 const CONFIG_FILES = ["src/config/**/*"];
 const SCHEMA_FILES = ["src/schemas/**/*"];
+const TEMPLATE_FILES = ["src/templates/**/*"];
 const SOURCE_FILES = ["src/**/*.ts", "!" + TEST_FILES];
 
 // pull in the project TypeScript config
@@ -55,8 +56,9 @@ gulp.task("doc", function() {
 gulp.task("copy:config", () => gulp.src(CONFIG_FILES).pipe(gulp.dest("dist/config")));
 gulp.task("copy:schema", () => gulp.src(SCHEMA_FILES).pipe(gulp.dest("dist/schemas")));
 gulp.task("copy:json", () => gulp.src(JSON_FILES).pipe(gulp.dest("dist")));
+gulp.task("copy:templates", () => gulp.src(TEMPLATE_FILES).pipe(gulp.dest("dist/templates")));
 
-gulp.task("assets", gulp.series(["copy:config", "copy:schema", "copy:json"]));
+gulp.task("assets", gulp.series(["copy:config", "copy:schema", "copy:json", "copy:templates"]));
 
 gulp.task("build", gulp.series("assets", "compile"));
 gulp.task("default", gulp.series("build", "watch"));

@@ -8,6 +8,7 @@ import PlanetService from "../services/PlanetService";
 import ShipService from "../services/ShipService";
 import TechService from "../services/TechService";
 import UserService from "../services/UserService";
+import ResetTokenService from "../services/ResetTokenService";
 
 module.exports = function() {
   const container = new Container();
@@ -21,6 +22,7 @@ module.exports = function() {
   container.service("shipService", () => new ShipService());
   container.service("techService", () => new TechService());
   container.service("userService", () => new UserService());
+  container.service("resetTokenService", () => new ResetTokenService());
 
   return container;
 };

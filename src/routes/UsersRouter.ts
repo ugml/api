@@ -20,6 +20,13 @@ import PlanetsRouter from "./PlanetsRouter";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 import ILogger from "../interfaces/ILogger";
+import IResetTokenService from "../interfaces/IResetTokenService";
+import ResetToken from "../units/ResetToken";
+import EntityInvalidException from "../exceptions/EntityInvalidException";
+import MailSender from "../common/MailSender";
+import dotenv = require("dotenv");
+
+dotenv.config();
 
 /**
  * Defines routes for user-data
@@ -36,6 +43,7 @@ export default class UsersRouter {
   private defenseService: IDefenseService;
   private shipService: IShipService;
   private techService: ITechService;
+  private resetTokenService: IResetTokenService;
 
   /**
    * Registers the routes and needed services
@@ -50,6 +58,7 @@ export default class UsersRouter {
     this.defenseService = container.defenseService;
     this.shipService = container.shipService;
     this.techService = container.techService;
+    this.resetTokenService = container.resetTokenService;
 
     // /user/create/
     this.router.post("/create", this.createUser);
@@ -71,6 +80,12 @@ export default class UsersRouter {
 
     // /users/:userID
     this.router.get("/:userID", this.getUserByID);
+
+    // /user/forgotPassword
+    this.router.post("/forgotPassword", this.forgotPassword);
+
+    // /user/resetPassword
+    this.router.post("/resetPassword", this.resetPassword);
 
     // /user
     this.router.get("/", this.getUserSelf);
@@ -397,6 +412,140 @@ export default class UsersRouter {
       user.currentPlanet = planetID;
 
       await this.userService.updateUserData(user);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({});
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        error: "There was an error while handling the request.",
+      });
+    }
+  };
+
+  public resetPassword = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      if (
+        !InputValidator.isSet(request.body.token) ||
+        !InputValidator.isSet(request.body.email) ||
+        !InputValidator.isSet(request.body.newPassword)
+      ) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
+      const token = InputValidator.sanitizeString(request.body.token);
+      const email = InputValidator.sanitizeString(request.body.email);
+
+      // all tokens, which are older than 24h are invalid
+      const lastValidTimestamp = Math.round(+new Date() / 1000) - 24 * 60 * 60;
+
+      const matchingResetToken = await this.resetTokenService.getTokenFromMail(email);
+
+      if (!InputValidator.isSet(matchingResetToken) || matchingResetToken.resetToken !== token) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid token",
+        });
+      }
+
+      if (matchingResetToken.requestedAt < lastValidTimestamp) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          error: "Token is not valid anymore",
+        });
+      }
+
+      if (InputValidator.isSet(matchingResetToken.usedAt)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Token was already used",
+        });
+      }
+
+      const newPassword = InputValidator.sanitizeString(request.body.newPassword);
+
+      const user = await this.userService.getUserForAuthentication(email);
+
+      user.password = await Encryption.hash(newPassword);
+
+      await this.userService.updateUserData(user);
+
+      const currentTimestamp: number = Math.round(+new Date() / 1000);
+
+      await this.resetTokenService.setTokenUsed(matchingResetToken.resetToken, currentTimestamp);
+
+      const fs = require("fs");
+
+      const messageBody = fs
+        .readFileSync("dist/templates/mail/resetPasswordSuccess.html", "utf-8")
+        .toString()
+        .replace("{{USERNAME}}", user.username)
+        .replace("{{SUPPORT_MAIL}}", process.env.MAIL_SUPPORT);
+
+      await MailSender.sendMail(user.email, "Your ugamela password has been reset", messageBody);
+
+      return response.status(Globals.Statuscode.SUCCESS).json({});
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        error: "There was an error while handling the request.",
+      });
+    }
+  };
+
+  public forgotPassword = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+    try {
+      // validate parameters
+      if (!InputValidator.isSet(request.body.email)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
+      const token: ResetToken = new ResetToken();
+
+      token.email = InputValidator.sanitizeString(request.body.email);
+
+      const user = await this.userService.getUserByMail(token.email);
+
+      if (!InputValidator.isSet(user)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Invalid parameter",
+        });
+      }
+
+      // all tokens, which are older than 24h are invalid
+      const lastValidTimestamp = Math.round(+new Date() / 1000) - 24 * 60 * 60;
+
+      if (await this.resetTokenService.checkIfResetAlreadyRequested(token.email, lastValidTimestamp)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "A request for this mail-address was already made.",
+        });
+      }
+
+      token.ipRequested = request.ip;
+      token.requestedAt = Math.round(+new Date() / 1000);
+
+      const generatedToken = await Encryption.generateToken();
+
+      token.resetToken = InputValidator.sanitizeString(generatedToken).substr(0, 64);
+
+      if (!token.isValid()) {
+        throw new EntityInvalidException("The resetToken-entity is invalid.");
+      }
+
+      await this.resetTokenService.storeResetToken(token);
+
+      const fs = require("fs");
+
+      const messageBody = fs
+        .readFileSync("dist/templates/mail/resetPasswordRequest.html", "utf-8")
+        .toString()
+        .replace("{{USERNAME}}", user.username)
+        .replace("{{TOKEN}}", token.resetToken)
+        .replace("{{SUPPORT_MAIL}}", process.env.MAIL_SUPPORT);
+
+      await MailSender.sendMail(token.email, "Reset your ugamela password", messageBody);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {

@@ -52,6 +52,31 @@ export default class UserService implements IUserService {
   }
 
   /**
+   * Returns information about a user.
+   * This information does not contain sensible data (like email or passwords).
+   * @param email
+   */
+  public async getUserByMail(email: string): Promise<User> {
+    const query: string = squel
+      .select()
+      .distinct()
+      .field("userID")
+      .field("username")
+      .field("email")
+      .from("users")
+      .where("email = ?", email)
+      .toString();
+
+    const [result] = await Database.query(query);
+
+    if (!InputValidator.isSet(result)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
+  }
+
+  /**
    * Returns informations about a user.
    * This information does contain sensible data which is needed for authentication (like email or passwords).
    * @param email The email of the user
@@ -141,11 +166,6 @@ export default class UserService implements IUserService {
    */
   public async updateUserData(user: User, connection = null) {
     let query = squel.update().table("users");
-
-    if (!user.isValid()) {
-      // TODO: throw exception
-      return null;
-    }
 
     if (typeof user.username !== "undefined") {
       query = query.set("username", user.username);

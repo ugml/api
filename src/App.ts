@@ -3,7 +3,6 @@ import * as express from "express";
 import * as cors from "cors";
 import { Router } from "express";
 import JwtHelper from "./common/JwtHelper";
-import Redis from "./common/Redis";
 import IAuthorizedRequest from "./interfaces/IAuthorizedRequest";
 import { Globals } from "./common/Globals";
 import IJwt from "./interfaces/IJwt";
@@ -61,25 +60,6 @@ export default class App {
     this.express = express();
     this.middleware();
     this.routes();
-    // TODO: await this call
-    this.loadEventsIntoQueue();
-  }
-
-  /**
-   * Loads all events from the database into the eventqueue
-   */
-  private async loadEventsIntoQueue(): Promise<void> {
-    this.logger.info("Loading unprocessed events into Queue");
-
-    const eventService = this.container.eventService;
-
-    const eventList = await eventService.getAllUnprocessedEvents();
-
-    for (const event of eventList) {
-      Redis.getClient().zadd("eventQueue", event.endTime, event.eventID);
-    }
-
-    this.logger.info(`Finished loading ${eventList.length} events into Queue`);
   }
 
   /**

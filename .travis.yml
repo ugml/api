@@ -39,7 +39,6 @@ jobs:
         - sudo apt-get -qq update
         - sudo apt-get -qq install mariadb-client mariadb-server                       # install mariadb
         - sudo mysql -u root < test/ci.sql                                             # import data-dump
-        - sudo redis-server /etc/redis/redis.conf --port 6379 --requirepass 'secret'   # start redis
         - npm run-script test-coverage
         - "cat ./coverage/lcov.info | codacy-coverage -p ."
     - stage: lint

@@ -1,6 +1,5 @@
 import * as chai from "chai";
 import User from "../units/User";
-import Redis from "./Redis";
 import SerializationHelper from "./SerializationHelper";
 
 const expect = chai.expect;

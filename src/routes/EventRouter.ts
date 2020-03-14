@@ -1,10 +1,8 @@
 import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
-import Database from "../common/Database";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import Redis from "../common/Redis";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
 import IEventService from "../interfaces/IEventService";
@@ -153,12 +151,7 @@ export default class EventRouter {
       event.returning = false;
       event.processed = false;
 
-      const [result] = await this.eventService.createNewEvent(event);
-
-      event.eventID = parseInt(result.insertId, 10);
-
-      // insert into redis
-      Redis.getClient().zadd("eventQueue", event.endTime, event.eventID);
+      await this.eventService.createNewEvent(event);
 
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json(event ?? {});
@@ -201,12 +194,6 @@ export default class EventRouter {
       event.startTime = Math.round(+new Date() / 1000);
 
       await this.eventService.cancelEvent(event);
-
-      // remove the event from the redis-queue
-      Redis.getClient().zremrangebyscore("eventQueue", event.endTime, event.eventID);
-
-      // add the event with the new endtime
-      Redis.getClient().zadd("eventQueue", event.endTime, request.body.eventID);
 
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json({});

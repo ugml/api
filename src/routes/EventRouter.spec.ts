@@ -380,6 +380,5 @@ describe("eventRouter", () => {
       });
   });
 
-  // TODO: check, if event is in redis
   // TODO: check, if event really is returning
 });

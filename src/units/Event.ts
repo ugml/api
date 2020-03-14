@@ -21,6 +21,7 @@ export default class Event implements IUnits {
   public loadedCrystal: number;
   public loadedDeuterium: number;
   public returning: boolean;
+  public inQueue: boolean;
   public processed: boolean;
 
   /**

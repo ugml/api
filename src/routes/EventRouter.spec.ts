@@ -380,5 +380,5 @@ describe("eventRouter", () => {
       });
   });
 
-  // TODO: check, if event really is returning
+  // TODO: check, if event really is inQueue and/or returning
 });

@@ -25,6 +25,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -49,6 +50,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -73,6 +75,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -97,6 +100,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -121,6 +125,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -145,6 +150,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -169,6 +175,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -193,6 +200,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -217,6 +225,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -241,6 +250,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -265,6 +275,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -289,6 +300,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -313,6 +325,7 @@ describe("Event-unit", function() {
       loadedCrystal: -1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -337,6 +350,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: -1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 
@@ -360,6 +374,7 @@ describe("Event-unit", function() {
       loadedCrystal: 1,
       loadedDeuterium: 1,
       returning: false,
+      inQueue: false,
       deleted: false,
     };
 

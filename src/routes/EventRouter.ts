@@ -148,6 +148,7 @@ export default class EventRouter {
       event.loadedMetal = eventData.data.loadedRessources.metal;
       event.loadedCrystal = eventData.data.loadedRessources.crystal;
       event.loadedDeuterium = eventData.data.loadedRessources.deuterium;
+      event.inQueue = false;
       event.returning = false;
       event.processed = false;
 
@@ -183,7 +184,7 @@ export default class EventRouter {
 
       const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
 
-      if (!InputValidator.isSet(event) || event.returning === true) {
+      if (!InputValidator.isSet(event) || event.returning === true || event.inQueue === true) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "The event does not exist or can't be canceled",
         });

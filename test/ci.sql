@@ -388,7 +388,7 @@ BEGIN
 END//
 DELIMITER ;
 
-CREATE USER IF NOT EXISTS 'dev'@'localhost' IDENTIFIED BY 'dev';
+CREATE USER IF NOT EXISTS 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dev';
 GRANT ALL ON *.* TO 'dev'@'localhost';
 FLUSH PRIVILEGES;
 

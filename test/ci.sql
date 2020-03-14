@@ -388,8 +388,8 @@ BEGIN
 END//
 DELIMITER ;
 
-CREATE USER IF NOT EXISTS 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dev';
-GRANT ALL ON *.* TO 'dev'@'localhost';
+CREATE USER 'dev' IDENTIFIED BY 'dev';
+GRANT ALL ON *.* TO 'dev'@localhost IDENTIFIED BY 'dev';
 FLUSH PRIVILEGES;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

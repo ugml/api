@@ -8,6 +8,9 @@ sudo: required
 git:
   quiet: true
 
+addons:
+  sonarqube: true
+
 cache: npm
 
 env:

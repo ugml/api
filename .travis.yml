@@ -9,7 +9,10 @@ git:
   quiet: true
 
 addons:
-  sonarqube: true
+  sonarcloud:
+    organization: "ugamela"
+    token:
+      secure: $SONAR_TOKEN
 
 cache: npm
 
@@ -43,7 +46,7 @@ jobs:
         - sudo apt-get -qq install mariadb-client mariadb-server                       # install mariadb
         - sudo mysql -u root < test/ci.sql                                             # import data-dump
         - npm run-script test-coverage
-        - sonar-scanner -Dsonar.projectKey=$SONAR_KEY -Dsonar.sources=src -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN
+        - sonar-scanner
     - stage: lint
       script: npm run-script lint
     -

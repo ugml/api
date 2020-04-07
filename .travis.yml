@@ -12,7 +12,7 @@ addons:
   sonarcloud:
     organization: "ugamela"
     token:
-      secure: $SONAR_TOKEN
+      secure: "EEC33LC7d3DLMJB6ZPuqHeUAa68Af0bi5yN1BoA6GT4R/+raLiDsNavjQZApJxhsdeXU6/LLne/dsJMq10fb/hbpMCzeLsgJXNX+6K8Szwhpx03RI7L+v/DgSvYzbryMLkbOP2EejCDfgt8SMg/meyfHgrwMhsqlwC8T2FipjjN3UKXhmZIBsJZtMeULZAYH27TX0nSqrXMa7IGtV4hwr9f6voXj9YAw9Jpi8aNYxnRLbArm07mwBif0MIFkPQyx0mBCgtsBw9bwceMlBsiE/CQTwHfMvk9zhnjJR+DkXycgnAoRt1TXZbT8bJrzD0UFUFVTe4iefJu6vHHBX19dIZBe2PlXN9CK7V0Wh7PV4ydbfAJrxP7UWeATL0oMaGUxyDIbxoS4hmW24MJ14qo4ZvmhTV/ddLlo8FBCQS4sgGNxQDk6w/u2HHCxfl7wGzlFCbna2/SONXt2jsIUb8DZsPjnOkTiCiJdcYd3sp2+w9Q1SkVPck57kYuzLVq8VUXaOYm1BHj3OFX5o0yPLWYge+UnlPyhJveYKVr45c+r2/qt0Amtp2xSarD/gGG97vWftmV1/PacgRK/AZeAnysBrI76Od4Iv3eV2SfBfd2M4BHRDv1UXASDdEtW/NtvSnFNuLazWFvZZM3ltmXBQxqcFgSP+3wChd6eq79yC/nR+3U="
 
 cache: npm
 

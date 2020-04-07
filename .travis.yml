@@ -43,6 +43,7 @@ jobs:
         - sudo apt-get -qq install mariadb-client mariadb-server                       # install mariadb
         - sudo mysql -u root < test/ci.sql                                             # import data-dump
         - npm run-script test-coverage
+      if: type = pull_request OR branch = master
         - sonar-scanner -Dsonar.projectKey=$SONAR_KEY -Dsonar.sources=src -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN
     - stage: lint
       script: npm run-script lint

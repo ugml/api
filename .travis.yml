@@ -43,7 +43,7 @@ jobs:
         - sudo apt-get -qq install mariadb-client mariadb-server                       # install mariadb
         - sudo mysql -u root < test/ci.sql                                             # import data-dump
         - npm run-script test-coverage
-        - sonar-scanner -Dsonar.projectKey=ugamela-api -Dsonar.sources=src -Dsonar.host.url=https://sonar.ugamela.org -Dsonar.login=$SONAR_TOKEN
+        - sonar-scanner -Dsonar.projectKey=$SONAR_KEY -Dsonar.sources=src -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN
     - stage: lint
       script: npm run-script lint
     -

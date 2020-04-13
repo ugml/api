@@ -1,8 +1,7 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import Logger from "../common/Logger";
 import Queue from "../common/Queue";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/IBuildingService";
@@ -12,12 +11,15 @@ import IShipService from "../interfaces/IShipService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import QueueItem from "../common/QueueItem";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for ships-data
  */
 export default class ShipsRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
@@ -26,14 +28,17 @@ export default class ShipsRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
     this.shipService = container.shipService;
 
     this.router.get("/:planetID", this.getAllShipsOnPlanet);
     this.router.post("/build/", this.buildShips);
+
+    this.logger = logger;
   }
 
   /**
@@ -55,9 +60,9 @@ export default class ShipsRouter {
 
       const ships = await this.shipService.getShips(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(ships);
+      return response.status(Globals.Statuscode.SUCCESS).json(ships ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -207,9 +212,9 @@ export default class ShipsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

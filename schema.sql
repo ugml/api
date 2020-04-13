@@ -196,6 +196,7 @@ CREATE TABLE `events` (
                           `loadedCrystal` int(11) NOT NULL DEFAULT 0,
                           `loadedDeuterium` int(11) NOT NULL DEFAULT 0,
                           `returning` tinyint(1) NOT NULL DEFAULT 0,
+                          `inQueue` tinyint(1) NOT NULL DEFAULT 0,
                           `processed` tinyint(1) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`eventID`),
                           KEY `fk_event_ownerid` (`ownerID`),

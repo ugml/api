@@ -2,12 +2,13 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
 import App from "../App";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container).express;
+const app = new App(container, new SimpleLogger()).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;

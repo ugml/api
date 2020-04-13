@@ -1,6 +1,5 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import Logger from "../common/Logger";
 import SerializationHelper from "../common/SerializationHelper";
 import IBuildingService from "../interfaces/IBuildingService";
 import Buildings from "../units/Buildings";
@@ -16,24 +15,19 @@ export default class BuildingService implements IBuildingService {
    * @param planetID the ID of the planet
    */
   public async getBuildings(planetID: number): Promise<Buildings> {
-    try {
-      const query: string = squel
-        .select()
-        .from("buildings", "b")
-        .where("b.planetID = ?", planetID)
-        .toString();
+    const query: string = squel
+      .select()
+      .from("buildings", "b")
+      .where("b.planetID = ?", planetID)
+      .toString();
 
-      const [rows] = await Database.query(query);
+    const [rows] = await Database.query(query);
 
-      if (!InputValidator.isSet(rows)) {
-        return null;
-      }
-
-      return SerializationHelper.toInstance(new Buildings(), JSON.stringify(rows[0]));
-    } catch (error) {
-      Logger.error(error);
+    if (!InputValidator.isSet(rows)) {
       return null;
     }
+
+    return SerializationHelper.toInstance(new Buildings(), JSON.stringify(rows[0]));
   }
 
   /**

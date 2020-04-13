@@ -78,18 +78,4 @@ export default class EventService implements IEventService {
 
     return await Database.query(query);
   }
-
-  /**
-   * Retuns a list of all not yet processed events
-   */
-  public async getAllUnprocessedEvents() {
-    const query: string = squel
-      .select()
-      .from("events")
-      .where("processed = ?", false)
-      .toString();
-
-    const [result] = await Database.query(query);
-    return result;
-  }
 }

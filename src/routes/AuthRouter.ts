@@ -1,27 +1,30 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
 import JwtHelper from "../common/JwtHelper";
-import Logger from "../common/Logger";
 import IRequest from "../interfaces/IRequest";
 import IUserService from "../interfaces/IUserService";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for authentication
  */
 export default class AuthRouter {
-  public router = newRouter();
+  public router: Router = Router();
 
   private userService: IUserService;
+  private logger: ILogger;
 
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.router.post("/login", this.authenticate);
+    this.logger = logger;
   }
 
   /**
@@ -62,11 +65,10 @@ export default class AuthRouter {
       return response.status(Globals.Statuscode.SUCCESS).json({
         token: JwtHelper.generateToken(data.userID),
       });
-    } catch (err) {
-      Logger.error(err);
+    } catch (error) {
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

@@ -1,5 +1,5 @@
 /**
- * This error sgould be thrown when a parameter is invalid.
+ * This error should be thrown when a parameter is invalid.
  */
 export default class InvalidParameterException extends Error {
   /**

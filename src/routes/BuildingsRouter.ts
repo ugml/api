@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -10,15 +10,17 @@ import IPlanetService from "../interfaces/IPlanetService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import ICosts from "../interfaces/ICosts";
-import Logger from "../common/Logger";
 import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for building-data
  */
 export default class BuildingsRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private buildingService: IBuildingService;
   private planetService: IPlanetService;
@@ -27,8 +29,9 @@ export default class BuildingsRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.buildingService = container.buildingService;
     this.planetService = container.planetService;
     this.userService = container.userService;
@@ -37,6 +40,8 @@ export default class BuildingsRouter {
     this.router.post("/cancel", this.cancelBuilding);
     this.router.post("/demolish", this.demolishBuilding);
     this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
+
+    this.logger = logger;
   }
 
   /**
@@ -58,9 +63,9 @@ export default class BuildingsRouter {
       // TODO: check if user owns the planet
       const data = await this.buildingService.getBuildings(planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data);
+      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -114,12 +119,11 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -256,12 +260,11 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -331,12 +334,11 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

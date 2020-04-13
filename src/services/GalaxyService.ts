@@ -56,7 +56,6 @@ export default class GalaxyService implements IGalaxyService {
     minPlanet: number,
     maxPlanet: number,
   ): Promise<ICoordinates> {
-    // getFreePosition(MAX_GALAXY, MAX_SYSTEM, MIN_PLANET, MAX_PLANET)
     const queryUser = `CALL getFreePosition(${maxGalaxy}, ${maxSystem}, ${minPlanet}, ${maxPlanet});`;
 
     const [[[result]]] = await Database.query(queryUser);

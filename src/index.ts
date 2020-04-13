@@ -1,16 +1,18 @@
-import * as debug from "debug";
 import * as http from "http";
-import Logger from "./common/Logger";
 import App from "./App";
 import Container from "./ioc/container";
+import ILogger from "./interfaces/ILogger";
+import SimpleLogger from "./loggers/SimpleLogger";
 
 const createContainer = require("./ioc/createContainer");
 
 const container: Container = createContainer();
 
-const app = new App(container);
+const logger: ILogger = new SimpleLogger();
 
 const port = process.env.PORT || 3000;
+
+const app = new App(container, logger);
 
 app.express.set("port", port);
 
@@ -24,11 +26,11 @@ server.on("error", function onError(error: NodeJS.ErrnoException): void {
 
   switch (error.code) {
     case "EACCES":
-      Logger.error(`${bind} requires elevated privileges`);
+      logger.error(`${bind} requires elevated privileges`, null);
       process.exit(1);
       break;
     case "EADDRINUSE":
-      Logger.error(`${bind} is already in use`);
+      logger.error(`${bind} is already in use`, null);
       process.exit(1);
       break;
     default:
@@ -39,7 +41,7 @@ server.on("error", function onError(error: NodeJS.ErrnoException): void {
 server.on("listening", () => {
   const addr = server.address();
   const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr.port}`;
-  Logger.info(`Listening on ${bind}`);
+  logger.info(`Listening on ${bind}`);
 });
 
 server.listen(port);

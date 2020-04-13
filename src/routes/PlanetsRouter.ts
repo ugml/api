@@ -1,30 +1,35 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import Logger from "../common/Logger";
 import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for planet-data
  */
 export default class PlanetsRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private planetService: IPlanetService;
 
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
 
     this.router.get("/movement/:planetID", this.getMovement);
     this.router.post("/destroy/", this.destroyPlanet);
     this.router.post("/rename/", this.renamePlanet);
     this.router.get("/:planetID", this.getPlanetByID);
+
+    this.logger = logger;
   }
 
   /**
@@ -40,9 +45,9 @@ export default class PlanetsRouter {
 
       const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planetList);
+      return response.status(Globals.Statuscode.SUCCESS).json(planetList ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         error: "There was an error while handling the request.",
@@ -63,9 +68,9 @@ export default class PlanetsRouter {
 
       const planetList = await this.planetService.getAllPlanetsOfUser(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planetList);
+      return response.status(Globals.Statuscode.SUCCESS).json(planetList ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SUCCESS).json({
         error: "There was an error while handling the request.",
@@ -93,9 +98,9 @@ export default class PlanetsRouter {
 
       const planet = await this.planetService.getPlanet(userID, planetID, true);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -123,9 +128,9 @@ export default class PlanetsRouter {
 
       const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(movement);
+      return response.status(Globals.Statuscode.SUCCESS).json(movement ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -162,9 +167,9 @@ export default class PlanetsRouter {
       // TODO: if the deleted planet was the current planet -> set another one as current planet
       await this.planetService.deletePlanet(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -203,15 +208,15 @@ export default class PlanetsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
 
       planet.name = newName;
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -239,9 +244,9 @@ export default class PlanetsRouter {
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet);
+      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

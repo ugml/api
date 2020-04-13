@@ -1,25 +1,30 @@
-import { NextFunction, Response, Router as newRouter, IRouter } from "express";
+import { NextFunction, Response, Router, IRouter } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import Logger from "../common/Logger";
 import IGalaxyService from "../interfaces/IGalaxyService";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for galaxy-data
  */
 export default class GalaxyRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private galaxyService: IGalaxyService;
 
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.galaxyService = container.galaxyService;
     this.router.get("/:posGalaxy/:posSystem", this.getGalaxyInformation);
+
+    this.logger = logger;
   }
 
   /**
@@ -53,12 +58,11 @@ export default class GalaxyRouter {
 
       const galaxyData = await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(galaxyData);
+      return response.status(Globals.Statuscode.SUCCESS).json(galaxyData ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

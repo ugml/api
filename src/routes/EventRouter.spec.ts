@@ -3,12 +3,13 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container).express;
+const app = new App(container, new SimpleLogger()).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -379,6 +380,5 @@ describe("eventRouter", () => {
       });
   });
 
-  // TODO: check, if event is in redis
-  // TODO: check, if event really is returning
+  // TODO: check, if event really is inQueue and/or returning
 });

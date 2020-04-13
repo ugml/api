@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router as newRouter } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import Config from "../common/Config";
 import Database from "../common/Database";
 import DuplicateRecordException from "../exceptions/DuplicateRecordException";
@@ -17,15 +17,17 @@ import IUserService from "../interfaces/IUserService";
 import Planet from "../units/Planet";
 import User from "../units/User";
 import PlanetsRouter from "./PlanetsRouter";
-import Logger from "../common/Logger";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for user-data
  */
 export default class UsersRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private userService: IUserService;
   private galaxyService: IGalaxyService;
@@ -38,8 +40,9 @@ export default class UsersRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.galaxyService = container.galaxyService;
     this.planetService = container.planetService;
@@ -55,13 +58,13 @@ export default class UsersRouter {
     this.router.post("/update", this.updateUser);
 
     // /user/planet/:planetID
-    this.router.get("/planet/:planetID", new PlanetsRouter(container).getOwnPlanet);
+    this.router.get("/planet/:planetID", new PlanetsRouter(container, logger).getOwnPlanet);
 
     // /user/planetlist/
-    this.router.get("/planetlist/", new PlanetsRouter(container).getAllPlanets);
+    this.router.get("/planetlist/", new PlanetsRouter(container, logger).getAllPlanets);
 
     // /users/planetlist/:userID
-    this.router.get("/planetlist/:userID", new PlanetsRouter(container).getAllPlanetsOfUser);
+    this.router.get("/planetlist/:userID", new PlanetsRouter(container, logger).getAllPlanetsOfUser);
 
     // /user/currentplanet/set/:planetID
     this.router.post("/currentplanet/set", this.setCurrentPlanet);
@@ -71,6 +74,8 @@ export default class UsersRouter {
 
     // /user
     this.router.get("/", this.getUserSelf);
+
+    this.logger = logger;
   }
 
   /**
@@ -90,9 +95,9 @@ export default class UsersRouter {
 
       const data = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data);
+      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -108,7 +113,6 @@ export default class UsersRouter {
    */
   public getUserByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
-      // validate parameters
       if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
@@ -119,12 +123,11 @@ export default class UsersRouter {
 
       const user = await this.userService.getUserById(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(user);
+      return response.status(Globals.Statuscode.SUCCESS).json(user ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -173,7 +176,7 @@ export default class UsersRouter {
         throw new DuplicateRecordException("Email is already taken");
       }
 
-      Logger.info("Getting a new userID");
+      this.logger.info("Getting a new userID");
 
       newUser.username = username;
       newUser.email = email;
@@ -185,14 +188,14 @@ export default class UsersRouter {
       newUser.password = hashedPassword;
       newPlanet.planetType = PlanetType.Planet;
 
-      Logger.info("Getting a new planetID");
+      this.logger.info("Getting a new planetID");
 
       const planetID = await await this.planetService.getNewId();
 
       newUser.currentPlanet = planetID;
       newPlanet.planetID = planetID;
 
-      Logger.info("Finding free position for new planet");
+      this.logger.info("Finding free position for new planet");
 
       const galaxyData = await this.galaxyService.getFreePosition(
         gameConfig.posGalaxyMax,
@@ -205,11 +208,11 @@ export default class UsersRouter {
       newPlanet.posSystem = galaxyData.posSystem;
       newPlanet.posPlanet = galaxyData.posPlanet;
 
-      Logger.info("Creating a new user");
+      this.logger.info("Creating a new user");
 
       await this.userService.createNewUser(newUser, connection);
 
-      Logger.info("Creating a new planet");
+      this.logger.info("Creating a new planet");
 
       newPlanet.name = gameConfig.startPlanetName;
       newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
@@ -253,21 +256,21 @@ export default class UsersRouter {
         }
       }
 
-      await await this.planetService.createNewPlanet(newPlanet, connection);
+      await this.planetService.createNewPlanet(newPlanet, connection);
 
-      Logger.info("Creating entry in buildings-table");
+      this.logger.info("Creating entry in buildings-table");
 
       await this.buildingService.createBuildingsRow(newPlanet.planetID, connection);
 
-      Logger.info("Creating entry in defenses-table");
+      this.logger.info("Creating entry in defenses-table");
 
       await this.defenseService.createDefenseRow(newPlanet.planetID, connection);
 
-      Logger.info("Creating entry in ships-table");
+      this.logger.info("Creating entry in ships-table");
 
       await this.shipService.createShipsRow(newPlanet.planetID, connection);
 
-      Logger.info("Creating entry in galaxy-table");
+      this.logger.info("Creating entry in galaxy-table");
 
       await this.galaxyService.createGalaxyRow(
         newPlanet.planetID,
@@ -277,18 +280,18 @@ export default class UsersRouter {
         connection,
       );
 
-      Logger.info("Creating entry in techs-table");
+      this.logger.info("Creating entry in techs-table");
 
       await this.techService.createTechRow(newUser.userID, connection);
 
       connection.commit();
 
-      Logger.info("Transaction complete");
+      this.logger.info("Transaction complete");
 
       await connection.commit();
     } catch (error) {
       await connection.rollback();
-      Logger.error(error);
+      this.logger.error(error, error);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -347,9 +350,9 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(user);
+      return response.status(Globals.Statuscode.SUCCESS).json(user ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -395,9 +398,9 @@ export default class UsersRouter {
 
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

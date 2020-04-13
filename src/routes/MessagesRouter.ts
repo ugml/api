@@ -1,16 +1,18 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import Logger from "../common/Logger";
 import IMessageService from "../interfaces/IMessageService";
 import IUserService from "../interfaces/IUserService";
+import ILogger from "../interfaces/ILogger";
 
 /**
  * Defines routes for message-sending and receiving
  */
 export default class MessagesRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private userService: IUserService;
   private messageService: IMessageService;
@@ -18,14 +20,17 @@ export default class MessagesRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.messageService = container.messageService;
     this.router.get("/get", this.getAllMessages);
     this.router.get("/get/:messageID", this.getMessageByID);
     this.router.post("/delete", this.deleteMessage);
     this.router.post("/send", this.sendMessage);
+
+    this.logger = logger;
   }
 
   /**
@@ -40,9 +45,9 @@ export default class MessagesRouter {
 
       const messages = await this.messageService.getAllMessages(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(messages);
+      return response.status(Globals.Statuscode.SUCCESS).json(messages ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -68,9 +73,9 @@ export default class MessagesRouter {
       const messageID = parseInt(request.params.messageID, 10);
       const message = await this.messageService.getMessageById(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(message);
+      return response.status(Globals.Statuscode.SUCCESS).json(message ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -97,9 +102,9 @@ export default class MessagesRouter {
 
       await this.messageService.deleteMessage(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
@@ -141,9 +146,9 @@ export default class MessagesRouter {
 
       await this.messageService.sendMessage(userID, receiverID, subject, messageText);
 
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
         error: "There was an error while handling the request.",

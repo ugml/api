@@ -1,18 +1,14 @@
-import { NextFunction, Response, Router as newRouter } from "express";
+import { NextFunction, Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
-import Database from "../common/Database";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import Redis from "../common/Redis";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
 import IEventService from "../interfaces/IEventService";
 import IPlanetService from "../interfaces/IPlanetService";
-import squel = require("safe-squel");
-import Logger from "../common/Logger";
-import EventService from "../services/EventService";
 import Event from "../units/Event";
+import ILogger from "../interfaces/ILogger";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
@@ -28,7 +24,9 @@ const eventSchema = require("../schemas/fleetevent.schema.json");
  * Defines routes for event-creation and cancellation
  */
 export default class EventRouter {
-  public router = newRouter();
+  public router: Router = Router();
+
+  private logger: ILogger;
 
   private planetService: IPlanetService;
   private eventService: IEventService;
@@ -36,13 +34,16 @@ export default class EventRouter {
   /**
    * Registers the routes and needed services
    * @param container the IoC-container with registered services
+   * @param logger Instance of an ILogger-object
    */
-  public constructor(container) {
+  public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.eventService = container.eventService;
 
     this.router.post("/create/", this.createEvent);
     this.router.post("/cancel/", this.cancelEvent);
+
+    this.logger = logger;
   }
 
   /**
@@ -147,23 +148,18 @@ export default class EventRouter {
       event.loadedMetal = eventData.data.loadedRessources.metal;
       event.loadedCrystal = eventData.data.loadedRessources.crystal;
       event.loadedDeuterium = eventData.data.loadedRessources.deuterium;
+      event.inQueue = false;
       event.returning = false;
       event.processed = false;
 
-      const [result] = await this.eventService.createNewEvent(event);
-
-      event.eventID = parseInt(result.insertId, 10);
-
-      // insert into redis
-      Redis.getConnection().zadd("eventQueue", event.endTime, event.eventID);
+      await this.eventService.createNewEvent(event);
 
       // all done
-      return response.status(Globals.Statuscode.SUCCESS).json(event);
+      return response.status(Globals.Statuscode.SUCCESS).json(event ?? {});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }
@@ -188,7 +184,7 @@ export default class EventRouter {
 
       const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
 
-      if (!InputValidator.isSet(event) || event.returning === true) {
+      if (!InputValidator.isSet(event) || event.returning === true || event.inQueue === true) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "The event does not exist or can't be canceled",
         });
@@ -200,19 +196,12 @@ export default class EventRouter {
 
       await this.eventService.cancelEvent(event);
 
-      // remove the event from the redis-queue
-      Redis.getConnection().zremrangebyscore("eventQueue", event.endTime, event.eventID);
-
-      // add the event with the new endtime
-      Redis.getConnection().zadd("eventQueue", event.endTime, request.body.eventID);
-
       // all done
-      return response.status(Globals.Statuscode.SUCCESS).json();
+      return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        status: Globals.Statuscode.SERVER_ERROR,
         error: "There was an error while handling the request.",
       });
     }

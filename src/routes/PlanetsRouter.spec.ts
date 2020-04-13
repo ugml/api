@@ -5,12 +5,13 @@ import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import User from "../units/User";
+import SimpleLogger from "../loggers/SimpleLogger";
 
 const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container).express;
+const app = new App(container, new SimpleLogger()).express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -51,7 +52,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.oneOf([null, undefined, ""]);
+        expect(res.body).to.be.empty;
       });
   });
 
@@ -121,7 +122,7 @@ describe("planetsRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.oneOf([null, undefined, ""]);
+        expect(res.body).to.be.empty;
       });
   });
 

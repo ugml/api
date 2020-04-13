@@ -1,5 +1,4 @@
 import mysql = require("mysql2/promise");
-import Logger from "./Logger";
 import dotenv = require("dotenv");
 
 dotenv.config();
@@ -12,7 +11,7 @@ export default class Database {
    * Returns the connection-pool to the mysql-database
    */
   public static getConnectionPool() {
-    return this.pool;
+    return this.connectionPool;
   }
 
   /**
@@ -20,26 +19,18 @@ export default class Database {
    * @param sql the sql-query
    * @param args optional arguments
    */
-  public static query(sql: string, args: object = null): Promise<any> {
-    Logger.info(sql);
-    return this.pool.query(sql);
+  public static query(sql: string, args: object = null): any {
+    // TODO: Log the mysql-errors
+    return this.connectionPool.query(sql);
   }
-
-  /**
-   * Represents a mysql connection-pool
-   */
-  private static pool = mysql
-    .createPool({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      database: process.env.DB_NAME || "ugamela",
-      password: process.env.DB_PASS || "",
-      port: process.env.DB_PORT || 3306,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    })
-    .on("error", function(err) {
-      Logger.error(err);
-    });
+  private static connectionPool = mysql.createPool({
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    database: process.env.DB_NAME || "ugamela",
+    password: process.env.DB_PASS || "",
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 40,
+  });
 }

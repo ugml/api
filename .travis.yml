@@ -42,6 +42,7 @@ jobs:
       node_js: '12'
     - stage: test
       script:
+        - git fetch --unshallow --quiet
         - sudo apt-get -qq update
         - sudo apt-get -qq install mariadb-client mariadb-server
         - sudo mysql -u root < test/ci.sql

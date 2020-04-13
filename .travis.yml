@@ -20,27 +20,27 @@ env:
   - NODE_ENV=development
 
 stages:
-  - audit
-  - build
-  - test
-  - lint
-  - documentation
-  - deploy
+  - "Audit"
+  - "Build"
+  - "Test"
+  - "Lint"
+  - "Generate documentation"
+  - "Deploy to docker hub"
 
 jobs:
   include:
-    - stage: Audit
+    - stage: "Audit"
       if: type = pull_request
       script: audit-ci --low --report-type full
     - &build
-      stage: Build
+      stage: "Build"
       script: npm run-script build
       node_js: '8'
     - <<: *build
       node_js: '10'
     - <<: *build
       node_js: '12'
-    - stage: Test
+    - stage: "Test"
       script:
         - git fetch --unshallow --quiet
         - sudo apt-get -qq update
@@ -48,7 +48,7 @@ jobs:
         - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage
         - sonar-scanner
-    - stage: Lint
+    - stage: "Lint"
       script: npm run-script lint
     -
       script: npm run-script tslint
@@ -57,7 +57,7 @@ jobs:
       script:
         - gulp doc
         - echo "TODO -> depoy to github pages"
-    - stage: Deploy to docker hub
+    - stage: "Deploy to docker hub"
       if: type = push AND (branch = master OR branch = development)
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

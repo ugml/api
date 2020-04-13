@@ -29,18 +29,18 @@ stages:
 
 jobs:
   include:
-    - stage: audit
+    - stage: Audit
       if: type = pull_request
       script: audit-ci --low --report-type full
     - &build
-      stage: build
+      stage: Build
       script: npm run-script build
       node_js: '8'
     - <<: *build
       node_js: '10'
     - <<: *build
       node_js: '12'
-    - stage: test
+    - stage: Test
       script:
         - git fetch --unshallow --quiet
         - sudo apt-get -qq update
@@ -48,16 +48,16 @@ jobs:
         - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage
         - sonar-scanner
-    - stage: lint
+    - stage: Lint
       script: npm run-script lint
     -
       script: npm run-script tslint
-    - stage: documentation
+    - stage: Generate documentation
       if: branch = master
       script:
         - gulp doc
         - echo "TODO -> depoy to github pages"
-    - stage: deploy to docker hub
+    - stage: Deploy to docker hub
       if: type = push AND (branch = master OR branch = development)
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

@@ -43,8 +43,8 @@ jobs:
     - stage: test
       script:
         - sudo apt-get -qq update
-        - sudo apt-get -qq install mariadb-client mariadb-server                       # install mariadb
-        - sudo mysql -u root < test/ci.sql                                             # import data-dump
+        - sudo apt-get -qq install mariadb-client mariadb-server
+        - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage
         - sonar-scanner
     - stage: lint

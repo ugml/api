@@ -8,49 +8,56 @@ sudo: required
 git:
   quiet: true
 
+addons:
+  sonarcloud:
+    organization: "ugamela"
+    token:
+      secure: "EEC33LC7d3DLMJB6ZPuqHeUAa68Af0bi5yN1BoA6GT4R/+raLiDsNavjQZApJxhsdeXU6/LLne/dsJMq10fb/hbpMCzeLsgJXNX+6K8Szwhpx03RI7L+v/DgSvYzbryMLkbOP2EejCDfgt8SMg/meyfHgrwMhsqlwC8T2FipjjN3UKXhmZIBsJZtMeULZAYH27TX0nSqrXMa7IGtV4hwr9f6voXj9YAw9Jpi8aNYxnRLbArm07mwBif0MIFkPQyx0mBCgtsBw9bwceMlBsiE/CQTwHfMvk9zhnjJR+DkXycgnAoRt1TXZbT8bJrzD0UFUFVTe4iefJu6vHHBX19dIZBe2PlXN9CK7V0Wh7PV4ydbfAJrxP7UWeATL0oMaGUxyDIbxoS4hmW24MJ14qo4ZvmhTV/ddLlo8FBCQS4sgGNxQDk6w/u2HHCxfl7wGzlFCbna2/SONXt2jsIUb8DZsPjnOkTiCiJdcYd3sp2+w9Q1SkVPck57kYuzLVq8VUXaOYm1BHj3OFX5o0yPLWYge+UnlPyhJveYKVr45c+r2/qt0Amtp2xSarD/gGG97vWftmV1/PacgRK/AZeAnysBrI76Od4Iv3eV2SfBfd2M4BHRDv1UXASDdEtW/NtvSnFNuLazWFvZZM3ltmXBQxqcFgSP+3wChd6eq79yC/nR+3U="
+
 cache: npm
 
 env:
   - NODE_ENV=development
 
 stages:
-  - audit
-  - build
-  - test
-  - lint
-  - documentation
-  - deploy
+  - "Audit"
+  - "Build"
+  - "Test"
+  - "Lint"
+  - "Generate documentation"
+  - "Deploy to docker hub"
 
 jobs:
   include:
-    - stage: audit
+    - stage: "Audit"
       if: type = pull_request
       script: audit-ci --low --report-type full
     - &build
-      stage: build
+      stage: "Build"
       script: npm run-script build
       node_js: '8'
     - <<: *build
       node_js: '10'
     - <<: *build
       node_js: '12'
-    - stage: test
+    - stage: "Test"
       script:
+        - git fetch --unshallow --quiet
         - sudo apt-get -qq update
-        - sudo apt-get -qq install mariadb-client mariadb-server                       # install mariadb
-        - sudo mysql -u root < test/ci.sql                                             # import data-dump
+        - sudo apt-get -qq install mariadb-client mariadb-server
+        - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage
-        - "cat ./coverage/lcov.info | codacy-coverage -p ."
-    - stage: lint
+        - sonar-scanner
+    - stage: "Lint"
       script: npm run-script lint
     -
       script: npm run-script tslint
-    - stage: documentation
+    - stage: Generate documentation
       if: branch = master
       script:
         - gulp doc
         - echo "TODO -> depoy to github pages"
-    - stage: deploy to docker hub
+    - stage: "Deploy to docker hub"
       if: type = push AND (branch = master OR branch = development)
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

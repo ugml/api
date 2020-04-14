@@ -13,8 +13,12 @@ const path = `./logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
 /* tslint:disable:no-empty*/
 // Folder setup
 if (!fs.existsSync(path)) {
-  fs.mkdir("./logs/", err => {});
-  fs.mkdir(path, err => {});
+  fs.mkdir("./logs/", err => {
+    console.error(err);
+  });
+  fs.mkdir(path, err => {
+    console.error(err);
+  });
 }
 /* tslint:enable:no-empty*/
 

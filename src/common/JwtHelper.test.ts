@@ -2,7 +2,6 @@ import * as chai from "chai";
 import JwtHelper from "./JwtHelper";
 
 const assert = chai.assert;
-const expect = chai.expect;
 
 describe("JwtHelper", function() {
   it("Generate Token", function() {

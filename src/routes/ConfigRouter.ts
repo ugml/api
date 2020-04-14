@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import ILogger from "../interfaces/ILogger";
 
@@ -27,7 +27,7 @@ export default class ConfigRouter {
    * @param response
    * @param next
    */
-  public getGameConfig(req: Request, response: Response, next: NextFunction) {
+  public getGameConfig(req: Request, response: Response) {
     try {
       const data = require("../config/game.json");
 
@@ -47,7 +47,7 @@ export default class ConfigRouter {
    * @param response
    * @param next
    */
-  public getUnitsConfig(req: Request, response: Response, next: NextFunction) {
+  public getUnitsConfig(req: Request, response: Response) {
     try {
       const data = require("../config/units.json");
 

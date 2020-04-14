@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import Config from "../common/Config";
 import Database from "../common/Database";
 import DuplicateRecordException from "../exceptions/DuplicateRecordException";
@@ -84,7 +84,7 @@ export default class UsersRouter {
    * @param response
    * @param next
    */
-  public getUserSelf = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getUserSelf = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
@@ -111,7 +111,7 @@ export default class UsersRouter {
    * @param response
    * @param next
    */
-  public getUserByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getUserByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -139,7 +139,7 @@ export default class UsersRouter {
    * @param response
    * @param next
    */
-  public createUser = async (request: Request, response: Response, next: NextFunction) => {
+  public createUser = async (request: Request, response: Response) => {
     if (
       !InputValidator.isSet(request.body.username) ||
       !InputValidator.isSet(request.body.password) ||
@@ -190,7 +190,7 @@ export default class UsersRouter {
 
       this.logger.info("Getting a new planetID");
 
-      const planetID = await await this.planetService.getNewId();
+      const planetID = await this.planetService.getNewId();
 
       newUser.currentPlanet = planetID;
       newPlanet.planetID = planetID;
@@ -318,7 +318,7 @@ export default class UsersRouter {
    * @param response
    * @param next
    */
-  public updateUser = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public updateUser = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // if no parameters are set
       if (
@@ -372,7 +372,7 @@ export default class UsersRouter {
    * @param response
    * @param next
    */
-  public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
@@ -384,7 +384,7 @@ export default class UsersRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await await this.planetService.getPlanet(userID, planetID);
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({

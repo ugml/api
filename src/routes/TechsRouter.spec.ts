@@ -3,7 +3,6 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
 import SimpleLogger from "../loggers/SimpleLogger";
 

@@ -1,6 +1,5 @@
 import * as chai from "chai";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "./Buildings";
 import Techs from "./Techs";
 
 const assert = chai.assert;

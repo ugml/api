@@ -164,7 +164,7 @@ describe("User Routes", () => {
   });
 
   it("should return nothing (user does not exist)", async () => {
-    const { type, status, body } = await request.get("/v1/users/2").set("Authorization", authToken);
+    const { type, status } = await request.get("/v1/users/2").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.Statuscode.SUCCESS);

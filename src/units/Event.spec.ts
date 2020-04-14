@@ -1,8 +1,6 @@
 import * as chai from "chai";
 import { Globals } from "../common/Globals";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "./Buildings";
-import Defenses from "./Defenses";
 import Event from "./Event";
 import PlanetType = Globals.PlanetType;
 

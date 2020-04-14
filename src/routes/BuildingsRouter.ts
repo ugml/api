@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -50,7 +50,7 @@ export default class BuildingsRouter {
    * @param response
    * @param next
    */
-  public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -79,7 +79,7 @@ export default class BuildingsRouter {
    * @param response
    * @param next
    */
-  public cancelBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public cancelBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -135,7 +135,7 @@ export default class BuildingsRouter {
    * @param response
    * @param next
    */
-  public startBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public startBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||
@@ -270,7 +270,7 @@ export default class BuildingsRouter {
     }
   };
 
-  public demolishBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public demolishBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||

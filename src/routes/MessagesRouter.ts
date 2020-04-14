@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
@@ -39,7 +39,7 @@ export default class MessagesRouter {
    * @param response
    * @param next
    */
-  public getAllMessages = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -61,7 +61,7 @@ export default class MessagesRouter {
    * @param response
    * @param next
    */
-  public getMessageByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getMessageByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -89,7 +89,7 @@ export default class MessagesRouter {
    * @param response
    * @param next
    */
-  public deleteMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public deleteMessage = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -118,7 +118,7 @@ export default class MessagesRouter {
    * @param response
    * @param next
    */
-  public sendMessage = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public sendMessage = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.receiverID) ||

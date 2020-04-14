@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
@@ -39,7 +39,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public getAllPlanets = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getAllPlanets = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -62,7 +62,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.params.userID, 10);
 
@@ -84,7 +84,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public getOwnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getOwnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -114,7 +114,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public getMovement = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getMovement = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -144,7 +144,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public destroyPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public destroyPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
@@ -183,7 +183,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public renamePlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public renamePlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (
@@ -230,7 +230,7 @@ export default class PlanetsRouter {
    * @param response
    * @param next
    */
-  public getPlanetByID = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getPlanetByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {

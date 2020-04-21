@@ -24,7 +24,7 @@ export default class Calculations {
     naniteFactory: number,
   ): number {
     return Math.round(
-      ((metalCosts + crystalCosts) / (2500 * (1 + robotFactory) * 2 ** naniteFactory * Config.getGameConfig().speed)) *
+      ((metalCosts + crystalCosts) / (2500 * (1 + robotFactory) * 2 ** naniteFactory * Config.getGameConfig().server.speed)) *
         3600,
     );
   }
@@ -36,7 +36,7 @@ export default class Calculations {
    * @param researchLab the current level of the reserach-lab
    */
   public static calculateResearchTimeInSeconds(metalCosts: number, crystalCosts: number, researchLab: number): number {
-    return Math.round(((metalCosts + crystalCosts) / ((1 + researchLab) * Config.getGameConfig().speed)) * 3600);
+    return Math.round(((metalCosts + crystalCosts) / ((1 + researchLab) * Config.getGameConfig().server.speed)) * 3600);
   }
 
   /**

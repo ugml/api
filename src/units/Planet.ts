@@ -210,11 +210,11 @@ export default class Planet implements IUnits {
       5 <= this.name.length &&
       this.name.length < 45 &&
       0 < this.posGalaxy &&
-      this.posGalaxy <= Config.getGameConfig().posGalaxyMax &&
+      this.posGalaxy <= Config.getGameConfig().limits.galaxy.max &&
       0 < this.posSystem &&
-      this.posSystem <= Config.getGameConfig().posSystemMax &&
+      this.posSystem <= Config.getGameConfig().limits.system.max &&
       0 < this.posPlanet &&
-      this.posPlanet <= Config.getGameConfig().posPlanetMax &&
+      this.posPlanet <= Config.getGameConfig().limits.planet.max &&
       0 < this.lastUpdate &&
       0 < this.diameter &&
       0 <= this.fieldsCurrent &&

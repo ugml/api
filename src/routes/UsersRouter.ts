@@ -198,10 +198,10 @@ export default class UsersRouter {
       this.logger.info("Finding free position for new planet");
 
       const galaxyData = await this.galaxyService.getFreePosition(
-        gameConfig.posGalaxyMax,
-        gameConfig.posSystemMax,
-        4,
-        12,
+        gameConfig.limits.galaxy.max,
+        gameConfig.limits.system.max,
+        gameConfig.startPlanet.minPlanetPos,
+        gameConfig.startPlanet.maxPlanetPos,
       );
 
       newPlanet.posGalaxy = galaxyData.posGalaxy;
@@ -214,13 +214,13 @@ export default class UsersRouter {
 
       this.logger.info("Creating a new planet");
 
-      newPlanet.name = gameConfig.startPlanetName;
+      newPlanet.name = gameConfig.startPlanet.name;
       newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
-      newPlanet.diameter = gameConfig.startPlanetDiameter;
-      newPlanet.fieldsMax = gameConfig.startPlanetMaxFields;
-      newPlanet.metal = gameConfig.metalStart;
-      newPlanet.crystal = gameConfig.crystalStart;
-      newPlanet.deuterium = gameConfig.deuteriumStart;
+      newPlanet.diameter = gameConfig.startPlanet.diameter;
+      newPlanet.fieldsMax = gameConfig.startPlanet.fields;
+      newPlanet.metal = gameConfig.startPlanet.resources.metal;
+      newPlanet.crystal = gameConfig.startPlanet.resources.crystal;
+      newPlanet.deuterium = gameConfig.startPlanet.resources.deuterium;
 
       switch (true) {
         case newPlanet.posPlanet <= 5: {

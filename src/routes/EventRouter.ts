@@ -127,8 +127,8 @@ export default class EventRouter {
 
       // calculate duration of flight
       const timeOfFlight = Calculations.calculateTimeOfFlight(
-        gameConfig.speed,
-        eventData.speed,
+        gameConfig.server.speed,
+        eventData.server.speed,
         distance,
         slowestShipSpeed,
       );

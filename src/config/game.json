@@ -3,13 +3,16 @@
         "speed":1
     },
     "startPlanet":{
+        "name": "Homeplanet",
         "diameter":150000,
         "fields":182,
         "resources":{
             "metal":500,
             "crystal":500,
             "deuterium":500
-        }
+        },
+        "minPlanetPos": 4,
+        "maxPlanetPos": 12
     },
     "limits":{
         "galaxy":{

@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
@@ -47,7 +47,7 @@ export default class ShipsRouter {
    * @param response
    * @param next
    */
-  public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -76,7 +76,7 @@ export default class ShipsRouter {
    * @param response
    * @param next
    */
-  public buildShips = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public buildShips = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||

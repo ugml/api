@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -52,7 +52,7 @@ export default class EventRouter {
    * @param response
    * @param next
    */
-  public createEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public createEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // TODO: check if enough ships on planet
       // TODO: check if planet has enough deuterium
@@ -171,7 +171,7 @@ export default class EventRouter {
    * @param response
    * @param next
    */
-  public cancelEvent = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public cancelEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({

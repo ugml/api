@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router, IRouter } from "express";
+import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
@@ -33,7 +33,7 @@ export default class GalaxyRouter {
    * @param response
    * @param next
    */
-  public getGalaxyInformation = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getGalaxyInformation = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // validate parameters
       if (

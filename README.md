@@ -1,8 +1,10 @@
 ![N|Solid](https://ugamela.org/images/logo.png)
 
 [![Travis (.org)](https://img.shields.io/travis/ugml/api)](https://travis-ci.org/ugml/api)
-[![Codacy grade](https://img.shields.io/codacy/grade/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ugml/api&amp;utm_campaign=Badge_Grade)
-[![Codacy coverage](https://img.shields.io/codacy/coverage/d850b7bc3284402583106ac38ec3d995)](https://www.codacy.com/app/mamen/api?utm_source=github.com&utm_medium=referral&utm_content=ugml/api&utm_campaign=Badge_Coverage)
+[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=alert_status)](https://sonarcloud.io/dashboard?id=ugamela-api) 
+[![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=ugamela-api)
+[![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=bugs)](https://sonarcloud.io/component_measures/metric/reliability_rating/list?id=ugamela-api)
+[![SonarCloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=vulnerabilities)](https://sonarcloud.io/component_measures/metric/security_rating/list?id=ugamela-api)
 [![Docker Pulls](https://img.shields.io/docker/pulls/ugamela/api)](https://hub.docker.com/r/ugamela/api)
 [![Discord](https://img.shields.io/discord/339129999082913794)](https://discord.gg/YDUHM3k)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](./LICENSE)

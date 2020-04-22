@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
@@ -34,7 +34,7 @@ export default class AuthRouter {
    * @param response
    * @param next
    */
-  public authenticate = async (req: IRequest, response: Response, next: NextFunction) => {
+  public authenticate = async (req: IRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({

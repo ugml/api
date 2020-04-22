@@ -19,27 +19,27 @@ export default class Config {
    * Returns a list of all buildings with their costs and cost-increase-factor per level
    */
   public static getBuildings(): IBuilding[] {
-    return require("../config/units.json").units.buildings;
+    return require("../config/game.json").units.buildings;
   }
 
   /**
    * Returns a list of all ships with their costs, rapidfire and properties like speed and capacity
    */
   public static getShips(): IShip[] {
-    return require("../config/units.json").units.ships;
+    return require("../config/game.json").units.ships;
   }
 
   /**
    * Returns a list of all ships with their costs
    */
   public static getDefenses(): IDefense[] {
-    return require("../config/units.json").units.defenses;
+    return require("../config/game.json").units.defenses;
   }
 
   /**
    * Returns a list of all technologies with their costs and cost-increase-factor per level
    */
   public static getTechnologies(): ITechnology[] {
-    return require("../config/units.json").units.technologies;
+    return require("../config/game.json").units.technologies;
   }
 }

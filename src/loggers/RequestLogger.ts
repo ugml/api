@@ -10,7 +10,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
 const date = new Date();
 const path = `./logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
 
-/* tslint:disable:no-empty*/
+/* tslint:disable:no-console*/
 // Folder setup
 if (!fs.existsSync(path)) {
   fs.mkdir("./logs/", err => {
@@ -20,7 +20,7 @@ if (!fs.existsSync(path)) {
     console.error(err);
   });
 }
-/* tslint:enable:no-empty*/
+/* tslint:enable:no-console*/
 
 /* tslint:disable: variable-name */
 const RequestLogger = createLogger({

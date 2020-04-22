@@ -1,6 +1,6 @@
 import InputValidator from "../common/InputValidator";
-import IUnit from "../interfaces/IUnit";
 import { Globals } from "../common/Globals";
+import IUnit from "../interfaces/IUnit";
 
 /**
  * Represents a user-row in the database

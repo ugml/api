@@ -24,7 +24,8 @@ export default class Calculations {
     naniteFactory: number,
   ): number {
     return Math.round(
-      ((metalCosts + crystalCosts) / (2500 * (1 + robotFactory) * 2 ** naniteFactory * Config.getGameConfig().server.speed)) *
+      ((metalCosts + crystalCosts) /
+        (2500 * (1 + robotFactory) * 2 ** naniteFactory * Config.getGameConfig().server.speed)) *
         3600,
     );
   }

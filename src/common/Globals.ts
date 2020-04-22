@@ -115,7 +115,6 @@ namespace Globals {
     antiBallisticMissile = 309,
     interplanetaryMissile = 310,
   }
-
 }
 
 export { Globals };

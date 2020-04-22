@@ -48,9 +48,8 @@ module.exports =  {
         "FunctionExpression": true
       }
     }],
-    "no-unused-vars": "off",
-    "unused-imports/no-unused-imports": 2,
-    "unused-imports/no-unused-vars": 1
+    "unused-imports/no-unused-imports-ts": 2,
+    "unused-imports/no-unused-vars-ts": 1
   },
   settings:  {
     react:  {

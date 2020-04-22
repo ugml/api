@@ -6,7 +6,7 @@ const assert = chai.assert;
 
 describe("Config", function() {
   it("Get config", function() {
-    expect(Config.getGameConfig().startPlanet).to.have.deep.property("metal", 500);
+    expect(Config.getGameConfig().server.startPlanet).to.have.deep.property("metal", 500);
   });
 
   it("Get Buildings", function() {

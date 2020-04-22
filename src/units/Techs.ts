@@ -1,8 +1,8 @@
-import IUnits from "../interfaces/IUnits";
+import IUnit from "../interfaces/IUnit";
 /**
  * Represents a techs-row in the database
  */
-export default class Techs implements IUnits {
+export default class Techs implements IUnit {
   /**
    * The ID of the user
    */

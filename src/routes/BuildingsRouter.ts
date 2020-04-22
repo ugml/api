@@ -13,6 +13,7 @@ import ICosts from "../interfaces/ICosts";
 import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
 import ILogger from "../interfaces/ILogger";
+import UnitNames = Globals.UnitNames;
 
 /**
  * Defines routes for building-data
@@ -105,7 +106,7 @@ export default class BuildingsRouter {
         });
       }
 
-      const buildingKey = Config.getMappings()[planet.bBuildingId];
+      const buildingKey = Globals.UnitNames[planet.bBuildingId];
 
       const currentLevel = buildings[buildingKey];
 
@@ -196,7 +197,7 @@ export default class BuildingsRouter {
       }
 
       // 2. check, if requirements are met
-      const requirements = Config.getRequirements().find(r => r.unitID === buildingID);
+      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
 
       // TODO: move to seperate file
       // building has requirements
@@ -206,7 +207,7 @@ export default class BuildingsRouter {
         for (const reqID in requirements) {
           if (requirements.hasOwnProperty(reqID)) {
             const reqLevel = requirements[reqID];
-            const key = Config.getMappings()[buildingID];
+            const key = Globals.UnitNames[buildingID];
 
             if (buildings[key] < reqLevel) {
               requirementsMet = false;
@@ -226,7 +227,7 @@ export default class BuildingsRouter {
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = Config.getMappings()[buildingID];
+      const buildingKey = Globals.UnitNames[buildingID];
       const currentLevel = buildings[buildingKey];
 
       const cost = Calculations.getCosts(buildingID, currentLevel);
@@ -308,7 +309,7 @@ export default class BuildingsRouter {
         });
       }
 
-      const buildingKey = Config.getMappings()[buildingID];
+      const buildingKey = Globals.UnitNames[buildingID];
       const currentLevel = buildings[buildingKey];
 
       if (currentLevel === 0) {

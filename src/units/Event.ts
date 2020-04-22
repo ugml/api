@@ -1,12 +1,12 @@
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IUnits from "../interfaces/IUnits";
+import IUnit from "../interfaces/IUnit";
 import PlanetType = Globals.PlanetType;
 
 /**
  * Represents a user-row in the database
  */
-export default class Event implements IUnits {
+export default class Event implements IUnit {
   public eventID: number;
   public ownerID: number;
   public mission: number;

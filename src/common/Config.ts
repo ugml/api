@@ -1,7 +1,7 @@
 /**
  * Helper-class to get the current game-configuration
  */
-import IGameConfig from "../interfaces/IGameConfig";
+import IGameConfig, { IBuilding, IDefense, IShip, ITechnology } from "../interfaces/IGameConfig";
 
 // TODO: define Interfaces for return-values
 /**
@@ -16,45 +16,30 @@ export default class Config {
   }
 
   /**
-   * Returns all configured requirements for all units
-   */
-  public static getRequirements() {
-    return require("../config/units.json").units.requirements;
-  }
-
-  /**
-   * Returns mappings between unit-name <-> unitID
-   */
-  public static getMappings() {
-    return require("../config/units.json").mappings;
-  }
-
-  /**
    * Returns a list of all buildings with their costs and cost-increase-factor per level
    */
-  public static getBuildings() {
+  public static getBuildings(): IBuilding[] {
     return require("../config/units.json").units.buildings;
   }
 
-  // TODO: reference interface
   /**
    * Returns a list of all ships with their costs, rapidfire and properties like speed and capacity
    */
-  public static getShips() {
+  public static getShips(): IShip[] {
     return require("../config/units.json").units.ships;
   }
 
   /**
    * Returns a list of all ships with their costs
    */
-  public static getDefenses() {
+  public static getDefenses(): IDefense[] {
     return require("../config/units.json").units.defenses;
   }
 
   /**
    * Returns a list of all technologies with their costs and cost-increase-factor per level
    */
-  public static getTechnologies() {
+  public static getTechnologies(): ITechnology[] {
     return require("../config/units.json").units.technologies;
   }
 }

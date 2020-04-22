@@ -1,10 +1,10 @@
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
-import IUnits from "../interfaces/IUnits";
+import IUnit from "../interfaces/IUnit";
 /**
  * Represents a planet-row in the database
  */
-export default class Planet implements IUnits {
+export default class Planet implements IUnit {
   /**
    * The ID of the planet
    */
@@ -210,11 +210,11 @@ export default class Planet implements IUnits {
       5 <= this.name.length &&
       this.name.length < 45 &&
       0 < this.posGalaxy &&
-      this.posGalaxy <= Config.getGameConfig().limits.galaxy.max &&
+      this.posGalaxy <= Config.getGameConfig().server.limits.galaxy.max &&
       0 < this.posSystem &&
-      this.posSystem <= Config.getGameConfig().limits.system.max &&
+      this.posSystem <= Config.getGameConfig().server.limits.system.max &&
       0 < this.posPlanet &&
-      this.posPlanet <= Config.getGameConfig().limits.planet.max &&
+      this.posPlanet <= Config.getGameConfig().server.limits.position.max &&
       0 < this.lastUpdate &&
       0 < this.diameter &&
       0 <= this.fieldsCurrent &&

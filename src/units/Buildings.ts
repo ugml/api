@@ -1,9 +1,9 @@
-import IUnits from "../interfaces/IUnits";
+import IUnit from "../interfaces/IUnit";
 
 /**
  * Represents a buildings-row in the database
  */
-export default class Buildings implements IUnits {
+export default class Buildings implements IUnit {
   /**
    * The ID of the planet
    */

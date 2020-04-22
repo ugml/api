@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
@@ -48,7 +48,7 @@ export default class DefenseRouter {
    * @param response
    * @param next
    */
-  public getAllDefensesOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getAllDefensesOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -77,7 +77,7 @@ export default class DefenseRouter {
    * @param response
    * @param next
    */
-  public buildDefense = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public buildDefense = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||

@@ -19,7 +19,7 @@ export default class Database {
    * @param sql the sql-query
    * @param args optional arguments
    */
-  public static query(sql: string, args: object = null): any {
+  public static query(sql: string): any {
     // TODO: Log the mysql-errors
     return this.connectionPool.query(sql);
   }

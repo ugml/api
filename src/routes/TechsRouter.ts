@@ -1,4 +1,4 @@
-import { NextFunction, Response, Router } from "express";
+import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -52,7 +52,7 @@ export default class TechsRouter {
    * @param response
    * @param next
    */
-  public getTechs = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public getTechs = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -74,7 +74,7 @@ export default class TechsRouter {
    * @param response
    * @param next
    */
-  public cancelTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public cancelTech = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -134,7 +134,7 @@ export default class TechsRouter {
    * @param response
    * @param next
    */
-  public buildTech = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
+  public buildTech = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||

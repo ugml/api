@@ -1,7 +1,5 @@
 import * as chai from "chai";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "./Buildings";
-import Defenses from "./Defenses";
 import Message from "./Message";
 
 const assert = chai.assert;

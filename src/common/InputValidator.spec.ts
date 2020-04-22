@@ -3,7 +3,6 @@ import { Globals } from "./Globals";
 import InputValidator from "./InputValidator";
 
 const assert = chai.assert;
-const expect = chai.expect;
 
 describe("InputValidator", function() {
   it("Valid Int", function() {

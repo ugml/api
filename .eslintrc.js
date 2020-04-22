@@ -36,8 +36,8 @@ module.exports =  {
     "@typescript-eslint/no-unused-vars": "on",
     "@typescript-eslint/no-explicit-any": "on",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "camelcase": "off",
-    "@typescript-eslint/camelcase": "off",
+    "camelcase": 2,
+    "@typescript-eslint/camelcase": 2,
     "@typescript-eslint/no-var-requires": "on",
     "require-jsdoc": ["error", {
       "require": {
@@ -47,11 +47,17 @@ module.exports =  {
         "ArrowFunctionExpression": true,
         "FunctionExpression": true
       }
-    }]
+    }],
+    "no-unused-vars": "off",
+    "unused-imports/no-unused-imports": 2,
+    "unused-imports/no-unused-vars": 1
   },
   settings:  {
     react:  {
       version:  'detect',  // Tells eslint-plugin-react to automatically detect the version of React to use
     },
   },
+  plugins: [
+    "unused-imports"
+  ]
 };

@@ -1,6 +1,6 @@
 ![N|Solid](https://ugamela.org/images/logo.png)
 
-[![Travis (.org)](https://img.shields.io/travis/ugml/api)](https://travis-ci.org/ugml/api)
+[![Travis (.org)](https://travis-ci.org/ugml/api.svg?branch=master)](https://travis-ci.org/ugml/api)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=alert_status)](https://sonarcloud.io/dashboard?id=ugamela-api) 
 [![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=ugamela-api)
 [![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=bugs)](https://sonarcloud.io/component_measures/metric/reliability_rating/list?id=ugamela-api)

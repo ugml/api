@@ -6,7 +6,7 @@
 [![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=bugs)](https://sonarcloud.io/component_measures/metric/reliability_rating/list?id=ugamela-api)
 [![SonarCloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ugamela-api&metric=vulnerabilities)](https://sonarcloud.io/component_measures/metric/security_rating/list?id=ugamela-api)
 [![Docker Pulls](https://img.shields.io/docker/pulls/ugamela/api)](https://hub.docker.com/r/ugamela/api)
-[![Discord](https://img.shields.io/discord/339129999082913794)](https://discord.gg/YDUHM3k)
+[![Discord](https://discordapp.com/api/guilds/339129999082913794/widget.png)](https://discord.gg/YDUHM3k)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](./LICENSE)
 
 # ugamela API

@@ -137,7 +137,7 @@ export default class Calculations {
    * @param units The sent ship in this event
    */
   public static getSlowestShipSpeed(units: IShipUnits): number {
-    const unitData = require("../config/units.json");
+    const unitData = require("../config/game.json");
 
     let minimum: number = Number.MAX_VALUE;
 

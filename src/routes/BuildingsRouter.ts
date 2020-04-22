@@ -1,19 +1,17 @@
-import { Response, Router } from "express";
+import {NextFunction, Router, Response } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import ILogger from "../interfaces/ILogger";
 import IBuildingService from "../interfaces/IBuildingService";
 import IPlanetService from "../interfaces/IPlanetService";
-import Buildings from "../units/Buildings";
-import Planet from "../units/Planet";
-import ICosts from "../interfaces/ICosts";
-import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
-import ILogger from "../interfaces/ILogger";
-import UnitNames = Globals.UnitNames;
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import Planet from "../units/Planet";
+import Buildings from "../units/Buildings";
+import User from "../units/User";
+import ICosts from "../interfaces/ICosts";
 
 /**
  * Defines routes for building-data
@@ -51,7 +49,7 @@ export default class BuildingsRouter {
    * @param response
    * @param next
    */
-  public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
+  public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -80,7 +78,7 @@ export default class BuildingsRouter {
    * @param response
    * @param next
    */
-  public cancelBuilding = async (request: IAuthorizedRequest, response: Response) => {
+  public cancelBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -136,7 +134,7 @@ export default class BuildingsRouter {
    * @param response
    * @param next
    */
-  public startBuilding = async (request: IAuthorizedRequest, response: Response) => {
+  public startBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||
@@ -202,28 +200,15 @@ export default class BuildingsRouter {
       // TODO: move to seperate file
       // building has requirements
       if (requirements !== undefined) {
-        let requirementsMet = true;
+        requirements.forEach(function(requirement) {
+          const key = Globals.UnitNames[requirement.unitID];
 
-        for (const reqID in requirements) {
-          if (requirements.hasOwnProperty(reqID)) {
-            const reqLevel = requirements[reqID];
-            const key = Globals.UnitNames[buildingID];
-
-            if (buildings[key] < reqLevel) {
-              requirementsMet = false;
-              break;
-            }
-          } else {
-            // TODO: throw a meaningful error
-            throw Error();
+          if (buildings[key] < requirement.level) {
+            return response.status(Globals.Statuscode.SUCCESS).json({
+              error: "Requirements are not met",
+            });
           }
-        }
-
-        if (!requirementsMet) {
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            error: "Requirements are not met",
-          });
-        }
+        });
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
@@ -271,7 +256,7 @@ export default class BuildingsRouter {
     }
   };
 
-  public demolishBuilding = async (request: IAuthorizedRequest, response: Response) => {
+  public demolishBuilding = async (request: IAuthorizedRequest, response: Response, next: NextFunction) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||

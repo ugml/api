@@ -49,9 +49,9 @@ export default class ConfigRouter {
    */
   public getUnitsConfig(req: Request, response: Response) {
     try {
-      const data = require("../config/units.json");
+      const data = require("../config/game.json");
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+      return response.status(Globals.Statuscode.SUCCESS).json(data.units ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 

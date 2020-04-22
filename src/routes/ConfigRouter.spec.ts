@@ -21,11 +21,11 @@ describe("configRoute", () => {
   });
 
   it("should return the units-config", () => {
-    const data = require("../config/units.json");
+    const data = require("../config/game.json");
 
     return request.get("/v1/config/units").then(res => {
       expect(res.type).to.eql("application/json");
-      expect(res.body).to.eql(data);
+      expect(res.body).to.eql(data.units);
     });
   });
 

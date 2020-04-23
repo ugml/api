@@ -1,1163 +1,1163 @@
 {
-    "server":{
+    "server": {
         "speed": 1,
         "language": "en",
-        "startPlanet":{
+        "startPlanet": {
             "name": "Homeplanet",
-            "diameter":150000,
-            "fields":182,
-            "resources":{
-                "metal":500,
-                "crystal":500,
-                "deuterium":500
+            "diameter": 150000,
+            "fields": 182,
+            "resources": {
+                "metal": 500,
+                "crystal": 500,
+                "deuterium": 500
             },
             "minPlanetPos": 4,
             "maxPlanetPos": 12
         },
-        "limits":{
-            "galaxy":{
-                "min":1,
-                "max":9
+        "limits": {
+            "galaxy": {
+                "min": 1,
+                "max": 9
             },
-            "system":{
-                "min":1,
-                "max":100
+            "system": {
+                "min": 1,
+                "max": 100
             },
-            "position":{
-                "min":1,
-                "max":15
+            "position": {
+                "min": 1,
+                "max": 15
             }
         }
     },
-    "units":{
-        "buildings":[
+    "units": {
+        "buildings": [
             {
-                "unitID":1,
-                "costs":{
-                    "metal":60,
-                    "crystal":15,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1.5
+                "unitID": 1,
+                "costs": {
+                    "metal": 60,
+                    "crystal": 15,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1.5
                 },
                 "requirements": []
             },
             {
-                "unitID":2,
-                "costs":{
-                    "metal":48,
-                    "crystal":24,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1.6
+                "unitID": 2,
+                "costs": {
+                    "metal": 48,
+                    "crystal": 24,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1.6
                 },
                 "requirements": []
             },
             {
-                "unitID":3,
-                "costs":{
-                    "metal":225,
-                    "crystal":75,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1.5
+                "unitID": 3,
+                "costs": {
+                    "metal": 225,
+                    "crystal": 75,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1.5
                 },
                 "requirements": []
             },
             {
-                "unitID":4,
-                "costs":{
-                    "metal":75,
-                    "crystal":30,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1.5
+                "unitID": 4,
+                "costs": {
+                    "metal": 75,
+                    "crystal": 30,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1.5
                 },
                 "requirements": []
             },
             {
-                "unitID":5,
-                "costs":{
-                    "metal":900,
-                    "crystal":360,
-                    "deuterium":180,
-                    "energy":0,
-                    "factor":1.8
+                "unitID": 5,
+                "costs": {
+                    "metal": 900,
+                    "crystal": 360,
+                    "deuterium": 180,
+                    "energy": 0,
+                    "factor": 1.8
                 },
                 "requirements": [
                     {
-                        "unitID":3,
-                        "level":5
+                        "unitID": 3,
+                        "level": 5
                     },
                     {
-                        "unitID":106,
-                        "level":3
+                        "unitID": 106,
+                        "level": 3
                     }
                 ]
             },
             {
-                "unitID":6,
-                "costs":{
-                    "metal":400,
-                    "crystal":120,
-                    "deuterium":200,
-                    "energy":0,
-                    "factor":2
+                "unitID": 6,
+                "costs": {
+                    "metal": 400,
+                    "crystal": 120,
+                    "deuterium": 200,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             },
             {
-                "unitID":7,
-                "costs":{
-                    "metal":1000000,
-                    "crystal":500000,
-                    "deuterium":100000,
-                    "energy":0,
-                    "factor":2
+                "unitID": 7,
+                "costs": {
+                    "metal": 1000000,
+                    "crystal": 500000,
+                    "deuterium": 100000,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":6,
-                        "level":10
+                        "unitID": 6,
+                        "level": 10
                     },
                     {
-                        "unitID":102,
-                        "level":10
+                        "unitID": 102,
+                        "level": 10
                     }
                 ]
             },
             {
-                "unitID":8,
-                "costs":{
-                    "metal":400,
-                    "crystal":200,
-                    "deuterium":100,
-                    "energy":0,
-                    "factor":2
+                "unitID": 8,
+                "costs": {
+                    "metal": 400,
+                    "crystal": 200,
+                    "deuterium": 100,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":6,
-                        "level":2
+                        "unitID": 6,
+                        "level": 2
                     }
                 ]
             },
             {
-                "unitID":9,
-                "costs":{
-                    "metal":1000,
-                    "crystal":0,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 9,
+                "costs": {
+                    "metal": 1000,
+                    "crystal": 0,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             },
             {
-                "unitID":10,
-                "costs":{
-                    "metal":1000,
-                    "crystal":500,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 10,
+                "costs": {
+                    "metal": 1000,
+                    "crystal": 500,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             },
             {
-                "unitID":11,
-                "costs":{
-                    "metal":1000,
-                    "crystal":1000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 11,
+                "costs": {
+                    "metal": 1000,
+                    "crystal": 1000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             },
             {
-                "unitID":12,
-                "costs":{
-                    "metal":200,
-                    "crystal":400,
-                    "deuterium":200,
-                    "energy":0,
-                    "factor":2
+                "unitID": 12,
+                "costs": {
+                    "metal": 200,
+                    "crystal": 400,
+                    "deuterium": 200,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             },
             {
-                "unitID":13,
-                "costs":{
-                    "metal":0,
-                    "crystal":50000,
-                    "deuterium":100000,
-                    "energy":1000,
-                    "factor":2
+                "unitID": 13,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 50000,
+                    "deuterium": 100000,
+                    "energy": 1000,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":7,
-                        "level":1
+                        "unitID": 7,
+                        "level": 1
                     },
                     {
-                        "unitID":106,
-                        "level":12
+                        "unitID": 106,
+                        "level": 12
                     }
                 ]
             },
             {
-                "unitID":14,
-                "costs":{
-                    "metal":20000,
-                    "crystal":40000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 14,
+                "costs": {
+                    "metal": 20000,
+                    "crystal": 40000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             },
             {
-                "unitID":15,
-                "costs":{
-                    "metal":20000,
-                    "crystal":20000,
-                    "deuterium":1000,
-                    "energy":0,
-                    "factor":2
+                "unitID": 15,
+                "costs": {
+                    "metal": 20000,
+                    "crystal": 20000,
+                    "deuterium": 1000,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": []
             }
         ],
-        "technologies":[
+        "technologies": [
             {
-                "unitID":101,
-                "costs":{
-                    "metal":200,
-                    "crystal":1000,
-                    "deuterium":200,
-                    "energy":0,
-                    "factor":2
+                "unitID": 101,
+                "costs": {
+                    "metal": 200,
+                    "crystal": 1000,
+                    "deuterium": 200,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":3
+                        "unitID": 12,
+                        "level": 3
                     }
                 ]
             },
             {
-                "unitID":102,
-                "costs":{
-                    "metal":0,
-                    "crystal":400,
-                    "deuterium":600,
-                    "energy":0,
-                    "factor":2
+                "unitID": 102,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 400,
+                    "deuterium": 600,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":1
+                        "unitID": 12,
+                        "level": 1
                     }
                 ]
             },
             {
-                "unitID":103,
-                "costs":{
-                    "metal":800,
-                    "crystal":200,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 103,
+                "costs": {
+                    "metal": 800,
+                    "crystal": 200,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":4
+                        "unitID": 12,
+                        "level": 4
                     }
                 ]
             },
             {
-                "unitID":104,
-                "costs":{
-                    "metal":200,
-                    "crystal":600,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 104,
+                "costs": {
+                    "metal": 200,
+                    "crystal": 600,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":2
+                        "unitID": 12,
+                        "level": 2
                     }
                 ]
             },
             {
-                "unitID":105,
-                "costs":{
-                    "metal":1000,
-                    "crystal":0,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 105,
+                "costs": {
+                    "metal": 1000,
+                    "crystal": 0,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":6
+                        "unitID": 12,
+                        "level": 6
                     },
                     {
-                        "unitID":106,
-                        "level":3
+                        "unitID": 106,
+                        "level": 3
                     }
                 ]
             },
             {
-                "unitID":106,
-                "costs":{
-                    "metal":0,
-                    "crystal":800,
-                    "deuterium":400,
-                    "energy":0,
-                    "factor":2
+                "unitID": 106,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 800,
+                    "deuterium": 400,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":1
+                        "unitID": 12,
+                        "level": 1
                     }
                 ]
             },
             {
-                "unitID":107,
-                "costs":{
-                    "metal":0,
-                    "crystal":4000,
-                    "deuterium":2000,
-                    "energy":0,
-                    "factor":2
+                "unitID": 107,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 4000,
+                    "deuterium": 2000,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":7
+                        "unitID": 12,
+                        "level": 7
                     },
                     {
-                        "unitID":105,
-                        "level":5
+                        "unitID": 105,
+                        "level": 5
                     },
                     {
-                        "unitID":106,
-                        "level":5
+                        "unitID": 106,
+                        "level": 5
                     }
                 ]
             },
             {
-                "unitID":108,
-                "costs":{
-                    "metal":400,
-                    "crystal":0,
-                    "deuterium":600,
-                    "energy":0,
-                    "factor":2
+                "unitID": 108,
+                "costs": {
+                    "metal": 400,
+                    "crystal": 0,
+                    "deuterium": 600,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":1
+                        "unitID": 12,
+                        "level": 1
                     },
                     {
-                        "unitID":106,
-                        "level":1
+                        "unitID": 106,
+                        "level": 1
                     }
                 ]
             },
             {
-                "unitID":109,
-                "costs":{
-                    "metal":2000,
-                    "crystal":4000,
-                    "deuterium":600,
-                    "energy":0,
-                    "factor":2
+                "unitID": 109,
+                "costs": {
+                    "metal": 2000,
+                    "crystal": 4000,
+                    "deuterium": 600,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":2
+                        "unitID": 12,
+                        "level": 2
                     },
                     {
-                        "unitID":106,
-                        "level":1
+                        "unitID": 106,
+                        "level": 1
                     }
                 ]
             },
             {
-                "unitID":110,
-                "costs":{
-                    "metal":10000,
-                    "crystal":20000,
-                    "deuterium":6000,
-                    "energy":0,
-                    "factor":2
+                "unitID": 110,
+                "costs": {
+                    "metal": 10000,
+                    "crystal": 20000,
+                    "deuterium": 6000,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":7
+                        "unitID": 12,
+                        "level": 7
                     },
                     {
-                        "unitID":107,
-                        "level":3
+                        "unitID": 107,
+                        "level": 3
                     }
                 ]
             },
             {
-                "unitID":111,
-                "costs":{
-                    "metal":200,
-                    "crystal":100,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":2
+                "unitID": 111,
+                "costs": {
+                    "metal": 200,
+                    "crystal": 100,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":1
+                        "unitID": 12,
+                        "level": 1
                     },
                     {
-                        "unitID":106,
-                        "level":2
+                        "unitID": 106,
+                        "level": 2
                     }
                 ]
             },
             {
-                "unitID":112,
-                "costs":{
-                    "metal":1000,
-                    "crystal":300,
-                    "deuterium":100,
-                    "energy":0,
-                    "factor":2
+                "unitID": 112,
+                "costs": {
+                    "metal": 1000,
+                    "crystal": 300,
+                    "deuterium": 100,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":4
+                        "unitID": 12,
+                        "level": 4
                     },
                     {
-                        "unitID":106,
-                        "level":4
+                        "unitID": 106,
+                        "level": 4
                     },
                     {
-                        "unitID":111,
-                        "level":5
+                        "unitID": 111,
+                        "level": 5
                     }
                 ]
             },
             {
-                "unitID":113,
-                "costs":{
-                    "metal":2000,
-                    "crystal":4000,
-                    "deuterium":1000,
-                    "energy":0,
-                    "factor":2
+                "unitID": 113,
+                "costs": {
+                    "metal": 2000,
+                    "crystal": 4000,
+                    "deuterium": 1000,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":4
+                        "unitID": 12,
+                        "level": 4
                     },
                     {
-                        "unitID":106,
-                        "level":8
+                        "unitID": 106,
+                        "level": 8
                     },
                     {
-                        "unitID":111,
-                        "level":10
+                        "unitID": 111,
+                        "level": 10
                     },
                     {
-                        "unitID":112,
-                        "level":5
+                        "unitID": 112,
+                        "level": 5
                     }
                 ]
             },
             {
-                "unitID":114,
-                "costs":{
-                    "metal":240000,
-                    "crystal":400000,
-                    "deuterium":160000,
-                    "energy":0,
-                    "factor":2
+                "unitID": 114,
+                "costs": {
+                    "metal": 240000,
+                    "crystal": 400000,
+                    "deuterium": 160000,
+                    "energy": 0,
+                    "factor": 2
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":10
+                        "unitID": 12,
+                        "level": 10
                     },
                     {
-                        "unitID":102,
-                        "level":8
+                        "unitID": 102,
+                        "level": 8
                     },
                     {
-                        "unitID":107,
-                        "level":8
+                        "unitID": 107,
+                        "level": 8
                     }
                 ]
             },
             {
-                "unitID":115,
-                "costs":{
-                    "metal":0,
-                    "crystal":0,
-                    "deuterium":0,
-                    "energy":300000,
-                    "factor":3
+                "unitID": 115,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 0,
+                    "deuterium": 0,
+                    "energy": 300000,
+                    "factor": 3
                 },
                 "requirements": [
                     {
-                        "unitID":12,
-                        "level":12
+                        "unitID": 12,
+                        "level": 12
                     }
                 ]
             }
         ],
-        "ships":[
+        "ships": [
             {
-                "unitID":201,
-                "costs":{
-                    "metal":2000,
-                    "crystal":2000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 201,
+                "costs": {
+                    "metal": 2000,
+                    "crystal": 2000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":20,
-                    "speed":28000,
-                    "capacity":5000
+                "stats": {
+                    "consumption": 20,
+                    "speed": 28000,
+                    "capacity": 5000
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":2
+                        "unitID": 8,
+                        "level": 2
                     },
                     {
-                        "unitID":108,
-                        "level":2
+                        "unitID": 108,
+                        "level": 2
                     }
                 ]
             },
             {
-                "unitID":202,
-                "costs":{
-                    "metal":6000,
-                    "crystal":6000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 202,
+                "costs": {
+                    "metal": 6000,
+                    "crystal": 6000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":50,
-                    "speed":17250,
-                    "capacity":25000
+                "stats": {
+                    "consumption": 50,
+                    "speed": 17250,
+                    "capacity": 25000
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":4
+                        "unitID": 8,
+                        "level": 4
                     },
                     {
-                        "unitID":108,
-                        "level":6
+                        "unitID": 108,
+                        "level": 6
                     }
                 ]
             },
             {
-                "unitID":203,
-                "costs":{
-                    "metal":3000,
-                    "crystal":1000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 203,
+                "costs": {
+                    "metal": 3000,
+                    "crystal": 1000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":20,
-                    "speed":28750,
-                    "capacity":50
+                "stats": {
+                    "consumption": 20,
+                    "speed": 28750,
+                    "capacity": 50
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":1
+                        "unitID": 8,
+                        "level": 1
                     },
                     {
-                        "unitID":108,
-                        "level":1
+                        "unitID": 108,
+                        "level": 1
                     }
                 ]
             },
             {
-                "unitID":204,
-                "costs":{
-                    "metal":6000,
-                    "crystal":4000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 204,
+                "costs": {
+                    "metal": 6000,
+                    "crystal": 4000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":75,
-                    "speed":28000,
-                    "capacity":100
+                "stats": {
+                    "consumption": 75,
+                    "speed": 28000,
+                    "capacity": 100
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":201,
-                        "amount":3
+                        "unitID": 201,
+                        "amount": 3
                     },
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":3
+                        "unitID": 8,
+                        "level": 3
                     },
                     {
-                        "unitID":104,
-                        "level":2
+                        "unitID": 104,
+                        "level": 2
                     },
                     {
-                        "unitID":109,
-                        "level":2
+                        "unitID": 109,
+                        "level": 2
                     }
                 ]
             },
             {
-                "unitID":205,
-                "costs":{
-                    "metal":20000,
-                    "crystal":7000,
-                    "deuterium":2000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 205,
+                "costs": {
+                    "metal": 20000,
+                    "crystal": 7000,
+                    "deuterium": 2000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":300,
-                    "speed":42000,
-                    "capacity":800
+                "stats": {
+                    "consumption": 300,
+                    "speed": 42000,
+                    "capacity": 800
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":203,
-                        "amount":6
+                        "unitID": 203,
+                        "amount": 6
                     },
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     },
                     {
-                        "unitID":301,
-                        "amount":10
+                        "unitID": 301,
+                        "amount": 10
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":5
+                        "unitID": 8,
+                        "level": 5
                     },
                     {
-                        "unitID":109,
-                        "level":4
+                        "unitID": 109,
+                        "level": 4
                     },
                     {
-                        "unitID":112,
-                        "level":2
+                        "unitID": 112,
+                        "level": 2
                     }
                 ]
             },
             {
-                "unitID":206,
-                "costs":{
-                    "metal":45000,
-                    "crystal":15000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 206,
+                "costs": {
+                    "metal": 45000,
+                    "crystal": 15000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":500,
-                    "speed":31000,
-                    "capacity":1500
+                "stats": {
+                    "consumption": 500,
+                    "speed": 31000,
+                    "capacity": 1500
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":7
+                        "unitID": 8,
+                        "level": 7
                     },
                     {
-                        "unitID":110,
-                        "level":4
+                        "unitID": 110,
+                        "level": 4
                     }
                 ]
             },
             {
-                "unitID":207,
-                "costs":{
-                    "metal":10000,
-                    "crystal":20000,
-                    "deuterium":10000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 207,
+                "costs": {
+                    "metal": 10000,
+                    "crystal": 20000,
+                    "deuterium": 10000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":1000,
-                    "speed":2500,
-                    "capacity":7500
+                "stats": {
+                    "consumption": 1000,
+                    "speed": 2500,
+                    "capacity": 7500
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":4
+                        "unitID": 8,
+                        "level": 4
                     },
                     {
-                        "unitID":109,
-                        "level":3
+                        "unitID": 109,
+                        "level": 3
                     }
                 ]
             },
             {
-                "unitID":208,
-                "costs":{
-                    "metal":10000,
-                    "crystal":6000,
-                    "deuterium":2000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 208,
+                "costs": {
+                    "metal": 10000,
+                    "crystal": 6000,
+                    "deuterium": 2000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":300,
-                    "speed":4600,
-                    "capacity":20000
+                "stats": {
+                    "consumption": 300,
+                    "speed": 4600,
+                    "capacity": 20000
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":4
+                        "unitID": 8,
+                        "level": 4
                     },
                     {
-                        "unitID":105,
-                        "level":2
+                        "unitID": 105,
+                        "level": 2
                     },
                     {
-                        "unitID":108,
-                        "level":6
+                        "unitID": 108,
+                        "level": 6
                     }
                 ]
             },
             {
-                "unitID":209,
-                "costs":{
-                    "metal":0,
-                    "crystal":1000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 209,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 1000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":1,
-                    "speed":230000000,
-                    "capacity":5
+                "stats": {
+                    "consumption": 1,
+                    "speed": 230000000,
+                    "capacity": 5
                 },
-                "rapidfire":[],
+                "rapidfire": [],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":3
+                        "unitID": 8,
+                        "level": 3
                     },
                     {
-                        "unitID":101,
-                        "level":2
+                        "unitID": 101,
+                        "level": 2
                     },
                     {
-                        "unitID":108,
-                        "level":3
+                        "unitID": 108,
+                        "level": 3
                     }
                 ]
             },
             {
-                "unitID":210,
-                "costs":{
-                    "metal":50000,
-                    "crystal":25000,
-                    "deuterium":15000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 210,
+                "costs": {
+                    "metal": 50000,
+                    "crystal": 25000,
+                    "deuterium": 15000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":1000,
-                    "speed":11200,
-                    "capacity":500
+                "stats": {
+                    "consumption": 1000,
+                    "speed": 11200,
+                    "capacity": 500
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     },
                     {
-                        "unitID":301,
-                        "amount":20
+                        "unitID": 301,
+                        "amount": 20
                     },
                     {
-                        "unitID":302,
-                        "amount":20
+                        "unitID": 302,
+                        "amount": 20
                     },
                     {
-                        "unitID":303,
-                        "amount":10
+                        "unitID": 303,
+                        "amount": 10
                     },
                     {
-                        "unitID":305,
-                        "amount":10
+                        "unitID": 305,
+                        "amount": 10
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":8
+                        "unitID": 8,
+                        "level": 8
                     },
                     {
-                        "unitID":109,
-                        "level":6
+                        "unitID": 109,
+                        "level": 6
                     },
                     {
-                        "unitID":113,
-                        "level":5
+                        "unitID": 113,
+                        "level": 5
                     }
                 ]
             },
             {
-                "unitID":211,
-                "costs":{
-                    "metal":0,
-                    "crystal":2000,
-                    "deuterium":500,
-                    "energy":0,
-                    "factor":1
+                "unitID": 211,
+                "costs": {
+                    "metal": 0,
+                    "crystal": 2000,
+                    "deuterium": 500,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":0,
-                    "speed":0,
-                    "capacity":0
+                "stats": {
+                    "consumption": 0,
+                    "speed": 0,
+                    "capacity": 0
                 },
-                "rapidfire":[],
+                "rapidfire": [],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":1
+                        "unitID": 8,
+                        "level": 1
                     }
                 ]
             },
             {
-                "unitID":212,
-                "costs":{
-                    "metal":60000,
-                    "crystal":50000,
-                    "deuterium":15000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 212,
+                "costs": {
+                    "metal": 60000,
+                    "crystal": 50000,
+                    "deuterium": 15000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":1000,
-                    "speed":15500,
-                    "capacity":2000
+                "stats": {
+                    "consumption": 1000,
+                    "speed": 15500,
+                    "capacity": 2000
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     },
                     {
-                        "unitID":215,
-                        "amount":2
+                        "unitID": 215,
+                        "amount": 2
                     },
                     {
-                        "unitID":302,
-                        "amount":10
+                        "unitID": 302,
+                        "amount": 10
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":9
+                        "unitID": 8,
+                        "level": 9
                     },
                     {
-                        "unitID":107,
-                        "level":5
+                        "unitID": 107,
+                        "level": 5
                     },
                     {
-                        "unitID":110,
-                        "level":6
+                        "unitID": 110,
+                        "level": 6
                     }
                 ]
             },
             {
-                "unitID":213,
-                "costs":{
-                    "metal":30000,
-                    "crystal":40000,
-                    "deuterium":15000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 213,
+                "costs": {
+                    "metal": 30000,
+                    "crystal": 40000,
+                    "deuterium": 15000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":250,
-                    "speed":10000,
-                    "capacity":750
+                "stats": {
+                    "consumption": 250,
+                    "speed": 10000,
+                    "capacity": 750
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":201,
-                        "amount":3
+                        "unitID": 201,
+                        "amount": 3
                     },
                     {
-                        "unitID":202,
-                        "amount":3
+                        "unitID": 202,
+                        "amount": 3
                     },
                     {
-                        "unitID":204,
-                        "amount":4
+                        "unitID": 204,
+                        "amount": 4
                     },
                     {
-                        "unitID":205,
-                        "amount":4
+                        "unitID": 205,
+                        "amount": 4
                     },
                     {
-                        "unitID":206,
-                        "amount":7
+                        "unitID": 206,
+                        "amount": 7
                     },
                     {
-                        "unitID":209,
-                        "amount":5
+                        "unitID": 209,
+                        "amount": 5
                     },
                     {
-                        "unitID":211,
-                        "amount":5
+                        "unitID": 211,
+                        "amount": 5
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":8
+                        "unitID": 8,
+                        "level": 8
                     },
                     {
-                        "unitID":107,
-                        "level":5
+                        "unitID": 107,
+                        "level": 5
                     },
                     {
-                        "unitID":110,
-                        "level":5
+                        "unitID": 110,
+                        "level": 5
                     },
                     {
-                        "unitID":111,
-                        "level":12
+                        "unitID": 111,
+                        "level": 12
                     }
                 ]
             },
             {
-                "unitID":214,
-                "costs":{
-                    "metal":5000000,
-                    "crystal":4000000,
-                    "deuterium":1000000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 214,
+                "costs": {
+                    "metal": 5000000,
+                    "crystal": 4000000,
+                    "deuterium": 1000000,
+                    "energy": 0,
+                    "factor": 1
                 },
-                "stats":{
-                    "consumption":1,
-                    "speed":100,
-                    "capacity":1000000
+                "stats": {
+                    "consumption": 1,
+                    "speed": 100,
+                    "capacity": 1000000
                 },
-                "rapidfire":[
+                "rapidfire": [
                     {
-                        "unitID":201,
-                        "amount":250
+                        "unitID": 201,
+                        "amount": 250
                     },
                     {
-                        "unitID":202,
-                        "amount":250
+                        "unitID": 202,
+                        "amount": 250
                     },
                     {
-                        "unitID":203,
-                        "amount":200
+                        "unitID": 203,
+                        "amount": 200
                     },
                     {
-                        "unitID":204,
-                        "amount":100
+                        "unitID": 204,
+                        "amount": 100
                     },
                     {
-                        "unitID":205,
-                        "amount":33
+                        "unitID": 205,
+                        "amount": 33
                     },
                     {
-                        "unitID":206,
-                        "amount":30
+                        "unitID": 206,
+                        "amount": 30
                     },
                     {
-                        "unitID":207,
-                        "amount":250
+                        "unitID": 207,
+                        "amount": 250
                     },
                     {
-                        "unitID":208,
-                        "amount":250
+                        "unitID": 208,
+                        "amount": 250
                     },
                     {
-                        "unitID":209,
-                        "amount":1250
+                        "unitID": 209,
+                        "amount": 1250
                     },
                     {
-                        "unitID":211,
-                        "amount":1250
+                        "unitID": 211,
+                        "amount": 1250
                     },
                     {
-                        "unitID":215,
-                        "amount":15
+                        "unitID": 215,
+                        "amount": 15
                     },
                     {
-                        "unitID":301,
-                        "amount":200
+                        "unitID": 301,
+                        "amount": 200
                     },
                     {
-                        "unitID":302,
-                        "amount":200
+                        "unitID": 302,
+                        "amount": 200
                     },
                     {
-                        "unitID":303,
-                        "amount":100
+                        "unitID": 303,
+                        "amount": 100
                     },
                     {
-                        "unitID":304,
-                        "amount":50
+                        "unitID": 304,
+                        "amount": 50
                     },
                     {
-                        "unitID":305,
-                        "amount":100
+                        "unitID": 305,
+                        "amount": 100
                     }
                 ],
                 "requirements": [
                     {
-                        "unitID":8,
-                        "level":12
+                        "unitID": 8,
+                        "level": 12
                     },
                     {
-                        "unitID":107,
-                        "level":6
+                        "unitID": 107,
+                        "level": 6
                     },
                     {
-                        "unitID":110,
-                        "level":7
+                        "unitID": 110,
+                        "level": 7
                     },
                     {
-                        "unitID":115,
-                        "level":1
+                        "unitID": 115,
+                        "level": 1
                     }
                 ]
             }
         ],
-        "defenses":[
+        "defenses": [
             {
-                "unitID":301,
-                "costs":{
-                    "metal":2000,
-                    "crystal":0,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 301,
+                "costs": {
+                    "metal": 2000,
+                    "crystal": 0,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1167,13 +1167,13 @@
                 ]
             },
             {
-                "unitID":302,
-                "costs":{
-                    "metal":1500,
-                    "crystal":500,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 302,
+                "costs": {
+                    "metal": 1500,
+                    "crystal": 500,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1191,13 +1191,13 @@
                 ]
             },
             {
-                "unitID":303,
-                "costs":{
-                    "metal":6000,
-                    "crystal":2000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 303,
+                "costs": {
+                    "metal": 6000,
+                    "crystal": 2000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1215,13 +1215,13 @@
                 ]
             },
             {
-                "unitID":304,
-                "costs":{
-                    "metal":20000,
-                    "crystal":15000,
-                    "deuterium":2000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 304,
+                "costs": {
+                    "metal": 20000,
+                    "crystal": 15000,
+                    "deuterium": 2000,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1235,13 +1235,13 @@
                 ]
             },
             {
-                "unitID":305,
-                "costs":{
-                    "metal":2000,
-                    "crystal":6000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 305,
+                "costs": {
+                    "metal": 2000,
+                    "crystal": 6000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1263,13 +1263,13 @@
                 ]
             },
             {
-                "unitID":306,
-                "costs":{
-                    "metal":50000,
-                    "crystal":50000,
-                    "deuterium":30000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 306,
+                "costs": {
+                    "metal": 50000,
+                    "crystal": 50000,
+                    "deuterium": 30000,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1283,13 +1283,13 @@
                 ]
             },
             {
-                "unitID":307,
-                "costs":{
-                    "metal":10000,
-                    "crystal":10000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 307,
+                "costs": {
+                    "metal": 10000,
+                    "crystal": 10000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1303,13 +1303,13 @@
                 ]
             },
             {
-                "unitID":308,
-                "costs":{
-                    "metal":50000,
-                    "crystal":50000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 308,
+                "costs": {
+                    "metal": 50000,
+                    "crystal": 50000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1323,13 +1323,13 @@
                 ]
             },
             {
-                "unitID":309,
-                "costs":{
-                    "metal":8000,
-                    "crystal":2000,
-                    "deuterium":0,
-                    "energy":0,
-                    "factor":1
+                "unitID": 309,
+                "costs": {
+                    "metal": 8000,
+                    "crystal": 2000,
+                    "deuterium": 0,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {
@@ -1343,13 +1343,13 @@
                 ]
             },
             {
-                "unitID":310,
-                "costs":{
-                    "metal":12500,
-                    "crystal":2500,
-                    "deuterium":10000,
-                    "energy":0,
-                    "factor":1
+                "unitID": 310,
+                "costs": {
+                    "metal": 12500,
+                    "crystal": 2500,
+                    "deuterium": 10000,
+                    "energy": 0,
+                    "factor": 1
                 },
                 "requirements": [
                     {

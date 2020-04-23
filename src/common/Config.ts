@@ -3,7 +3,6 @@
  */
 import IGameConfig, { IBuilding, IDefense, IShip, ITechnology } from "../interfaces/IGameConfig";
 
-// TODO: define Interfaces for return-values
 /**
  * This class reads and returns the two main config files for the game.
  */

@@ -9,6 +9,7 @@ git:
   quiet: true
 
 addons:
+  mariadb: '10.2'
   sonarcloud:
     organization: "ugamela"
     token:
@@ -44,14 +45,12 @@ jobs:
       script:
         - git fetch --unshallow --quiet
         - sudo apt-get -qq update
-        - sudo apt-get -qq install mariadb-client mariadb-server
+        #- sudo apt-get -qq install mariadb-client mariadb-server
         - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage
         - sonar-scanner
     - stage: "Lint"
       script: npm run-script lint
-    -
-      script: npm run-script tslint
     - stage: Generate documentation
       if: branch = master
       script:

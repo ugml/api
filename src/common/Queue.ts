@@ -7,12 +7,12 @@ export default class Queue {
   /**
    * The last time, the queue was updated
    */
-  private lastUpdateTime: number = 0;
+  private lastUpdateTime = 0;
 
   /**
    * The remaining time for the queue
    */
-  private timeRemaining: number = 0;
+  private timeRemaining = 0;
 
   /**
    * The queue itself

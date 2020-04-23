@@ -54,7 +54,7 @@ export default class InputValidator {
    * Checks, if a given input is defined and set
    * @param input the input-string
    */
-  public static isSet(input: any): boolean {
+  public static isSet(input): boolean {
     return !(input === "" || typeof input === "undefined" || input === null || input.length === 0 || input === {});
   }
 

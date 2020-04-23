@@ -4,7 +4,9 @@ import chaiHttp = require("chai-http");
 import App from "../App";
 import SimpleLogger from "../loggers/SimpleLogger";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const createContainer = require("../ioc/createContainer");
+import Config from "../common/Config";
 
 const container = createContainer();
 
@@ -21,7 +23,7 @@ describe("configRoute", () => {
   });
 
   it("should return the units-config", () => {
-    const data = require("../config/game.json");
+    const data = Config.getGameConfig();
 
     return request.get("/v1/config/units").then(res => {
       expect(res.type).to.eql("application/json");
@@ -30,7 +32,7 @@ describe("configRoute", () => {
   });
 
   it("should return the game-config", () => {
-    const data = require("../config/game.json");
+    const data = Config.getGameConfig();
 
     return request.get("/v1/config/game").then(res => {
       expect(res.type).to.eql("application/json");

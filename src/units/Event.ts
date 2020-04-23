@@ -45,9 +45,9 @@ export default class Event implements IUnit {
       return false;
     }
     if (
-      this.startType !== PlanetType.Planet &&
-      this.startType !== PlanetType.Moon &&
-      this.startType !== PlanetType.Debris
+      this.startType !== PlanetType.PLANET &&
+      this.startType !== PlanetType.MOON &&
+      this.startType !== PlanetType.DEBRIS
     ) {
       return false;
     }
@@ -57,7 +57,7 @@ export default class Event implements IUnit {
     if (!InputValidator.isSet(this.endID) || this.endID < 0) {
       return false;
     }
-    if (this.endType !== PlanetType.Planet && this.endType !== PlanetType.Moon && this.endType !== PlanetType.Debris) {
+    if (this.endType !== PlanetType.PLANET && this.endType !== PlanetType.MOON && this.endType !== PlanetType.DEBRIS) {
       return false;
     }
     if (!InputValidator.isSet(this.endTime) || this.endTime < 0) {

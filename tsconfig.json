@@ -10,7 +10,8 @@
     ],
     "typeRoots" : [
       "node_modules/@types"
-    ]
+    ],
+    "resolveJsonModule": true
   },
   "compileOnSave": true,
   "include": [

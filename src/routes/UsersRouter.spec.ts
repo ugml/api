@@ -5,6 +5,7 @@ import { Globals } from "../common/Globals";
 import chaiHttp = require("chai-http");
 import SimpleLogger from "../loggers/SimpleLogger";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();

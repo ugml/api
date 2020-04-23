@@ -64,7 +64,7 @@ export default class GalaxyService implements IGalaxyService {
       posGalaxy: result.posGalaxy,
       posSystem: result.posSystem,
       posPlanet: result.posPlanet,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
   }
 

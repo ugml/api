@@ -2,17 +2,17 @@
  * This class holds all global variables
  */
 class Globals {
-  public static MIN_BUILDING_ID: number = 1;
-  public static MAX_BUILDING_ID: number = 15;
+  public static MIN_BUILDING_ID = 1;
+  public static MAX_BUILDING_ID = 15;
 
-  public static MIN_DEFENSE_ID: number = 301;
-  public static MAX_DEFENSE_ID: number = 310;
+  public static MIN_DEFENSE_ID = 301;
+  public static MAX_DEFENSE_ID = 310;
 
-  public static MIN_TECHNOLOGY_ID: number = 101;
-  public static MAX_TECHNOLOGY_ID: number = 115;
+  public static MIN_TECHNOLOGY_ID = 101;
+  public static MAX_TECHNOLOGY_ID = 115;
 
-  public static MIN_SHIP_ID: number = 201;
-  public static MAX_SHIP_ID: number = 214;
+  public static MIN_SHIP_ID = 201;
+  public static MAX_SHIP_ID = 214;
 }
 
 namespace Globals {
@@ -47,9 +47,9 @@ namespace Globals {
   }
 
   export enum PlanetType {
-    Planet = 1,
-    Moon = 2,
-    Debris = 3,
+    PLANET = 1,
+    MOON = 2,
+    DEBRIS = 3,
   }
 
   export enum UnitType {

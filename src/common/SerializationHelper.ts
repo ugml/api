@@ -9,21 +9,19 @@ export default class SerializationHelper {
    * @param json The data, the new object should hold
    * @returns A new instance of the given object-type
    */
-  public static toInstance<T>(obj: T, json: string): T {
+  public static toInstance(object, json: string) {
     const jsonObj: object = JSON.parse(json);
 
-    // @ts-ignore
-    if (typeof obj.fromJSON === "function") {
-      // @ts-ignore
-      obj.fromJSON(jsonObj);
+    if (typeof object.fromJSON === "function") {
+      object.fromJSON(jsonObj);
     } else {
       for (const propName in jsonObj) {
         if (propName !== "") {
-          obj[propName] = jsonObj[propName];
+          object[propName] = jsonObj[propName];
         }
       }
     }
 
-    return obj;
+    return object;
   }
 }

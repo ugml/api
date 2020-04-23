@@ -186,7 +186,7 @@ export default class UsersRouter {
       newUser.userID = userID;
       newPlanet.ownerID = userID;
       newUser.password = hashedPassword;
-      newPlanet.planetType = PlanetType.Planet;
+      newPlanet.planetType = PlanetType.PLANET;
 
       this.logger.info("Getting a new planetID");
 

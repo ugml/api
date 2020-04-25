@@ -26,7 +26,6 @@ export default class TechsRouter {
   private buildingService: IBuildingService;
   private techService: ITechService;
 
-
   public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.planetService = container.planetService;

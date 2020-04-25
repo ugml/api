@@ -32,7 +32,6 @@ export default class EventRouter {
   private planetService: IPlanetService;
   private eventService: IEventService;
 
-
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.eventService = container.eventService;

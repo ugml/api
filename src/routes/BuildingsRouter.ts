@@ -28,7 +28,6 @@ export default class BuildingsRouter {
   private planetService: IPlanetService;
   private userService: IUserService;
 
-
   public constructor(container, logger: ILogger) {
     this.buildingService = container.buildingService;
     this.planetService = container.planetService;

@@ -37,7 +37,6 @@ export default class UsersRouter {
   private shipService: IShipService;
   private techService: ITechService;
 
-
   public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.galaxyService = container.galaxyService;
@@ -81,7 +80,6 @@ export default class UsersRouter {
    */
   public getUserSelf = async (request: IAuthorizedRequest, response: Response) => {
     try {
-
       if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
@@ -350,7 +348,6 @@ export default class UsersRouter {
 
   public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",

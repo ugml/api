@@ -15,7 +15,6 @@ export default class MessagesRouter {
   private userService: IUserService;
   private messageService: IMessageService;
 
-
   public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.messageService = container.messageService;

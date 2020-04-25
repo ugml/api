@@ -26,7 +26,6 @@ export default class DefenseRouter {
   private buildingService: IBuildingService;
   private defenseService: IDefenseService;
 
-
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
@@ -68,10 +67,7 @@ export default class DefenseRouter {
    */
   public buildDefense = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isValidJson(request.body.buildOrder)
-      ) {
+      if (!InputValidator.isValidInt(request.body.planetID) || !InputValidator.isValidJson(request.body.buildOrder)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

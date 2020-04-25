@@ -23,7 +23,6 @@ export default class ShipsRouter {
   private buildingService: IBuildingService;
   private shipService: IShipService;
 
-
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;

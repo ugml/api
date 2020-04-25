@@ -13,7 +13,6 @@ export default class GalaxyRouter {
   private logger: ILogger;
   private galaxyService: IGalaxyService;
 
-
   public constructor(container, logger: ILogger) {
     this.galaxyService = container.galaxyService;
     this.router.get("/:posGalaxy/:posSystem", this.getGalaxyInformation);

@@ -1,7 +1,7 @@
 import * as chai from "chai";
-import ICoordinates from "../interfaces/ICoordinates";
 import Calculations from "./Calculations";
 import { Globals } from "./Globals";
+import ICoordinates from "../interfaces/ICoordinates";
 import PlanetType = Globals.PlanetType;
 
 const expect = chai.expect;
@@ -129,14 +129,14 @@ describe("Calculations", function() {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
 
     const destination: ICoordinates = {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Moon,
+      type: PlanetType.MOON,
     };
 
     expect(Calculations.calculateDistance(origin, destination)).to.be.equals(5);
@@ -147,14 +147,14 @@ describe("Calculations", function() {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
 
     const destination: ICoordinates = {
       posGalaxy: 2,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Moon,
+      type: PlanetType.MOON,
     };
 
     expect(Calculations.calculateDistance(origin, destination)).to.be.equals(20000);
@@ -165,14 +165,14 @@ describe("Calculations", function() {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
 
     const destination: ICoordinates = {
       posGalaxy: 3,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Moon,
+      type: PlanetType.MOON,
     };
 
     expect(Calculations.calculateDistance(origin, destination)).to.be.equals(40000);
@@ -183,14 +183,14 @@ describe("Calculations", function() {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
 
     const destination: ICoordinates = {
       posGalaxy: 1,
       posSystem: 2,
       posPlanet: 1,
-      type: PlanetType.Moon,
+      type: PlanetType.MOON,
     };
 
     expect(Calculations.calculateDistance(origin, destination)).to.be.equals(2795);
@@ -201,14 +201,14 @@ describe("Calculations", function() {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 1,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
 
     const destination: ICoordinates = {
       posGalaxy: 1,
       posSystem: 1,
       posPlanet: 2,
-      type: PlanetType.Moon,
+      type: PlanetType.MOON,
     };
 
     expect(Calculations.calculateDistance(origin, destination)).to.be.equals(1005);
@@ -219,14 +219,14 @@ describe("Calculations", function() {
       posGalaxy: 9,
       posSystem: 3,
       posPlanet: 1,
-      type: PlanetType.Planet,
+      type: PlanetType.PLANET,
     };
 
     const destination: ICoordinates = {
       posGalaxy: 3,
       posSystem: 8,
       posPlanet: 5,
-      type: PlanetType.Moon,
+      type: PlanetType.MOON,
     };
 
     expect(Calculations.calculateDistance(origin, destination)).to.be.equals(120000);

@@ -3,16 +3,15 @@ import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import ILogger from "../interfaces/ILogger";
 import IBuildingService from "../interfaces/IBuildingService";
 import IPlanetService from "../interfaces/IPlanetService";
-import Buildings from "../units/Buildings";
-import Planet from "../units/Planet";
-import ICosts from "../interfaces/ICosts";
-import User from "../units/User";
 import IUserService from "../interfaces/IUserService";
-import ILogger from "../interfaces/ILogger";
+import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+import Planet from "../units/Planet";
+import Buildings from "../units/Buildings";
+import User from "../units/User";
+import ICosts from "../interfaces/ICosts";
 
 /**
  * Defines routes for building-data
@@ -105,7 +104,7 @@ export default class BuildingsRouter {
         });
       }
 
-      const buildingKey = Config.getMappings()[planet.bBuildingId];
+      const buildingKey = Globals.UnitNames[planet.bBuildingId];
 
       const currentLevel = buildings[buildingKey];
 
@@ -196,37 +195,24 @@ export default class BuildingsRouter {
       }
 
       // 2. check, if requirements are met
-      const requirements = Config.getRequirements().find(r => r.unitID === buildingID);
+      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
 
       // TODO: move to seperate file
       // building has requirements
       if (requirements !== undefined) {
-        let requirementsMet = true;
+        requirements.forEach(function(requirement) {
+          const key = Globals.UnitNames[requirement.unitID];
 
-        for (const reqID in requirements) {
-          if (requirements.hasOwnProperty(reqID)) {
-            const reqLevel = requirements[reqID];
-            const key = Config.getMappings()[buildingID];
-
-            if (buildings[key] < reqLevel) {
-              requirementsMet = false;
-              break;
-            }
-          } else {
-            // TODO: throw a meaningful error
-            throw Error();
+          if (buildings[key] < requirement.level) {
+            return response.status(Globals.Statuscode.SUCCESS).json({
+              error: "Requirements are not met",
+            });
           }
-        }
-
-        if (!requirementsMet) {
-          return response.status(Globals.Statuscode.SUCCESS).json({
-            error: "Requirements are not met",
-          });
-        }
+        });
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = Config.getMappings()[buildingID];
+      const buildingKey = Globals.UnitNames[buildingID];
       const currentLevel = buildings[buildingKey];
 
       const cost = Calculations.getCosts(buildingID, currentLevel);
@@ -308,7 +294,7 @@ export default class BuildingsRouter {
         });
       }
 
-      const buildingKey = Config.getMappings()[buildingID];
+      const buildingKey = Globals.UnitNames[buildingID];
       const currentLevel = buildings[buildingKey];
 
       if (currentLevel === 0) {

@@ -103,7 +103,7 @@ export default class TechsRouter {
         });
       }
 
-      const techKey = Config.getMappings()[user.bTechID];
+      const techKey = Globals.UnitNames[user.bTechID];
 
       const currentLevel = techs[techKey];
 
@@ -195,7 +195,7 @@ export default class TechsRouter {
       // }
 
       // 2. check, if requirements are met
-      const requirements = Config.getRequirements().find(r => r.unitID === techID);
+      const requirements = Config.getGameConfig().units.technologies.find(r => r.unitID === techID).requirements;
 
       // building has requirements
       if (requirements !== undefined) {
@@ -204,7 +204,7 @@ export default class TechsRouter {
         for (const reqID in requirements) {
           if (requirements.hasOwnProperty(reqID)) {
             const reqLevel = requirements[reqID];
-            const key = Config.getMappings()[reqID];
+            const key = Globals.UnitNames[reqID];
 
             if (techs[key] < reqLevel) {
               requirementsMet = false;
@@ -224,7 +224,7 @@ export default class TechsRouter {
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = Config.getMappings()[techID];
+      const buildingKey = Globals.UnitNames[techID];
 
       const currentLevel = techs[buildingKey];
 

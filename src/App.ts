@@ -20,16 +20,13 @@ import PlanetRouter from "./routes/PlanetsRouter";
 import UsersRouter from "./routes/UsersRouter";
 import ShipsRouter from "./routes/ShipsRouter";
 import TechsRouter from "./routes/TechsRouter";
-import dotenv = require("dotenv");
+import * as dotenv from "dotenv";
+import * as helmet from "helmet";
+import * as apiConfig from "./config/apiconfig.json";
+import * as winston from "winston";
+import * as expressWinston from "express-winston";
 
 dotenv.config();
-
-const helmet = require("helmet");
-
-const apiConfig = require("./config/apiconfig.json");
-
-const winston = require("winston");
-const expressWinston = require("express-winston");
 
 const { format } = winston;
 const { combine, printf } = format;

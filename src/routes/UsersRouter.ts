@@ -186,7 +186,7 @@ export default class UsersRouter {
       newUser.userID = userID;
       newPlanet.ownerID = userID;
       newUser.password = hashedPassword;
-      newPlanet.planetType = PlanetType.Planet;
+      newPlanet.planetType = PlanetType.PLANET;
 
       this.logger.info("Getting a new planetID");
 
@@ -198,10 +198,10 @@ export default class UsersRouter {
       this.logger.info("Finding free position for new planet");
 
       const galaxyData = await this.galaxyService.getFreePosition(
-        gameConfig.posGalaxyMax,
-        gameConfig.posSystemMax,
-        4,
-        12,
+        gameConfig.server.limits.galaxy.max,
+        gameConfig.server.limits.system.max,
+        gameConfig.server.startPlanet.minPlanetPos,
+        gameConfig.server.startPlanet.maxPlanetPos,
       );
 
       newPlanet.posGalaxy = galaxyData.posGalaxy;
@@ -214,13 +214,13 @@ export default class UsersRouter {
 
       this.logger.info("Creating a new planet");
 
-      newPlanet.name = gameConfig.startPlanetName;
+      newPlanet.name = gameConfig.server.startPlanet.name;
       newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
-      newPlanet.diameter = gameConfig.startPlanetDiameter;
-      newPlanet.fieldsMax = gameConfig.startPlanetMaxFields;
-      newPlanet.metal = gameConfig.metalStart;
-      newPlanet.crystal = gameConfig.crystalStart;
-      newPlanet.deuterium = gameConfig.deuteriumStart;
+      newPlanet.diameter = gameConfig.server.startPlanet.diameter;
+      newPlanet.fieldsMax = gameConfig.server.startPlanet.fields;
+      newPlanet.metal = gameConfig.server.startPlanet.resources.metal;
+      newPlanet.crystal = gameConfig.server.startPlanet.resources.crystal;
+      newPlanet.deuterium = gameConfig.server.startPlanet.resources.deuterium;
 
       switch (true) {
         case newPlanet.posPlanet <= 5: {

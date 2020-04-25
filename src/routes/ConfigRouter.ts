@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import ILogger from "../interfaces/ILogger";
+import Config from "../common/Config";
 
 /**
  * Defines routes to get the config-files
@@ -29,7 +30,7 @@ export default class ConfigRouter {
    */
   public getGameConfig(req: Request, response: Response) {
     try {
-      const data = require("../config/game.json");
+      const data = Config.getGameConfig();
 
       return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
     } catch (error) {
@@ -49,9 +50,9 @@ export default class ConfigRouter {
    */
   public getUnitsConfig(req: Request, response: Response) {
     try {
-      const data = require("../config/units.json");
+      const data = Config.getGameConfig();
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+      return response.status(Globals.Statuscode.SUCCESS).json(data.units ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 

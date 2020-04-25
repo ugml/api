@@ -7,6 +7,7 @@ import Planet from "../units/Planet";
 import User from "../units/User";
 import SimpleLogger from "../loggers/SimpleLogger";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();

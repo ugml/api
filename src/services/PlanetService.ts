@@ -17,7 +17,7 @@ export default class PlanetService implements IPlanetService {
    * @param planetID the ID of the planet
    * @param fullInfo true - all informations are returned, false - only basic information is returned
    */
-  public async getPlanet(userID: number, planetID: number, fullInfo: boolean = false): Promise<Planet> {
+  public async getPlanet(userID: number, planetID: number, fullInfo = false): Promise<Planet> {
     let query = squel
       .select()
       .from("planets", "p")
@@ -201,7 +201,7 @@ export default class PlanetService implements IPlanetService {
    * @param userID the ID of the user
    * @param fullInfo true - all informations are returned, false - only basic information is returned
    */
-  public async getAllPlanetsOfUser(userID: number, fullInfo: boolean = false) {
+  public async getAllPlanetsOfUser(userID: number, fullInfo = false) {
     let query = squel
       .select()
       .from("planets")

@@ -54,7 +54,7 @@ export default class InputValidator {
    * Checks, if a given input is defined and set
    * @param input the input-string
    */
-  public static isSet(input: any): boolean {
+  public static isSet(input): boolean {
     return !(input === "" || typeof input === "undefined" || input === null || input.length === 0 || input === {});
   }
 
@@ -146,11 +146,11 @@ export default class InputValidator {
   public static isValidPosition(posGalaxy, posSystem, posPlanet = 1): boolean {
     return (
       posGalaxy >= 1 &&
-      posGalaxy <= Config.getGameConfig().posGalaxyMax &&
+      posGalaxy <= Config.getGameConfig().server.limits.galaxy.max &&
       posSystem >= 1 &&
-      posSystem <= Config.getGameConfig().posSystemMax &&
+      posSystem <= Config.getGameConfig().server.limits.system.max &&
       posPlanet >= 1 &&
-      posPlanet <= Config.getGameConfig().posPlanetMax
+      posPlanet <= Config.getGameConfig().server.limits.position.max
     );
   }
 }

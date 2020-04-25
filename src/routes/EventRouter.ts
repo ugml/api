@@ -12,7 +12,8 @@ import ILogger from "../interfaces/ILogger";
 
 const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
-const eventSchema = require("../schemas/fleetevent.schema.json");
+
+import * as eventSchema from "../schemas/fleetevent.schema.json";
 
 // TODO: validate input data:
 //  is start != end?
@@ -127,7 +128,7 @@ export default class EventRouter {
 
       // calculate duration of flight
       const timeOfFlight = Calculations.calculateTimeOfFlight(
-        gameConfig.speed,
+        gameConfig.server.speed,
         eventData.speed,
         distance,
         slowestShipSpeed,

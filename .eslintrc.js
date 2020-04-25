@@ -1,5 +1,5 @@
 module.exports =  {
-  parser:  '@typescript-eslint/parser',  // Specifies the ESLint parser
+  parser: '@typescript-eslint/parser',  // Specifies the ESLint parser
   extends:  [
     // 'plugin:react/recommended',  // Uses the recommended rules from @eslint-plugin-react
     'plugin:@typescript-eslint/recommended',  // Uses the recommended rules from @typescript-eslint/eslint-plugin
@@ -7,36 +7,31 @@ module.exports =  {
     "plugin:prettier/recommended" // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions:  {
-  ecmaVersion:  2018,  // Allows for the parsing of modern ECMAScript features
-  sourceType:  'module',  // Allows for the use of imports
-  ecmaFeatures:  {
-    // jsx:  true,  // Allows for the parsing of JSX
-  },
+    ecmaVersion:  2018,  // Allows for the parsing of modern ECMAScript features
+    sourceType:  'module',  // Allows for the use of imports
+    project: './tsconfig.json'
   },
   rules:  {
-    // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
-    // "indent": ["error", 2], handled better by formatters
-    "comma-dangle": ["error", "always-multiline"],
-    "quotes": ["error", "double"],
-    "eqeqeq": ["error", "always"],
-    "space-before-function-paren": ["error", {
+    "comma-dangle": [2, "always-multiline"],
+    "quotes": [2, "double"],
+    "eqeqeq": [2, "always"],
+    "arrow-parens": [2, "as-needed"],
+    "space-before-function-paren": [2, {
       "anonymous": "never",
       "named": "never",
       "asyncArrow": "always"
     }],
-    "object-curly-spacing": ["error", "always"],
-    //"arrow-parens": ["error", "always"], // prettier has a different opinion, maybe we really don't need these parens
+    "object-curly-spacing": [2, "always"],
     "max-len": ["warn", { "code": 120, "tabWidth": 2 }],
-
-    "@typescript-eslint/interface-name-prefix": "always",
-    "@typescript-eslint/no-use-before-define": "error",
-    "@typescript-eslint/no-namespace": "off",
-    "@typescript-eslint/no-explicit-any": "on",
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "camelcase": 2,
-    "@typescript-eslint/camelcase": 2,
-    "@typescript-eslint/no-var-requires": "on",
-    "require-jsdoc": ["error", {
+    "@typescript-eslint/no-use-before-define": 2,
+    "@typescript-eslint/no-namespace": 0,
+    "@typescript-eslint/no-empty-interface": 0,
+    "no-unused-vars": 2,
+    "@typescript-eslint/no-unused-vars": 2,
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-var-requires": 2,
+    "require-jsdoc": [2, {
       "require": {
         "FunctionDeclaration": true,
         "MethodDefinition": true,
@@ -45,9 +40,55 @@ module.exports =  {
         "FunctionExpression": true
       }
     }],
-    "no-unused-vars": "off",
-    "unused-imports/no-unused-imports": 2,
-    "unused-imports/no-unused-vars": 1
+    "unused-imports/no-unused-imports-ts": 2,
+    "unused-imports/no-unused-vars-ts": 1,
+    "@typescript-eslint/interface-name-prefix": 0,
+    "@typescript-eslint/naming-convention": [
+      2,
+      {
+        "selector": "default",
+        "format": ["PascalCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "method",
+        "format": ["camelCase"]
+      },
+      {
+        "selector": "method",
+        "format": ["PascalCase"],
+        "prefix": ["is", "should", "has", "can", "did", "will"]
+      },
+      {
+        "selector": "parameter",
+        "format": ["camelCase"]
+      },
+      {
+        "selector": "property",
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "variable",
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "enum",
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": "enumMember",
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "typeParameter",
+        "format": ["PascalCase"],
+        "prefix": ["T"]
+      },
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "prefix": ["I"]
+      }
+    ]
   },
   settings:  {
     react:  {
@@ -55,6 +96,7 @@ module.exports =  {
     },
   },
   plugins: [
-    "unused-imports"
+    "unused-imports",
+    "@typescript-eslint"
   ]
 };

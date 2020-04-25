@@ -6,6 +6,7 @@ import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import SimpleLogger from "../loggers/SimpleLogger";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();

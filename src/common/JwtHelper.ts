@@ -1,5 +1,6 @@
 import IJwt from "../interfaces/IJwt";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const jwt = require("jsonwebtoken");
 
 /**
@@ -30,7 +31,7 @@ export default class JwtHelper {
    */
   public static validateToken(token: string): IJwt {
     if (token !== undefined) {
-      return jwt.verify(token, process.env.JWT_SECRET, function(error: any, decoded: any) {
+      return jwt.verify(token, process.env.JWT_SECRET, function(error, decoded) {
         return decoded;
       });
     }

@@ -1,8 +1,8 @@
-import IUnits from "../interfaces/IUnits";
+import IUnit from "../interfaces/IUnit";
 /**
  * Represents a defenses-row in the database
  */
-export default class Defenses implements IUnits {
+export default class Defenses implements IUnit {
   /**
    * The ID of the planet
    */

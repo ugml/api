@@ -1,11 +1,11 @@
-import InputValidator from "../common/InputValidator";
-import IUnits from "../interfaces/IUnits";
 import { Globals } from "../common/Globals";
+import IUnit from "../interfaces/IUnit";
+import InputValidator from "../common/InputValidator";
 
 /**
  * Represents a user-row in the database
  */
-export default class User implements IUnits {
+export default class User implements IUnit {
   /**
    * The ID of the user
    */

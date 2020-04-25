@@ -1,6 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const winston = require("winston");
 const { createLogger, format } = winston;
 const { combine, printf } = format;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require("fs");
 
 const myFormat = printf(({ level, message, timestamp }) => {
@@ -10,7 +12,6 @@ const myFormat = printf(({ level, message, timestamp }) => {
 const date = new Date();
 const path = `./logs/${date.getFullYear()}-${date.getMonth() + 1}/`;
 
-/* tslint:disable:no-empty*/
 // Folder setup
 if (!fs.existsSync(path)) {
   fs.mkdir("./logs/", err => {
@@ -20,9 +21,7 @@ if (!fs.existsSync(path)) {
     console.error(err);
   });
 }
-/* tslint:enable:no-empty*/
-
-/* tslint:disable: variable-name */
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const RequestLogger = createLogger({
   /* tslint:enable */
   format: combine(

@@ -1,12 +1,11 @@
 import * as chai from "chai";
 import Config from "./Config";
 
-const expect = chai.expect;
 const assert = chai.assert;
 
 describe("Config", function() {
   it("Get config", function() {
-    expect(Config.getGameConfig()).to.have.deep.property("metalStart", 500);
+    assert.equal(Config.getGameConfig().server.startPlanet.resources.metal, 500);
   });
 
   it("Get Buildings", function() {

@@ -1,8 +1,8 @@
-import IUnits from "../interfaces/IUnits";
+import IUnit from "../interfaces/IUnit";
 /**
  * Represents a messages-row in the database
  */
-export default class Message implements IUnits {
+export default class Message implements IUnit {
   /**
    * The ID of the message
    */

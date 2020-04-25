@@ -1,86 +1,25 @@
-import IUnit from "../interfaces/IUnit";
+import IBuildableUnit from "../interfaces/IBuildableUnit";
+
 /**
  * Represents a ships-row in the database
  */
-export default class Ships implements IUnit {
-  /**
-   * The ID of the planet
-   */
+export default class Ships implements IBuildableUnit {
   public planetID: number;
-
-  /**
-   * The current amount of smallCargoShip
-   */
   public smallCargoShip: number;
-
-  /**
-   * The current amount of largeCargoShip
-   */
   public largeCargoShip: number;
-
-  /**
-   * The current amount of lightFighter
-   */
   public lightFighter: number;
-
-  /**
-   * The current amount of heavyFighter
-   */
   public heavyFighter: number;
-
-  /**
-   * The current amount of cruiser
-   */
   public cruiser: number;
-
-  /**
-   * The current amount of battleship
-   */
   public battleship: number;
-
-  /**
-   * The current amount of colonyShip
-   */
   public colonyShip: number;
-
-  /**
-   * The current amount of recycler
-   */
   public recycler: number;
-
-  /**
-   * The current amount of espionageProbe
-   */
   public espionageProbe: number;
-
-  /**
-   * The current amount of bomber
-   */
   public bomber: number;
-
-  /**
-   * The current amount of solarSatellite
-   */
   public solarSatellite: number;
-
-  /**
-   * The current amount of destroyer
-   */
   public destroyer: number;
-
-  /**
-   * The current amount of battlecruiser
-   */
   public battlecruiser: number;
-
-  /**
-   * The current amount of deathstar
-   */
   public deathstar: number;
 
-  /**
-   * Returns, if the contains valid data or not
-   */
   public isValid(): boolean {
     return (
       0 < this.planetID &&
@@ -100,70 +39,4 @@ export default class Ships implements IUnit {
       0 <= this.deathstar
     );
   }
-
-  // public save(): Promise<{}> {
-  //   return new Promise((resolve, reject) => {
-  //     const query = squel
-  //       .update()
-  //       .table("ships")
-  //       .set("smallCargoShip", this.smallCargoShip)
-  //       .set("largeCargoShip", this.largeCargoShip)
-  //       .set("lightFighter", this.lightFighter)
-  //       .set("heavyFighter", this.heavyFighter)
-  //       .set("cruiser", this.cruiser)
-  //       .set("battleship", this.battleship)
-  //       .set("colonyShip", this.colonyShip)
-  //       .set("recycler", this.recycler)
-  //       .set("espionageProbe", this.espionageProbe)
-  //       .set("bomber", this.bomber)
-  //       .set("solarSatellite", this.solarSatellite)
-  //       .set("destroyer", this.destroyer)
-  //       .set("battlecruiser", this.battlecruiser)
-  //       .set("deathstar", this.deathstar)
-  //       .where("planetID = ?", this.planetID)
-  //       .toString();
-  //
-  //     Database.query(query)
-  //       .then(() => {
-  //         return resolve(this);
-  //       })
-  //       .catch(error => {
-  //         Logger.error(error);
-  //         return reject(error);
-  //       });
-  //   });
-  // }
-  //
-  // public create(): Promise<{}> {
-  //   return new Promise((resolve, reject) => {
-  //     const query = squel
-  //       .insert()
-  //       .into("ships")
-  //       .set("planetID", this.planetID)
-  //       .set("smallCargoShip", this.smallCargoShip)
-  //       .set("largeCargoShip", this.largeCargoShip)
-  //       .set("lightFighter", this.lightFighter)
-  //       .set("heavyFighter", this.heavyFighter)
-  //       .set("cruiser", this.cruiser)
-  //       .set("battleship", this.battleship)
-  //       .set("colonyShip", this.colonyShip)
-  //       .set("recycler", this.recycler)
-  //       .set("espionageProbe", this.espionageProbe)
-  //       .set("bomber", this.bomber)
-  //       .set("solarSatellite", this.solarSatellite)
-  //       .set("destroyer", this.destroyer)
-  //       .set("battlecruiser", this.battlecruiser)
-  //       .set("deathstar", this.deathstar)
-  //       .toString();
-  //
-  //     Database.query(query)
-  //       .then(() => {
-  //         return resolve(this);
-  //       })
-  //       .catch(error => {
-  //         Logger.error(error);
-  //         return reject(error);
-  //       });
-  //   });
-  // }
 }

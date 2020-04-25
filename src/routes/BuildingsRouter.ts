@@ -61,7 +61,7 @@ export default class BuildingsRouter {
       const userID = parseInt(request.userID, 10);
       const planet: Planet = await this.planetService.getPlanet(1, planetID, false);
 
-      if(planet.ownerID !== userID) {
+      if (planet.ownerID !== userID) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "User does not own the planet.",
         });

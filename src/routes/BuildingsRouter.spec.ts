@@ -55,13 +55,13 @@ describe("buildingsRoute", () => {
         });
     });
 
-    it("should return an empty list", () => {
+    it("should fail (planet does not exist)", () => {
       return request
         .get("/v1/buildings/1")
         .set("Authorization", authToken)
         .then(res => {
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
-          expect(res.body).to.be.empty;
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.error).to.equals("Planet does not exist.");
         });
     });
 

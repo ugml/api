@@ -61,6 +61,12 @@ export default class BuildingsRouter {
       const userID = parseInt(request.userID, 10);
       const planet: Planet = await this.planetService.getPlanet(1, planetID, false);
 
+      if (!InputValidator.isSet(planet)) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: "Planet does not exist.",
+        });
+      }
+
       if (planet.ownerID !== userID) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "User does not own the planet.",
@@ -332,15 +338,18 @@ export default class BuildingsRouter {
   private meetsRequirements(buildingID: number, buildingsOnPlanet: Buildings): boolean {
     const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
 
-    if (InputValidator.isSet(requirements)) {
-      requirements.forEach(function(requirement) {
-        const key = Globals.UnitNames[requirement.unitID];
-
-        if (buildingsOnPlanet[key] < requirement.level) {
-          return false;
-        }
-      });
+    if (!InputValidator.isSet(requirements)) {
+      return true;
     }
+
+    for (const requirement of requirements) {
+      const key = Globals.UnitNames[requirement.unitID];
+
+      if (buildingsOnPlanet[key] < requirement.level) {
+        return false;
+      }
+    }
+
     return true;
   }
 

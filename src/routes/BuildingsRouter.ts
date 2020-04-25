@@ -50,7 +50,7 @@ export default class BuildingsRouter {
    */
   public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      if (!InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -86,7 +86,7 @@ export default class BuildingsRouter {
    */
   public cancelBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+      if (!InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -98,7 +98,7 @@ export default class BuildingsRouter {
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildingsOnPlanet: Buildings = await this.buildingService.getBuildings(planetID);
 
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildingsOnPlanet)) {
+      if (!InputValidator.isSet(buildingsOnPlanet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -137,12 +137,7 @@ export default class BuildingsRouter {
    */
   public startBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildingID) ||
-        !InputValidator.isValidInt(request.body.buildingID)
-      ) {
+      if (!InputValidator.isValidInt(request.body.planetID) || !InputValidator.isValidInt(request.body.buildingID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -228,12 +223,7 @@ export default class BuildingsRouter {
 
   public demolishBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildingID) ||
-        !InputValidator.isValidInt(request.body.buildingID)
-      ) {
+      if (!InputValidator.isValidInt(request.body.planetID) || !InputValidator.isValidInt(request.body.buildingID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

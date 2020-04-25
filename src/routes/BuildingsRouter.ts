@@ -13,6 +13,9 @@ import Buildings from "../units/Buildings";
 import User from "../units/User";
 import ICosts from "../interfaces/ICosts";
 
+import IBuildableUnit from "../interfaces/IBuildableUnit";
+import { IRequirement } from "../interfaces/IGameConfig";
+
 /**
  * Defines routes for building-data
  */
@@ -120,9 +123,8 @@ export default class BuildingsRouter {
       const currentLevel = buildingsOnPlanet[buildingKey];
       const costs: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
 
-      this.substractCostsFromPlanet(planet, costs);
-
-      this.cancelBuildingOnPlanet(planet);
+      planet.substractCosts(costs);
+      planet.cancelBuilding();
 
       await this.planetService.updatePlanet(planet);
 
@@ -194,7 +196,9 @@ export default class BuildingsRouter {
         });
       }
 
-      if (!this.meetsRequirements(buildingID, buildingsOnPlanet)) {
+      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
+
+      if (!this.meetsRequirements(buildingsOnPlanet, requirements)) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Requirements are not met",
         });
@@ -205,7 +209,7 @@ export default class BuildingsRouter {
       const costs = Calculations.getCosts(buildingID, currentLevel);
 
       // 3. check if there are enough resources on the planet for the building to be built
-      if (!this.hasEnoughResourcesOnPlanet(planet, costs)) {
+      if (!planet.hasEnoughResources(costs)) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Not enough resources",
         });
@@ -214,7 +218,7 @@ export default class BuildingsRouter {
       // 4. start the build-job
       const buildTime: number = this.calculateBuildTime(buildingID, buildingsOnPlanet);
 
-      this.substractCostsFromPlanet(planet, costs);
+      planet.substractCosts(costs);
       await this.startBuildJob(buildTime, planet, buildingID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
@@ -293,11 +297,6 @@ export default class BuildingsRouter {
     );
   }
 
-  private cancelBuildingOnPlanet(planet: Planet): void {
-    planet.bBuildingId = 0;
-    planet.bBuildingEndTime = 0;
-  }
-
   /**
    * Checks if a given building is demolishable on a given planet.
    * @param buildingID
@@ -320,7 +319,7 @@ export default class BuildingsRouter {
     await this.planetService.updatePlanet(planet);
   }
 
-  private async startBuildJob(buildTime: number, planet: Planet, buildingID: number) {
+  private async startBuildJob(buildTime: number, planet: Planet, buildingID: number): Promise<void> {
     const endTime: number = Math.round(+new Date() / 1000) + buildTime;
 
     planet.bBuildingId = buildingID;
@@ -329,15 +328,7 @@ export default class BuildingsRouter {
     await this.planetService.updatePlanet(planet);
   }
 
-  private substractCostsFromPlanet(planet: Planet, cost: ICosts) {
-    planet.metal = planet.metal - cost.metal;
-    planet.crystal = planet.crystal - cost.crystal;
-    planet.deuterium = planet.deuterium - cost.deuterium;
-  }
-
-  private meetsRequirements(buildingID: number, buildingsOnPlanet: Buildings): boolean {
-    const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
-
+  public meetsRequirements(unitsAvailable: IBuildableUnit, requirements: IRequirement[]): boolean {
     if (!InputValidator.isSet(requirements)) {
       return true;
     }
@@ -345,20 +336,11 @@ export default class BuildingsRouter {
     for (const requirement of requirements) {
       const key = Globals.UnitNames[requirement.unitID];
 
-      if (buildingsOnPlanet[key] < requirement.level) {
+      if (unitsAvailable[key] < requirement.level) {
         return false;
       }
     }
 
     return true;
-  }
-
-  public hasEnoughResourcesOnPlanet(planet: Planet, cost: ICosts) {
-    return (
-      planet.metal >= cost.metal &&
-      planet.crystal >= cost.crystal &&
-      planet.deuterium >= cost.deuterium &&
-      planet.energyUsed >= cost.energy
-    );
   }
 }

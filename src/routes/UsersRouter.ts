@@ -37,11 +37,7 @@ export default class UsersRouter {
   private shipService: IShipService;
   private techService: ITechService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.galaxyService = container.galaxyService;
@@ -82,11 +78,10 @@ export default class UsersRouter {
    * Returns sensible information about the currently authenticated user
    * @param request
    * @param response
-   * @param next
    */
   public getUserSelf = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
+
       if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
@@ -109,7 +104,6 @@ export default class UsersRouter {
    * Returns basic information about a user given its userID
    * @param request
    * @param response
-   * @param next
    */
   public getUserByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
@@ -133,12 +127,6 @@ export default class UsersRouter {
     }
   };
 
-  /**
-   * Creates a new user with homeplanet
-   * @param request
-   * @param response
-   * @param next
-   */
   public createUser = async (request: Request, response: Response) => {
     if (
       !InputValidator.isSet(request.body.username) ||
@@ -312,12 +300,6 @@ export default class UsersRouter {
     });
   };
 
-  /**
-   * Updates a user
-   * @param request
-   * @param response
-   * @param next
-   */
   public updateUser = async (request: IAuthorizedRequest, response: Response) => {
     try {
       // if no parameters are set
@@ -366,15 +348,9 @@ export default class UsersRouter {
     }
   };
 
-  /**
-   * Sets the current planet for a user
-   * @param request
-   * @param response
-   * @param next
-   */
   public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
+
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",

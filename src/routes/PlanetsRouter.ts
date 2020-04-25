@@ -11,16 +11,9 @@ import ILogger from "../interfaces/ILogger";
  */
 export default class PlanetsRouter {
   public router: Router = Router();
-
   private logger: ILogger;
-
   private planetService: IPlanetService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
 
@@ -32,13 +25,6 @@ export default class PlanetsRouter {
     this.logger = logger;
   }
 
-  /**
-   * Returns a list of all planets of a given authenticated user.
-   * This route returns sensible planet-data.
-   * @param request
-   * @param response
-   * @param next
-   */
   public getAllPlanets = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
@@ -55,13 +41,6 @@ export default class PlanetsRouter {
     }
   };
 
-  /**
-   * Returns a list of all planets of a given user.
-   * This route returns only the basic planet-data.
-   * @param request
-   * @param response
-   * @param next
-   */
   public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.params.userID, 10);
@@ -78,16 +57,9 @@ export default class PlanetsRouter {
     }
   };
 
-  /**
-   * Returns a planet owned by the authenticated user
-   * @param request
-   * @param response
-   * @param next
-   */
   public getOwnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      if (!InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -108,16 +80,9 @@ export default class PlanetsRouter {
     }
   };
 
-  /**
-   * Returns a list of flights to and from the given planet
-   * @param request
-   * @param response
-   * @param next
-   */
   public getMovement = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      if (!InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -138,15 +103,8 @@ export default class PlanetsRouter {
     }
   };
 
-  /**
-   * Destroys a given planet
-   * @param request
-   * @param response
-   * @param next
-   */
   public destroyPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
@@ -177,20 +135,9 @@ export default class PlanetsRouter {
     }
   };
 
-  /**
-   * Renames a planet
-   * @param request
-   * @param response
-   * @param next
-   */
   public renamePlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.name)
-      ) {
+      if (!InputValidator.isValidInt(request.body.planetID) || !InputValidator.isSet(request.body.name)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -224,16 +171,9 @@ export default class PlanetsRouter {
     }
   };
 
-  /**
-   * Returns basic informations about a planet owned by the given user
-   * @param request
-   * @param response
-   * @param next
-   */
   public getPlanetByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      if (!InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

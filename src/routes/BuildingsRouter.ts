@@ -28,11 +28,7 @@ export default class BuildingsRouter {
   private planetService: IPlanetService;
   private userService: IUserService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.buildingService = container.buildingService;
     this.planetService = container.planetService;

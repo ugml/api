@@ -11,10 +11,6 @@ export default class ConfigRouter {
 
   private logger: ILogger;
 
-  /**
-   * Initialize the Router
-   * @param logger Instance of an ILogger-object
-   */
   public constructor(logger: ILogger) {
     this.router.get("/game", this.getGameConfig);
     this.router.get("/units", this.getUnitsConfig);
@@ -22,13 +18,7 @@ export default class ConfigRouter {
     this.logger = logger;
   }
 
-  /**
-   * Returns the current game-configuration
-   * @param req
-   * @param response
-   * @param next
-   */
-  public getGameConfig(req: Request, response: Response) {
+  public getGameConfig(request: Request, response: Response) {
     try {
       const data = Config.getGameConfig();
 
@@ -42,13 +32,7 @@ export default class ConfigRouter {
     }
   }
 
-  /**
-   * Returns the current unit-configuration
-   * @param req
-   * @param response
-   * @param next
-   */
-  public getUnitsConfig(req: Request, response: Response) {
+  public getUnitsConfig(request: Request, response: Response) {
     try {
       const data = Config.getGameConfig();
 

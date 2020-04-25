@@ -2,6 +2,7 @@
  * This class defines a container for IoC
  * and dependency-injection functionality
  */
+
 export default class Container {
   /**
    * All registered services

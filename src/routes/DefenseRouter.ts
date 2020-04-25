@@ -26,11 +26,7 @@ export default class DefenseRouter {
   private buildingService: IBuildingService;
   private defenseService: IDefenseService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
@@ -42,15 +38,9 @@ export default class DefenseRouter {
     this.logger = logger;
   }
 
-  /**
-   * Returns a list of defenses on a given planet
-   * @param request
-   * @param response
-   * @param next
-   */
   public getAllDefensesOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      if (!InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -72,17 +62,14 @@ export default class DefenseRouter {
   };
 
   /**
-   * Append a new build-order to the current build-queue
+   * Appends a new build-order to the current build-queue
    * @param request
    * @param response
-   * @param next
    */
   public buildDefense = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
-        !InputValidator.isSet(request.body.planetID) ||
         !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildOrder) ||
         !InputValidator.isValidJson(request.body.buildOrder)
       ) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -133,11 +120,15 @@ export default class DefenseRouter {
         defenses.interplanetaryMissile,
       );
 
+      // processBuildOrder
+
       // TODO: put this into a seperate function
       for (const item in buildOrders) {
+        const unitID = parseInt(item, 10);
+
         if (buildOrders.hasOwnProperty(item)) {
           let count: number = buildOrders[item];
-          const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1);
+          const cost: ICosts = Calculations.getCosts(unitID, 1);
 
           // if the user has not enough ressources to fullfill the complete build-order
           if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
@@ -172,7 +163,7 @@ export default class DefenseRouter {
           }
 
           // check free slots in silo
-          if (item === "309") {
+          if (unitID === Globals.Defenses.ANTI_BALLISTIC_MISSILE) {
             // can't build any more rockets
             if (freeSiloSlots === 0) {
               buildOrders[item] = 0;
@@ -182,7 +173,7 @@ export default class DefenseRouter {
             }
           }
 
-          if (item === "310") {
+          if (unitID === Globals.Defenses.INTERPLANETARY_MISSILE) {
             // can't build any more rockets
             if (freeSiloSlots === 0) {
               buildOrders[item] = 0;

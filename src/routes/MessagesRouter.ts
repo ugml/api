@@ -11,17 +11,11 @@ import ILogger from "../interfaces/ILogger";
  */
 export default class MessagesRouter {
   public router: Router = Router();
-
   private logger: ILogger;
-
   private userService: IUserService;
   private messageService: IMessageService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.messageService = container.messageService;
@@ -33,12 +27,6 @@ export default class MessagesRouter {
     this.logger = logger;
   }
 
-  /**
-   * Returns a list of all messages
-   * @param request
-   * @param response
-   * @param next
-   */
   public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
@@ -55,15 +43,9 @@ export default class MessagesRouter {
     }
   };
 
-  /**
-   * Returns a specific message by its messageID
-   * @param request
-   * @param response
-   * @param next
-   */
   public getMessageByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
+      if (!InputValidator.isValidInt(request.params.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -83,15 +65,9 @@ export default class MessagesRouter {
     }
   };
 
-  /**
-   * Deletes a message by its messageID
-   * @param request
-   * @param response
-   * @param next
-   */
   public deleteMessage = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
+      if (!InputValidator.isValidInt(request.body.messageID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -112,16 +88,9 @@ export default class MessagesRouter {
     }
   };
 
-  /**
-   * Sends a new message
-   * @param request
-   * @param response
-   * @param next
-   */
   public sendMessage = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
-        !InputValidator.isSet(request.body.receiverID) ||
         !InputValidator.isValidInt(request.body.receiverID) ||
         !InputValidator.isSet(request.body.subject) ||
         !InputValidator.isSet(request.body.body)

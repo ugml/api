@@ -32,7 +32,6 @@ export default class AuthRouter {
    * a new JWT-token is returned.
    * @param req
    * @param response
-   * @param next
    */
   public authenticate = async (req: IRequest, response: Response) => {
     try {

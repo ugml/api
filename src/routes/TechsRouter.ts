@@ -20,39 +20,27 @@ import ILogger from "../interfaces/ILogger";
  */
 export default class TechsRouter {
   public router: Router = Router();
-
   private logger: ILogger;
-
   private userService: IUserService;
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
   private techService: ITechService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.userService = container.userService;
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
     this.techService = container.techService;
 
-    this.router.get("/", this.getTechs);
-    this.router.post("/build/", this.buildTech);
-    this.router.post("/cancel/", this.cancelTech);
+    this.router.get("/", this.getTechnologies);
+    this.router.post("/build/", this.buildTechnology);
+    this.router.post("/cancel/", this.cancelTechnology);
 
     this.logger = logger;
   }
 
-  /**
-   * Returns all technologies of a given user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getTechs = async (request: IAuthorizedRequest, response: Response) => {
+  public getTechnologies = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
 
@@ -68,13 +56,7 @@ export default class TechsRouter {
     }
   };
 
-  /**
-   * Cancels a currently researching technology
-   * @param request
-   * @param response
-   * @param next
-   */
-  public cancelTech = async (request: IAuthorizedRequest, response: Response) => {
+  public cancelTechnology = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -128,13 +110,7 @@ export default class TechsRouter {
     }
   };
 
-  /**
-   * Starts researching a new technology
-   * @param request
-   * @param response
-   * @param next
-   */
-  public buildTech = async (request: IAuthorizedRequest, response: Response) => {
+  public buildTechnology = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (
         !InputValidator.isSet(request.body.planetID) ||

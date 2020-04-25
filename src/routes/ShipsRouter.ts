@@ -18,18 +18,12 @@ import ILogger from "../interfaces/ILogger";
  */
 export default class ShipsRouter {
   public router: Router = Router();
-
   private logger: ILogger;
-
   private planetService: IPlanetService;
   private buildingService: IBuildingService;
   private shipService: IShipService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.buildingService = container.buildingService;
@@ -41,12 +35,6 @@ export default class ShipsRouter {
     this.logger = logger;
   }
 
-  /**
-   * Returns a list of all ships on a given planet owned by the authenticated user
-   * @param request
-   * @param response
-   * @param next
-   */
   public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
@@ -74,7 +62,6 @@ export default class ShipsRouter {
    * Starts a new build-order on the planet and appends it to the build-queue
    * @param request
    * @param response
-   * @param next
    */
   public buildShips = async (request: IAuthorizedRequest, response: Response) => {
     try {

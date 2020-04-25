@@ -32,11 +32,7 @@ export default class EventRouter {
   private planetService: IPlanetService;
   private eventService: IEventService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
+
   public constructor(container, logger: ILogger) {
     this.planetService = container.planetService;
     this.eventService = container.eventService;
@@ -51,7 +47,6 @@ export default class EventRouter {
    * Creates a new event
    * @param request
    * @param response
-   * @param next
    */
   public createEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {
@@ -170,7 +165,6 @@ export default class EventRouter {
    * Cancels an event
    * @param request
    * @param response
-   * @param next
    */
   public cancelEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {

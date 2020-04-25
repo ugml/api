@@ -34,6 +34,54 @@ namespace Globals {
     MISSILE_SILO = 15,
   }
 
+  export enum Technologies {
+    ESPIONAGE_TECH = 101,
+    COMPUTER_TECH = 102,
+    WEAPON_TECH = 103,
+    ARMOUR_TECH = 104,
+    SHIELDING_TECH = 105,
+    ENERGY_TECH = 106,
+    HYPERSPACE_TECH = 107,
+    COMBUSTION_DRIVE_TECH = 108,
+    IMPULSE_DRIVE_TECH = 109,
+    HYPERSPACE_DRIVE_TECH = 110,
+    LASER_TECH = 111,
+    ION_TECH = 112,
+    PLASMA_TECH = 113,
+    INTERGALACTIC_RESEARCH_TECH = 114,
+    GRAVITON_TECH = 115,
+  }
+
+  export enum Ships {
+    SMALL_CARGOSHIP = 201,
+    LARGE_CARGOSHIP = 202,
+    LIGHT_FIGHTER = 203,
+    HEAVY_FIGHTER = 204,
+    CRUISER = 205,
+    BATTLESHIP = 206,
+    COLONYSHIP = 207,
+    RECYCLER = 208,
+    ESPIONAGE_PROBE = 209,
+    BOMBER = 210,
+    SOLAR_SATELLITE = 211,
+    DESTROYER = 212,
+    BATTLECRUISER = 213,
+    DEATHSTAR = 214,
+  }
+
+  export enum Defenses {
+    ROCKET_LAUNCHER = 301,
+    LIGHT_LASER = 302,
+    HEAVY_LASER = 303,
+    GAUSS_CANNON = 304,
+    ION_CANNON = 305,
+    PLASMA_TURRET = 306,
+    SMALL_SHIELD_DOME = 307,
+    LARGE_SHIELD_DOME = 308,
+    ANTI_BALLISTIC_MISSILE = 309,
+    INTERPLANETARY_MISSILE = 310,
+  }
+
   // 4xx - authentication failure
   // 5xx - server errors
 

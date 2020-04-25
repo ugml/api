@@ -47,7 +47,6 @@ export default class BuildingsRouter {
    * Returns all buildings on a given planet
    * @param request
    * @param response
-   * @param next
    */
   public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
@@ -76,7 +75,6 @@ export default class BuildingsRouter {
    * Cancels a build-order on a planet
    * @param request
    * @param response
-   * @param next
    */
   public cancelBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
@@ -90,9 +88,9 @@ export default class BuildingsRouter {
       const planetID = parseInt(request.body.planetID, 10);
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const buildingsOnPlanet: Buildings = await this.buildingService.getBuildings(planetID);
 
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildingsOnPlanet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -105,16 +103,12 @@ export default class BuildingsRouter {
       }
 
       const buildingKey = Globals.UnitNames[planet.bBuildingId];
+      const currentLevel = buildingsOnPlanet[buildingKey];
+      const costs: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
 
-      const currentLevel = buildings[buildingKey];
+      this.substractCostsFromPlanet(planet, costs);
 
-      const cost: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
-
-      planet.bBuildingId = 0;
-      planet.bBuildingEndTime = 0;
-      planet.metal = planet.metal + cost.metal;
-      planet.crystal = planet.crystal + cost.crystal;
-      planet.crystal = planet.crystal + cost.crystal;
+      this.cancelBuildingOnPlanet(planet);
 
       await this.planetService.updatePlanet(planet);
 
@@ -132,7 +126,6 @@ export default class BuildingsRouter {
    * Starts a new build-order
    * @param request
    * @param response
-   * @param next
    */
   public startBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
@@ -147,8 +140,6 @@ export default class BuildingsRouter {
         });
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
       const buildingID = parseInt(request.body.buildingID, 10);
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
@@ -157,24 +148,25 @@ export default class BuildingsRouter {
         });
       }
 
+      const userID = parseInt(request.userID, 10);
+      const planetID = parseInt(request.body.planetID, 10);
+
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const buildingsOnPlanet: Buildings = await this.buildingService.getBuildings(planetID);
       const user: User = await this.userService.getAuthenticatedUser(userID);
 
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildingsOnPlanet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
 
-      // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Planet already has a build-job",
         });
       }
 
-      // can't build shipyard / robotic / nanite while ships or defenses are built
       if (
         (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
           buildingID === Globals.Buildings.NANITE_FACTORY ||
@@ -187,64 +179,34 @@ export default class BuildingsRouter {
         });
       }
 
-      // can't build research lab while they are researching... poor scientists :(
       if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Can't build this building while it is in use",
         });
       }
 
-      // 2. check, if requirements are met
-      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
-
-      // TODO: move to seperate file
-      // building has requirements
-      if (requirements !== undefined) {
-        requirements.forEach(function(requirement) {
-          const key = Globals.UnitNames[requirement.unitID];
-
-          if (buildings[key] < requirement.level) {
-            return response.status(Globals.Statuscode.SUCCESS).json({
-              error: "Requirements are not met",
-            });
-          }
+      if (!this.meetsRequirements(buildingID, buildingsOnPlanet)) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          error: "Requirements are not met",
         });
       }
 
-      // 3. check if there are enough resources on the planet for the building to be built
       const buildingKey = Globals.UnitNames[buildingID];
-      const currentLevel = buildings[buildingKey];
+      const currentLevel = buildingsOnPlanet[buildingKey];
+      const costs = Calculations.getCosts(buildingID, currentLevel);
 
-      const cost = Calculations.getCosts(buildingID, currentLevel);
-
-      if (
-        planet.metal < cost.metal ||
-        planet.crystal < cost.crystal ||
-        planet.deuterium < cost.deuterium ||
-        planet.energyUsed < cost.energy
-      ) {
+      // 3. check if there are enough resources on the planet for the building to be built
+      if (!this.hasEnoughResourcesOnPlanet(planet, costs)) {
         return response.status(Globals.Statuscode.SUCCESS).json({
           error: "Not enough resources",
         });
       }
 
       // 4. start the build-job
-      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
-        cost.metal,
-        cost.crystal,
-        buildings.roboticFactory,
-        buildings.naniteFactory,
-      );
+      const buildTime: number = this.calculateBuildTime(buildingID, buildingsOnPlanet);
 
-      const endTime: number = Math.round(+new Date() / 1000) + buildTime;
-
-      planet.metal = planet.metal - cost.metal;
-      planet.crystal = planet.crystal - cost.crystal;
-      planet.deuterium = planet.deuterium - cost.deuterium;
-      planet.bBuildingId = buildingID;
-      planet.bBuildingEndTime = endTime;
-
-      await this.planetService.updatePlanet(planet);
+      this.substractCostsFromPlanet(planet, costs);
+      await this.startBuildJob(buildTime, planet, buildingID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
@@ -280,9 +242,9 @@ export default class BuildingsRouter {
       }
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const buildingsOnPlanet: Buildings = await this.buildingService.getBuildings(planetID);
 
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildingsOnPlanet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -294,31 +256,15 @@ export default class BuildingsRouter {
         });
       }
 
-      const buildingKey = Globals.UnitNames[buildingID];
-      const currentLevel = buildings[buildingKey];
-
-      if (currentLevel === 0) {
+      if (!this.isBuildingDemolishable(buildingID, buildingsOnPlanet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "This building can't be demolished",
         });
       }
 
-      const cost = Calculations.getCosts(buildingID, currentLevel - 1);
+      const buildTime = this.calculateBuildTime(buildingID, buildingsOnPlanet);
 
-      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
-        cost.metal,
-        cost.crystal,
-        buildings.roboticFactory,
-        buildings.naniteFactory,
-      );
-
-      const endTime: number = Math.round(+new Date() / 1000) + buildTime;
-
-      planet.bBuildingId = buildingID;
-      planet.bBuildingEndTime = endTime;
-      planet.bBuildingDemolition = true;
-
-      await this.planetService.updatePlanet(planet);
+      this.startDemolitionJob(buildingID, buildTime, planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
@@ -329,4 +275,83 @@ export default class BuildingsRouter {
       });
     }
   };
+
+  private calculateBuildTime(buildingID: number, buildingsOnPlanet: Buildings) {
+    const buildingKey = Globals.UnitNames[buildingID];
+    const currentLevel = buildingsOnPlanet[buildingKey];
+    const cost = Calculations.getCosts(buildingID, currentLevel - 1);
+
+    return Calculations.calculateBuildTimeInSeconds(
+      cost.metal,
+      cost.crystal,
+      buildingsOnPlanet.roboticFactory,
+      buildingsOnPlanet.naniteFactory,
+    );
+  }
+
+  private cancelBuildingOnPlanet(planet: Planet): void {
+    planet.bBuildingId = 0;
+    planet.bBuildingEndTime = 0;
+  }
+
+  /**
+   * Checks if a given building is demolishable on a given planet.
+   * @param buildingID
+   * @param buildingsOnPlanet
+   */
+  private isBuildingDemolishable(buildingID: number, buildingsOnPlanet: Buildings): boolean {
+    const buildingKey = Globals.UnitNames[buildingID];
+    const currentLevel = buildingsOnPlanet[buildingKey];
+
+    return currentLevel === 0;
+  }
+
+  private async startDemolitionJob(buildingID: number, buildTime: number, planet: Planet) {
+    const endTime: number = Math.round(+new Date() / 1000) + buildTime;
+
+    planet.bBuildingId = buildingID;
+    planet.bBuildingEndTime = endTime;
+    planet.bBuildingDemolition = true;
+
+    await this.planetService.updatePlanet(planet);
+  }
+
+  private async startBuildJob(buildTime: number, planet: Planet, buildingID: number) {
+    const endTime: number = Math.round(+new Date() / 1000) + buildTime;
+
+    planet.bBuildingId = buildingID;
+    planet.bBuildingEndTime = endTime;
+
+    await this.planetService.updatePlanet(planet);
+  }
+
+  private substractCostsFromPlanet(planet: Planet, cost: ICosts) {
+    planet.metal = planet.metal - cost.metal;
+    planet.crystal = planet.crystal - cost.crystal;
+    planet.deuterium = planet.deuterium - cost.deuterium;
+  }
+
+  private meetsRequirements(buildingID: number, buildingsOnPlanet: Buildings): boolean {
+    const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
+
+    if (InputValidator.isSet(requirements)) {
+      requirements.forEach(function(requirement) {
+        const key = Globals.UnitNames[requirement.unitID];
+
+        if (buildingsOnPlanet[key] < requirement.level) {
+          return false;
+        }
+      });
+    }
+    return true;
+  }
+
+  public hasEnoughResourcesOnPlanet(planet: Planet, cost: ICosts) {
+    return (
+      planet.metal >= cost.metal &&
+      planet.crystal >= cost.crystal &&
+      planet.deuterium >= cost.deuterium &&
+      planet.energyUsed >= cost.energy
+    );
+  }
 }

@@ -301,7 +301,7 @@ export default class BuildingsRouter {
     const buildingKey = Globals.UnitNames[buildingID];
     const currentLevel = buildingsOnPlanet[buildingKey];
 
-    return currentLevel === 0;
+    return currentLevel > 0;
   }
 
   private async startDemolitionJob(buildingID: number, buildTime: number, planet: Planet) {

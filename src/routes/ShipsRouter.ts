@@ -36,7 +36,7 @@ export default class ShipsRouter {
 
   public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
+      if (!InputValidator.isValidInt(request.params.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

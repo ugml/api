@@ -167,7 +167,7 @@ export default class EventRouter {
    */
   public cancelEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
+      if (!InputValidator.isValidInt(request.body.eventID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

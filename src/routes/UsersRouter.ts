@@ -80,7 +80,7 @@ export default class UsersRouter {
    */
   public getUserSelf = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.userID) || !InputValidator.isValidInt(request.userID)) {
+      if (!InputValidator.isValidInt(request.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -105,7 +105,7 @@ export default class UsersRouter {
    */
   public getUserByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
+      if (!InputValidator.isValidInt(request.params.userID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
@@ -348,7 +348,7 @@ export default class UsersRouter {
 
   public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+      if (!InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

@@ -57,7 +57,7 @@ export default class TechsRouter {
 
   public cancelTechnology = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+      if (!InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

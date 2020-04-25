@@ -105,7 +105,7 @@ export default class PlanetsRouter {
 
   public destroyPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
+      if (!InputValidator.isValidInt(request.body.planetID)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
           error: "Invalid parameter",
         });

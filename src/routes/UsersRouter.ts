@@ -142,8 +142,6 @@ export default class UsersRouter {
     const password: string = InputValidator.sanitizeString(request.body.password);
     const email: string = InputValidator.sanitizeString(request.body.email);
 
-    const hashedPassword = await Encryption.hash(password);
-
     const connection = await Database.getConnectionPool().getConnection();
 
     const newUser: User = new User();
@@ -171,7 +169,7 @@ export default class UsersRouter {
 
       newUser.userID = userID;
       newPlanet.ownerID = userID;
-      newUser.password = hashedPassword;
+      newUser.password = await Encryption.hash(password);
       newPlanet.planetType = PlanetType.PLANET;
 
       this.logger.info("Getting a new planetID");
@@ -208,39 +206,8 @@ export default class UsersRouter {
       newPlanet.crystal = gameConfig.server.startPlanet.resources.crystal;
       newPlanet.deuterium = gameConfig.server.startPlanet.resources.deuterium;
 
-      switch (true) {
-        case newPlanet.posPlanet <= 5: {
-          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
-          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
-
-          const images: string[] = ["desert", "dry"];
-
-          newPlanet.image =
-            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-
-          break;
-        }
-        case newPlanet.posPlanet <= 10: {
-          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
-          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
-
-          const images: string[] = ["normal", "jungle", "gas"];
-
-          newPlanet.image =
-            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-
-          break;
-        }
-        case newPlanet.posPlanet <= 15: {
-          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
-          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
-
-          const images: string[] = ["ice", "water"];
-
-          newPlanet.image =
-            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
-        }
-      }
+      [ newPlanet.tempMin, newPlanet.tempMax ] = this.getRandomTemperaturesByPosition(newPlanet.posPlanet);
+      newPlanet.image = this.getRandomImageByPosition(newPlanet.posPlanet);
 
       await this.planetService.createNewPlanet(newPlanet, connection);
 
@@ -300,7 +267,6 @@ export default class UsersRouter {
 
   public updateUser = async (request: IAuthorizedRequest, response: Response) => {
     try {
-      // if no parameters are set
       if (
         !InputValidator.isSet(request.body.username) &&
         !InputValidator.isSet(request.body.password) &&
@@ -314,7 +280,7 @@ export default class UsersRouter {
       const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
-        // TODO: Check if username already exists
+        // TODO: Check if new username already exists
         user.username = InputValidator.sanitizeString(request.body.username);
       }
 
@@ -380,4 +346,56 @@ export default class UsersRouter {
       });
     }
   };
+
+  private getRandomImageByPosition(planetPosition: number): string {
+    let image;
+
+    switch (true) {
+      case planetPosition <= 5: {
+        const images: string[] = ["desert", "dry"];
+
+        image = images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+        break;
+      }
+      case planetPosition <= 10: {
+        const images: string[] = ["normal", "jungle", "gas"];
+
+        image = images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+        break;
+      }
+      case planetPosition <= 15: {
+        const images: string[] = ["ice", "water"];
+
+        image = images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+      }
+    }
+
+    return image;
+  }
+
+  private getRandomTemperaturesByPosition(planetPosition: number): number[] {
+    let tempMin = 0;
+    let tempMax = 0;
+
+    switch (true) {
+      case planetPosition <= 5: {
+        tempMin = Math.random() * (130 - 40) + 40;
+        tempMax = Math.random() * (150 - 240) + 240;
+        break;
+      }
+      case planetPosition <= 10: {
+        tempMin = Math.random() * (130 - 40) + 40;
+        tempMax = Math.random() * (150 - 240) + 240;
+        break;
+      }
+      case planetPosition <= 15: {
+        tempMin = Math.random() * (130 - 40) + 40;
+        tempMax = Math.random() * (150 - 240) + 240;
+      }
+    }
+
+    return [tempMin, tempMax];
+  }
 }

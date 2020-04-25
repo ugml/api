@@ -297,11 +297,6 @@ export default class BuildingsRouter {
     );
   }
 
-  /**
-   * Checks if a given building is demolishable on a given planet.
-   * @param buildingID
-   * @param buildingsOnPlanet
-   */
   private isBuildingDemolishable(buildingID: number, buildingsOnPlanet: Buildings): boolean {
     const buildingKey = Globals.UnitNames[buildingID];
     const currentLevel = buildingsOnPlanet[buildingKey];
@@ -328,7 +323,7 @@ export default class BuildingsRouter {
     await this.planetService.updatePlanet(planet);
   }
 
-  public meetsRequirements(unitsAvailable: IBuildableUnit, requirements: IRequirement[]): boolean {
+  private meetsRequirements(unitsAvailable: IBuildableUnit, requirements: IRequirement[]): boolean {
     if (!InputValidator.isSet(requirements)) {
       return true;
     }

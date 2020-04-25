@@ -31,15 +31,6 @@ module.exports =  {
     "@typescript-eslint/no-explicit-any": 2,
     "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/no-var-requires": 2,
-    "require-jsdoc": [1, {
-      "require": {
-        "FunctionDeclaration": true,
-        "MethodDefinition": true,
-        "ClassDeclaration": true,
-        "ArrowFunctionExpression": true,
-        "FunctionExpression": true
-      }
-    }],
     "unused-imports/no-unused-imports-ts": 2,
     "unused-imports/no-unused-vars-ts": 1,
     "@typescript-eslint/interface-name-prefix": 0,

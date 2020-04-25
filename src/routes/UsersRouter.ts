@@ -206,7 +206,7 @@ export default class UsersRouter {
       newPlanet.crystal = gameConfig.server.startPlanet.resources.crystal;
       newPlanet.deuterium = gameConfig.server.startPlanet.resources.deuterium;
 
-      [ newPlanet.tempMin, newPlanet.tempMax ] = this.getRandomTemperaturesByPosition(newPlanet.posPlanet);
+      [newPlanet.tempMin, newPlanet.tempMax] = this.getRandomTemperaturesByPosition(newPlanet.posPlanet);
       newPlanet.image = this.getRandomImageByPosition(newPlanet.posPlanet);
 
       await this.planetService.createNewPlanet(newPlanet, connection);

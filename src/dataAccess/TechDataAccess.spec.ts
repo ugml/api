@@ -7,10 +7,10 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-describe("TechService", () => {
+describe("TechDataAccess", () => {
   it("should return a planet", async () => {
     try {
-      await container.techService.createTechRow(1);
+      await container.techDataAccess.createTechRow(1);
     } catch (error) {
       expect(error.message).contains("Duplicate entry");
     }

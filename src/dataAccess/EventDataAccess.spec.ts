@@ -10,7 +10,7 @@
 
 // const container = createContainer();
 
-// describe("EventService", () => {
+// describe("EventDataAccess", () => {
 //   it("should return a planet", async () => {
 //     const ownerID = 1;
 //     const position: ICoordinates = {
@@ -19,6 +19,6 @@
 //       posPlanet: 1,
 //       type: PlanetType.Planet,
 //     };
-//     const result = await container.eventService.getPlanetPosition(ownerID, position);
+//     const result = await container.eventDataAccess.getPlanetPosition(ownerID, position);
 //   });
 // });

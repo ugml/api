@@ -2,7 +2,7 @@ import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IGalaxyService from "../interfaces/IGalaxyService";
+import IGalaxyService from "../interfaces/services/IGalaxyService";
 import ILogger from "../interfaces/ILogger";
 
 /**

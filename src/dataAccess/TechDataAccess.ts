@@ -1,12 +1,12 @@
 import Database from "../common/Database";
-import ITechService from "../interfaces/ITechService";
+import ITechDataAccess from "../interfaces/dataAccess/ITechDataAccess";
 
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact with the techs-table in the database
+ * This class defines a DataAccess to interact with the techs-table in the database
  */
-export default class TechService implements ITechService {
+export default class TechDataAccess implements ITechDataAccess {
   /**
    * Returns a list of technologies for a given user
    * @param userID the ID of the user

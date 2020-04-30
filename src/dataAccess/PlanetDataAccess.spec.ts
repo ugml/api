@@ -8,23 +8,23 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-describe("PlanetService", () => {
+describe("PlanetDataAccess", () => {
   it("should return a planet", async () => {
     const ownerID = 1;
     const planetID = 167546850;
 
-    const result = await container.planetService.getPlanet(ownerID, planetID);
+    const result = await container.planetDataAccess.getPlanet(ownerID, planetID);
 
     expect(result.ownerID).to.be.equals(ownerID);
     expect(result.planetID).to.be.equals(planetID);
   });
 
   it("should update a planet", async () => {
-    const planet: Planet = await container.planetService.getPlanet(1, 167546850, true);
+    const planet: Planet = await container.planetDataAccess.getPlanet(1, 167546850, true);
 
     planet.name = "SomethingElse";
 
-    const result = await container.planetService.updatePlanet(planet);
+    const result = await container.planetDataAccess.updatePlanet(planet);
 
     expect(result).to.be.equals(planet);
   });

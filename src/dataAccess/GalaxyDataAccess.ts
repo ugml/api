@@ -1,15 +1,15 @@
 import Database from "../common/Database";
 import { Globals } from "../common/Globals";
 import ICoordinates from "../interfaces/ICoordinates";
-import IGalaxyService from "../interfaces/IGalaxyService";
+import IGalaxyDataAccess from "../interfaces/dataAccess/IGalaxyDataAccess";
 import PlanetType = Globals.PlanetType;
 
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact with the galaxy-table in the database
+ * This class defines a DataAccess to interact with the galaxy-table in the database
  */
-export default class GalaxyService implements IGalaxyService {
+export default class GalaxyDataAccess implements IGalaxyDataAccess {
   /**
    * Returns all information for a given galaxy-position
    * @param posGalaxy the galaxy

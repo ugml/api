@@ -5,37 +5,37 @@
 
 export default class Container {
   /**
-   * All registered services
+   * All registered DataAccesss
    */
-  private readonly services;
+  private readonly DataAccesss;
 
   /**
-   * Initializes the object with an empty list of services
+   * Initializes the object with an empty list of DataAccesss
    */
   public constructor() {
-    this.services = {};
+    this.DataAccesss = {};
   }
 
   /**
-   * Returns a registered service by name.
+   * Returns a registered DataAccess by name.
    *
    * Example of registering:
-   * container.service("buildingService", () => new BuildingService());
+   * container.DataAccess("buildingDataAccess", () => new BuildingDataAccess());
    *
-   * Example of getting a registered service:
-   * const myService = container.buildingService;
+   * Example of getting a registered DataAccess:
+   * const myDataAccess = container.buildingDataAccess;
    *
-   * @param name the key for the registered service
-   * @param createService a function which creates a new service
+   * @param name the key for the registered DataAccess
+   * @param createDataAccess a function which creates a new DataAccess
    */
-  public service(name, createService) {
+  public DataAccess(name, createDataAccess) {
     Object.defineProperty(this, name, {
       get: () => {
-        if (!this.services.hasOwnProperty(name)) {
-          this.services[name] = createService(this);
+        if (!this.DataAccesss.hasOwnProperty(name)) {
+          this.DataAccesss[name] = createDataAccess(this);
         }
 
-        return this.services[name];
+        return this.DataAccesss[name];
       },
       configurable: true,
       enumerable: true,

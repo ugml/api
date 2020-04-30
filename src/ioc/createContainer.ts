@@ -1,26 +1,26 @@
-import BuildingService from "../services/BuildingService";
-import DefenseService from "../services/DefenseService";
-import EventService from "../services/EventService";
+import BuildingDataAccess from "../dataAccess/BuildingDataAccess";
+import DefenseDataAccess from "../dataAccess/DefenseDataAccess";
+import EventDataAccess from "../dataAccess/EventDataAccess";
 import Container from "./container";
-import GalaxyService from "../services/GalaxyService";
-import MessageService from "../services/MessageService";
-import PlanetService from "../services/PlanetService";
-import ShipService from "../services/ShipService";
-import TechService from "../services/TechService";
-import UserService from "../services/UserService";
+import GalaxyDataAccess from "../dataAccess/GalaxyDataAccess";
+import MessageDataAccess from "../dataAccess/MessageDataAccess";
+import PlanetDataAccess from "../dataAccess/PlanetDataAccess";
+import ShipDataAccess from "../dataAccess/ShipDataAccess";
+import TechDataAccess from "../dataAccess/TechDataAccess";
+import UserDataAccess from "../dataAccess/UserDataAccess";
 
 module.exports = function() {
   const container = new Container();
 
-  container.service("buildingService", () => new BuildingService());
-  container.service("defenseService", () => new DefenseService());
-  container.service("eventService", () => new EventService());
-  container.service("galaxyService", () => new GalaxyService());
-  container.service("messageService", () => new MessageService());
-  container.service("planetService", () => new PlanetService());
-  container.service("shipService", () => new ShipService());
-  container.service("techService", () => new TechService());
-  container.service("userService", () => new UserService());
+  container.DataAccess("buildingDataAccess", () => new BuildingDataAccess());
+  container.DataAccess("defenseDataAccess", () => new DefenseDataAccess());
+  container.DataAccess("eventDataAccess", () => new EventDataAccess());
+  container.DataAccess("galaxyDataAccess", () => new GalaxyDataAccess());
+  container.DataAccess("messageDataAccess", () => new MessageDataAccess());
+  container.DataAccess("planetDataAccess", () => new PlanetDataAccess());
+  container.DataAccess("shipDataAccess", () => new ShipDataAccess());
+  container.DataAccess("techDataAccess", () => new TechDataAccess());
+  container.DataAccess("userDataAccess", () => new UserDataAccess());
 
   return container;
 };

@@ -1,6 +1,6 @@
-import Techs from "../units/Techs";
+import Techs from "../../units/Techs";
 
-export default interface ITechService {
+export default interface ITechDataAccess {
   createTechRow(userID: number, connection);
   getTechs(userID: number): Promise<Techs>;
 }

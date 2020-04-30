@@ -48,7 +48,7 @@ export default class App {
 
   /**
    * Creates and configures a new App-instance
-   * @param container the IoC-container with registered services
+   * @param container the IoC-container with registered DataAccesss
    * @param logger Instance of an ILogger-object
    */
   public constructor(container, logger: ILogger) {

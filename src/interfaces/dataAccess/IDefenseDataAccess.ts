@@ -1,6 +1,6 @@
-import Defenses from "../units/Defenses";
+import Defenses from "../../units/Defenses";
 
-export default interface IDefenseService {
+export default interface IDefenseDataAccess {
   createDefenseRow(planetID: number, connection);
   getDefenses(userID: number, planetID: number): Promise<Defenses>;
 }

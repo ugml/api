@@ -1,11 +1,11 @@
 import Database from "../common/Database";
-import IDefenseService from "../interfaces/IDefenseService";
+import IDefenseDataAccess from "../interfaces/dataAccess/IDefenseDataAccess";
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact with the defenses-table in the database
+ * This class defines a DataAccess to interact with the defenses-table in the database
  */
-export default class DefenseService implements IDefenseService {
+export default class DefenseDataAccess implements IDefenseDataAccess {
   /**
    * Returns a list of defenses on a given planet owner by a given user
    * @param userID the ID of the user

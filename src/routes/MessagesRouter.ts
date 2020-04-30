@@ -2,8 +2,8 @@ import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IMessageService from "../interfaces/IMessageService";
-import IUserService from "../interfaces/IUserService";
+import IMessageService from "../interfaces/services/IMessageService";
+import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
 
 /**

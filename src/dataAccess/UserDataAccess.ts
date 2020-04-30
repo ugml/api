@@ -1,14 +1,14 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IUserService from "../interfaces/IUserService";
+import IUserDataAccess from "../interfaces/dataAccess/IUserDataAccess";
 import User from "../units/User";
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact with the users-table in the database
+ * This class defines a DataAccess to interact with the users-table in the database
  */
-export default class UserService implements IUserService {
+export default class UserDataAccess implements IUserDataAccess {
   /**
    * Returns all information about an authenticated user.
    * @param userID The ID of the currently authenticated user

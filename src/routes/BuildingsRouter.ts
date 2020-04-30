@@ -4,9 +4,9 @@ import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import ILogger from "../interfaces/ILogger";
-import IBuildingService from "../interfaces/IBuildingService";
-import IPlanetService from "../interfaces/IPlanetService";
-import IUserService from "../interfaces/IUserService";
+import IBuildingService from "../interfaces/services/IBuildingService";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import IUserService from "../interfaces/services/IUserService";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import Planet from "../units/Planet";
 import Buildings from "../units/Buildings";
@@ -15,6 +15,8 @@ import ICosts from "../interfaces/ICosts";
 
 import IBuildableUnit from "../interfaces/IBuildableUnit";
 import { IRequirement } from "../interfaces/IGameConfig";
+import UnitDoesNotExistException from "../exceptions/UnitDoesNotExistException";
+import PermissionException from "../exceptions/PermissionException";
 
 /**
  * Defines routes for building-data
@@ -55,26 +57,24 @@ export default class BuildingsRouter {
       }
 
       const planetID: number = parseInt(request.params.planetID, 10);
-
       const userID = parseInt(request.userID, 10);
-      const planet: Planet = await this.planetService.getPlanet(1, planetID, false);
 
-      if (!InputValidator.isSet(planet)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Planet does not exist.",
-        });
-      }
+      const result = await this.buildingService.getBuildingsOnPlanetWithID(planetID, userID);
 
-      if (planet.ownerID !== userID) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "User does not own the planet.",
-        });
-      }
-
-      const data = await this.buildingService.getBuildings(planetID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+      return response.status(Globals.Statuscode.SUCCESS).json(result ?? {});
     } catch (error) {
+      if (error instanceof UnitDoesNotExistException) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: error.message,
+        });
+      }
+
+      if (error instanceof PermissionException) {
+        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+          error: error.message,
+        });
+      }
+
       this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
@@ -99,19 +99,12 @@ export default class BuildingsRouter {
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildingsOnPlanet: Buildings = await this.buildingService.getBuildings(planetID);
+      // const result = await this.buildingsService
 
-      if (!InputValidator.isSet(buildingsOnPlanet)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      const buildingsOnPlanet = await this.buildingService.getBuildingsOnPlanetWithID(planetID, userID);
 
-      if (!planet.isUpgradingBuilding()) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
-          error: "Planet has no build-job",
-        });
+      if (!(await this.planetService.checkPlanetIsUpgradingBuilding(planetID))) {
+        throw new Error("Planet has no build-job");
       }
 
       const buildingKey = Globals.UnitNames[planet.bBuildingId];
@@ -125,6 +118,19 @@ export default class BuildingsRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
+
+      if(error instanceof UnitDoesNotExistException) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          error: error.message,
+        });
+      }
+
+      if(error instanceof PermissionException) {
+        return response.status(Globals.Statuscode.SUCCESS).json({
+          error: error.message,
+        });
+      }
+
       this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({

@@ -1,6 +1,6 @@
-import Message from "../units/Message";
+import Message from "../../units/Message";
 
-export default interface IMessageService {
+export default interface IMessageDataAccess {
   getAllMessages(userID: number);
   getMessageById(userID: number, messageID: number): Promise<Message>;
   deleteMessage(userID: number, messageID: number);

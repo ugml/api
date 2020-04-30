@@ -1,11 +1,10 @@
 import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
-import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
-import JwtHelper from "../common/JwtHelper";
 import IRequest from "../interfaces/IRequest";
-import IUserService from "../interfaces/IUserService";
 import ILogger from "../interfaces/ILogger";
+import IAuthenticationService from "../services/AuthenticationService";
+import AuthenticationFailedException from "../exceptions/AuthenticationFailedException";
 
 /**
  * Defines routes for authentication
@@ -13,16 +12,16 @@ import ILogger from "../interfaces/ILogger";
 export default class AuthRouter {
   public router: Router = Router();
 
-  private userService: IUserService;
+  private authenticationService: IAuthenticationService;
   private logger: ILogger;
 
   /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
+   * Registers the routes and needed Services
+   * @param container the IoC-container with registered Services
    * @param logger
    */
   public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
+    this.authenticationService = container.authenticationService;
     this.router.post("/login", this.authenticate);
     this.logger = logger;
   }
@@ -42,29 +41,18 @@ export default class AuthRouter {
       }
 
       const email: string = InputValidator.sanitizeString(req.body.email);
-
       const password: string = InputValidator.sanitizeString(req.body.password);
 
-      const data = await this.userService.getUserForAuthentication(email);
-
-      if (!InputValidator.isSet(data)) {
-        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          error: "Authentication failed",
-        });
-      }
-
-      const isValidPassword = await Encryption.compare(password, data.password);
-
-      if (!isValidPassword) {
-        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          error: "Authentication failed",
-        });
-      }
-
       return response.status(Globals.Statuscode.SUCCESS).json({
-        token: JwtHelper.generateToken(data.userID),
+        token: await this.authenticationService.authenticate(email, password),
       });
     } catch (error) {
+      if (error instanceof AuthenticationFailedException) {
+        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+          error: error.message,
+        });
+      }
+
       this.logger.error(error, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({

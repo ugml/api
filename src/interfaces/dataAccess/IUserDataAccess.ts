@@ -1,6 +1,6 @@
-import User from "../units/User";
+import User from "../../units/User";
 
-export default interface IUserService {
+export default interface IUserDataAccess {
   getAuthenticatedUser(userID: number): Promise<User>;
   getUserById(userID: number): Promise<User>;
   getUserForAuthentication(email: string): Promise<User>;

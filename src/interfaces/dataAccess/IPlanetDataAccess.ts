@@ -1,8 +1,9 @@
-import Planet from "../units/Planet";
-import ICoordinates from "./ICoordinates";
+import Planet from "../../units/Planet";
+import ICoordinates from "../ICoordinates";
 
-export default interface IPlanetService {
+export default interface IPlanetDataAccess {
   getPlanet(userID: number, planetID: number, fullInfo?: boolean): Promise<Planet>;
+  getPlanetByID(planetID: number): Promise<Planet>;
   updatePlanet(planet: Planet): Promise<Planet>;
   getNewId(): Promise<number>;
   createNewPlanet(planet: Planet, connection?);

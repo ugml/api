@@ -1,13 +1,13 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import IShipService from "../interfaces/IShipService";
+import IShipDataAccess from "../interfaces/dataAccess/IShipDataAccess";
 
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact with the ships-table in the database
+ * This class defines a DataAccess to interact with the ships-table in the database
  */
-export default class ShipService implements IShipService {
+export default class ShipDataAccess implements IShipDataAccess {
   /**
    * Returns a list of ships on a given planet, owned by the given user
    * @param userID the ID of the user

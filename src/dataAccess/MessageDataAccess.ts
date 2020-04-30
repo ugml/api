@@ -1,15 +1,15 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IMessageService from "../interfaces/IMessageService";
+import IMessageDataAccess from "../interfaces/dataAccess/IMessageDataAccess";
 import Message from "../units/Message";
 
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact with the messages-table in the database
+ * This class defines a DataAccess to interact with the messages-table in the database
  */
-export default class MessageService implements IMessageService {
+export default class MessageDataAccess implements IMessageDataAccess {
   /**
    * Returns a list of all messages a user has sent or received
    * @param userID the ID of the user

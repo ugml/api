@@ -1,14 +1,14 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IEventService from "../interfaces/IEventService";
+import IEventDataAccess from "../interfaces/dataAccess/IEventDataAccess";
 import Event from "../units/Event";
 import squel = require("safe-squel");
 
 /**
- * This class defines a service to interact manage events
+ * This class defines a DataAccess to interact manage events
  */
-export default class EventService implements IEventService {
+export default class EventDataAccess implements IEventDataAccess {
   /**
    *
    * @param event

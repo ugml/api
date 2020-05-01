@@ -5,14 +5,14 @@ class Globals {
   public static MIN_BUILDING_ID = 1;
   public static MAX_BUILDING_ID = 15;
 
-  public static MIN_DEFENSE_ID = 301;
-  public static MAX_DEFENSE_ID = 310;
-
   public static MIN_TECHNOLOGY_ID = 101;
   public static MAX_TECHNOLOGY_ID = 115;
 
   public static MIN_SHIP_ID = 201;
   public static MAX_SHIP_ID = 214;
+
+  public static MIN_DEFENSE_ID = 301;
+  public static MAX_DEFENSE_ID = 310;
 }
 
 namespace Globals {

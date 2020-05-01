@@ -23,7 +23,7 @@ describe("shipsRouter", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await container.planetDataAccess.getPlanetByIDWithFullInformation(167546850);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -33,7 +33,7 @@ describe("shipsRouter", () => {
   });
 
   after(async () => {
-    await container.planetService.updatePlanet(planetBeforeTests);
+    await container.planetDataAccess.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -122,7 +122,7 @@ describe("shipsRouter", () => {
   });
 
   it("should fail (player does not own the planet)", () => {
-    const planetID = 21234;
+    const planetID = 61614;
 
     /* eslint-disable quotes */
     return request
@@ -130,9 +130,9 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.Statuscode.NOT_AUTHORIZED);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("The player does not own the planet");
+        expect(res.body.error).to.be.equals("User does not own the planet");
       });
     /* eslint-enable quotes */
   });
@@ -140,13 +140,13 @@ describe("shipsRouter", () => {
   it("should fail (shipyard is upgrading)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     const valueBefore = planet.bHangarPlus;
 
     planet.bHangarPlus = true;
 
-    await container.planetService.updatePlanet(planet);
+    await container.planetDataAccess.updatePlanet(planet);
 
     /* eslint-disable quotes */
     return request
@@ -160,7 +160,7 @@ describe("shipsRouter", () => {
 
         // reset
         planet.bHangarPlus = valueBefore;
-        await container.planetService.updatePlanet(planet);
+        await container.planetDataAccess.updatePlanet(planet);
       });
     /* eslint-enable quotes */
   });

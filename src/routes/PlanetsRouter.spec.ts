@@ -25,8 +25,8 @@ describe("planetsRouter", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    authUserBeforeTests = await container.userService.getAuthenticatedUser(1);
-    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
+    authUserBeforeTests = await container.userDataAccess.getAuthenticatedUser(1);
+    planetBeforeTests = await container.planetDataAccess.getPlanetByIDWithFullInformation(167546850);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -36,8 +36,8 @@ describe("planetsRouter", () => {
   });
 
   after(async () => {
-    await container.userService.updateUserData(authUserBeforeTests);
-    await container.planetService.updatePlanet(planetBeforeTests);
+    await container.userDataAccess.updateUserData(authUserBeforeTests);
+    await container.planetDataAccess.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -116,14 +116,13 @@ describe("planetsRouter", () => {
       });
   });
 
-  it("should return nothing", () => {
+  it("should fail (planet does not exist)", () => {
     return request
       .get("/v1/user/planet/1234")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.empty;
       });
   });
 
@@ -189,7 +188,7 @@ describe("planetsRouter", () => {
   it("should rename a planet", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     return request
       .post("/v1/planets/rename")
@@ -201,7 +200,7 @@ describe("planetsRouter", () => {
         expect(res.body.name).to.be.equals("FancyNewName");
 
         // reset
-        await container.planetService.updatePlanet(planet);
+        await container.planetDataAccess.updatePlanet(planet);
       });
   });
 
@@ -301,7 +300,7 @@ describe("planetsRouter", () => {
   it("should delete the planet", async () => {
     const planetID = 167546999;
 
-    secondPlanetBackup = await container.planetService.getPlanet(1, planetID, true);
+    secondPlanetBackup = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     return request
       .post("/v1/planets/destroy/")
@@ -324,7 +323,7 @@ describe("planetsRouter", () => {
         expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("The last planet cannot be destroyed");
-        await container.planetService.createNewPlanet(secondPlanetBackup);
+        await container.planetDataAccess.createNewPlanet(secondPlanetBackup);
       });
   });
 });

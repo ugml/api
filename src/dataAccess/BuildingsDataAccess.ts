@@ -1,15 +1,31 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IBuildingDataAccess from "../interfaces/dataAccess/IBuildingDataAccess";
+import IBuildingsDataAccess from "../interfaces/dataAccess/IBuildingsDataAccess";
 import Buildings from "../units/Buildings";
 
 import squel = require("safe-squel");
+import { Globals } from "../common/Globals";
 
 /**
  * This class defines a DataAccess to interact with the buildings-table in the database
  */
-export default class BuildingDataAccess implements IBuildingDataAccess {
+export default class BuildingsDataAccess implements IBuildingsDataAccess {
+  public async getCurrentLevelOfBuildingOnPlanet(planetID: number, buildingID: number): Promise<number> {
+    const columnName = Globals.UnitNames[buildingID];
+
+    const query: string = squel
+      .select()
+      .from("buildings", "b")
+      .field(columnName)
+      .where("b.planetID = ?", planetID)
+      .toString();
+
+    const [[rows]] = await Database.query(query);
+
+    return rows[columnName];
+  }
+
   /**
    * Returns a list of buildings on a given planet
    * @param planetID the ID of the planet

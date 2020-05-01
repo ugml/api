@@ -1,10 +1,9 @@
-export default class UnitDoesNotExistException extends Error {
-  /**
-   * Takes a message-string and returns a new DuplicateRecordException-object
-   * @param m the exception-message
-   */
+import { Globals } from "../common/Globals";
+import Exception from "./Exception";
+
+export default class UnitDoesNotExistException extends Exception {
   public constructor(m: string) {
-    super(m);
+    super(m, Globals.Statuscode.BAD_REQUEST);
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, UnitDoesNotExistException.prototype);

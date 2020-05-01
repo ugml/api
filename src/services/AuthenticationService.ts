@@ -9,17 +9,21 @@ import IAuthenticationService from "../interfaces/services/IAuthenticationServic
 export default class AuthenticationService implements IAuthenticationService {
   private userDataAccess: IUserDataAccess;
 
+  constructor(container) {
+    this.userDataAccess = container.userDataAccess;
+  }
+
   public authenticate = async (email: string, password: string): Promise<string> => {
     const data = await this.userDataAccess.getUserForAuthentication(email);
 
     if (!InputValidator.isSet(data)) {
-      throw new AuthenticationFailedException("Authentication failed.");
+      throw new AuthenticationFailedException("Authentication failed");
     }
 
     const isValidPassword = await Encryption.compare(password, data.password);
 
     if (!isValidPassword) {
-      throw new AuthenticationFailedException("Authentication failed.");
+      throw new AuthenticationFailedException("Authentication failed");
     }
 
     return JwtHelper.generateToken(data.userID);

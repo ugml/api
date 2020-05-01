@@ -13,14 +13,15 @@ describe("PlanetDataAccess", () => {
     const ownerID = 1;
     const planetID = 167546850;
 
-    const result = await container.planetDataAccess.getPlanet(ownerID, planetID);
+    const result = await container.planetDataAccess.getPlanetByIDWithBasicInformation(planetID);
 
     expect(result.ownerID).to.be.equals(ownerID);
     expect(result.planetID).to.be.equals(planetID);
   });
 
   it("should update a planet", async () => {
-    const planet: Planet = await container.planetDataAccess.getPlanet(1, 167546850, true);
+    const planetID = 167546850;
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     planet.name = "SomethingElse";
 

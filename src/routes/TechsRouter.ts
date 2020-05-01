@@ -4,16 +4,20 @@ import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IBuildingService from "../interfaces/services/IBuildingService";
 import ICosts from "../interfaces/ICosts";
-import IPlanetService from "../interfaces/services/IPlanetService";
-import ITechService from "../interfaces/services/ITechService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import Techs from "../units/Techs";
 import User from "../units/User";
-import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
+import IUserDataAccess from "../interfaces/dataAccess/IUserDataAccess";
+import IPlanetDataAccess from "../interfaces/dataAccess/IPlanetDataAccess";
+import IBuildingsDataAccess from "../interfaces/dataAccess/IBuildingsDataAccess";
+import ITechDataAccess from "../interfaces/dataAccess/ITechDataAccess";
+import PermissionException from "../exceptions/PermissionException";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import UnitDoesNotExistException from "../exceptions/UnitDoesNotExistException";
+import Exception from "../exceptions/Exception";
 
 /**
  * Defines routes for technology-data
@@ -21,16 +25,16 @@ import ILogger from "../interfaces/ILogger";
 export default class TechsRouter {
   public router: Router = Router();
   private logger: ILogger;
-  private userService: IUserService;
-  private planetService: IPlanetService;
-  private buildingService: IBuildingService;
-  private techService: ITechService;
+  private userDataAccess: IUserDataAccess;
+  private planetDataAccess: IPlanetDataAccess;
+  private buildingsDataAccess: IBuildingsDataAccess;
+  private techDataAccess: ITechDataAccess;
 
   public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.planetService = container.planetService;
-    this.buildingService = container.buildingService;
-    this.techService = container.techService;
+    this.userDataAccess = container.userDataAccess;
+    this.planetDataAccess = container.planetDataAccess;
+    this.buildingsDataAccess = container.buildingsDataAccess;
+    this.techDataAccess = container.techDataAccess;
 
     this.router.get("/", this.getTechnologies);
     this.router.post("/build/", this.buildTechnology);
@@ -43,14 +47,20 @@ export default class TechsRouter {
     try {
       const userID = parseInt(request.userID, 10);
 
-      const techs: Techs = await this.techService.getTechs(userID);
+      const techs: Techs = await this.techDataAccess.getTechs(userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(techs ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -58,24 +68,24 @@ export default class TechsRouter {
   public cancelTechnology = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const techs: Techs = await this.techService.getTechs(userID);
-      const user: User = await this.userService.getAuthenticatedUser(userID);
+      const planet: Planet = await this.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
-      // player does not own the planet
       if (!InputValidator.isSet(planet)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new UnitDoesNotExistException("Planet does not exist");
       }
+
+      if (planet.ownerID !== userID) {
+        throw new PermissionException("User does not own the planet");
+      }
+
+      const techs: Techs = await this.techDataAccess.getTechs(userID);
+      const user: User = await this.userDataAccess.getAuthenticatedUser(userID);
 
       // 1. check if there is already a build-job on the planet
       if (user.bTechID === 0 && user.bTechEndTime === 0) {
@@ -96,15 +106,21 @@ export default class TechsRouter {
       user.bTechID = 0;
       user.bTechEndTime = 0;
 
-      await this.planetService.updatePlanet(planet);
-      await this.userService.updateUserData(user);
+      await this.planetDataAccess.updatePlanet(planet);
+      await this.userDataAccess.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -117,9 +133,7 @@ export default class TechsRouter {
         !InputValidator.isSet(request.body.techID) ||
         !InputValidator.isValidInt(request.body.techID)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
@@ -127,20 +141,25 @@ export default class TechsRouter {
       const techID = parseInt(request.body.techID, 10);
 
       if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-      const techs: Techs = await this.techService.getTechs(userID);
-      const user: User = await this.userService.getAuthenticatedUser(userID);
+      const planet: Planet = await this.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
       if (!InputValidator.isSet(planet)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new UnitDoesNotExistException("Planet does not exist");
+      }
+
+      if (planet.ownerID !== userID) {
+        throw new PermissionException("User does not own the planet");
+      }
+
+      const buildings: Buildings = await this.buildingsDataAccess.getBuildings(planetID);
+      const techs: Techs = await this.techDataAccess.getTechs(userID);
+      const user: User = await this.userDataAccess.getAuthenticatedUser(userID);
+
+      if (!InputValidator.isSet(planet)) {
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       if (planet.isUpgradingResearchLab()) {
@@ -227,15 +246,21 @@ export default class TechsRouter {
       user.bTechID = techID;
       user.bTechEndTime = endTime;
 
-      await this.planetService.updatePlanet(planet);
-      await this.userService.updateUserData(user);
+      await this.planetDataAccess.updatePlanet(planet);
+      await this.userDataAccess.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };

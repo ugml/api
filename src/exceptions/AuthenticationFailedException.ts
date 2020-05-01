@@ -1,11 +1,9 @@
-export default class AuthenticationFailedException extends Error {
-  /**
-   * Takes a message-string and returns a new DuplicateRecordException-object
-   * @param m the exception-message
-   */
-  public constructor(m: string) {
-    super(m);
+import { Globals } from "../common/Globals";
+import Exception from "./Exception";
 
+export default class AuthenticationFailedException extends Exception {
+  public constructor(message: string) {
+    super(message, Globals.Statuscode.NOT_AUTHORIZED);
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, AuthenticationFailedException.prototype);
   }

@@ -23,7 +23,7 @@ describe("defenseRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await container.planetDataAccess.getPlanetByIDWithFullInformation(167546850);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -33,7 +33,7 @@ describe("defenseRoute", () => {
   });
 
   after(async () => {
-    await container.planetService.updatePlanet(planetBeforeTests);
+    await container.planetDataAccess.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -168,7 +168,7 @@ describe("defenseRoute", () => {
         // eslint-disable-next-line prettier/prettier
         .send({ planetID, buildOrder: "{ \"301\": 1 }" })
         .then(res => {
-          expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.be.equals(Globals.Statuscode.NOT_AUTHORIZED);
           expect(res.body.error).to.be.equals("The player does not own the planet");
         })
     );
@@ -177,13 +177,13 @@ describe("defenseRoute", () => {
   it("should fail (shipyard is currently upgrading)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     const valueBefore = planet.bHangarPlus;
 
     planet.bHangarPlus = true;
 
-    await container.planetService.updatePlanet(planet);
+    await container.planetDataAccess.updatePlanet(planet);
 
     return (
       request
@@ -196,7 +196,7 @@ describe("defenseRoute", () => {
           expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
           planet.bHangarPlus = valueBefore;
-          await container.planetService.updatePlanet(planet);
+          await container.planetDataAccess.updatePlanet(planet);
         })
     );
   });

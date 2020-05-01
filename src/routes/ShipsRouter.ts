@@ -4,14 +4,18 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import Queue from "../common/Queue";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IBuildingService from "../interfaces/services/IBuildingService";
 import ICosts from "../interfaces/ICosts";
-import IPlanetService from "../interfaces/services/IPlanetService";
-import IShipService from "../interfaces/services/IShipService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import QueueItem from "../common/QueueItem";
 import ILogger from "../interfaces/ILogger";
+import IPlanetDataAccess from "../interfaces/dataAccess/IPlanetDataAccess";
+import IBuildingsDataAccess from "../interfaces/dataAccess/IBuildingsDataAccess";
+import IShipDataAccess from "../interfaces/dataAccess/IShipDataAccess";
+import PermissionException from "../exceptions/PermissionException";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import UnitDoesNotExistException from "../exceptions/UnitDoesNotExistException";
+import Exception from "../exceptions/Exception";
 
 /**
  * Defines routes for ships-data
@@ -19,14 +23,14 @@ import ILogger from "../interfaces/ILogger";
 export default class ShipsRouter {
   public router: Router = Router();
   private logger: ILogger;
-  private planetService: IPlanetService;
-  private buildingService: IBuildingService;
-  private shipService: IShipService;
+  private planetDataAccess: IPlanetDataAccess;
+  private buildingsDataAccess: IBuildingsDataAccess;
+  private shipDataAccess: IShipDataAccess;
 
   public constructor(container, logger: ILogger) {
-    this.planetService = container.planetService;
-    this.buildingService = container.buildingService;
-    this.shipService = container.shipService;
+    this.planetDataAccess = container.planetDataAccess;
+    this.buildingsDataAccess = container.buildingsDataAccess;
+    this.shipDataAccess = container.shipDataAccess;
 
     this.router.get("/:planetID", this.getAllShipsOnPlanet);
     this.router.post("/build/", this.buildShips);
@@ -37,22 +41,26 @@ export default class ShipsRouter {
   public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.params.planetID, 10);
 
-      const ships = await this.shipService.getShips(userID, planetID);
+      const ships = await this.shipDataAccess.getShips(userID, planetID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(ships ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -70,18 +78,14 @@ export default class ShipsRouter {
         !InputValidator.isSet(request.body.buildOrder) ||
         !InputValidator.isValidJson(request.body.buildOrder)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const buildOrders = JSON.parse(request.body.buildOrder);
 
       // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.SHIP)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
@@ -89,14 +93,17 @@ export default class ShipsRouter {
 
       const queue: Queue = new Queue();
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+      const planet: Planet = await this.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
-      if (planet === null) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "The player does not own the planet",
-        });
+      if (!InputValidator.isSet(planet)) {
+        throw new UnitDoesNotExistException("Planet does not exist");
       }
+
+      if (planet.ownerID !== userID) {
+        throw new PermissionException("User does not own the planet");
+      }
+
+      const buildings: Buildings = await this.buildingsDataAccess.getBuildings(planetID);
 
       if (planet.bHangarPlus) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -196,14 +203,20 @@ export default class ShipsRouter {
       planet.crystal = crystal;
       planet.deuterium = deuterium;
 
-      await this.planetService.updatePlanet(planet);
+      await this.planetDataAccess.updatePlanet(planet);
 
       return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };

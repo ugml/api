@@ -6,20 +6,22 @@ import { Globals } from "../common/Globals";
 import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IBuildingService from "../interfaces/services/IBuildingService";
-import IDefenseService from "../interfaces/services/IDefenseService";
-import IGalaxyService from "../interfaces/services/IGalaxyService";
 import IGameConfig from "../interfaces/IGameConfig";
-import IPlanetService from "../interfaces/services/IPlanetService";
-import IShipService from "../interfaces/services/IShipService";
-import ITechService from "../interfaces/services/ITechService";
-import IUserService from "../interfaces/services/IUserService";
 import Planet from "../units/Planet";
 import User from "../units/User";
 import PlanetsRouter from "./PlanetsRouter";
 import JwtHelper from "../common/JwtHelper";
 import PlanetType = Globals.PlanetType;
 import ILogger from "../interfaces/ILogger";
+import IUserDataAccess from "../interfaces/dataAccess/IUserDataAccess";
+import IGalaxyDataAccess from "../interfaces/dataAccess/IGalaxyDataAccess";
+import IPlanetDataAccess from "../interfaces/dataAccess/IPlanetDataAccess";
+import IBuildingsDataAccess from "../interfaces/dataAccess/IBuildingsDataAccess";
+import IDefenseDataAccess from "../interfaces/dataAccess/IDefenseDataAccess";
+import IShipDataAccess from "../interfaces/dataAccess/IShipDataAccess";
+import ITechDataAccess from "../interfaces/dataAccess/ITechDataAccess";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import Exception from "../exceptions/Exception";
 
 /**
  * Defines routes for user-data
@@ -29,22 +31,22 @@ export default class UsersRouter {
 
   private logger: ILogger;
 
-  private userService: IUserService;
-  private galaxyService: IGalaxyService;
-  private planetService: IPlanetService;
-  private buildingService: IBuildingService;
-  private defenseService: IDefenseService;
-  private shipService: IShipService;
-  private techService: ITechService;
+  private userDataAccess: IUserDataAccess;
+  private galaxyDataAccess: IGalaxyDataAccess;
+  private planetDataAccess: IPlanetDataAccess;
+  private buildingsDataAccess: IBuildingsDataAccess;
+  private defenseDataAccess: IDefenseDataAccess;
+  private shipDataAccess: IShipDataAccess;
+  private techDataAccess: ITechDataAccess;
 
   public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.galaxyService = container.galaxyService;
-    this.planetService = container.planetService;
-    this.buildingService = container.buildingService;
-    this.defenseService = container.defenseService;
-    this.shipService = container.shipService;
-    this.techService = container.techService;
+    this.userDataAccess = container.userDataAccess;
+    this.galaxyDataAccess = container.galaxyDataAccess;
+    this.planetDataAccess = container.planetDataAccess;
+    this.buildingsDataAccess = container.buildingsDataAccess;
+    this.defenseDataAccess = container.defenseDataAccess;
+    this.shipDataAccess = container.shipDataAccess;
+    this.techDataAccess = container.techDataAccess;
 
     // /user/create/
     this.router.post("/create", this.createUser);
@@ -81,19 +83,23 @@ export default class UsersRouter {
   public getUserSelf = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.userID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
-      const data = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
+      const data = await this.userDataAccess.getAuthenticatedUser(parseInt(request.userID, 10));
 
       return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -106,163 +112,179 @@ export default class UsersRouter {
   public getUserByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.params.userID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID: number = parseInt(request.params.userID, 10);
 
-      const user = await this.userService.getUserById(userID);
+      const user = await this.userDataAccess.getUserById(userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(user ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
 
   public createUser = async (request: Request, response: Response) => {
-    if (
-      !InputValidator.isSet(request.body.username) ||
-      !InputValidator.isSet(request.body.password) ||
-      !InputValidator.isSet(request.body.email)
-    ) {
-      return response.status(Globals.Statuscode.BAD_REQUEST).json({
-        error: "Invalid parameter",
-      });
-    }
-
-    const gameConfig: IGameConfig = Config.getGameConfig();
-
-    const username: string = InputValidator.sanitizeString(request.body.username);
-    const password: string = InputValidator.sanitizeString(request.body.password);
-    const email: string = InputValidator.sanitizeString(request.body.email);
-
-    const connection = await Database.getConnectionPool().getConnection();
-
-    const newUser: User = new User();
-    const newPlanet: Planet = new Planet();
-
     try {
-      await connection.beginTransaction();
-
-      const data = await this.userService.checkIfNameOrMailIsTaken(username, email);
-
-      if (data.username_taken === 1) {
-        throw new DuplicateRecordException("Username is already taken");
+      if (
+        !InputValidator.isSet(request.body.username) ||
+        !InputValidator.isSet(request.body.password) ||
+        !InputValidator.isSet(request.body.email)
+      ) {
+        throw new InvalidParameterException("Invalid parameter");
       }
 
-      if (data.email_taken === 1) {
-        throw new DuplicateRecordException("Email is already taken");
+      const gameConfig: IGameConfig = Config.getGameConfig();
+
+      const username: string = InputValidator.sanitizeString(request.body.username);
+      const password: string = InputValidator.sanitizeString(request.body.password);
+      const email: string = InputValidator.sanitizeString(request.body.email);
+
+      const connection = await Database.getConnectionPool().getConnection();
+
+      const newUser: User = new User();
+      const newPlanet: Planet = new Planet();
+
+      try {
+        await connection.beginTransaction();
+
+        const data = await this.userDataAccess.checkIfNameOrMailIsTaken(username, email);
+
+        if (data.username_taken === 1) {
+          throw new DuplicateRecordException("Username is already taken");
+        }
+
+        if (data.email_taken === 1) {
+          throw new DuplicateRecordException("Email is already taken");
+        }
+
+        this.logger.info("Getting a new userID");
+
+        newUser.username = username;
+        newUser.email = email;
+
+        const userID = await this.userDataAccess.getNewId();
+
+        newUser.userID = userID;
+        newPlanet.ownerID = userID;
+        newUser.password = await Encryption.hash(password);
+        newPlanet.planetType = PlanetType.PLANET;
+
+        this.logger.info("Getting a new planetID");
+
+        const planetID = await this.planetDataAccess.getNewId();
+
+        newUser.currentPlanet = planetID;
+        newPlanet.planetID = planetID;
+
+        this.logger.info("Finding free position for new planet");
+
+        const galaxyData = await this.galaxyDataAccess.getFreePosition(
+          gameConfig.server.limits.galaxy.max,
+          gameConfig.server.limits.system.max,
+          gameConfig.server.startPlanet.minPlanetPos,
+          gameConfig.server.startPlanet.maxPlanetPos,
+        );
+
+        newPlanet.posGalaxy = galaxyData.posGalaxy;
+        newPlanet.posSystem = galaxyData.posSystem;
+        newPlanet.posPlanet = galaxyData.posPlanet;
+
+        this.logger.info("Creating a new user");
+
+        await this.userDataAccess.createNewUser(newUser, connection);
+
+        this.logger.info("Creating a new planet");
+
+        newPlanet.name = gameConfig.server.startPlanet.name;
+        newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
+        newPlanet.diameter = gameConfig.server.startPlanet.diameter;
+        newPlanet.fieldsMax = gameConfig.server.startPlanet.fields;
+        newPlanet.metal = gameConfig.server.startPlanet.resources.metal;
+        newPlanet.crystal = gameConfig.server.startPlanet.resources.crystal;
+        newPlanet.deuterium = gameConfig.server.startPlanet.resources.deuterium;
+
+        [newPlanet.tempMin, newPlanet.tempMax] = this.getRandomTemperaturesByPosition(newPlanet.posPlanet);
+        newPlanet.image = this.getRandomImageByPosition(newPlanet.posPlanet);
+
+        await this.planetDataAccess.createNewPlanet(newPlanet, connection);
+
+        this.logger.info("Creating entry in buildings-table");
+
+        await this.buildingsDataAccess.createBuildingsRow(newPlanet.planetID, connection);
+
+        this.logger.info("Creating entry in defenses-table");
+
+        await this.defenseDataAccess.createDefenseRow(newPlanet.planetID, connection);
+
+        this.logger.info("Creating entry in ships-table");
+
+        await this.shipDataAccess.createShipsRow(newPlanet.planetID, connection);
+
+        this.logger.info("Creating entry in galaxy-table");
+
+        await this.galaxyDataAccess.createGalaxyRow(
+          newPlanet.planetID,
+          newPlanet.posGalaxy,
+          newPlanet.posSystem,
+          newPlanet.posPlanet,
+          connection,
+        );
+
+        this.logger.info("Creating entry in techs-table");
+
+        await this.techDataAccess.createTechRow(newUser.userID, connection);
+
+        connection.commit();
+
+        this.logger.info("Transaction complete");
+
+        await connection.commit();
+      } catch (error) {
+        await connection.rollback();
+        this.logger.error(error, error);
+
+        if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
+          return response.status(Globals.Statuscode.BAD_REQUEST).json({
+            error: `There was an error while handling the request: ${error.message}`,
+          });
+        }
+
+        return response.status(Globals.Statuscode.SERVER_ERROR).json({
+          error: "There was an error while handling the request",
+        });
+      } finally {
+        await connection.release();
       }
 
-      this.logger.info("Getting a new userID");
-
-      newUser.username = username;
-      newUser.email = email;
-
-      const userID = await this.userService.getNewId();
-
-      newUser.userID = userID;
-      newPlanet.ownerID = userID;
-      newUser.password = await Encryption.hash(password);
-      newPlanet.planetType = PlanetType.PLANET;
-
-      this.logger.info("Getting a new planetID");
-
-      const planetID = await this.planetService.getNewId();
-
-      newUser.currentPlanet = planetID;
-      newPlanet.planetID = planetID;
-
-      this.logger.info("Finding free position for new planet");
-
-      const galaxyData = await this.galaxyService.getFreePosition(
-        gameConfig.server.limits.galaxy.max,
-        gameConfig.server.limits.system.max,
-        gameConfig.server.startPlanet.minPlanetPos,
-        gameConfig.server.startPlanet.maxPlanetPos,
-      );
-
-      newPlanet.posGalaxy = galaxyData.posGalaxy;
-      newPlanet.posSystem = galaxyData.posSystem;
-      newPlanet.posPlanet = galaxyData.posPlanet;
-
-      this.logger.info("Creating a new user");
-
-      await this.userService.createNewUser(newUser, connection);
-
-      this.logger.info("Creating a new planet");
-
-      newPlanet.name = gameConfig.server.startPlanet.name;
-      newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
-      newPlanet.diameter = gameConfig.server.startPlanet.diameter;
-      newPlanet.fieldsMax = gameConfig.server.startPlanet.fields;
-      newPlanet.metal = gameConfig.server.startPlanet.resources.metal;
-      newPlanet.crystal = gameConfig.server.startPlanet.resources.crystal;
-      newPlanet.deuterium = gameConfig.server.startPlanet.resources.deuterium;
-
-      [newPlanet.tempMin, newPlanet.tempMax] = this.getRandomTemperaturesByPosition(newPlanet.posPlanet);
-      newPlanet.image = this.getRandomImageByPosition(newPlanet.posPlanet);
-
-      await this.planetService.createNewPlanet(newPlanet, connection);
-
-      this.logger.info("Creating entry in buildings-table");
-
-      await this.buildingService.createBuildingsRow(newPlanet.planetID, connection);
-
-      this.logger.info("Creating entry in defenses-table");
-
-      await this.defenseService.createDefenseRow(newPlanet.planetID, connection);
-
-      this.logger.info("Creating entry in ships-table");
-
-      await this.shipService.createShipsRow(newPlanet.planetID, connection);
-
-      this.logger.info("Creating entry in galaxy-table");
-
-      await this.galaxyService.createGalaxyRow(
-        newPlanet.planetID,
-        newPlanet.posGalaxy,
-        newPlanet.posSystem,
-        newPlanet.posPlanet,
-        connection,
-      );
-
-      this.logger.info("Creating entry in techs-table");
-
-      await this.techService.createTechRow(newUser.userID, connection);
-
-      connection.commit();
-
-      this.logger.info("Transaction complete");
-
-      await connection.commit();
+      return response.status(Globals.Statuscode.SUCCESS).json({
+        userID: newUser.userID,
+        token: JwtHelper.generateToken(newUser.userID),
+      });
     } catch (error) {
-      await connection.rollback();
-      this.logger.error(error, error);
-
-      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: `There was an error while handling the request: ${error.message}`,
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
         });
       }
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    } finally {
-      await connection.release();
-    }
+      this.logger.error(error.message, error.stack);
 
-    return response.status(Globals.Statuscode.SUCCESS).json({
-      userID: newUser.userID,
-      token: JwtHelper.generateToken(newUser.userID),
-    });
+      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+        error: "There was an error while handling the request",
+      });
+    }
   };
 
   public updateUser = async (request: IAuthorizedRequest, response: Response) => {
@@ -277,7 +299,7 @@ export default class UsersRouter {
         });
       }
 
-      const user: User = await this.userService.getAuthenticatedUser(parseInt(request.userID, 10));
+      const user: User = await this.userDataAccess.getAuthenticatedUser(parseInt(request.userID, 10));
 
       if (InputValidator.isSet(request.body.username)) {
         // TODO: Check if new username already exists
@@ -294,7 +316,7 @@ export default class UsersRouter {
         user.email = InputValidator.sanitizeString(request.body.email);
       }
 
-      await this.userService.updateUserData(user);
+      await this.userDataAccess.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json(user ?? {});
     } catch (error) {
@@ -306,7 +328,7 @@ export default class UsersRouter {
         });
       } else {
         return response.status(Globals.Statuscode.SERVER_ERROR).json({
-          error: "There was an error while handling the request.",
+          error: "There was an error while handling the request",
         });
       }
     }
@@ -315,15 +337,13 @@ export default class UsersRouter {
   public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
       const planetID = parseInt(request.body.planetID, 10);
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+      const planet: Planet = await this.planetDataAccess.getPlanetByIDWithBasicInformation(planetID);
 
       if (!InputValidator.isSet(planet)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -331,18 +351,24 @@ export default class UsersRouter {
         });
       }
 
-      const user: User = await this.userService.getUserById(userID);
+      const user: User = await this.userDataAccess.getUserById(userID);
 
       user.currentPlanet = planetID;
 
-      await this.userService.updateUserData(user);
+      await this.userDataAccess.updateUserData(user);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };

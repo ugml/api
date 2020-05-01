@@ -1,13 +1,9 @@
-/**
- * This error should be thrown when an entity is invalid.
- */
-export default class EntityInvalidException extends Error {
-  /**
-   * Takes a message-string and returns a new EntityInvalidException-object
-   * @param m the exception-message
-   */
+import { Globals } from "../common/Globals";
+import Exception from "./Exception";
+
+export default class EntityInvalidException extends Exception {
   public constructor(m: string) {
-    super(m);
+    super(m, Globals.Statuscode.BAD_REQUEST);
 
     // Set the prototype explicitly.
     Object.setPrototypeOf(this, EntityInvalidException.prototype);

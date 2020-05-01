@@ -24,7 +24,7 @@ describe("buildingsRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await container.planetDataAccess.getPlanetByIDWithFullInformation(167546850);
     return request
       .post("/v1/auth/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -34,7 +34,7 @@ describe("buildingsRoute", () => {
   });
 
   after(async () => {
-    await container.planetService.updatePlanet(planetBeforeTests);
+    await container.planetDataAccess.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -61,7 +61,7 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .then(res => {
           expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.error).to.equals("Planet does not exist.");
+          expect(res.body.error).to.equals("Planet does not exist");
         });
     });
 
@@ -131,10 +131,10 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID: 1234, buildingID: 1 })
+        .send({ planetID: 61614, buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.error).equals("User does not own the planet");
+          expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
         });
     });
 
@@ -163,7 +163,7 @@ describe("buildingsRoute", () => {
           .send({ planetID: `${planetID}`, buildingID: "1" })
           .then(res => {
             expect(res.body.error).equals("Planet already has a build-job");
-            expect(res.status).equals(Globals.Statuscode.SUCCESS);
+            expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
           });
       });
       it("cancel the build-order", () => {
@@ -188,7 +188,7 @@ describe("buildingsRoute", () => {
           .send({ planetID: `${planetID}`, buildingID: "1" })
           .then(res => {
             expect(res.body.error).equals("Planet has no build-job");
-            expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
           });
       });
     });
@@ -247,23 +247,23 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID: 1234, buildingID: 1 })
+        .send({ planetID: 61614, buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.error).equals("User does not own the planet");
+          expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
         });
     });
 
     it("should fail (player does not own the planet)", () => {
-      const planetID = 12;
+      const planetID = 61614;
 
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
         .send({ planetID, buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.error).equals("User does not own the planet");
+          expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
         });
     });
 
@@ -274,7 +274,7 @@ describe("buildingsRoute", () => {
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
-        .send({ planetID, buildingID })
+        .send({ planetID: planetID, buildingID: buildingID })
         .then(res => {
           expect(res.body.planetID).equals(planetID);
           expect(res.body.bBuildingId).equals(buildingID);
@@ -291,7 +291,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.error).equals("Planet already has a build-job");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
         });
     });
 
@@ -333,34 +333,34 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.error).equals("Planet has no build-job");
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
         });
     });
 
     it("cancel should fail (player does not own the planet)", () => {
-      const planetID = 1234;
+      const planetID = 61614;
 
       return request
         .post("/v1/buildings/cancel")
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.body.error).equals("User does not own the planet");
+          expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
         });
     });
 
     it("should fail (can't build shipyard/robotic/nanite while it is being used)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
       const valueBefore = planet.bHangarStartTime;
 
       planet.bHangarQueue = "[ { test: 1234 } ]";
       planet.bHangarStartTime = 1;
 
-      await container.planetService.updatePlanet(planet);
+      await container.planetDataAccess.updatePlanet(planet);
 
       return request
         .post("/v1/buildings/build")
@@ -368,19 +368,19 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.ROBOTIC_FACTORY })
         .then(async res => {
           expect(res.body.error).equals("Can't build this building while it is in use");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
 
           // reset planet
           planet.bHangarStartTime = valueBefore;
-          await container.planetService.updatePlanet(planet);
+          await container.planetDataAccess.updatePlanet(planet);
         });
     });
 
     it("should fail (can't build research-lab while it is being used)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
-      const user: User = await container.userService.getAuthenticatedUser(planet.ownerID);
+      const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
+      const user: User = await container.userDataAccess.getAuthenticatedUser(planet.ownerID);
 
       const techIDold = user.bTechID;
       const endtime = user.bTechEndTime;
@@ -388,7 +388,7 @@ describe("buildingsRoute", () => {
       user.bTechEndTime = 1;
       user.bTechID = 109;
 
-      await container.userService.updateUserData(user);
+      await container.userDataAccess.updateUserData(user);
 
       return request
         .post("/v1/buildings/build")
@@ -396,12 +396,12 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.RESEARCH_LAB })
         .then(async res => {
           expect(res.body.error).to.be.equal("Can't build this building while it is in use");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
 
           user.bTechEndTime = techIDold;
           user.bTechID = endtime;
 
-          await container.userService.updateUserData(user);
+          await container.userDataAccess.updateUserData(user);
         });
     });
 
@@ -414,20 +414,20 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.TERRAFORMER })
         .then(async res => {
           expect(res.body.error).equals("Requirements are not met");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
         });
     });
 
     it("should fail (planet has not enough resources)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
       const metalBefore = planet.metal;
 
       planet.metal = 0;
 
-      await container.planetService.updatePlanet(planet);
+      await container.planetDataAccess.updatePlanet(planet);
 
       return request
         .post("/v1/buildings/build")
@@ -435,11 +435,11 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
         .then(async res => {
           expect(res.body.error).equals("Not enough resources");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
 
           // reset planet
           planet.metal = metalBefore;
-          await container.planetService.updatePlanet(planet);
+          await container.planetDataAccess.updatePlanet(planet);
         });
     });
   });
@@ -492,15 +492,15 @@ describe("buildingsRoute", () => {
   });
 
   it("should fail (player does not own planet)", async () => {
-    const planetID = 1234;
+    const planetID = 61614;
 
     return request
       .post("/v1/buildings/demolish")
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
-        expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.error).equals("User does not own the planet");
+        expect(res.status).equals(Globals.Statuscode.NOT_AUTHORIZED);
       });
   });
 
@@ -520,7 +520,7 @@ describe("buildingsRoute", () => {
   it("should start demolition of a building", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     return request
       .post("/v1/buildings/demolish")
@@ -534,20 +534,20 @@ describe("buildingsRoute", () => {
         expect(res.status).equals(Globals.Statuscode.SUCCESS);
 
         // reset
-        await container.planetService.updatePlanet(planet);
+        await container.planetDataAccess.updatePlanet(planet);
       });
   });
 
   it("should fail (planet has already a build job)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     planet.bBuildingId = 1;
     planet.bBuildingEndTime = 1234;
     planet.bBuildingDemolition = true;
 
-    await container.planetService.updatePlanet(planet);
+    await container.planetDataAccess.updatePlanet(planet);
 
     return request
       .post("/v1/buildings/demolish")
@@ -561,7 +561,7 @@ describe("buildingsRoute", () => {
         planet.bBuildingId = 0;
         planet.bBuildingEndTime = 0;
         planet.bBuildingDemolition = false;
-        await container.planetService.updatePlanet(planet);
+        await container.planetDataAccess.updatePlanet(planet);
       });
   });
 });

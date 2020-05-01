@@ -100,10 +100,10 @@ describe("techsRouter", () => {
     return request
       .post("/v1/techs/build")
       .set("Authorization", authToken)
-      .send({ planetID: 1234, techID: 101 })
+      .send({ planetID: 61614, techID: 101 })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.error).equals("User does not own the planet");
+        expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
       });
   });
 
@@ -136,13 +136,13 @@ describe("techsRouter", () => {
   it("try to start a tech-build-order while research-lab is upgrading", async () => {
     const planetID = 167546850;
 
-    const planetBackup: Planet = await container.planetService.getPlanet(1, planetID, true);
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planetBackup: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
+    const planet: Planet = await container.planetDataAccess.getPlanetByIDWithFullInformation(planetID);
 
     planet.bBuildingId = Globals.Buildings.RESEARCH_LAB;
     planet.bBuildingEndTime = 1;
 
-    await container.planetService.updatePlanet(planet);
+    await container.planetDataAccess.updatePlanet(planet);
 
     return request
       .post("/v1/techs/build")
@@ -153,7 +153,7 @@ describe("techsRouter", () => {
         expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
 
         // reset
-        await container.planetService.updatePlanet(planetBackup);
+        await container.planetDataAccess.updatePlanet(planetBackup);
       });
   });
 
@@ -184,15 +184,15 @@ describe("techsRouter", () => {
   });
 
   it("should fail (user does not own the planet)", () => {
-    const planetID = 1234;
+    const planetID = 61614;
 
     return request
       .post("/v1/techs/cancel")
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "1101" })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.body.error).equals("User does not own the planet");
+        expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
       });
   });
 

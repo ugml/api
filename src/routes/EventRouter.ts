@@ -5,8 +5,6 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
-import IEventService from "../interfaces/services/IEventService";
-import IPlanetService from "../interfaces/services/IPlanetService";
 import Event from "../units/Event";
 import ILogger from "../interfaces/ILogger";
 
@@ -14,6 +12,10 @@ const validator = require("jsonschema").Validator;
 const jsonValidator = new validator();
 
 import * as eventSchema from "../schemas/fleetevent.schema.json";
+import IEventDataAccess from "../interfaces/dataAccess/IEventDataAccess";
+import IPlanetDataAccess from "../interfaces/dataAccess/IPlanetDataAccess";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import Exception from "../exceptions/Exception";
 
 // TODO: validate input data:
 //  is start != end?
@@ -29,12 +31,12 @@ export default class EventRouter {
 
   private logger: ILogger;
 
-  private planetService: IPlanetService;
-  private eventService: IEventService;
+  private planetDataAccess: IPlanetDataAccess;
+  private eventDataAccess: IEventDataAccess;
 
   public constructor(container, logger: ILogger) {
-    this.planetService = container.planetService;
-    this.eventService = container.eventService;
+    this.planetDataAccess = container.planetDataAccess;
+    this.eventDataAccess = container.eventDataAccess;
 
     this.router.post("/create/", this.createEvent);
     this.router.post("/cancel/", this.cancelEvent);
@@ -53,9 +55,7 @@ export default class EventRouter {
       // TODO: check if planet has enough deuterium
 
       if (!InputValidator.isSet(request.body.event)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const eventData = JSON.parse(request.body.event);
@@ -98,8 +98,8 @@ export default class EventRouter {
         type: this.getDestinationTypeByName(eventData.data.destination.type),
       };
 
-      const startPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionOrigin);
-      const destinationPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionDestination);
+      const startPlanet = await this.planetDataAccess.getPlanetOrMoonAtPosition(positionOrigin);
+      const destinationPlanet = await this.planetDataAccess.getPlanetOrMoonAtPosition(positionDestination);
 
       if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -147,15 +147,21 @@ export default class EventRouter {
       event.returning = false;
       event.processed = false;
 
-      await this.eventService.createNewEvent(event);
+      await this.eventDataAccess.createNewEvent(event);
 
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json(event ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -168,15 +174,13 @@ export default class EventRouter {
   public cancelEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.body.eventID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
       const eventID = parseInt(request.body.eventID, 10);
 
-      const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
+      const event: Event = await this.eventDataAccess.getEventOfPlayer(userID, eventID);
 
       if (!InputValidator.isSet(event) || event.returning === true || event.inQueue === true) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -188,15 +192,21 @@ export default class EventRouter {
       event.endTime = Math.round(+new Date() / 1000) - event.startTime + Math.round(+new Date() / 1000);
       event.startTime = Math.round(+new Date() / 1000);
 
-      await this.eventService.cancelEvent(event);
+      await this.eventDataAccess.cancelEvent(event);
 
       // all done
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };

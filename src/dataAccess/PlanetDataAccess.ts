@@ -11,30 +11,40 @@ import EntityInvalidException from "../exceptions/EntityInvalidException";
  * This class defines a DataAccess to interact with the planets-table in the database
  */
 export default class PlanetDataAccess implements IPlanetDataAccess {
+  public async getPlanetByIDWithBasicInformation(planetID: number): Promise<Planet> {
+    const query = squel
+      .select()
+      .from("planets", "p")
+      .field("planetID")
+      .field("ownerID")
+      .field("name")
+      .field("posGalaxy")
+      .field("posSystem")
+      .field("posPlanet")
+      .field("planetType")
+      .field("image")
+      .where("p.planetID = ?", planetID);
+
+    const [rows] = await Database.query(query.toString());
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new Planet(), JSON.stringify(rows[0]));
+  }
+
   /**
    * Returns all information about a given planet owned by the given user.
    * @param userID the ID of the user
    * @param planetID the ID of the planet
    * @param fullInfo true - all informations are returned, false - only basic information is returned
    */
-  public async getPlanet(userID: number, planetID: number, fullInfo = false): Promise<Planet> {
-    let query = squel
+  public async getPlanetByIDWithFullInformation(planetID: number): Promise<Planet> {
+    const query = squel
       .select()
       .from("planets", "p")
-      .where("p.planetID = ?", planetID)
-      .where("p.ownerID = ?", userID);
-
-    if (!fullInfo) {
-      query = query
-        .field("planetID")
-        .field("ownerID")
-        .field("name")
-        .field("posGalaxy")
-        .field("posSystem")
-        .field("posPlanet")
-        .field("planetType")
-        .field("image");
-    }
+      .where("p.planetID = ?", planetID);
 
     const [rows] = await Database.query(query.toString());
 

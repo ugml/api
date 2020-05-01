@@ -2,6 +2,7 @@ import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import IUnit from "../interfaces/IUnit";
 import ICosts from "../interfaces/ICosts";
+import Queue from "../common/Queue";
 
 /**
  * Represents a planet-row in the database
@@ -92,6 +93,63 @@ export default class Planet implements IUnit {
   public cancelBuilding(): void {
     this.bBuildingId = 0;
     this.bBuildingEndTime = 0;
+  }
+
+  public startBuildJob(buildingID: number, buildingTime: number): void {
+    this.bBuildingId = buildingID;
+    this.bBuildingEndTime = buildingTime;
+  }
+
+  public startDemolishJob(buildingID: number, buildingTime: number): void {
+    this.bBuildingId = buildingID;
+    this.bBuildingEndTime = buildingTime;
+    this.bBuildingDemolition = true;
+  }
+  public setBuildOrder(queue: Queue) {
+    let oldBuildOrder;
+
+    // TODO: refactor and simplify
+    if (!this.isBuildingUnits()) {
+      this.bHangarQueue = JSON.parse("[]");
+      oldBuildOrder = this.bHangarQueue;
+      this.bHangarStartTime = Math.floor(Date.now() / 1000);
+    } else {
+      oldBuildOrder = JSON.parse(this.bHangarQueue);
+    }
+
+    oldBuildOrder.push(queue);
+
+    this.bHangarQueue = JSON.stringify(oldBuildOrder);
+  }
+
+  public getMaxBuildableAmountOfUnit(costs: ICosts, count: number) {
+    let tempCount: number;
+
+    if (costs.metal > 0) {
+      tempCount = this.metal / costs.metal;
+
+      if (tempCount < count) {
+        count = tempCount;
+      }
+    }
+
+    if (costs.crystal > 0) {
+      tempCount = this.crystal / costs.crystal;
+
+      if (tempCount < count) {
+        count = tempCount;
+      }
+    }
+
+    if (costs.deuterium > 0) {
+      tempCount = this.deuterium / costs.deuterium;
+
+      if (tempCount < count) {
+        count = tempCount;
+      }
+    }
+
+    return count;
   }
 
   public isValid(): boolean {

@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import ILogger from "../interfaces/ILogger";
 import Config from "../common/Config";
+import Exception from "../exceptions/Exception";
 
 /**
  * Defines routes to get the config-files
@@ -24,10 +25,16 @@ export default class ConfigRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   }
@@ -38,10 +45,16 @@ export default class ConfigRouter {
 
       return response.status(Globals.Statuscode.SUCCESS).json(data.units ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   }

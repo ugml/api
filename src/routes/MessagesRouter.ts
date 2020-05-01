@@ -2,9 +2,11 @@ import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IMessageService from "../interfaces/services/IMessageService";
-import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
+import IUserDataAccess from "../interfaces/dataAccess/IUserDataAccess";
+import IMessageDataAccess from "../interfaces/dataAccess/IMessageDataAccess";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import Exception from "../exceptions/Exception";
 
 /**
  * Defines routes for message-sending and receiving
@@ -12,12 +14,12 @@ import ILogger from "../interfaces/ILogger";
 export default class MessagesRouter {
   public router: Router = Router();
   private logger: ILogger;
-  private userService: IUserService;
-  private messageService: IMessageService;
+  private userDataAccess: IUserDataAccess;
+  private messageDataAccess: IMessageDataAccess;
 
   public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.messageService = container.messageService;
+    this.userDataAccess = container.userDataAccess;
+    this.messageDataAccess = container.messageDataAccess;
     this.router.get("/get", this.getAllMessages);
     this.router.get("/get/:messageID", this.getMessageByID);
     this.router.post("/delete", this.deleteMessage);
@@ -30,14 +32,20 @@ export default class MessagesRouter {
     try {
       const userID = parseInt(request.userID, 10);
 
-      const messages = await this.messageService.getAllMessages(userID);
+      const messages = await this.messageDataAccess.getAllMessages(userID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(messages ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -45,21 +53,25 @@ export default class MessagesRouter {
   public getMessageByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.params.messageID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
       const messageID = parseInt(request.params.messageID, 10);
-      const message = await this.messageService.getMessageById(userID, messageID);
+      const message = await this.messageDataAccess.getMessageById(userID, messageID);
 
       return response.status(Globals.Statuscode.SUCCESS).json(message ?? {});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -67,22 +79,26 @@ export default class MessagesRouter {
   public deleteMessage = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isValidInt(request.body.messageID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
       const messageID = parseInt(request.body.messageID, 10);
 
-      await this.messageService.deleteMessage(userID, messageID);
+      await this.messageDataAccess.deleteMessage(userID, messageID);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };
@@ -94,9 +110,7 @@ export default class MessagesRouter {
         !InputValidator.isSet(request.body.subject) ||
         !InputValidator.isSet(request.body.body)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const userID = parseInt(request.userID, 10);
@@ -104,7 +118,7 @@ export default class MessagesRouter {
       const subject = InputValidator.sanitizeString(request.body.subject);
       const messageText = InputValidator.sanitizeString(request.body.body);
 
-      const receiver = await this.userService.getUserById(receiverID);
+      const receiver = await this.userDataAccess.getUserById(receiverID);
 
       if (!InputValidator.isSet(receiver)) {
         return response.status(Globals.Statuscode.BAD_REQUEST).json({
@@ -112,14 +126,20 @@ export default class MessagesRouter {
         });
       }
 
-      await this.messageService.sendMessage(userID, receiverID, subject, messageText);
+      await this.messageDataAccess.sendMessage(userID, receiverID, subject, messageText);
 
       return response.status(Globals.Statuscode.SUCCESS).json({});
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
+          error: error.message,
+        });
+      }
+
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };

@@ -1,6 +1,7 @@
 import Database from "../common/Database";
 import IDefenseDataAccess from "../interfaces/dataAccess/IDefenseDataAccess";
 import squel = require("safe-squel");
+import Defenses from "../units/Defenses";
 
 /**
  * This class defines a DataAccess to interact with the defenses-table in the database
@@ -11,7 +12,7 @@ export default class DefenseDataAccess implements IDefenseDataAccess {
    * @param userID the ID of the user
    * @param planetID the ID of the planet
    */
-  public async getDefenses(userID: number, planetID: number) {
+  public async getDefenses(planetID: number, userID: number): Promise<Defenses> {
     const query: string = squel
       .select()
       .field("p.ownerID", "ownerID")

@@ -40,7 +40,7 @@ describe("User Routes", () => {
       email: "iamnotareal@email.com",
     };
 
-    container.galaxyService.getFreePosition = function() {
+    container.galaxyDataAccess.getFreePosition = function() {
       return {
         posGalaxy: 1,
         posSystem: 1,

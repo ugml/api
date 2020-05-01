@@ -4,7 +4,8 @@ import InputValidator from "../common/InputValidator";
 import IRequest from "../interfaces/IRequest";
 import ILogger from "../interfaces/ILogger";
 import IAuthenticationService from "../services/AuthenticationService";
-import AuthenticationFailedException from "../exceptions/AuthenticationFailedException";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import Exception from "../exceptions/Exception";
 
 /**
  * Defines routes for authentication
@@ -35,9 +36,7 @@ export default class AuthRouter {
   public authenticate = async (req: IRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        throw new InvalidParameterException("Invalid parameter");
       }
 
       const email: string = InputValidator.sanitizeString(req.body.email);
@@ -47,16 +46,16 @@ export default class AuthRouter {
         token: await this.authenticationService.authenticate(email, password),
       });
     } catch (error) {
-      if (error instanceof AuthenticationFailedException) {
-        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
+      if (error instanceof Exception) {
+        return response.status(error.statusCode).json({
           error: error.message,
         });
       }
 
-      this.logger.error(error, error.stack);
+      this.logger.error(error.message, error.stack);
 
       return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
+        error: "There was an error while handling the request",
       });
     }
   };

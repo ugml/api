@@ -52,7 +52,7 @@ export default class BuildingsRouter {
   public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -62,11 +62,11 @@ export default class BuildingsRouter {
       // TODO: check if user owns the planet
       const data = await this.buildingService.getBuildings(planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(data ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -81,7 +81,7 @@ export default class BuildingsRouter {
   public cancelBuilding = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -93,13 +93,13 @@ export default class BuildingsRouter {
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
 
       if (!planet.isUpgradingBuilding()) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
+        return response.status(Globals.StatusCodes.SUCCESS).json({
           error: "Planet has no build-job",
         });
       }
@@ -118,11 +118,11 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -142,7 +142,7 @@ export default class BuildingsRouter {
         !InputValidator.isSet(request.body.buildingID) ||
         !InputValidator.isValidInt(request.body.buildingID)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -152,7 +152,7 @@ export default class BuildingsRouter {
       const buildingID = parseInt(request.body.buildingID, 10);
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -162,14 +162,14 @@ export default class BuildingsRouter {
       const user: User = await this.userService.getAuthenticatedUser(userID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
 
       // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
+        return response.status(Globals.StatusCodes.SUCCESS).json({
           error: "Planet already has a build-job",
         });
       }
@@ -182,14 +182,14 @@ export default class BuildingsRouter {
         InputValidator.isSet(planet.bHangarQueue) &&
         planet.isBuildingUnits()
       ) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
+        return response.status(Globals.StatusCodes.SUCCESS).json({
           error: "Can't build this building while it is in use",
         });
       }
 
       // can't build research lab while they are researching... poor scientists :(
       if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
+        return response.status(Globals.StatusCodes.SUCCESS).json({
           error: "Can't build this building while it is in use",
         });
       }
@@ -204,7 +204,7 @@ export default class BuildingsRouter {
           const key = Globals.UnitNames[requirement.unitID];
 
           if (buildings[key] < requirement.level) {
-            return response.status(Globals.Statuscode.SUCCESS).json({
+            return response.status(Globals.StatusCodes.SUCCESS).json({
               error: "Requirements are not met",
             });
           }
@@ -223,7 +223,7 @@ export default class BuildingsRouter {
         planet.deuterium < cost.deuterium ||
         planet.energyUsed < cost.energy
       ) {
-        return response.status(Globals.Statuscode.SUCCESS).json({
+        return response.status(Globals.StatusCodes.SUCCESS).json({
           error: "Not enough resources",
         });
       }
@@ -246,11 +246,11 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -264,7 +264,7 @@ export default class BuildingsRouter {
         !InputValidator.isSet(request.body.buildingID) ||
         !InputValidator.isValidInt(request.body.buildingID)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -274,7 +274,7 @@ export default class BuildingsRouter {
       const buildingID = parseInt(request.body.buildingID, 10);
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -283,13 +283,13 @@ export default class BuildingsRouter {
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
 
       if (planet.isUpgradingBuilding()) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Planet already has a build-job",
         });
       }
@@ -298,7 +298,7 @@ export default class BuildingsRouter {
       const currentLevel = buildings[buildingKey];
 
       if (currentLevel === 0) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "This building can't be demolished",
         });
       }
@@ -320,11 +320,11 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }

@@ -45,11 +45,11 @@ export default class MessagesRouter {
 
       const messages = await this.messageService.getAllMessages(userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(messages ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(messages ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -64,7 +64,7 @@ export default class MessagesRouter {
   public getMessageByID = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -73,11 +73,11 @@ export default class MessagesRouter {
       const messageID = parseInt(request.params.messageID, 10);
       const message = await this.messageService.getMessageById(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(message ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(message ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -92,7 +92,7 @@ export default class MessagesRouter {
   public deleteMessage = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -102,11 +102,11 @@ export default class MessagesRouter {
 
       await this.messageService.deleteMessage(userID, messageID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({});
+      return response.status(Globals.StatusCodes.SUCCESS).json({});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -126,7 +126,7 @@ export default class MessagesRouter {
         !InputValidator.isSet(request.body.subject) ||
         !InputValidator.isSet(request.body.body)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -139,18 +139,18 @@ export default class MessagesRouter {
       const receiver = await this.userService.getUserById(receiverID);
 
       if (!InputValidator.isSet(receiver)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "The receiver does not exist",
         });
       }
 
       await this.messageService.sendMessage(userID, receiverID, subject, messageText);
 
-      return response.status(Globals.Statuscode.SUCCESS).json({});
+      return response.status(Globals.StatusCodes.SUCCESS).json({});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }

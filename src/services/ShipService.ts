@@ -3,10 +3,12 @@ import InputValidator from "../common/InputValidator";
 import IShipService from "../interfaces/IShipService";
 
 import squel = require("safe-squel");
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact with the ships-table in the database
  */
+@injectable()
 export default class ShipService implements IShipService {
   /**
    * Returns a list of ships on a given planet, owned by the given user

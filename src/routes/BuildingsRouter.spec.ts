@@ -12,7 +12,7 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -26,7 +26,7 @@ describe("buildingsRoute", () => {
   before(async () => {
     planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -51,7 +51,7 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .then(res => {
           expect(res.body.planetID).equals(planetID);
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         });
     });
 
@@ -60,7 +60,7 @@ describe("buildingsRoute", () => {
         .get("/v1/buildings/1")
         .set("Authorization", authToken)
         .then(res => {
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
           expect(res.body).to.be.empty;
         });
     });
@@ -71,7 +71,7 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
   });
@@ -86,7 +86,7 @@ describe("buildingsRoute", () => {
         .send({ planetID })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -97,7 +97,7 @@ describe("buildingsRoute", () => {
         .send({ buildingID: 1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -110,7 +110,7 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID: -1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -123,7 +123,7 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID: 100 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -134,7 +134,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: 1234, buildingID: 1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -148,7 +148,7 @@ describe("buildingsRoute", () => {
           .set("Authorization", authToken)
           .send({ planetID, buildingID: 1 })
           .then(res => {
-            expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
             expect(res.body.planetID).to.be.equals(planetID);
             // TODO
           });
@@ -163,7 +163,7 @@ describe("buildingsRoute", () => {
           .send({ planetID: `${planetID}`, buildingID: "1" })
           .then(res => {
             expect(res.body.error).equals("Planet already has a build-job");
-            expect(res.status).equals(Globals.Statuscode.SUCCESS);
+            expect(res.status).equals(Globals.StatusCodes.SUCCESS);
           });
       });
       it("cancel the build-order", () => {
@@ -175,7 +175,7 @@ describe("buildingsRoute", () => {
           .send({ planetID: `${planetID}`, buildingID: "1" })
           .then(res => {
             // TODO
-            expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
             expect(res.body.planetID).to.be.equals(planetID);
           });
       });
@@ -188,7 +188,7 @@ describe("buildingsRoute", () => {
           .send({ planetID: `${planetID}`, buildingID: "1" })
           .then(res => {
             expect(res.body.error).equals("Planet has no build-job");
-            expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+            expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
           });
       });
     });
@@ -202,7 +202,7 @@ describe("buildingsRoute", () => {
         .send({ planetID })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -213,7 +213,7 @@ describe("buildingsRoute", () => {
         .send({ buildingID: 1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -226,7 +226,7 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID: -1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -239,7 +239,7 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID: 100 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -250,7 +250,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: 1234, buildingID: 1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -263,7 +263,7 @@ describe("buildingsRoute", () => {
         .send({ planetID, buildingID: 1 })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -278,7 +278,7 @@ describe("buildingsRoute", () => {
         .then(res => {
           expect(res.body.planetID).equals(planetID);
           expect(res.body.bBuildingId).equals(buildingID);
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         });
     });
 
@@ -291,7 +291,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.error).equals("Planet already has a build-job");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.StatusCodes.SUCCESS);
         });
     });
 
@@ -304,7 +304,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -320,7 +320,7 @@ describe("buildingsRoute", () => {
           expect(res.body.planetID).to.be.equals(planetID);
           expect(res.body.bBuildingId).to.be.equals(0);
           expect(res.body.bBuildingEndTime).to.be.equals(0);
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         });
     });
 
@@ -333,7 +333,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.error).equals("Planet has no build-job");
-          expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         });
     });
 
@@ -346,7 +346,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
           expect(res.body.error).equals("Invalid parameter");
-          expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
 
@@ -368,7 +368,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.ROBOTIC_FACTORY })
         .then(async res => {
           expect(res.body.error).equals("Can't build this building while it is in use");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
           // reset planet
           planet.bHangarStartTime = valueBefore;
@@ -396,7 +396,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.RESEARCH_LAB })
         .then(async res => {
           expect(res.body.error).to.be.equal("Can't build this building while it is in use");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
           user.bTechEndTime = techIDold;
           user.bTechID = endtime;
@@ -414,7 +414,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.TERRAFORMER })
         .then(async res => {
           expect(res.body.error).equals("Requirements are not met");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.StatusCodes.SUCCESS);
         });
     });
 
@@ -435,7 +435,7 @@ describe("buildingsRoute", () => {
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
         .then(async res => {
           expect(res.body.error).equals("Not enough resources");
-          expect(res.status).equals(Globals.Statuscode.SUCCESS);
+          expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
           // reset planet
           planet.metal = metalBefore;
@@ -451,7 +451,7 @@ describe("buildingsRoute", () => {
       .send({ buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -464,7 +464,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: `${planetID}` })
       .then(async res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -474,7 +474,7 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .then(async res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -487,7 +487,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: `${planetID}`, buildingID: 503 })
       .then(async res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -500,7 +500,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -513,7 +513,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.MISSILE_SILO })
       .then(async res => {
         expect(res.body.error).equals("This building can't be demolished");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -531,7 +531,7 @@ describe("buildingsRoute", () => {
         expect(res.body.bBuildingId).greaterThan(0);
         expect(res.body.bBuildingEndTime).greaterThan(0);
         expect(res.body.bBuildingDemolition).equals(true);
-        expect(res.status).equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
         // reset
         await container.planetService.updatePlanet(planet);
@@ -555,7 +555,7 @@ describe("buildingsRoute", () => {
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
         expect(res.body.error).equals("Planet already has a build-job");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
 
         // reset
         planet.bBuildingId = 0;

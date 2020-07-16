@@ -11,7 +11,7 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -22,7 +22,7 @@ let request = chai.request(app);
 describe("techsRouter", () => {
   before(() => {
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -39,7 +39,7 @@ describe("techsRouter", () => {
       .get("/v1/techs/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.userID).to.be.equals(1);
         expect(res.body.gravitonTech).to.be.equals(1);
@@ -55,7 +55,7 @@ describe("techsRouter", () => {
       .send({ planetID })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -66,7 +66,7 @@ describe("techsRouter", () => {
       .send({ techID: 1 })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -79,7 +79,7 @@ describe("techsRouter", () => {
       .send({ planetID, techID: -1 })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -92,7 +92,7 @@ describe("techsRouter", () => {
       .send({ planetID, techID: 500 })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -103,7 +103,7 @@ describe("techsRouter", () => {
       .send({ planetID: 1234, techID: 101 })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -115,7 +115,7 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, techID: 101 })
       .then(res => {
-        expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         expect(res.body.planetID).to.be.equals(planetID);
       });
   });
@@ -129,7 +129,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
         expect(res.body.error).equals("Planet already has a build-job");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -150,7 +150,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(async res => {
         expect(res.body.error).equals("Planet is upgrading the research-lab");
-        expect(res.status).equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
 
         // reset
         await container.planetService.updatePlanet(planetBackup);
@@ -166,7 +166,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -178,7 +178,7 @@ describe("techsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, techID: "101" })
       .then(res => {
-        expect(res.status).to.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         expect(res.body.planetID).to.equals(planetID);
       });
   });
@@ -192,7 +192,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "1101" })
       .then(res => {
         expect(res.body.error).equals("Invalid parameter");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -205,7 +205,7 @@ describe("techsRouter", () => {
       .send({ planetID: `${planetID}`, techID: "1" })
       .then(res => {
         expect(res.body.error).equals("Planet has no build-job");
-        expect(res.status).to.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 });

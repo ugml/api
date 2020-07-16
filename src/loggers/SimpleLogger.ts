@@ -1,9 +1,11 @@
 import ILogger from "../interfaces/ILogger";
+import {injectable} from "inversify";
 
 /**
  * This class represents a simple logger which logs
  * straight to the console.
  */
+@injectable()
 export default class SimpleLogger implements ILogger {
   /**
    * Log a message of severity 'error'

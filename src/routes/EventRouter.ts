@@ -59,7 +59,7 @@ export default class EventRouter {
       // TODO: check if planet has enough deuterium
 
       if (!InputValidator.isSet(request.body.event)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -68,7 +68,7 @@ export default class EventRouter {
 
       // validate JSON against schema
       if (!jsonValidator.validate(eventData, eventSchema).valid) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid json",
         });
       }
@@ -78,14 +78,14 @@ export default class EventRouter {
 
       // check if sender of event == currently authenticated user
       if (userID !== ownerID) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Event-creator is not currently authenticated user",
         });
       }
 
       // TODO: temporary
       if (["deploy", "acs", "hold", "harvest", "espionage", "destroy"].indexOf(eventData.mission) >= 0) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Missiontype not yet supported",
         });
       }
@@ -108,14 +108,14 @@ export default class EventRouter {
       const destinationPlanet = await this.planetService.getPlanetOrMoonAtPosition(positionDestination);
 
       if (!InputValidator.isSet(startPlanet) || startPlanet.ownerID !== userID) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Origin does not exist or user is not the owner",
         });
       }
 
       // destination does not exist
       if (!InputValidator.isSet(destinationPlanet) && eventData.mission !== "colonize") {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Destination does not exist",
         });
       }
@@ -156,11 +156,11 @@ export default class EventRouter {
       await this.eventService.createNewEvent(event);
 
       // all done
-      return response.status(Globals.Statuscode.SUCCESS).json(event ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(event ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -175,7 +175,7 @@ export default class EventRouter {
   public cancelEvent = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.body.eventID) || !InputValidator.isValidInt(request.body.eventID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -186,7 +186,7 @@ export default class EventRouter {
       const event: Event = await this.eventService.getEventOfPlayer(userID, eventID);
 
       if (!InputValidator.isSet(event) || event.returning === true || event.inQueue === true) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "The event does not exist or can't be canceled",
         });
       }
@@ -198,11 +198,11 @@ export default class EventRouter {
       await this.eventService.cancelEvent(event);
 
       // all done
-      return response.status(Globals.Statuscode.SUCCESS).json({});
+      return response.status(Globals.StatusCodes.SUCCESS).json({});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }

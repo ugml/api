@@ -11,7 +11,7 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -25,7 +25,7 @@ describe("shipsRouter", () => {
   before(async () => {
     planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -47,7 +47,7 @@ describe("shipsRouter", () => {
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).to.be.equals(planetID);
       });
@@ -59,7 +59,7 @@ describe("shipsRouter", () => {
       .get(`/v1/ships/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -71,7 +71,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID: "sadf", buildOrder: { 201: 3 } })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -85,7 +85,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: { hallo: 3 } })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -99,7 +99,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: { 201: "asdf" } })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -114,7 +114,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "301": 3000 }' })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -130,7 +130,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("The player does not own the planet");
       });
@@ -154,7 +154,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 3000 }' })
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
@@ -174,7 +174,7 @@ describe("shipsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID, buildOrder: '{ "201": 4 }' })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).to.be.equals(planetID);
         const buildOrders = JSON.parse(res.body.bHangarQueue);

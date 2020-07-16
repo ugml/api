@@ -10,7 +10,7 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -21,7 +21,7 @@ describe("User Routes", () => {
 
   before(() => {
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -52,7 +52,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body).to.have.keys("userID", "token");
     expect(body.token.length).to.be.above(120);
   });
@@ -67,7 +67,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("There was an error while handling the request: Username is already taken");
   });
 
@@ -81,7 +81,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("There was an error while handling the request: Email is already taken");
   });
 
@@ -94,7 +94,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("Invalid parameter");
   });
 
@@ -107,7 +107,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("Invalid parameter");
   });
 
@@ -120,7 +120,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/").send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("Invalid parameter");
   });
 
@@ -128,7 +128,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/users/create/");
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("Invalid parameter");
   });
 
@@ -136,7 +136,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.get("/v1/user/").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body.userID).to.be.equals(1);
     expect(body.username).to.not.be.equals(null);
     expect(body.email).to.not.be.equals(null);
@@ -148,7 +148,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.get("/v1/users/41").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body.userID).to.be.equals(41);
     expect(body.username).to.not.be.equals(null);
     expect(body.email).to.be.equals(undefined);
@@ -160,7 +160,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.get("/v1/users/asdf").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("Invalid parameter");
   });
 
@@ -168,7 +168,7 @@ describe("User Routes", () => {
     const { type, status } = await request.get("/v1/users/2").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
   });
 
   it("should update the user", async () => {
@@ -182,7 +182,7 @@ describe("User Routes", () => {
       .send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body.userID).to.be.equals(1);
     expect(body.username).to.be.equals("testuser1234");
 
@@ -198,7 +198,7 @@ describe("User Routes", () => {
     const { type, status, body } = await request.post("/v1/user/update").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).to.be.equals("No parameters were passed");
   });
 
@@ -213,7 +213,7 @@ describe("User Routes", () => {
       .send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).contain("There was an error while handling the request: ");
   });
 
@@ -228,7 +228,7 @@ describe("User Routes", () => {
       .send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
     expect(body.error).contain("There was an error while handling the request: ");
   });
 
@@ -243,7 +243,7 @@ describe("User Routes", () => {
       .send(user);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.Statuscode.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body.userID).to.be.equals(1);
     expect(body.username).to.be.equals("admin");
   });

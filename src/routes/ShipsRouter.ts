@@ -50,7 +50,7 @@ export default class ShipsRouter {
   public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
     try {
       if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -60,11 +60,11 @@ export default class ShipsRouter {
 
       const ships = await this.shipService.getShips(userID, planetID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(ships ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(ships ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -84,7 +84,7 @@ export default class ShipsRouter {
         !InputValidator.isSet(request.body.buildOrder) ||
         !InputValidator.isValidJson(request.body.buildOrder)
       ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -93,7 +93,7 @@ export default class ShipsRouter {
 
       // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.SHIP)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Invalid parameter",
         });
       }
@@ -107,13 +107,13 @@ export default class ShipsRouter {
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (planet === null) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "The player does not own the planet",
         });
       }
 
       if (planet.bHangarPlus) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
+        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
           error: "Shipyard is currently upgrading",
         });
       }
@@ -212,11 +212,11 @@ export default class ShipsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }

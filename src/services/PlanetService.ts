@@ -6,10 +6,12 @@ import IPlanetService from "../interfaces/IPlanetService";
 import Planet from "../units/Planet";
 import squel = require("safe-squel");
 import EntityInvalidException from "../exceptions/EntityInvalidException";
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact with the planets-table in the database
  */
+@injectable()
 export default class PlanetService implements IPlanetService {
   /**
    * Returns all information about a given planet owned by the given user.

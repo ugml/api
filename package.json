@@ -106,7 +106,6 @@
     "bcrypt": "^3.0.7"
   },
   "dependencies": {
-    "swagger-ui-express": "^4.1.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
@@ -120,16 +119,20 @@
     "gulp-typedoc": "^2.2.2",
     "gulp-typescript": "^5.0.1",
     "helmet": "^3.16.0",
+    "inversify": "^5.0.1",
+    "inversify-binding-decorators": "^4.0.0",
+    "inversify-express-utils": "^6.3.2",
     "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.4.0",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
     "node-pre-gyp": "^0.14.0",
     "redis": "^2.8.0",
+    "reflect-metadata": "^0.1.13",
     "safe-squel": "^5.12.4",
+    "swagger-ui-express": "^4.1.4",
     "ts-graylog": "^1.0.2",
-    "winston": "^3.1.0",
     "tsoa": "^3.2.1",
-    "typescript-ioc": "^3.2.2"
+    "winston": "^3.1.0"
   }
 }

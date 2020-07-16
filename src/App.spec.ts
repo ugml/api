@@ -6,12 +6,7 @@ import { Globals } from "./common/Globals";
 import JwtHelper from "./common/JwtHelper";
 import SimpleLogger from "./loggers/SimpleLogger";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("./ioc/createContainer");
-
-const logger = new SimpleLogger();
-
-const app = new App(createContainer(), logger).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -22,7 +17,7 @@ let request = chai.request(app);
 describe("App", () => {
   before(() => {
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com ", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -38,7 +33,7 @@ describe("App", () => {
     const planetID = 167546850;
 
     return request.get(`/v1/buildings/${planetID}`).then(res => {
-      expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
+      expect(res.status).to.equals(Globals.StatusCodes.NOT_AUTHORIZED);
       expect(res.body.error).to.be.equals("Authentication failed");
     });
   });
@@ -49,7 +44,7 @@ describe("App", () => {
       .get(`/v1/buildings/${planetID}`)
       .set("Authorization", JwtHelper.generateToken(parseInt("iAmNotAValidUserId", 10)))
       .then(res => {
-        expect(res.status).to.equals(Globals.Statuscode.NOT_AUTHORIZED);
+        expect(res.status).to.equals(Globals.StatusCodes.NOT_AUTHORIZED);
         expect(res.body.error).to.be.equals("Authentication failed");
       });
   });
@@ -59,7 +54,7 @@ describe("App", () => {
       .get("/v1/idontexist")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.equals(Globals.Statuscode.NOT_FOUND);
+        expect(res.status).to.equals(Globals.StatusCodes.NOT_FOUND);
         expect(res.body.error).to.be.equals("The route does not exist");
       });
   });

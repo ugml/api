@@ -1,20 +1,13 @@
 import * as http from "http";
 import App from "./App";
-import Container from "./ioc/container";
 import ILogger from "./interfaces/ILogger";
 import SimpleLogger from "./loggers/SimpleLogger";
-
-import { AuthRouter } from "./routes/AuthRouter";
-
-const createContainer = require("./ioc/createContainer");
-
-const container: Container = createContainer();
 
 const logger: ILogger = new SimpleLogger();
 
 const port = process.env.PORT || 3000;
 
-const app = new App(container, logger);
+const app = new App();
 
 app.express.set("port", port);
 

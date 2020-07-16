@@ -5,10 +5,12 @@ import IMessageService from "../interfaces/IMessageService";
 import Message from "../units/Message";
 
 import squel = require("safe-squel");
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact with the messages-table in the database
  */
+@injectable()
 export default class MessageService implements IMessageService {
   /**
    * Returns a list of all messages a user has sent or received

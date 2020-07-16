@@ -7,13 +7,6 @@
 //
 // iocContainer.get<FooController>(FooController);
 
-export class iocContainer {
-  private readonly services;
-
-  public get<T>(T controller) {
-
-  }
-}
 
 export default class Container {
   /**

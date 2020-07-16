@@ -5,10 +5,12 @@ import IBuildingService from "../interfaces/IBuildingService";
 import Buildings from "../units/Buildings";
 
 import squel = require("safe-squel");
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact with the buildings-table in the database
  */
+@injectable()
 export default class BuildingService implements IBuildingService {
   /**
    * Returns a list of buildings on a given planet

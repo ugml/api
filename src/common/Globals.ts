@@ -37,7 +37,7 @@ namespace Globals {
   // 4xx - authentication failure
   // 5xx - server errors
 
-  export enum Statuscode {
+  export enum StatusCodes {
     SUCCESS = 200,
     CREATED = 201,
     BAD_REQUEST = 400,

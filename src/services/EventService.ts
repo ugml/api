@@ -4,10 +4,12 @@ import SerializationHelper from "../common/SerializationHelper";
 import IEventService from "../interfaces/IEventService";
 import Event from "../units/Event";
 import squel = require("safe-squel");
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact manage events
  */
+@injectable()
 export default class EventService implements IEventService {
   /**
    *

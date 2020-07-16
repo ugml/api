@@ -1,10 +1,12 @@
 import Database from "../common/Database";
 import IDefenseService from "../interfaces/IDefenseService";
 import squel = require("safe-squel");
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact with the defenses-table in the database
  */
+@injectable()
 export default class DefenseService implements IDefenseService {
   /**
    * Returns a list of defenses on a given planet owner by a given user

@@ -10,7 +10,7 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -21,7 +21,7 @@ let request = chai.request(app);
 describe("galaxyRouter", () => {
   before(() => {
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -39,7 +39,7 @@ describe("galaxyRouter", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.type).to.eql("application/json");
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.body).to.have.lengthOf(2);
         expect(res.body[0].planetID).to.be.equals(61614);
         expect(res.body[0].posGalaxy).to.be.equals(7);
@@ -55,7 +55,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/-1/4")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.eql("Invalid parameter");
       });
@@ -66,7 +66,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/asdf/4")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.eql("Invalid parameter");
       });
@@ -77,7 +77,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/1/asdf")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.eql("Invalid parameter");
       });
@@ -88,7 +88,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/9/100")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body).to.be.eql([]);
       });
@@ -99,7 +99,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/9999/4")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.eql("Invalid parameter");
       });
@@ -110,7 +110,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/4/-1")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.eql("Invalid parameter");
       });
@@ -121,7 +121,7 @@ describe("galaxyRouter", () => {
       .get("/v1/galaxy/4/9999")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.eql("Invalid parameter");
       });

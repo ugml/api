@@ -4,10 +4,12 @@ import SerializationHelper from "../common/SerializationHelper";
 import IUserService from "../interfaces/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");
+import {injectable} from "inversify";
 
 /**
  * This class defines a service to interact with the users-table in the database
  */
+@injectable()
 export default class UserService implements IUserService {
   /**
    * Returns all information about an authenticated user.

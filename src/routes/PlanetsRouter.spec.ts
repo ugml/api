@@ -12,7 +12,7 @@ const createContainer = require("../ioc/createContainer");
 
 const container = createContainer();
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -28,7 +28,7 @@ describe("planetsRouter", () => {
     authUserBeforeTests = await container.userService.getAuthenticatedUser(1);
     planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -51,7 +51,7 @@ describe("planetsRouter", () => {
       .send({ planetID: 167546850 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body).to.be.empty;
       });
@@ -62,7 +62,7 @@ describe("planetsRouter", () => {
       .post("/v1/user/currentplanet/set")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.body.error).to.be.equals("Invalid parameter");
         expect(res.type).to.eql("application/json");
       });
@@ -74,7 +74,7 @@ describe("planetsRouter", () => {
       .send({ planetID: 1 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.body.error).to.be.equals("The player does not own the planet");
         expect(res.type).to.eql("application/json");
       });
@@ -85,7 +85,7 @@ describe("planetsRouter", () => {
       .get("/v1/user/planetlist/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body[0].planetID).to.be.equals(167546850);
         expect(res.body[0].ownerID).to.be.equals(1);
@@ -103,7 +103,7 @@ describe("planetsRouter", () => {
       .get("/v1/user/planetlist/35")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body[0].planetID).to.be.equals(93133);
         expect(res.body[0].ownerID).to.be.equals(35);
@@ -121,7 +121,7 @@ describe("planetsRouter", () => {
       .get("/v1/user/planet/1234")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body).to.be.empty;
       });
@@ -134,7 +134,7 @@ describe("planetsRouter", () => {
       .get(`/v1/user/planet/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).to.be.equals(planetID);
         expect(res.body.ownerID).to.be.equals(1);
@@ -154,7 +154,7 @@ describe("planetsRouter", () => {
       .get(`/v1/user/planet/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -167,7 +167,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/movement/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         // TODO
       });
@@ -180,7 +180,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/movement/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -196,7 +196,7 @@ describe("planetsRouter", () => {
       .send({ planetID, name: "FancyNewName" })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.name).to.be.equals("FancyNewName");
 
@@ -213,7 +213,7 @@ describe("planetsRouter", () => {
       .send({ planetID })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -225,7 +225,7 @@ describe("planetsRouter", () => {
       .send({ name: "NewName" })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -239,7 +239,7 @@ describe("planetsRouter", () => {
       .send({ planetID, name: "A" })
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("New name is too short");
       });
@@ -252,7 +252,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -265,7 +265,7 @@ describe("planetsRouter", () => {
       .get(`/v1/planets/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).to.be.equals(planetID);
       });
@@ -276,7 +276,7 @@ describe("planetsRouter", () => {
       .post("/v1/planets/destroy/")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -290,7 +290,7 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Invalid parameter");
       });
@@ -308,7 +308,7 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
       });
   });
@@ -321,7 +321,7 @@ describe("planetsRouter", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(async res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("The last planet cannot be destroyed");
         await container.planetService.createNewPlanet(secondPlanetBackup);

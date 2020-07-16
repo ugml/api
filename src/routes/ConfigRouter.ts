@@ -32,11 +32,11 @@ export default class ConfigRouter {
     try {
       const data = Config.getGameConfig();
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(data ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }
@@ -52,11 +52,11 @@ export default class ConfigRouter {
     try {
       const data = Config.getGameConfig();
 
-      return response.status(Globals.Statuscode.SUCCESS).json(data.units ?? {});
+      return response.status(Globals.StatusCodes.SUCCESS).json(data.units ?? {});
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
+      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
         error: "There was an error while handling the request.",
       });
     }

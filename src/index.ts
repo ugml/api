@@ -4,6 +4,8 @@ import Container from "./ioc/container";
 import ILogger from "./interfaces/ILogger";
 import SimpleLogger from "./loggers/SimpleLogger";
 
+import { AuthRouter } from "./routes/AuthRouter";
+
 const createContainer = require("./ioc/createContainer");
 
 const container: Container = createContainer();

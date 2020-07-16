@@ -2,6 +2,19 @@
  * This class defines a container for IoC
  * and dependency-injection functionality
  */
+
+// import { iocContainer } from "./the/path/to/the/module/from/tsoa.json";
+//
+// iocContainer.get<FooController>(FooController);
+
+export class iocContainer {
+  private readonly services;
+
+  public get<T>(T controller) {
+
+  }
+}
+
 export default class Container {
   /**
    * All registered services

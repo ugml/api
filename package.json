@@ -20,7 +20,8 @@
     "lint-fix": "eslint src/**/*.ts --fix",
     "tsc": "tsc --noEmit --project .",
     "build": "gulp build",
-    "watch": "gulp"
+    "watch": "gulp",
+    "tsoa:gen": "tsoa routes && tsoa swagger"
   },
   "nyc": {
     "branches": 0,
@@ -105,6 +106,7 @@
     "bcrypt": "^3.0.7"
   },
   "dependencies": {
+    "swagger-ui-express": "^4.1.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
@@ -126,6 +128,8 @@
     "redis": "^2.8.0",
     "safe-squel": "^5.12.4",
     "ts-graylog": "^1.0.2",
-    "winston": "^3.1.0"
+    "winston": "^3.1.0",
+    "tsoa": "^3.2.1",
+    "typescript-ioc": "^3.2.2"
   }
 }

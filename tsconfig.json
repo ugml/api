@@ -11,7 +11,10 @@
     "typeRoots" : [
       "node_modules/@types"
     ],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node"
   },
   "compileOnSave": true,
   "include": [

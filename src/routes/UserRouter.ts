@@ -26,7 +26,6 @@ import CreateUserRequest from "../interfaces/requests/CreateUserRequest";
 import UpdateUserRequest from "../interfaces/requests/UpdateUserRequest";
 import SetCurrentPlanetRequest from "../interfaces/requests/SetCurrentPlanetRequest";
 
-
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";

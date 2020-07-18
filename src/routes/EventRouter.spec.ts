@@ -3,12 +3,6 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import SimpleLogger from "../loggers/SimpleLogger";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
-
-const container = createContainer();
 
 const app = new App().express;
 

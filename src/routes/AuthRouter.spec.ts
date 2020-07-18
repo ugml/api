@@ -44,7 +44,6 @@ describe("authRoute", () => {
       .post("/v1/login")
       .send({ email: "user_1501005189510@test.com" })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -54,14 +53,12 @@ describe("authRoute", () => {
       .post("/v1/login")
       .send({ password: "admin" })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
   it("authentication should fail (nothing sent)", async () => {
     return request.post("/v1/login").then(res => {
-      expect(res.body.error).equals("Invalid parameter");
       expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
     });
   });
@@ -71,7 +68,6 @@ describe("authRoute", () => {
       .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "iAmWrong" })
       .then(res => {
-        expect(res.body.error).equals("Authentication failed");
         expect(res.status).to.equals(Globals.StatusCodes.NOT_AUTHORIZED);
       });
   });

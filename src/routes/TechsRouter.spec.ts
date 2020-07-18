@@ -4,12 +4,10 @@ import chaiHttp = require("chai-http");
 import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
-import SimpleLogger from "../loggers/SimpleLogger";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
-
-const container = createContainer();
+import { iocContainer } from "../ioc/inversify.config";
+import TYPES from "../ioc/types";
+import IPlanetService from "../interfaces/services/IPlanetService";
 
 const app = new App().express;
 
@@ -18,6 +16,8 @@ const expect = chai.expect;
 
 let authToken = "";
 let request = chai.request(app);
+
+const planetService = iocContainer.get<IPlanetService>(TYPES.IPlanetService);
 
 describe("techsRouter", () => {
   before(() => {
@@ -136,13 +136,13 @@ describe("techsRouter", () => {
   it("try to start a tech-build-order while research-lab is upgrading", async () => {
     const planetID = 167546850;
 
-    const planetBackup: Planet = await container.planetService.getPlanet(1, planetID, true);
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planetBackup: Planet = await planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetService.getPlanet(1, planetID, true);
 
     planet.bBuildingId = Globals.Buildings.RESEARCH_LAB;
     planet.bBuildingEndTime = 1;
 
-    await container.planetService.updatePlanet(planet);
+    await planetService.updatePlanet(planet);
 
     return request
       .post("/v1/techs/build")
@@ -153,7 +153,7 @@ describe("techsRouter", () => {
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
 
         // reset
-        await container.planetService.updatePlanet(planetBackup);
+        await planetService.updatePlanet(planetBackup);
       });
   });
 

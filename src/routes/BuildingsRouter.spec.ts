@@ -5,12 +5,13 @@ import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import User from "../units/User";
-import SimpleLogger from "../loggers/SimpleLogger";
+import { iocContainer } from "../ioc/inversify.config";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import TYPES from "../ioc/types";
+import IUserService from "../interfaces/services/IUserService";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
-
-const container = createContainer();
+const planetService = iocContainer.get<IPlanetService>(TYPES.IPlanetService);
+const userService = iocContainer.get<IUserService>(TYPES.IUserService);
 
 const app = new App().express;
 
@@ -24,7 +25,7 @@ describe("buildingsRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await planetService.getPlanet(1, 167546850, true);
     return request
       .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -34,7 +35,7 @@ describe("buildingsRoute", () => {
   });
 
   after(async () => {
-    await container.planetService.updatePlanet(planetBeforeTests);
+    await planetService.updatePlanet(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -70,7 +71,6 @@ describe("buildingsRoute", () => {
         .get("/v1/buildings/test")
         .set("Authorization", authToken)
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -85,7 +85,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -96,7 +95,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -109,7 +107,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID, buildingID: -1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -122,7 +119,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID, buildingID: 100 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -133,7 +129,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: 1234, buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -201,7 +196,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -212,7 +206,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -225,7 +218,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID, buildingID: -1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -238,7 +230,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID, buildingID: 100 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -249,7 +240,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: 1234, buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -262,7 +252,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID, buildingID: 1 })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -303,7 +292,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -345,7 +333,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
-          expect(res.body.error).equals("Invalid parameter");
           expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
         });
     });
@@ -353,14 +340,14 @@ describe("buildingsRoute", () => {
     it("should fail (can't build shipyard/robotic/nanite while it is being used)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await planetService.getPlanet(1, planetID, true);
 
       const valueBefore = planet.bHangarStartTime;
 
       planet.bHangarQueue = "[ { test: 1234 } ]";
       planet.bHangarStartTime = 1;
 
-      await container.planetService.updatePlanet(planet);
+      await planetService.updatePlanet(planet);
 
       return request
         .post("/v1/buildings/build")
@@ -372,15 +359,15 @@ describe("buildingsRoute", () => {
 
           // reset planet
           planet.bHangarStartTime = valueBefore;
-          await container.planetService.updatePlanet(planet);
+          await planetService.updatePlanet(planet);
         });
     });
 
     it("should fail (can't build research-lab while it is being used)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
-      const user: User = await container.userService.getAuthenticatedUser(planet.ownerID);
+      const planet: Planet = await planetService.getPlanet(1, planetID, true);
+      const user: User = await userService.getAuthenticatedUser(planet.ownerID);
 
       const techIDold = user.bTechID;
       const endtime = user.bTechEndTime;
@@ -388,7 +375,7 @@ describe("buildingsRoute", () => {
       user.bTechEndTime = 1;
       user.bTechID = 109;
 
-      await container.userService.updateUserData(user);
+      await userService.updateUserData(user);
 
       return request
         .post("/v1/buildings/build")
@@ -401,7 +388,7 @@ describe("buildingsRoute", () => {
           user.bTechEndTime = techIDold;
           user.bTechID = endtime;
 
-          await container.userService.updateUserData(user);
+          await userService.updateUserData(user);
         });
     });
 
@@ -413,7 +400,6 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.TERRAFORMER })
         .then(async res => {
-          expect(res.body.error).equals("Requirements are not met");
           expect(res.status).equals(Globals.StatusCodes.SUCCESS);
         });
     });
@@ -421,25 +407,24 @@ describe("buildingsRoute", () => {
     it("should fail (planet has not enough resources)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await planetService.getPlanet(1, planetID, true);
 
       const metalBefore = planet.metal;
 
       planet.metal = 0;
 
-      await container.planetService.updatePlanet(planet);
+      await planetService.updatePlanet(planet);
 
       return request
         .post("/v1/buildings/build")
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
         .then(async res => {
-          expect(res.body.error).equals("Not enough resources");
           expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
           // reset planet
           planet.metal = metalBefore;
-          await container.planetService.updatePlanet(planet);
+          await planetService.updatePlanet(planet);
         });
     });
   });
@@ -450,7 +435,6 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .send({ buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -463,7 +447,6 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}` })
       .then(async res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -473,7 +456,6 @@ describe("buildingsRoute", () => {
       .post("/v1/buildings/demolish")
       .set("Authorization", authToken)
       .then(async res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -486,7 +468,6 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, buildingID: 503 })
       .then(async res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -499,7 +480,6 @@ describe("buildingsRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
-        expect(res.body.error).equals("Invalid parameter");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -520,7 +500,7 @@ describe("buildingsRoute", () => {
   it("should start demolition of a building", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetService.getPlanet(1, planetID, true);
 
     return request
       .post("/v1/buildings/demolish")
@@ -534,20 +514,20 @@ describe("buildingsRoute", () => {
         expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
         // reset
-        await container.planetService.updatePlanet(planet);
+        await planetService.updatePlanet(planet);
       });
   });
 
   it("should fail (planet has already a build job)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetService.getPlanet(1, planetID, true);
 
     planet.bBuildingId = 1;
     planet.bBuildingEndTime = 1234;
     planet.bBuildingDemolition = true;
 
-    await container.planetService.updatePlanet(planet);
+    await planetService.updatePlanet(planet);
 
     return request
       .post("/v1/buildings/demolish")
@@ -561,7 +541,7 @@ describe("buildingsRoute", () => {
         planet.bBuildingId = 0;
         planet.bBuildingEndTime = 0;
         planet.bBuildingDemolition = false;
-        await container.planetService.updatePlanet(planet);
+        await planetService.updatePlanet(planet);
       });
   });
 });

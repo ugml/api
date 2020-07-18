@@ -3,12 +3,6 @@ import * as chai from "chai";
 import App from "../App";
 import { Globals } from "../common/Globals";
 import chaiHttp = require("chai-http");
-import SimpleLogger from "../loggers/SimpleLogger";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
-
-const container = createContainer();
 
 const app = new App().express;
 
@@ -38,15 +32,6 @@ describe("User Routes", () => {
       username: "IDoNotExistYet",
       password: "test",
       email: "iamnotareal@email.com",
-    };
-
-    container.galaxyService.getFreePosition = function() {
-      return {
-        posGalaxy: 1,
-        posSystem: 1,
-        posPlanet: 1,
-        type: 1,
-      };
     };
 
     const { type, status, body } = await request.post("/v1/users/create/").send(user);

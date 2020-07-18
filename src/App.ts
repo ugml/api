@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import * as bodyParser from "body-parser";
 import * as express from "express";
+const { expressCspHeader, INLINE, NONE, SELF } = require("express-csp-header");
 import ILogger from "./interfaces/ILogger";
 import * as dotenv from "dotenv";
 import * as helmet from "helmet";
@@ -18,9 +19,10 @@ export default class App {
 
   public constructor() {
     this.express = express();
+
+    this.allowCors();
     this.middleware();
     this.startSwagger();
-    this.allowCors();
 
     RegisterRoutes(this.express);
   }
@@ -28,6 +30,19 @@ export default class App {
   private startSwagger(): void {
     const swaggerDocument = require("./tsoa/swagger.json");
     const swaggerUi = require("swagger-ui-express");
+
+    this.express.use(
+      expressCspHeader({
+        directives: {
+          "default-src": [SELF, INLINE],
+          "script-src": [SELF, INLINE],
+          "style-src": [SELF, INLINE],
+          "img-src": ["data:", "*"],
+          "worker-src": [SELF, INLINE, "*"],
+          "block-all-mixed-content": true,
+        },
+      }),
+    );
 
     this.express.use("/v1/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }

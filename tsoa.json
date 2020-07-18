@@ -2,7 +2,7 @@
     "entryFile":"./src/App.ts",
     "noImplicitAdditionalProperties":"throw-on-extras",
     "controllerPathGlobs":[
-        "./src/**/*Router.ts"
+        "./src/routes/*Router.ts"
     ],
     "routes":{
         "basePath":"/v1",

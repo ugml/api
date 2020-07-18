@@ -10,5 +10,5 @@ export default interface IUserService {
   checkIfNameOrMailIsTaken(username: string, email: string);
   getNewId(): Promise<number>;
   createNewUser(user: User, connection?);
-  updateUserData(user: User, connection?);
+  updateUserData(user: User, connection?): Promise<User>;
 }

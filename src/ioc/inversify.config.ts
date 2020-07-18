@@ -24,7 +24,7 @@ import ITechService from "../interfaces/services/ITechService";
 import { AuthRouter } from "../routes/AuthRouter";
 import ILogger from "../interfaces/ILogger";
 import SimpleLogger from "../loggers/SimpleLogger";
-import {UsersRouter} from "../routes/UsersRouter";
+import {UserRouter} from "../routes/UserRouter";
 
 const iocContainer = new Container();
 
@@ -44,6 +44,6 @@ iocContainer.bind<IPlanetService>(TYPES.IPlanetService).to(PlanetService);
 iocContainer.bind<IShipService>(TYPES.IShipService).to(ShipService);
 iocContainer.bind<ITechService>(TYPES.ITechService).to(TechService);
 iocContainer.bind<AuthRouter>(TYPES.AuthRouter).to(AuthRouter);
-iocContainer.bind<UsersRouter>(TYPES.UsersRouter).to(UsersRouter);
+iocContainer.bind<UserRouter>(TYPES.UsersRouter).to(UserRouter);
 
 export { iocContainer, autoProvide, inject, decorate, injectable };

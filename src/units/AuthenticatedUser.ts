@@ -1,4 +1,3 @@
-import { Globals } from "../common/Globals";
 import IUnit from "../interfaces/IUnit";
 import InputValidator from "../common/InputValidator";
 

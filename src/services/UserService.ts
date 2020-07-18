@@ -143,7 +143,7 @@ export default class UserService implements IUserService {
    * @param user A user-object
    * @param connection An open database-connection, if the query should be run within a transaction
    */
-  public async updateUserData(user: AuthenticatedUser, connection = null) {
+  public async updateUserData(user: User, connection = null): Promise<User> {
     let query = squel.update().table("users");
 
     if (!user.isValid()) {
@@ -181,12 +181,11 @@ export default class UserService implements IUserService {
 
     query = query.where("userID = ?", user.userID);
 
-    console.log(query);
-
     if (connection === null) {
-      return await Database.query(query.toString());
+      await Database.query(query.toString());
     } else {
-      return await connection.query(query.toString());
+      await connection.query(query.toString());
     }
+    return user;
   }
 }

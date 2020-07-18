@@ -5,7 +5,7 @@ import InputValidator from "../common/InputValidator";
 /**
  * Represents a user-row in the database
  */
-export default class AuthenticatedUser implements IUnit {
+export default class User implements IUnit {
   /**
    * The ID of the user
    */

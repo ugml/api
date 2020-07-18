@@ -66,6 +66,11 @@ export default class InputValidator {
     return input.replace(/[^a-z0-9@ .,_-]/gim, "").trim();
   }
 
+  public static isValidEmail(email: string): boolean {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  }
+
   /**
    * Checks, if a given unitID is a valid buildingID
    * @param unitID a unitID

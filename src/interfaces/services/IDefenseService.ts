@@ -1,4 +1,4 @@
-import Defenses from "../units/Defenses";
+import Defenses from "../../units/Defenses";
 
 export default interface IDefenseService {
   createDefenseRow(planetID: number, connection);

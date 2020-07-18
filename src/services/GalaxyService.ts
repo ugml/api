@@ -1,7 +1,7 @@
 import Database from "../common/Database";
 import { Globals } from "../common/Globals";
 import ICoordinates from "../interfaces/ICoordinates";
-import IGalaxyService from "../interfaces/IGalaxyService";
+import IGalaxyService from "../interfaces/services/IGalaxyService";
 import PlanetType = Globals.PlanetType;
 
 import squel = require("safe-squel");

@@ -2,7 +2,7 @@ import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
 import JwtHelper from "../common/JwtHelper";
 
-import IUserService from "../interfaces/IUserService";
+import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
 
 import { Route, Post, Body, Tags, SuccessResponse, Response, Controller, Example } from "tsoa";
@@ -11,19 +11,9 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 import { Globals } from "../common/Globals";
-
-export class AuthResponse {
-  token: string;
-}
-
-export interface BadRequest {
-  error: string;
-}
-
-export interface AuthRequest {
-  email: string;
-  password: string;
-}
+import AuthResponse from "../interfaces/responses/AuthResponse";
+import FailureResponse from "../interfaces/responses/FailureResponse";
+import AuthRequest from "../interfaces/requests/AuthRequest";
 
 /**
  * Defines routes for authentication
@@ -38,9 +28,9 @@ export class AuthRouter extends Controller {
   @Post()
   @SuccessResponse(Globals.StatusCodes.SUCCESS)
   @Example<AuthResponse>({ token: "someToken" })
-  @Response<BadRequest>(Globals.StatusCodes.BAD_REQUEST, "", { error: "Invalid parameter" })
-  @Response<BadRequest>(Globals.StatusCodes.NOT_AUTHORIZED, "", { error: "Authentication failed" })
-  public async authenticate(@Body() req: AuthRequest): Promise<AuthResponse | BadRequest> {
+  @Response<FailureResponse>(Globals.StatusCodes.BAD_REQUEST, "", { error: "Invalid parameter" })
+  @Response<FailureResponse>(Globals.StatusCodes.NOT_AUTHORIZED, "", { error: "Authentication failed" })
+  public async authenticate(@Body() req: AuthRequest): Promise<AuthResponse | FailureResponse> {
     if (!InputValidator.isSet(req.email) || !InputValidator.isSet(req.password)) {
       this.setStatus(Globals.StatusCodes.BAD_REQUEST);
       return {

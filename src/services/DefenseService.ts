@@ -1,5 +1,5 @@
 import Database from "../common/Database";
-import IDefenseService from "../interfaces/IDefenseService";
+import IDefenseService from "../interfaces/services/IDefenseService";
 import squel = require("safe-squel");
 import {injectable} from "inversify";
 

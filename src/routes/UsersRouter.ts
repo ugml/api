@@ -1,22 +1,29 @@
 import { Globals } from "../common/Globals";
 
-import IBuildingService from "../interfaces/IBuildingService";
-import IDefenseService from "../interfaces/IDefenseService";
-import IGalaxyService from "../interfaces/IGalaxyService";
-
-import IPlanetService from "../interfaces/IPlanetService";
-import IShipService from "../interfaces/IShipService";
-import ITechService from "../interfaces/ITechService";
-import IUserService from "../interfaces/IUserService";
+import IBuildingService from "../interfaces/services/IBuildingService";
+import IDefenseService from "../interfaces/services/IDefenseService";
+import IGalaxyService from "../interfaces/services/IGalaxyService";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import IShipService from "../interfaces/services/IShipService";
+import ITechService from "../interfaces/services/ITechService";
+import IUserService from "../interfaces/services/IUserService";
 
 import User from "../units/User";
 
 import ILogger from "../interfaces/ILogger";
 
-import { Route, Get, Tags, SuccessResponse, Controller, Security, Request } from "tsoa";
+import { Route, Get, Tags, SuccessResponse, Controller, Security, Request, Post, Body } from "tsoa";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
+import InputValidator from "../common/InputValidator";
+import Planet from "../units/Planet";
+import FailureResponse from "../interfaces/responses/FailureResponse";
+import UserInfo from "../units/UserInfo";
+
+export class SetCurrentPlanetRequest {
+  planetID: number;
+}
 
 /**
  * Defines routes for user-data
@@ -45,34 +52,17 @@ export class UsersRouter extends Controller {
     return await this.userService.getAuthenticatedUser(request.user.userID);
   }
 
-  // /**
-  //  * Returns basic information about a user given its userID
-  //  * @param request
-  //  * @param response
-  //  * @param next
-  //  */
-  // public getUserByID = async (request: IAuthorizedRequest, response: Response) => {
-  //   try {
-  //     if (!InputValidator.isSet(request.params.userID) || !InputValidator.isValidInt(request.params.userID)) {
-  //       return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-  //         error: "Invalid parameter",
-  //       });
-  //     }
-  //
-  //     const userID: number = parseInt(request.params.userID, 10);
-  //
-  //     const user = await this.userService.getUserById(userID);
-  //
-  //     return response.status(Globals.StatusCodes.SUCCESS).json(user ?? {});
-  //   } catch (error) {
-  //     this.logger.error(error, error.stack);
-  //
-  //     return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-  //       error: "There was an error while handling the request.",
-  //     });
-  //   }
-  // };
-  //
+  // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjEsImlhdCI6MTU5NTAwMDMzMywiZXhwIjoxNTk1NjA1MTMzfQ.pkkEdN_Kkn6N6z-fKz0BLARc4L18qFRK33irWSsUEMQ
+  /**
+   * Returns basic information about a user given its userID
+   */
+  @Security("jwt")
+  @Get("/{userID}")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async getUserByID(userID: number): Promise<UserInfo> {
+    return await this.userService.getUserById(userID);
+  }
+
   // /**
   //  * Creates a new user with homeplanet
   //  * @param request
@@ -306,45 +296,44 @@ export class UsersRouter extends Controller {
   //   }
   // };
   //
-  // /**
-  //  * Sets the current planet for a user
-  //  * @param request
-  //  * @param response
-  //  * @param next
-  //  */
-  // public setCurrentPlanet = async (request: IAuthorizedRequest, response: Response) => {
-  //   try {
-  //     // validate parameters
-  //     if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-  //       return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-  //         error: "Invalid parameter",
-  //       });
-  //     }
-  //
-  //     const userID = parseInt(request.userID, 10);
-  //     const planetID = parseInt(request.body.planetID, 10);
-  //
-  //     const planet: Planet = await this.planetService.getPlanet(userID, planetID);
-  //
-  //     if (!InputValidator.isSet(planet)) {
-  //       return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-  //         error: "The player does not own the planet",
-  //       });
-  //     }
-  //
-  //     const user: User = await this.userService.getUserById(userID);
-  //
-  //     user.currentPlanet = planetID;
-  //
-  //     await this.userService.updateUserData(user);
-  //
-  //     return response.status(Globals.StatusCodes.SUCCESS).json({});
-  //   } catch (error) {
-  //     this.logger.error(error, error.stack);
-  //
-  //     return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-  //       error: "There was an error while handling the request.",
-  //     });
-  //   }
-  // };
+
+  /**
+   * Sets the current planet for a user
+   */
+  @Security("jwt")
+  @Post("/currentplanet/set")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async setCurrentPlanet(
+    @Request() request,
+    @Body() model: SetCurrentPlanetRequest,
+  ): Promise<User | FailureResponse> {
+    try {
+      const userID = request.user.userID;
+      const planetID = model.planetID;
+
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
+
+      if (!InputValidator.isSet(planet)) {
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+        return {
+          error: "The player does not own the planet",
+        };
+      }
+
+      const user: User = await this.userService.getAuthenticatedUser(userID);
+
+      user.currentPlanet = planetID;
+
+      await this.userService.updateUserData(user);
+
+      return user;
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
+  }
 }

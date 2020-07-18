@@ -1,4 +1,4 @@
-import ICoordinates from "./ICoordinates";
+import ICoordinates from "../ICoordinates";
 
 export default interface IGalaxyService {
   getFreePosition(maxGalaxy: number, maxSystem: number, minPlanet: number, maxPlanet: number): Promise<ICoordinates>;

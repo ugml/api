@@ -1,6 +1,6 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
-import IShipService from "../interfaces/IShipService";
+import IShipService from "../interfaces/services/IShipService";
 
 import squel = require("safe-squel");
 import {injectable} from "inversify";

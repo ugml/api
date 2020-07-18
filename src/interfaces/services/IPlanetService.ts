@@ -1,5 +1,5 @@
-import Planet from "../units/Planet";
-import ICoordinates from "./ICoordinates";
+import Planet from "../../units/Planet";
+import ICoordinates from "../ICoordinates";
 
 export default interface IPlanetService {
   getPlanet(userID: number, planetID: number, fullInfo?: boolean): Promise<Planet>;

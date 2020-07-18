@@ -4,15 +4,15 @@ import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IBuildingService from "../interfaces/IBuildingService";
+import IBuildingService from "../interfaces/services/IBuildingService";
 import ICosts from "../interfaces/ICosts";
-import IPlanetService from "../interfaces/IPlanetService";
-import ITechService from "../interfaces/ITechService";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import ITechService from "../interfaces/services/ITechService";
 import Buildings from "../units/Buildings";
 import Planet from "../units/Planet";
 import Techs from "../units/Techs";
 import User from "../units/User";
-import IUserService from "../interfaces/IUserService";
+import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
 
 /**

@@ -5,8 +5,8 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import ICoordinates from "../interfaces/ICoordinates";
-import IEventService from "../interfaces/IEventService";
-import IPlanetService from "../interfaces/IPlanetService";
+import IEventService from "../interfaces/services/IEventService";
+import IPlanetService from "../interfaces/services/IPlanetService";
 import Event from "../units/Event";
 import ILogger from "../interfaces/ILogger";
 

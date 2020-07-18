@@ -1,10 +1,12 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IUserService from "../interfaces/IUserService";
+import IUserService from "../interfaces/services/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");
 import {injectable} from "inversify";
+import AuthenticatedUser from "../units/AuthenticatedUser";
+import UserInfo from "../units/UserInfo";
 
 /**
  * This class defines a service to interact with the users-table in the database
@@ -34,7 +36,7 @@ export default class UserService implements IUserService {
    * @param userID The ID of the user
    * @returns A user-object
    */
-  public async getUserById(userID: number): Promise<User> {
+  public async getUserById(userID: number): Promise<UserInfo> {
     const query: string = squel
       .select()
       .distinct()
@@ -50,7 +52,7 @@ export default class UserService implements IUserService {
       return null;
     }
 
-    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
+    return SerializationHelper.toInstance(new UserInfo(), JSON.stringify(result[0]));
   }
 
   /**
@@ -59,7 +61,7 @@ export default class UserService implements IUserService {
    * @param email The email of the user
    * @returns A user-object
    */
-  public async getUserForAuthentication(email: string): Promise<User> {
+  public async getUserForAuthentication(email: string): Promise<AuthenticatedUser> {
     const query: string = squel
       .select({ autoQuoteFieldNames: true })
       .field("userID")
@@ -75,7 +77,7 @@ export default class UserService implements IUserService {
       return null;
     }
 
-    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
+    return SerializationHelper.toInstance(new AuthenticatedUser(), JSON.stringify(result[0]));
   }
 
   /**
@@ -141,7 +143,7 @@ export default class UserService implements IUserService {
    * @param user A user-object
    * @param connection An open database-connection, if the query should be run within a transaction
    */
-  public async updateUserData(user: User, connection = null) {
+  public async updateUserData(user: AuthenticatedUser, connection = null) {
     let query = squel.update().table("users");
 
     if (!user.isValid()) {
@@ -178,6 +180,8 @@ export default class UserService implements IUserService {
     }
 
     query = query.where("userID = ?", user.userID);
+
+    console.log(query);
 
     if (connection === null) {
       return await Database.query(query.toString());

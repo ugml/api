@@ -1,5 +1,5 @@
 import Database from "../common/Database";
-import ITechService from "../interfaces/ITechService";
+import ITechService from "../interfaces/services/ITechService";
 
 import squel = require("safe-squel");
 import {injectable} from "inversify";

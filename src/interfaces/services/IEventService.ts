@@ -1,4 +1,4 @@
-import Event from "../units/Event";
+import Event from "../../units/Event";
 
 export default interface IEventService {
   createNewEvent(event: Event);

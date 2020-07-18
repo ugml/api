@@ -3,7 +3,11 @@ import * as jwt from "jsonwebtoken";
 
 export function expressAuthentication(request: express.Request, securityName: string, scopes?: string[]): Promise<any> {
   if (securityName === "JWT" || securityName === "jwt") {
-    const token: string = request.headers["access-token"] as string;
+    let token: string = (request.headers["access-token"] as string) || (request.headers.authorization as string);
+
+    if (token.startsWith("Bearer")) {
+      token = token.replace("Bearer ", "");
+    }
 
     return new Promise((resolve, reject) => {
       if (!token) {
@@ -19,7 +23,7 @@ export function expressAuthentication(request: express.Request, securityName: st
               reject(new Error("JWT does not contain required scope."));
             }
           }
-          return resolve(decoded);
+          resolve(decoded);
         }
       });
     });

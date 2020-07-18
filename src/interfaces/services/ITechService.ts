@@ -1,4 +1,4 @@
-import Techs from "../units/Techs";
+import Techs from "../../units/Techs";
 
 export default interface ITechService {
   createTechRow(userID: number, connection);

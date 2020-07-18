@@ -12,17 +12,10 @@ dotenv.config();
 
 const noCache = require("nocache");
 
-/**
- * Creates and configures an ExpressJS web server.
- */
 export default class App {
   public express: express.Express;
   @inject(TYPES.ILogger) private logger: ILogger;
 
-  /**
-   * Creates and configures a new App-instance
-   * @param logger Instance of an ILogger-object
-   */
   public constructor() {
     this.express = express();
     this.middleware();
@@ -36,7 +29,7 @@ export default class App {
     const swaggerDocument = require("./tsoa/swagger.json");
     const swaggerUi = require("swagger-ui-express");
 
-    this.express.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    this.express.use("/v1/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 
   private allowCors() {
@@ -50,9 +43,6 @@ export default class App {
     });
   }
 
-  /**
-   * Registers middleware
-   */
   private middleware(): void {
     this.express.use(
       bodyParser.urlencoded({

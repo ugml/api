@@ -1,7 +1,7 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IBuildingService from "../interfaces/IBuildingService";
+import IBuildingService from "../interfaces/services/IBuildingService";
 import Buildings from "../units/Buildings";
 
 import squel = require("safe-squel");

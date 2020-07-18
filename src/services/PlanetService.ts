@@ -2,7 +2,7 @@ import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
 import ICoordinates from "../interfaces/ICoordinates";
-import IPlanetService from "../interfaces/IPlanetService";
+import IPlanetService from "../interfaces/services/IPlanetService";
 import Planet from "../units/Planet";
 import squel = require("safe-squel");
 import EntityInvalidException from "../exceptions/EntityInvalidException";

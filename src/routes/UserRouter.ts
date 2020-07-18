@@ -4,6 +4,13 @@ import InputValidator from "../common/InputValidator";
 import Planet from "../units/Planet";
 import FailureResponse from "../interfaces/responses/FailureResponse";
 import UserInfo from "../units/UserInfo";
+import IGameConfig from "../interfaces/IGameConfig";
+import Config from "../common/Config";
+import Encryption from "../common/Encryption";
+import Database from "../common/Database";
+import DuplicateRecordException from "../exceptions/DuplicateRecordException";
+import PlanetType = Globals.PlanetType;
+import JwtHelper from "../common/JwtHelper";
 
 import ILogger from "../interfaces/ILogger";
 import IBuildingService from "../interfaces/services/IBuildingService";
@@ -14,23 +21,17 @@ import IShipService from "../interfaces/services/IShipService";
 import ITechService from "../interfaces/services/ITechService";
 import IUserService from "../interfaces/services/IUserService";
 
+import CreateUserResponse from "../interfaces/responses/CreateUserResponse";
+import CreateUserRequest from "../interfaces/requests/CreateUserRequest";
+import UpdateUserRequest from "../interfaces/requests/UpdateUserRequest";
+import SetCurrentPlanetRequest from "../interfaces/requests/SetCurrentPlanetRequest";
+
+
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 
 import { Route, Get, Tags, SuccessResponse, Controller, Security, Request, Post, Body } from "tsoa";
-import SetCurrentPlanetRequest from "../interfaces/requests/SetCurrentPlanetRequest";
-import IGameConfig from "../interfaces/IGameConfig";
-import Config from "../common/Config";
-import Encryption from "../common/Encryption";
-import Database from "../common/Database";
-import DuplicateRecordException from "../exceptions/DuplicateRecordException";
-import PlanetType = Globals.PlanetType;
-import JwtHelper from "../common/JwtHelper";
-
-import CreateUserRequest from "../interfaces/requests/CreateUserRequest";
-import CreateUserResponse from "../interfaces/responses/CreateUserResponse";
-import UpdateUserRequest from "../interfaces/requests/UpdateUserRequest";
 
 /**
  * Defines routes for user-data

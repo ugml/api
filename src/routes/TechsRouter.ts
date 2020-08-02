@@ -5,7 +5,7 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/services/IBuildingService";
-import ICosts from "../interfaces/ICosts";
+import IUnitCosts from "../interfaces/IUnitCosts";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import ITechService from "../interfaces/services/ITechService";
 import Buildings from "../units/Buildings";
@@ -107,7 +107,7 @@ export default class TechsRouter {
 
       const currentLevel = techs[techKey];
 
-      const cost: ICosts = Calculations.getCosts(user.bTechID, currentLevel);
+      const cost: IUnitCosts = Calculations.getCosts(user.bTechID, currentLevel);
 
       planet.metal += cost.metal;
       planet.crystal += cost.crystal;

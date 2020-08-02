@@ -1,44 +1,29 @@
-import { Response, Router } from "express";
+import { Response } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IMessageService from "../interfaces/services/IMessageService";
 import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
+import { Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags } from "tsoa";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
+import SendMessageRequest from "../entities/requests/SendMessageRequest";
+import DeleteMessageRequest from "../entities/requests/DeleteMessageRequest";
+import { provide } from "inversify-binding-decorators";
 
-/**
- * Defines routes for message-sending and receiving
- */
-export default class MessagesRouter {
-  public router: Router = Router();
+@Tags("Messages")
+@Route("messages")
+@provide(MessagesRouter)
+export class MessagesRouter extends Controller {
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-  private logger: ILogger;
+  @inject(TYPES.IUserService) private userService: IUserService;
+  @inject(TYPES.IMessageService) private messageService: IMessageService;
 
-  private userService: IUserService;
-  private messageService: IMessageService;
-
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.messageService = container.messageService;
-    this.router.get("/get", this.getAllMessages);
-    this.router.get("/get/:messageID", this.getMessageByID);
-    this.router.post("/delete", this.deleteMessage);
-    this.router.post("/send", this.sendMessage);
-
-    this.logger = logger;
-  }
-
-  /**
-   * Returns a list of all messages
-   * @param request
-   * @param response
-   * @param next
-   */
+  @Security("jwt")
+  @Get()
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
@@ -55,104 +40,75 @@ export default class MessagesRouter {
     }
   };
 
-  /**
-   * Returns a specific message by its messageID
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getMessageByID = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Get("/{messageID}")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async getMessageByID(@Request() headers, messageID: number) {
     try {
-      if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const messageID = parseInt(request.params.messageID, 10);
+      const userID = headers.user.userID;
       const message = await this.messageService.getMessageById(userID, messageID);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(message ?? {});
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return message;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Deletes a message by its messageID
-   * @param request
-   * @param response
-   * @param next
-   */
-  public deleteMessage = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/send")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async sendMessage(@Request() headers, @Body() request: SendMessageRequest) {
     try {
-      if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      const subject = InputValidator.sanitizeString(request.subject);
+      const messageText = InputValidator.sanitizeString(request.body);
 
-      const userID = parseInt(request.userID, 10);
-      const messageID = parseInt(request.body.messageID, 10);
-
-      await this.messageService.deleteMessage(userID, messageID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json({});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Sends a new message
-   * @param request
-   * @param response
-   * @param next
-   */
-  public sendMessage = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      if (
-        !InputValidator.isSet(request.body.receiverID) ||
-        !InputValidator.isValidInt(request.body.receiverID) ||
-        !InputValidator.isSet(request.body.subject) ||
-        !InputValidator.isSet(request.body.body)
-      ) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const receiverID = parseInt(request.body.receiverID, 10);
-      const subject = InputValidator.sanitizeString(request.body.subject);
-      const messageText = InputValidator.sanitizeString(request.body.body);
-
-      const receiver = await this.userService.getUserById(receiverID);
+      const receiver = await this.userService.getUserById(request.receiverID);
 
       if (!InputValidator.isSet(receiver)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+        return {
           error: "The receiver does not exist",
-        });
+        };
       }
 
-      await this.messageService.sendMessage(userID, receiverID, subject, messageText);
+      this.setStatus(Globals.StatusCodes.SUCCESS);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json({});
+      return await this.messageService.sendMessage(headers.user.userID, request.receiverID, subject, messageText);
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
+
+  @Security("jwt")
+  @Post("/delete")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async deleteMessage(@Request() headers, @Body() request: DeleteMessageRequest) {
+    try {
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return await this.messageService.deleteMessage(headers.user.userID, request.messageID);
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
+  }
 }

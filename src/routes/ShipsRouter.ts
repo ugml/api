@@ -5,7 +5,7 @@ import InputValidator from "../common/InputValidator";
 import Queue from "../common/Queue";
 import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IBuildingService from "../interfaces/services/IBuildingService";
-import ICosts from "../interfaces/ICosts";
+import IUnitCosts from "../interfaces/IUnitCosts";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import IShipService from "../interfaces/services/IShipService";
 import Buildings from "../units/Buildings";
@@ -132,7 +132,7 @@ export default class ShipsRouter {
         }
 
         let count: number = buildOrders[item];
-        const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1);
+        const cost: IUnitCosts = Calculations.getCosts(parseInt(item, 10), 1);
 
         // if the user has not enough ressources to fullfill the complete build-order
         if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {

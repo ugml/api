@@ -1,5 +1,6 @@
 import Config from "./Config";
 import { Globals } from "./Globals";
+import { BuildOrderItem } from "../entities/requests/BuildDefenseRequest";
 
 /**
  * This class contains methods for input- and data-validation
@@ -108,7 +109,7 @@ export default class InputValidator {
    * @param buildOrders an object representing a build-order
    * @param unitType the type of the units in the build-order
    */
-  public static isValidBuildOrder(buildOrders: object, unitType: Globals.UnitType): boolean {
+  public static isValidBuildOrder(buildOrders: BuildOrderItem[], unitType: Globals.UnitType): boolean {
     let minID = 0;
     let maxID = 0;
 
@@ -127,14 +128,8 @@ export default class InputValidator {
         break;
     }
 
-    for (const order in buildOrders) {
-      if (
-        !InputValidator.isValidInt(order) ||
-        !InputValidator.isValidInt(buildOrders[order]) ||
-        parseInt(order, 10) < minID ||
-        parseInt(order, 10) > maxID ||
-        buildOrders[order] < 0
-      ) {
+    for (const order of buildOrders) {
+      if (order.unitID < minID || order.unitID > maxID || order.amount < 0) {
         return false;
       }
     }

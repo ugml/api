@@ -10,7 +10,7 @@ import IUserService from "../interfaces/services/IUserService";
 import Planet from "../units/Planet";
 import Buildings from "../units/Buildings";
 import User from "../units/User";
-import ICosts from "../interfaces/ICosts";
+import IUnitCosts from "../interfaces/IUnitCosts";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags } from "tsoa";
@@ -20,9 +20,6 @@ import CancelBuildingRequest from "../entities/requests/CancelBuildingRequest";
 import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 
-/**
- * Defines routes for building-data
- */
 @Tags("Buildings")
 @Route("buildings")
 @provide(BuildingsRouter)
@@ -219,7 +216,7 @@ export class BuildingsRouter extends Controller {
 
       const currentLevel = buildings[buildingKey];
 
-      const cost: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
+      const cost: IUnitCosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
 
       planet.bBuildingId = 0;
       planet.bBuildingEndTime = 0;

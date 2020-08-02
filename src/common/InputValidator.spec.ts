@@ -73,26 +73,26 @@ describe("InputValidator", function() {
   });
 
   it("Valid build-order (building)", function() {
-    assert.equal(InputValidator.isValidBuildOrder({}, Globals.UnitType.BUILDING), null);
+    assert.equal(InputValidator.isValidBuildOrder([], Globals.UnitType.BUILDING), null);
   });
 
   it("Valid build-order (technology)", function() {
-    assert.equal(InputValidator.isValidBuildOrder({}, Globals.UnitType.TECHNOLOGY), null);
+    assert.equal(InputValidator.isValidBuildOrder([], Globals.UnitType.TECHNOLOGY), null);
   });
 
   it("Valid build-order (ship)", function() {
-    assert.equal(InputValidator.isValidBuildOrder({ 201: 1 }, Globals.UnitType.SHIP), true);
+    assert.equal(InputValidator.isValidBuildOrder([{ unitID: 201, amount: 1 }], Globals.UnitType.SHIP), true);
   });
 
   it("Valid build-order (ship)", function() {
-    assert.equal(InputValidator.isValidBuildOrder({ 301: 1 }, Globals.UnitType.SHIP), false);
+    assert.equal(InputValidator.isValidBuildOrder([{ unitID: 301, amount: 1 }], Globals.UnitType.SHIP), false);
   });
 
   it("Valid build-order (defense)", function() {
-    assert.equal(InputValidator.isValidBuildOrder({ 301: 1 }, Globals.UnitType.DEFENSE), true);
+    assert.equal(InputValidator.isValidBuildOrder([{ unitID: 301, amount: 1 }], Globals.UnitType.DEFENSE), true);
   });
 
   it("Valid build-order (defense)", function() {
-    assert.equal(InputValidator.isValidBuildOrder({ 401: 1 }, Globals.UnitType.DEFENSE), false);
+    assert.equal(InputValidator.isValidBuildOrder([{ unitID: 401, amount: 1 }], Globals.UnitType.DEFENSE), false);
   });
 });

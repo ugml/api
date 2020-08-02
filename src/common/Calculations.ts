@@ -1,5 +1,5 @@
 import ICoordinates from "../interfaces/ICoordinates";
-import ICosts from "../interfaces/ICosts";
+import IUnitCosts from "../interfaces/IUnitCosts";
 import IPricelist from "../interfaces/IPricelist";
 import IShipUnits from "../interfaces/IShipUnits";
 import Config from "./Config";
@@ -61,7 +61,7 @@ export default class Calculations {
    * @param unitID
    * @param currentLevel
    */
-  public static getCosts(unitID: number, currentLevel: number): ICosts {
+  public static getCosts(unitID: number, currentLevel: number): IUnitCosts {
     let costs: IPricelist;
 
     if (InputValidator.isValidBuildingId(unitID)) {

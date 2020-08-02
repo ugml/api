@@ -4,6 +4,9 @@
     "controllerPathGlobs":[
         "./src/routes/*Router.ts"
     ],
+    "ignore": [
+        "**/node_modules/**"
+    ],
     "routes":{
         "basePath":"/v1",
         "routesDir":"./src/tsoa/",

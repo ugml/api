@@ -1,64 +1,50 @@
-import { Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import ILogger from "../interfaces/ILogger";
 import Config from "../common/Config";
+import {Controller, Get, Route, SuccessResponse, Tags} from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
 
-/**
- * Defines routes to get the config-files
- */
-export default class ConfigRouter {
-  public router: Router = Router();
+@Tags("Configuration")
+@Route("config")
+@provide(ConfigRouter)
+export class ConfigRouter extends Controller {
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-  private logger: ILogger;
-
-  /**
-   * Initialize the Router
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(logger: ILogger) {
-    this.router.get("/game", this.getGameConfig);
-    this.router.get("/units", this.getUnitsConfig);
-
-    this.logger = logger;
-  }
-
-  /**
-   * Returns the current game-configuration
-   * @param req
-   * @param response
-   * @param next
-   */
-  public getGameConfig(req: Request, response: Response) {
+  @Get("/game")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public getGameConfig() {
     try {
-      const data = Config.getGameConfig();
+      this.setStatus(Globals.StatusCodes.SUCCESS);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(data ?? {});
+      return Config.getGameConfig();
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
   }
 
-  /**
-   * Returns the current unit-configuration
-   * @param req
-   * @param response
-   * @param next
-   */
-  public getUnitsConfig(req: Request, response: Response) {
+  @Get("/units")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public getUnitsConfig() {
     try {
-      const data = Config.getGameConfig();
+      this.setStatus(Globals.StatusCodes.SUCCESS);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(data.units ?? {});
+      return Config.getGameConfig().units;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
   }
 }

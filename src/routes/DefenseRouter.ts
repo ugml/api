@@ -1,11 +1,10 @@
-import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import Queue from "../common/Queue";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+
 import IBuildingService from "../interfaces/services/IBuildingService";
-import ICosts from "../interfaces/ICosts";
+import IUnitCosts from "../interfaces/IUnitCosts";
 import IDefenseService from "../interfaces/services/IDefenseService";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import Buildings from "../units/Buildings";
@@ -13,95 +12,57 @@ import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
 import QueueItem from "../common/QueueItem";
 import ILogger from "../interfaces/ILogger";
+import {Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags} from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
 
-/**
- * Defines routes for defense-data
- */
-export default class DefenseRouter {
-  public router: Router = Router();
+import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 
-  private logger: ILogger;
+@Tags("Defenses")
+@Route("defenses")
+@provide(DefenseRouter)
+export class DefenseRouter extends Controller {
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-  private planetService: IPlanetService;
-  private buildingService: IBuildingService;
-  private defenseService: IDefenseService;
+  @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+  @inject(TYPES.IDefenseService) private defenseService: IDefenseService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.planetService = container.planetService;
-    this.buildingService = container.buildingService;
-    this.defenseService = container.defenseService;
-
-    this.router.get("/:planetID", this.getAllDefensesOnPlanet);
-    this.router.post("/build/", this.buildDefense);
-
-    this.logger = logger;
-  }
-
-  /**
-   * Returns a list of defenses on a given planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllDefensesOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Get("/{planetID}")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async getAllDefensesOnPlanet(@Request() headers, planetID: number) {
     try {
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      this.setStatus(Globals.StatusCodes.SUCCESS);
 
-      const planetID = parseInt(request.params.planetID, 10);
-      const userID = parseInt(request.userID, 10);
-
-      const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(defenses ?? {});
+      return await this.defenseService.getDefenses(headers.user.userID, planetID);
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Append a new build-order to the current build-queue
-   * @param request
-   * @param response
-   * @param next
-   */
-  public buildDefense = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/build")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async buildDefense(@Request() headers, @Body() request: BuildDefenseRequest) {
     try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildOrder) ||
-        !InputValidator.isValidJson(request.body.buildOrder)
-      ) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      const userID = headers.user.userID;
+      const planetID = request.planetID;
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
+      const buildOrders = request.buildOrder;
 
-      const buildOrders = JSON.parse(request.body.buildOrder);
-
-      const queue: Queue = new Queue();
-
-      // validate build-order
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.DEFENSE)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
@@ -109,15 +70,17 @@ export default class DefenseRouter {
       const defenses: Defenses = await this.defenseService.getDefenses(userID, planetID);
 
       if (!InputValidator.isSet(buildings) || !InputValidator.isSet(planet)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+        return {
           error: "The player does not own the planet",
-        });
+        };
       }
 
       if (planet.isUpgradingHangar()) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+        return {
           error: "Shipyard is currently upgrading",
-        });
+        };
       }
 
       let metal = planet.metal;
@@ -133,86 +96,84 @@ export default class DefenseRouter {
         defenses.interplanetaryMissile,
       );
 
+      const queue: Queue = new Queue();
+
       // TODO: put this into a seperate function
-      for (const item in buildOrders) {
-        if (buildOrders.hasOwnProperty(item)) {
-          let count: number = buildOrders[item];
-          const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1);
+      for (const buildOrder of buildOrders) {
+        let count = buildOrder.amount;
 
-          // if the user has not enough ressources to fullfill the complete build-order
-          if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-            let tempCount: number;
+        const cost: IUnitCosts = Calculations.getCosts(buildOrder.unitID, 1);
 
-            if (cost.metal > 0) {
-              tempCount = metal / cost.metal;
+        // if the user has not enough ressources to fullfill the complete build-order
+        if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+          let tempCount: number;
 
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
+          if (cost.metal > 0) {
+            tempCount = metal / cost.metal;
 
-            if (cost.crystal > 0) {
-              tempCount = crystal / cost.crystal;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            if (cost.deuterium > 0) {
-              tempCount = deuterium / cost.deuterium;
-
-              if (tempCount < count) {
-                count = tempCount;
-              }
-            }
-
-            // no need to further process the queue
-            stopProcessing = true;
-          }
-
-          // check free slots in silo
-          if (item === "309") {
-            // can't build any more rockets
-            if (freeSiloSlots === 0) {
-              buildOrders[item] = 0;
-            } else {
-              buildOrders[item] = Math.min(freeSiloSlots, buildOrders[item]);
-              freeSiloSlots -= buildOrders[item];
+            if (tempCount < count) {
+              count = tempCount;
             }
           }
 
-          if (item === "310") {
-            // can't build any more rockets
-            if (freeSiloSlots === 0) {
-              buildOrders[item] = 0;
-            } else {
-              buildOrders[item] = Math.floor(freeSiloSlots / 2) * buildOrders[item];
-              freeSiloSlots -= buildOrders[item];
+          if (cost.crystal > 0) {
+            tempCount = crystal / cost.crystal;
+
+            if (tempCount < count) {
+              count = tempCount;
             }
           }
 
-          // build time in seconds
-          buildTime +=
-            Calculations.calculateBuildTimeInSeconds(
-              cost.metal,
-              cost.crystal,
-              buildings.shipyard,
-              buildings.naniteFactory,
-            ) * Math.floor(count);
+          if (cost.deuterium > 0) {
+            tempCount = deuterium / cost.deuterium;
 
-          queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
-
-          metal -= cost.metal * count;
-          crystal -= cost.crystal * count;
-          deuterium -= cost.deuterium * count;
-
-          if (stopProcessing) {
-            break;
+            if (tempCount < count) {
+              count = tempCount;
+            }
           }
-        } else {
-          // TODO: throw a meaningful error
-          throw Error();
+
+          // no need to further process the queue
+          stopProcessing = true;
+        }
+
+        // check free slots in silo
+        if (buildOrder.unitID === 309) {
+          // can't build any more rockets
+          if (freeSiloSlots === 0) {
+            buildOrder.amount = 0;
+          } else {
+            buildOrder.amount = Math.min(freeSiloSlots, buildOrder.amount);
+            freeSiloSlots -= buildOrder.amount;
+          }
+        }
+
+        if (buildOrder.unitID === 310) {
+          // can't build any more rockets
+          if (freeSiloSlots === 0) {
+            buildOrder.amount = 0;
+          } else {
+            buildOrder.amount = Math.floor(freeSiloSlots / 2) * buildOrder.amount;
+            freeSiloSlots -= buildOrder.amount;
+          }
+        }
+
+        // build time in seconds
+        buildTime +=
+          Calculations.calculateBuildTimeInSeconds(
+            cost.metal,
+            cost.crystal,
+            buildings.shipyard,
+            buildings.naniteFactory,
+          ) * Math.floor(count);
+
+        queue.getQueue().push(new QueueItem(buildOrder.unitID, Math.floor(count)));
+
+        metal -= cost.metal * count;
+        crystal -= cost.crystal * count;
+        deuterium -= cost.deuterium * count;
+
+        if (stopProcessing) {
+          break;
         }
       }
 
@@ -239,13 +200,17 @@ export default class DefenseRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 }

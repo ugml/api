@@ -26,7 +26,6 @@ export class AuthRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
 
   @Post()
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   @Example<AuthResponse>({ token: "someToken" })
   @Response<FailureResponse>(Globals.StatusCodes.BAD_REQUEST, "", { error: "Invalid parameter" })
   @Response<FailureResponse>(Globals.StatusCodes.NOT_AUTHORIZED, "", { error: "Authentication failed" })

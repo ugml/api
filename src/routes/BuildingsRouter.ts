@@ -13,7 +13,7 @@ import User from "../units/User";
 import IUnitCosts from "../interfaces/IUnitCosts";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
-import { Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags } from "tsoa";
+import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 
 import CancelBuildingRequest from "../entities/requests/CancelBuildingRequest";
@@ -32,7 +32,6 @@ export class BuildingsRouter extends Controller {
 
   @Security("jwt")
   @Get("/{planetID}")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async getAllBuildingsOnPlanet(@Request() request, planetID: number) {
     try {
       if (!(await this.planetService.checkPlayerOwnsPlanet(request.user.userID, planetID))) {
@@ -56,7 +55,6 @@ export class BuildingsRouter extends Controller {
 
   @Security("jwt")
   @Post("/build")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async startBuilding(@Request() headers, @Body() request: BuildBuildingRequest) {
     try {
       const userID = headers.user.userID;
@@ -85,8 +83,6 @@ export class BuildingsRouter extends Controller {
 
       // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
-        this.setStatus(Globals.StatusCodes.SUCCESS);
-
         return {
           error: "Planet already has a build-job",
         };
@@ -100,7 +96,7 @@ export class BuildingsRouter extends Controller {
         InputValidator.isSet(planet.bHangarQueue) &&
         planet.isBuildingUnits()
       ) {
-        this.setStatus(Globals.StatusCodes.SUCCESS);
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
         return {
           error: "Can't build this building while it is in use",
@@ -109,8 +105,6 @@ export class BuildingsRouter extends Controller {
 
       // can't build research lab while they are researching... poor scientists :(
       if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
-        this.setStatus(Globals.StatusCodes.SUCCESS);
-
         return {
           error: "Can't build this building while it is in use",
         };
@@ -126,7 +120,7 @@ export class BuildingsRouter extends Controller {
           const key = Globals.UnitNames[requirement.unitID];
 
           if (buildings[key] < requirement.level) {
-            this.setStatus(Globals.StatusCodes.SUCCESS);
+            this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
             return {
               error: "Requirements are not met",
@@ -147,7 +141,7 @@ export class BuildingsRouter extends Controller {
         planet.deuterium < cost.deuterium ||
         planet.energyUsed < cost.energy
       ) {
-        this.setStatus(Globals.StatusCodes.SUCCESS);
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
         return {
           error: "Not enough resources",
@@ -172,8 +166,6 @@ export class BuildingsRouter extends Controller {
 
       await this.planetService.updatePlanet(planet);
 
-      this.setStatus(Globals.StatusCodes.SUCCESS);
-
       return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
@@ -188,7 +180,6 @@ export class BuildingsRouter extends Controller {
 
   @Security("jwt")
   @Post("/cancel")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async cancelBuilding(@Request() headers, @Body() request: CancelBuildingRequest) {
     try {
       const userID = headers.user.userID;
@@ -206,7 +197,6 @@ export class BuildingsRouter extends Controller {
       }
 
       if (!planet.isUpgradingBuilding()) {
-        this.setStatus(Globals.StatusCodes.SUCCESS);
         return {
           error: "Planet has no build-job",
         };
@@ -226,8 +216,6 @@ export class BuildingsRouter extends Controller {
 
       await this.planetService.updatePlanet(planet);
 
-      this.setStatus(Globals.StatusCodes.SUCCESS);
-
       return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
@@ -242,7 +230,6 @@ export class BuildingsRouter extends Controller {
 
   @Security("jwt")
   @Post("/demolish")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async demolishBuilding(@Request() headers, @Body() request: DemolishBuildingRequest) {
     try {
       const userID = headers.user.userID;
@@ -303,8 +290,6 @@ export class BuildingsRouter extends Controller {
       planet.bBuildingDemolition = true;
 
       await this.planetService.updatePlanet(planet);
-
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return planet;
     } catch (error) {

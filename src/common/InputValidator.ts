@@ -1,6 +1,6 @@
 import Config from "./Config";
 import { Globals } from "./Globals";
-import { BuildOrderItem } from "../entities/requests/BuildDefenseRequest";
+import BuildOrderItem from "../entities/common/BuildOrderItem";
 
 /**
  * This class contains methods for input- and data-validation

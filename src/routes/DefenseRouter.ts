@@ -12,7 +12,7 @@ import Defenses from "../units/Defenses";
 import Planet from "../units/Planet";
 import QueueItem from "../common/QueueItem";
 import ILogger from "../interfaces/ILogger";
-import {Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags} from "tsoa";
+import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
@@ -31,11 +31,8 @@ export class DefenseRouter extends Controller {
 
   @Security("jwt")
   @Get("/{planetID}")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async getAllDefensesOnPlanet(@Request() headers, planetID: number) {
     try {
-      this.setStatus(Globals.StatusCodes.SUCCESS);
-
       return await this.defenseService.getDefenses(headers.user.userID, planetID);
     } catch (error) {
       this.logger.error(error, error.stack);
@@ -50,7 +47,6 @@ export class DefenseRouter extends Controller {
 
   @Security("jwt")
   @Post("/build")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async buildDefense(@Request() headers, @Body() request: BuildDefenseRequest) {
     try {
       const userID = headers.user.userID;
@@ -98,7 +94,7 @@ export class DefenseRouter extends Controller {
 
       const queue: Queue = new Queue();
 
-      // TODO: put this into a seperate function
+      // TODO: put this into a separate function
       for (const buildOrder of buildOrders) {
         let count = buildOrder.amount;
 
@@ -199,8 +195,6 @@ export class DefenseRouter extends Controller {
       planet.deuterium = deuterium;
 
       await this.planetService.updatePlanet(planet);
-
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return planet;
     } catch (error) {

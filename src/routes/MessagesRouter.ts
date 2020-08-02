@@ -23,7 +23,6 @@ export class MessagesRouter extends Controller {
 
   @Security("jwt")
   @Get()
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
@@ -42,13 +41,10 @@ export class MessagesRouter extends Controller {
 
   @Security("jwt")
   @Get("/{messageID}")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async getMessageByID(@Request() headers, messageID: number) {
     try {
       const userID = headers.user.userID;
       const message = await this.messageService.getMessageById(userID, messageID);
-
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return message;
     } catch (error) {
@@ -64,7 +60,6 @@ export class MessagesRouter extends Controller {
 
   @Security("jwt")
   @Post("/send")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async sendMessage(@Request() headers, @Body() request: SendMessageRequest) {
     try {
       const subject = InputValidator.sanitizeString(request.subject);
@@ -78,8 +73,6 @@ export class MessagesRouter extends Controller {
           error: "The receiver does not exist",
         };
       }
-
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return await this.messageService.sendMessage(headers.user.userID, request.receiverID, subject, messageText);
     } catch (error) {
@@ -95,10 +88,8 @@ export class MessagesRouter extends Controller {
 
   @Security("jwt")
   @Post("/delete")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async deleteMessage(@Request() headers, @Body() request: DeleteMessageRequest) {
     try {
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return await this.messageService.deleteMessage(headers.user.userID, request.messageID);
     } catch (error) {

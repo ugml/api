@@ -1,9 +1,8 @@
-import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+
 import IBuildingService from "../interfaces/services/IBuildingService";
 import IUnitCosts from "../interfaces/IUnitCosts";
 import IPlanetService from "../interfaces/services/IPlanetService";
@@ -14,93 +13,64 @@ import Techs from "../units/Techs";
 import User from "../units/User";
 import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
+import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
 
-/**
- * Defines routes for technology-data
- */
-export default class TechsRouter {
-  public router: Router = Router();
+import CancelTechRequest from "../entities/requests/CancelTechRequest";
+import BuildTechRequest from "../entities/requests/BuildTechRequest";
 
-  private logger: ILogger;
+@Tags("Technologies")
+@Route("technologies")
+@provide(TechsRouter)
+export class TechsRouter extends Controller {
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-  private userService: IUserService;
-  private planetService: IPlanetService;
-  private buildingService: IBuildingService;
-  private techService: ITechService;
+  @inject(TYPES.IUserService) private userService: IUserService;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+  @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
+  @inject(TYPES.ITechService) private techService: ITechService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.planetService = container.planetService;
-    this.buildingService = container.buildingService;
-    this.techService = container.techService;
-
-    this.router.get("/", this.getTechs);
-    this.router.post("/build/", this.buildTech);
-    this.router.post("/cancel/", this.cancelTech);
-
-    this.logger = logger;
-  }
-
-  /**
-   * Returns all technologies of a given user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getTechs = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Get()
+  public async getTechs(@Request() headers) {
     try {
-      const userID = parseInt(request.userID, 10);
-
-      const techs: Techs = await this.techService.getTechs(userID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(techs ?? {});
+      return await this.techService.getTechs(headers.user.userID);
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Cancels a currently researching technology
-   * @param request
-   * @param response
-   * @param next
-   */
-  public cancelTech = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/cancel")
+  public async cancelTech(@Request() headers, @Body() request: CancelTechRequest) {
     try {
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const techs: Techs = await this.techService.getTechs(userID);
-      const user: User = await this.userService.getAuthenticatedUser(userID);
+      const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
+      const techs: Techs = await this.techService.getTechs(headers.user.userID);
+      const user: User = await this.userService.getAuthenticatedUser(headers.user.userID);
 
       // player does not own the planet
       if (!InputValidator.isSet(planet)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       // 1. check if there is already a build-job on the planet
       if (user.bTechID === 0 && user.bTechEndTime === 0) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+        return {
           error: "Planet has no build-job",
-        });
+        };
       }
 
       const techKey = Globals.UnitNames[user.bTechID];
@@ -118,67 +88,58 @@ export default class TechsRouter {
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Starts researching a new technology
-   * @param request
-   * @param response
-   * @param next
-   */
-  public buildTech = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/build")
+  public async buildTech(@Request() headers, @Body() request: BuildTechRequest) {
     try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.techID) ||
-        !InputValidator.isValidInt(request.body.techID)
-      ) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+      if (request.techID < Globals.MIN_TECHNOLOGY_ID || request.techID > Globals.MAX_TECHNOLOGY_ID) {
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-      const techID = parseInt(request.body.techID, 10);
-
-      if (request.body.techID < Globals.MIN_TECHNOLOGY_ID || request.body.techID > Globals.MAX_TECHNOLOGY_ID) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-      const techs: Techs = await this.techService.getTechs(userID);
-      const user: User = await this.userService.getAuthenticatedUser(userID);
+      const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(request.planetID);
+      const techs: Techs = await this.techService.getTechs(headers.user.userID);
+      const user: User = await this.userService.getAuthenticatedUser(headers.user.userID);
 
       if (!InputValidator.isSet(planet)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       if (planet.isUpgradingResearchLab()) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Planet is upgrading the research-lab",
-        });
+        };
       }
 
       // 1. check if there is already a build-job on the planet
       if (user.isResearching()) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Planet already has a build-job",
-        });
+        };
       }
 
       // can't build research lab while they are researching... poor scientists :(
@@ -195,7 +156,8 @@ export default class TechsRouter {
       // }
 
       // 2. check, if requirements are met
-      const requirements = Config.getGameConfig().units.technologies.find(r => r.unitID === techID).requirements;
+      const requirements = Config.getGameConfig().units.technologies.find(r => r.unitID === request.techID)
+        .requirements;
 
       // building has requirements
       if (requirements !== undefined) {
@@ -217,18 +179,20 @@ export default class TechsRouter {
         }
 
         if (!requirementsMet) {
-          return response.status(Globals.StatusCodes.SUCCESS).json({
+          this.setStatus(Globals.StatusCodes.SUCCESS);
+
+          return {
             error: "Requirements are not met",
-          });
+          };
         }
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = Globals.UnitNames[techID];
+      const buildingKey = Globals.UnitNames[request.techID];
 
       const currentLevel = techs[buildingKey];
 
-      const cost = Calculations.getCosts(techID, currentLevel);
+      const cost = Calculations.getCosts(request.techID, currentLevel);
 
       if (
         planet.metal < cost.metal ||
@@ -236,9 +200,11 @@ export default class TechsRouter {
         planet.deuterium < cost.deuterium ||
         planet.energyMax < cost.energy
       ) {
-        return response.status(Globals.StatusCodes.SUCCESS).json({
+        this.setStatus(Globals.StatusCodes.SUCCESS);
+
+        return {
           error: "Not enough resources",
-        });
+        };
       }
 
       // 4. start the build-job
@@ -249,19 +215,21 @@ export default class TechsRouter {
       planet.metal = planet.metal - cost.metal;
       planet.crystal = planet.crystal - cost.crystal;
       planet.deuterium = planet.deuterium - cost.deuterium;
-      user.bTechID = techID;
+      user.bTechID = request.techID;
       user.bTechEndTime = endTime;
 
       await this.planetService.updatePlanet(planet);
       await this.userService.updateUserData(user);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 }

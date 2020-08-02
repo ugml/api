@@ -30,7 +30,7 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 
-import { Route, Get, Tags, SuccessResponse, Controller, Security, Request, Post, Body } from "tsoa";
+import { Route, Get, Tags, Controller, Security, Request, Post, Body } from "tsoa";
 
 /**
  * Defines routes for user-data
@@ -54,7 +54,6 @@ export class UserRouter extends Controller {
    */
   @Security("jwt")
   @Get("/")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async getUserSelf(@Request() request): Promise<User> {
     return await this.userService.getAuthenticatedUser(request.user.userID);
   }
@@ -64,7 +63,6 @@ export class UserRouter extends Controller {
    */
   @Security("jwt")
   @Get("/{userID}")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async getUserByID(userID: number): Promise<UserInfo> {
     return await this.userService.getUserById(userID);
   }
@@ -73,7 +71,6 @@ export class UserRouter extends Controller {
    * Creates a new user with homeplanet
    */
   @Post("/create")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async createUser(@Body() request: CreateUserRequest): Promise<CreateUserResponse | FailureResponse> {
     if (
       !InputValidator.isSet(request.username) ||
@@ -247,8 +244,6 @@ export class UserRouter extends Controller {
       await connection.release();
     }
 
-    this.setStatus(Globals.StatusCodes.SUCCESS);
-
     return {
       userID: newUser.userID,
       token: JwtHelper.generateToken(newUser.userID),
@@ -260,7 +255,6 @@ export class UserRouter extends Controller {
    */
   @Security("jwt")
   @Post("/update")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async updateUser(
     @Request() request,
     @Body() requestModel: UpdateUserRequest,
@@ -293,8 +287,6 @@ export class UserRouter extends Controller {
 
       await this.userService.updateUserData(user);
 
-      this.setStatus(Globals.StatusCodes.SUCCESS);
-
       return user;
     } catch (error) {
       this.logger.error(error, error.stack);
@@ -319,7 +311,6 @@ export class UserRouter extends Controller {
    */
   @Security("jwt")
   @Post("/currentplanet/set")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async setCurrentPlanet(
     @Request() request,
     @Body() model: SetCurrentPlanetRequest,

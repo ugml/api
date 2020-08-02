@@ -13,10 +13,8 @@ export class ConfigRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
 
   @Get("/game")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public getGameConfig() {
     try {
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return Config.getGameConfig();
     } catch (error) {
@@ -31,10 +29,8 @@ export class ConfigRouter extends Controller {
   }
 
   @Get("/units")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public getUnitsConfig() {
     try {
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return Config.getGameConfig().units;
     } catch (error) {

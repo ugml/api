@@ -1,256 +1,154 @@
-import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+
 import IPlanetService from "../interfaces/services/IPlanetService";
 import Planet from "../units/Planet";
 import ILogger from "../interfaces/ILogger";
+import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
 
-/**
- * Defines routes for planet-data
- */
-export default class PlanetsRouter {
-  public router: Router = Router();
+import DestroyPlanetRequest from "../entities/requests/DestroyPlanetRequest";
+import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
 
-  private logger: ILogger;
+@Tags("Planets")
+@Route("planets")
+@provide(PlanetsRouter)
+export class PlanetsRouter extends Controller {
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-  private planetService: IPlanetService;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.planetService = container.planetService;
+  @Security("jwt")
+  @Get("/planetList")
+  public async getAllPlanets(@Request() headers) {
+    try {
+      return await this.planetService.getAllPlanetsOfUser(headers.user.userID, true);
+    } catch (error) {
+      this.logger.error(error, error.stack);
 
-    this.router.get("/movement/:planetID", this.getMovement);
-    this.router.post("/destroy/", this.destroyPlanet);
-    this.router.post("/rename/", this.renamePlanet);
-    this.router.get("/:planetID", this.getPlanetByID);
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-    this.logger = logger;
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
   }
 
-  /**
-   * Returns a list of all planets of a given authenticated user.
-   * This route returns sensible planet-data.
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllPlanets = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Get("/planetList/{userID}")
+  public async getAllPlanetsOfUser(userID: number) {
     try {
-      const userID = parseInt(request.userID, 10);
-
-      const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(planetList ?? {});
+      return await this.planetService.getAllPlanetsOfUser(userID);
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json({
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Returns a list of all planets of a given user.
-   * This route returns only the basic planet-data.
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Get("/movement/{planetID}")
+  public async getMovement(@Request() headers, planetID: number) {
     try {
-      const userID = parseInt(request.params.userID, 10);
-
-      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(planetList ?? {});
+      return await this.planetService.getMovementOnPlanet(headers.user.userID, planetID);
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Returns a planet owned by the authenticated user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getOwnPlanet = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/destroy")
+  public async destroyPlanet(@Request() headers, @Body() request: DestroyPlanetRequest) {
     try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const planet = await this.planetService.getPlanet(userID, planetID, true);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Returns a list of flights to and from the given planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getMovement = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(movement ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Destroys a given planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public destroyPlanet = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      // validate parameters
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
+      const planetList = await this.planetService.getAllPlanetsOfUser(headers.user.userID);
 
       if (planetList.length === 1) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "The last planet cannot be destroyed",
-        });
+        };
       }
 
       // TODO: if the deleted planet was the current planet -> set another one as current planet
-      await this.planetService.deletePlanet(userID, planetID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json({});
+      return await this.planetService.deletePlanet(headers.user.userID, request.planetID);
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 
-  /**
-   * Renames a planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public renamePlanet = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/rename")
+  public async renamePlanet(@Request() headers, @Body() request: RenamePlanetRequest) {
     try {
-      // validate parameters
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.name)
-      ) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+      const newName: string = InputValidator.sanitizeString(request.newName);
+
+      // TODO: put into config
+      const minLength = 4;
+      const maxLength = 10;
+
+      if (newName.length < minLength || newName.length > maxLength) {
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
+          error: `Length of new name must be between ${minLength} and ${maxLength}`,
+        };
       }
 
-      const newName: string = InputValidator.sanitizeString(request.body.name);
-
-      // TODO: check max-length
-      if (newName.length <= 4) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "New name is too short",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
 
       planet.name = newName;
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-  /**
-   * Returns basic informations about a planet owned by the given user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getPlanetByID = async (request: IAuthorizedRequest, response: Response) => {
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
+  }
+
+  @Security("jwt")
+  @Get("/{planetID}")
+  public async getPlanetByID(@Request() headers, planetID: number) {
     try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+      const planet: Planet = await this.planetService.getPlanet(headers.user.userID, planetID);
+
+      if (planet.ownerID === headers.user.userID) {
+        return await this.planetService.getPlanet(headers.user.userID, planetID, true);
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 }

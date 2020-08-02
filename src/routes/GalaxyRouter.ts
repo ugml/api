@@ -18,7 +18,6 @@ export class GalaxyRouter extends Controller {
 
   @Security("jwt")
   @Get("/{posGalaxy}/{posSystem}")
-  @SuccessResponse(Globals.StatusCodes.SUCCESS)
   public async getGalaxyInformation(posGalaxy: number, posSystem: number) {
     try {
       if (!InputValidator.isValidPosition(posGalaxy, posSystem)) {
@@ -27,8 +26,6 @@ export class GalaxyRouter extends Controller {
           error: "Invalid parameter",
         };
       }
-
-      this.setStatus(Globals.StatusCodes.SUCCESS);
 
       return await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
     } catch (error) {

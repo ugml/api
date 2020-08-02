@@ -2,7 +2,7 @@ import { Globals } from "../common/Globals";
 import User from "../units/User";
 import InputValidator from "../common/InputValidator";
 import Planet from "../units/Planet";
-import FailureResponse from "../interfaces/responses/FailureResponse";
+import FailureResponse from "../entities/responses/FailureResponse";
 import UserInfo from "../units/UserInfo";
 import IGameConfig from "../interfaces/IGameConfig";
 import Config from "../common/Config";
@@ -21,10 +21,10 @@ import IShipService from "../interfaces/services/IShipService";
 import ITechService from "../interfaces/services/ITechService";
 import IUserService from "../interfaces/services/IUserService";
 
-import CreateUserResponse from "../interfaces/responses/CreateUserResponse";
-import CreateUserRequest from "../interfaces/requests/CreateUserRequest";
-import UpdateUserRequest from "../interfaces/requests/UpdateUserRequest";
-import SetCurrentPlanetRequest from "../interfaces/requests/SetCurrentPlanetRequest";
+import CreateUserResponse from "../entities/responses/CreateUserResponse";
+import CreateUserRequest from "../entities/requests/CreateUserRequest";
+import UpdateUserRequest from "../entities/requests/UpdateUserRequest";
+import SetCurrentPlanetRequest from "../entities/requests/SetCurrentPlanetRequest";
 
 import { inject } from "inversify";
 import TYPES from "../ioc/types";

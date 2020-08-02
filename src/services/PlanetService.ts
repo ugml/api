@@ -230,6 +230,21 @@ export default class PlanetService implements IPlanetService {
     return rows;
   }
 
+  public async checkPlayerOwnsPlanet(userID: number, planetID: number): Promise<boolean> {
+    const query = squel
+      .select()
+      .from("planets")
+      .field("1")
+      .where("ownerID = ?", userID)
+      .where("planetID = ?", planetID);
+
+    const [rows] = await Database.query(query.toString());
+
+    console.log(rows);
+
+    return rows.length === 1;
+  }
+
   /**
    * Returns a list of flights to and from a given planet owned by a given user
    * @param userID the ID of the user

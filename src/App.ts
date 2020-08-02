@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import * as bodyParser from "body-parser";
 import * as express from "express";
-const { expressCspHeader, INLINE, NONE, SELF } = require("express-csp-header");
+
 import ILogger from "./interfaces/ILogger";
 import * as dotenv from "dotenv";
 import * as helmet from "helmet";
@@ -9,9 +9,9 @@ import { RegisterRoutes } from "./tsoa/routes";
 import { inject } from "inversify";
 import TYPES from "./ioc/types";
 
-dotenv.config();
+import { expressCspHeader, INLINE, SELF } from "express-csp-header";
 
-const noCache = require("nocache");
+dotenv.config();
 
 export default class App {
   public express: express.Express;
@@ -28,9 +28,6 @@ export default class App {
   }
 
   private startSwagger(): void {
-    const swaggerDocument = require("./tsoa/swagger.json");
-    const swaggerUi = require("swagger-ui-express");
-
     this.express.use(
       expressCspHeader({
         directives: {
@@ -43,6 +40,11 @@ export default class App {
         },
       }),
     );
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const swaggerDocument = require("./tsoa/swagger.json");
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const swaggerUi = require("swagger-ui-express");
 
     this.express.use("/v1/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
@@ -59,6 +61,9 @@ export default class App {
   }
 
   private middleware(): void {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const noCache = require("nocache");
+
     this.express.use(
       bodyParser.urlencoded({
         extended: true,

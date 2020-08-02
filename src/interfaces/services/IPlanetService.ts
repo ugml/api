@@ -7,6 +7,7 @@ export default interface IPlanetService {
   getNewId(): Promise<number>;
   createNewPlanet(planet: Planet, connection?);
   getAllPlanetsOfUser(userID: number, fullInfo?: boolean);
+  checkPlayerOwnsPlanet(userID: number, planetID: number): Promise<boolean>;
   getMovementOnPlanet(userID: number, planetID: number);
   deletePlanet(userID: number, planetID: number);
   getPlanetOrMoonAtPosition(position: ICoordinates): Promise<Planet>;

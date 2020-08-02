@@ -1,4 +1,3 @@
-import { Response, Router } from "express";
 import Calculations from "../common/Calculations";
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
@@ -7,154 +6,72 @@ import ILogger from "../interfaces/ILogger";
 import IBuildingService from "../interfaces/services/IBuildingService";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import IUserService from "../interfaces/services/IUserService";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+
 import Planet from "../units/Planet";
 import Buildings from "../units/Buildings";
 import User from "../units/User";
 import ICosts from "../interfaces/ICosts";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
+import { Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+
+import CancelBuildingRequest from "../entities/requests/CancelBuildingRequest";
+import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
+import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 
 /**
  * Defines routes for building-data
  */
-export default class BuildingsRouter {
-  public router: Router = Router();
+@Tags("Buildings")
+@Route("buildings")
+@provide(BuildingsRouter)
+export class BuildingsRouter extends Controller {
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-  private logger: ILogger;
+  @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+  @inject(TYPES.IUserService) private userService: IUserService;
 
-  private buildingService: IBuildingService;
-  private planetService: IPlanetService;
-  private userService: IUserService;
+  @Security("jwt")
+  @Get("/{planetID}")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async getAllBuildingsOnPlanet(@Request() request, planetID: number) {
+    try {
+      if (!(await this.planetService.checkPlayerOwnsPlanet(request.user.userID, planetID))) {
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.buildingService = container.buildingService;
-    this.planetService = container.planetService;
-    this.userService = container.userService;
+        return {
+          error: "Invalid parameter",
+        };
+      }
 
-    this.router.post("/build", this.startBuilding);
-    this.router.post("/cancel", this.cancelBuilding);
-    this.router.post("/demolish", this.demolishBuilding);
-    this.router.get("/:planetID", this.getAllBuildingsOnPlanet);
+      return await this.buildingService.getBuildings(planetID);
+    } catch (error) {
+      this.logger.error(error, error.stack);
 
-    this.logger = logger;
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
   }
 
-  /**
-   * Returns all buildings on a given planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllBuildingsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
+  @Security("jwt")
+  @Post("/build")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async startBuilding(@Request() headers, @Body() request: BuildBuildingRequest) {
     try {
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const planetID: number = parseInt(request.params.planetID, 10);
-
-      // TODO: check if user owns the planet
-      const data = await this.buildingService.getBuildings(planetID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(data ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Cancels a build-order on a planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public cancelBuilding = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      if (!planet.isUpgradingBuilding()) {
-        return response.status(Globals.StatusCodes.SUCCESS).json({
-          error: "Planet has no build-job",
-        });
-      }
-
-      const buildingKey = Globals.UnitNames[planet.bBuildingId];
-
-      const currentLevel = buildings[buildingKey];
-
-      const cost: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
-
-      planet.bBuildingId = 0;
-      planet.bBuildingEndTime = 0;
-      planet.metal = planet.metal + cost.metal;
-      planet.crystal = planet.crystal + cost.crystal;
-      planet.crystal = planet.crystal + cost.crystal;
-
-      await this.planetService.updatePlanet(planet);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Starts a new build-order
-   * @param request
-   * @param response
-   * @param next
-   */
-  public startBuilding = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildingID) ||
-        !InputValidator.isValidInt(request.body.buildingID)
-      ) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-      const buildingID = parseInt(request.body.buildingID, 10);
+      const userID = headers.user.userID;
+      const planetID = request.planetID;
+      const buildingID = request.buildingID;
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
@@ -162,16 +79,20 @@ export default class BuildingsRouter {
       const user: User = await this.userService.getAuthenticatedUser(userID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
-        return response.status(Globals.StatusCodes.SUCCESS).json({
+        this.setStatus(Globals.StatusCodes.SUCCESS);
+
+        return {
           error: "Planet already has a build-job",
-        });
+        };
       }
 
       // can't build shipyard / robotic / nanite while ships or defenses are built
@@ -182,16 +103,20 @@ export default class BuildingsRouter {
         InputValidator.isSet(planet.bHangarQueue) &&
         planet.isBuildingUnits()
       ) {
-        return response.status(Globals.StatusCodes.SUCCESS).json({
+        this.setStatus(Globals.StatusCodes.SUCCESS);
+
+        return {
           error: "Can't build this building while it is in use",
-        });
+        };
       }
 
       // can't build research lab while they are researching... poor scientists :(
       if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
-        return response.status(Globals.StatusCodes.SUCCESS).json({
+        this.setStatus(Globals.StatusCodes.SUCCESS);
+
+        return {
           error: "Can't build this building while it is in use",
-        });
+        };
       }
 
       // 2. check, if requirements are met
@@ -204,9 +129,11 @@ export default class BuildingsRouter {
           const key = Globals.UnitNames[requirement.unitID];
 
           if (buildings[key] < requirement.level) {
-            return response.status(Globals.StatusCodes.SUCCESS).json({
+            this.setStatus(Globals.StatusCodes.SUCCESS);
+
+            return {
               error: "Requirements are not met",
-            });
+            };
           }
         });
       }
@@ -223,9 +150,11 @@ export default class BuildingsRouter {
         planet.deuterium < cost.deuterium ||
         planet.energyUsed < cost.energy
       ) {
-        return response.status(Globals.StatusCodes.SUCCESS).json({
+        this.setStatus(Globals.StatusCodes.SUCCESS);
+
+        return {
           error: "Not enough resources",
-        });
+        };
       }
 
       // 4. start the build-job
@@ -246,61 +175,119 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-  public demolishBuilding = async (request: IAuthorizedRequest, response: Response) => {
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
+  }
+
+  @Security("jwt")
+  @Post("/cancel")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async cancelBuilding(@Request() headers, @Body() request: CancelBuildingRequest) {
     try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildingID) ||
-        !InputValidator.isValidInt(request.body.buildingID)
-      ) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+      const userID = headers.user.userID;
+      const planetID = request.planetID;
+
+      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
+
+      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-      const buildingID = parseInt(request.body.buildingID, 10);
+      if (!planet.isUpgradingBuilding()) {
+        this.setStatus(Globals.StatusCodes.SUCCESS);
+        return {
+          error: "Planet has no build-job",
+        };
+      }
+
+      const buildingKey = Globals.UnitNames[planet.bBuildingId];
+
+      const currentLevel = buildings[buildingKey];
+
+      const cost: ICosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
+
+      planet.bBuildingId = 0;
+      planet.bBuildingEndTime = 0;
+      planet.metal = planet.metal + cost.metal;
+      planet.crystal = planet.crystal + cost.crystal;
+      planet.deuterium = planet.deuterium + cost.deuterium;
+
+      await this.planetService.updatePlanet(planet);
+
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return planet;
+    } catch (error) {
+      this.logger.error(error, error.stack);
+
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
+        error: "There was an error while handling the request.",
+      };
+    }
+  }
+
+  @Security("jwt")
+  @Post("/demolish")
+  @SuccessResponse(Globals.StatusCodes.SUCCESS)
+  public async demolishBuilding(@Request() headers, @Body() request: DemolishBuildingRequest) {
+    try {
+      const userID = headers.user.userID;
+      const planetID = request.planetID;
+      const buildingID = request.buildingID;
 
       if (!InputValidator.isValidBuildingId(buildingID)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Invalid parameter",
-        });
+        };
       }
 
       if (planet.isUpgradingBuilding()) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "Planet already has a build-job",
-        });
+        };
       }
 
       const buildingKey = Globals.UnitNames[buildingID];
       const currentLevel = buildings[buildingKey];
 
       if (currentLevel === 0) {
-        return response.status(Globals.StatusCodes.BAD_REQUEST).json({
+        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
+
+        return {
           error: "This building can't be demolished",
-        });
+        };
       }
 
       const cost = Calculations.getCosts(buildingID, currentLevel - 1);
@@ -320,13 +307,17 @@ export default class BuildingsRouter {
 
       await this.planetService.updatePlanet(planet);
 
-      return response.status(Globals.StatusCodes.SUCCESS).json(planet ?? {});
+      this.setStatus(Globals.StatusCodes.SUCCESS);
+
+      return planet;
     } catch (error) {
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
+      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+
+      return {
         error: "There was an error while handling the request.",
-      });
+      };
     }
-  };
+  }
 }

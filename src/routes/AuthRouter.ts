@@ -11,9 +11,9 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 import { Globals } from "../common/Globals";
-import AuthResponse from "../interfaces/responses/AuthResponse";
-import FailureResponse from "../interfaces/responses/FailureResponse";
-import AuthRequest from "../interfaces/requests/AuthRequest";
+import AuthResponse from "../entities/responses/AuthResponse";
+import FailureResponse from "../entities/responses/FailureResponse";
+import AuthRequest from "../entities/requests/AuthRequest";
 
 /**
  * Defines routes for authentication

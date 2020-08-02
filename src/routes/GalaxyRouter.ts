@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 
 import IGalaxyService from "../interfaces/services/IGalaxyService";
 import ILogger from "../interfaces/ILogger";
-import {Controller, Get, Route, Security, SuccessResponse, Tags} from "tsoa";
+import { Controller, Get, Route, Security, Tags } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";

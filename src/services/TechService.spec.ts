@@ -1,6 +1,6 @@
 import * as chai from "chai";
-import {iocContainer} from "../ioc/inversify.config";
-import IPlanetService from "../interfaces/services/IPlanetService";
+import { iocContainer } from "../ioc/inversify.config";
+
 import TYPES from "../ioc/types";
 import ITechService from "../interfaces/services/ITechService";
 

@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 import IShipService from "../interfaces/services/IShipService";
 
 import squel = require("safe-squel");
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class defines a service to interact with the ships-table in the database

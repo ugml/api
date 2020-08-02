@@ -1,4 +1,5 @@
-let TYPES = {
+/* eslint-disable @typescript-eslint/naming-convention */
+const TYPES = {
   ILogger: Symbol("ILogger"),
   IUserService: Symbol("IUserService"),
   IBuildingService: Symbol("IBuildingService"),

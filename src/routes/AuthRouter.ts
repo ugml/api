@@ -5,7 +5,7 @@ import JwtHelper from "../common/JwtHelper";
 import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
 
-import { Route, Post, Body, Tags, SuccessResponse, Response, Controller, Example } from "tsoa";
+import { Route, Post, Body, Tags, Response, Controller, Example } from "tsoa";
 
 import { inject } from "inversify";
 import TYPES from "../ioc/types";

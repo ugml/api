@@ -1,5 +1,5 @@
 import ILogger from "../interfaces/ILogger";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class represents a simple logger which logs

@@ -5,7 +5,7 @@ import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
 import IMessageService from "../interfaces/services/IMessageService";
 import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
-import { Body, Controller, Get, Post, Request, Route, Security, SuccessResponse, Tags } from "tsoa";
+import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import SendMessageRequest from "../entities/requests/SendMessageRequest";
@@ -90,7 +90,6 @@ export class MessagesRouter extends Controller {
   @Post("/delete")
   public async deleteMessage(@Request() headers, @Body() request: DeleteMessageRequest) {
     try {
-
       return await this.messageService.deleteMessage(headers.user.userID, request.messageID);
     } catch (error) {
       this.logger.error(error, error.stack);

@@ -3,7 +3,6 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import SimpleLogger from "../loggers/SimpleLogger";
 
 const app = new App().express;
 

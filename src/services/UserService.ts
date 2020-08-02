@@ -4,7 +4,7 @@ import SerializationHelper from "../common/SerializationHelper";
 import IUserService from "../interfaces/services/IUserService";
 import User from "../units/User";
 import squel = require("safe-squel");
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 import AuthenticatedUser from "../units/AuthenticatedUser";
 import UserInfo from "../units/UserInfo";
 

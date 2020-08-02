@@ -6,7 +6,7 @@ import IPlanetService from "../interfaces/services/IPlanetService";
 import Planet from "../units/Planet";
 import squel = require("safe-squel");
 import EntityInvalidException from "../exceptions/EntityInvalidException";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class defines a service to interact with the planets-table in the database

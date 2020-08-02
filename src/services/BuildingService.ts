@@ -5,7 +5,7 @@ import IBuildingService from "../interfaces/services/IBuildingService";
 import Buildings from "../units/Buildings";
 
 import squel = require("safe-squel");
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class defines a service to interact with the buildings-table in the database

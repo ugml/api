@@ -1,6 +1,6 @@
 import { Controller } from "tsoa";
-import { Container, inject, interfaces, decorate, injectable } from "inversify";
-import { autoProvide, fluentProvide, buildProviderModule } from "inversify-binding-decorators";
+import { Container, inject, decorate, injectable } from "inversify";
+import { autoProvide, buildProviderModule } from "inversify-binding-decorators";
 
 import TYPES from "./types";
 import UserService from "../services/UserService";
@@ -24,7 +24,7 @@ import ITechService from "../interfaces/services/ITechService";
 import { AuthRouter } from "../routes/AuthRouter";
 import ILogger from "../interfaces/ILogger";
 import SimpleLogger from "../loggers/SimpleLogger";
-import {UserRouter} from "../routes/UserRouter";
+import { UserRouter } from "../routes/UserRouter";
 
 const iocContainer = new Container();
 

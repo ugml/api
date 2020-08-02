@@ -5,7 +5,7 @@ import IGalaxyService from "../interfaces/services/IGalaxyService";
 import PlanetType = Globals.PlanetType;
 
 import squel = require("safe-squel");
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class defines a service to interact with the galaxy-table in the database

@@ -5,7 +5,7 @@ import IMessageService from "../interfaces/services/IMessageService";
 import Message from "../units/Message";
 
 import squel = require("safe-squel");
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class defines a service to interact with the messages-table in the database

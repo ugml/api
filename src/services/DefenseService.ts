@@ -1,7 +1,7 @@
 import Database from "../common/Database";
 import IDefenseService from "../interfaces/services/IDefenseService";
 import squel = require("safe-squel");
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 /**
  * This class defines a service to interact with the defenses-table in the database

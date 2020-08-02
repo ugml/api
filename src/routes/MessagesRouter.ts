@@ -11,6 +11,7 @@ import TYPES from "../ioc/types";
 import SendMessageRequest from "../entities/requests/SendMessageRequest";
 import DeleteMessageRequest from "../entities/requests/DeleteMessageRequest";
 import { provide } from "inversify-binding-decorators";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Messages")
 @Route("messages")
@@ -52,9 +53,7 @@ export class MessagesRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -69,9 +68,7 @@ export class MessagesRouter extends Controller {
 
       if (!InputValidator.isSet(receiver)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return {
-          error: "The receiver does not exist",
-        };
+        return new FailureResponse("The receiver does not exist");
       }
 
       return await this.messageService.sendMessage(headers.user.userID, request.receiverID, subject, messageText);
@@ -80,9 +77,7 @@ export class MessagesRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -96,9 +91,7 @@ export class MessagesRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

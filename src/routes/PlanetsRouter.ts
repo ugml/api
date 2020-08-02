@@ -11,6 +11,7 @@ import TYPES from "../ioc/types";
 
 import DestroyPlanetRequest from "../entities/requests/DestroyPlanetRequest";
 import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Planets")
 @Route("planets")
@@ -30,9 +31,7 @@ export class PlanetsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -46,9 +45,7 @@ export class PlanetsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SUCCESS);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -61,9 +58,7 @@ export class PlanetsRouter extends Controller {
       this.logger.error(error, error.stack);
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -76,9 +71,7 @@ export class PlanetsRouter extends Controller {
       if (planetList.length === 1) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "The last planet cannot be destroyed",
-        };
+        return new FailureResponse("The last planet cannot be destroyed");
       }
 
       // TODO: if the deleted planet was the current planet -> set another one as current planet
@@ -88,9 +81,7 @@ export class PlanetsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -124,9 +115,7 @@ export class PlanetsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -146,9 +135,7 @@ export class PlanetsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

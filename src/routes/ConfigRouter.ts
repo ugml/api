@@ -5,6 +5,7 @@ import { Controller, Get, Route, Tags } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Configuration")
 @Route("config")
@@ -21,9 +22,7 @@ export class ConfigRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -36,9 +35,7 @@ export class ConfigRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

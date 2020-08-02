@@ -79,9 +79,7 @@ export class UserRouter extends Controller {
     ) {
       this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-      return {
-        error: "Invalid parameter",
-      };
+      return new FailureResponse("Invalid parameter");
     }
 
     const gameConfig: IGameConfig = Config.getGameConfig();
@@ -237,9 +235,7 @@ export class UserRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     } finally {
       await connection.release();
     }
@@ -263,9 +259,7 @@ export class UserRouter extends Controller {
       if (!requestModel.isValid()) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameters were passed",
-        };
+        return new FailureResponse("Invalid parameters were passed");
       }
 
       const user: User = await this.userService.getAuthenticatedUser(request.headers.userID);
@@ -299,9 +293,7 @@ export class UserRouter extends Controller {
       } else {
         this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-        return {
-          error: "There was an error while handling the request.",
-        };
+        return new FailureResponse("There was an error while handling the request.");
       }
     }
   }
@@ -323,9 +315,7 @@ export class UserRouter extends Controller {
 
       if (!InputValidator.isSet(planet)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return {
-          error: "The player does not own the planet",
-        };
+        return new FailureResponse("The player does not own the planet");
       }
 
       const user: User = await this.userService.getAuthenticatedUser(userID);
@@ -339,9 +329,7 @@ export class UserRouter extends Controller {
       this.logger.error(error, error.stack);
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

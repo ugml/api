@@ -17,6 +17,7 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 
 import BuildShipsRequest from "../entities/requests/BuildShipsRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Ships")
 @Route("ships")
@@ -38,9 +39,7 @@ export class ShipsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -51,9 +50,7 @@ export class ShipsRouter extends Controller {
       if (!InputValidator.isValidBuildOrder(request.buildOrder, Globals.UnitType.SHIP)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       const queue: Queue = new Queue();
@@ -64,17 +61,13 @@ export class ShipsRouter extends Controller {
       if (planet === null) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "The player does not own the planet",
-        };
+        return new FailureResponse("The player does not own the planet");
       }
 
       if (planet.bHangarPlus) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Shipyard is currently upgrading",
-        };
+        return new FailureResponse("Shipyard is currently upgrading");
       }
 
       let metal = planet.metal;
@@ -176,9 +169,7 @@ export class ShipsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

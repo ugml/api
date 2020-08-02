@@ -15,9 +15,6 @@ import AuthResponse from "../entities/responses/AuthResponse";
 import FailureResponse from "../entities/responses/FailureResponse";
 import AuthRequest from "../entities/requests/AuthRequest";
 
-/**
- * Defines routes for authentication
- */
 @Tags("Authentication")
 @Route("login")
 @provide(AuthRouter)
@@ -32,9 +29,7 @@ export class AuthRouter extends Controller {
   public async authenticate(@Body() req: AuthRequest): Promise<AuthResponse | FailureResponse> {
     if (!InputValidator.isSet(req.email) || !InputValidator.isSet(req.password)) {
       this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-      return {
-        error: "Invalid parameter",
-      };
+      return new FailureResponse("Invalid parameter");
     }
 
     const email: string = InputValidator.sanitizeString(req.email);
@@ -45,18 +40,14 @@ export class AuthRouter extends Controller {
 
     if (!InputValidator.isSet(data)) {
       this.setStatus(Globals.StatusCodes.NOT_AUTHORIZED);
-      return {
-        error: "Authentication failed",
-      };
+      return new FailureResponse("Authentication failed");
     }
 
     const isValidPassword = await Encryption.compare(password, data.password);
 
     if (!isValidPassword) {
       this.setStatus(Globals.StatusCodes.NOT_AUTHORIZED);
-      return {
-        error: "Authentication failed",
-      };
+      return new FailureResponse("Authentication failed");
     }
 
     return {

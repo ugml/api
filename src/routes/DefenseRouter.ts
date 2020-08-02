@@ -18,6 +18,7 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 
 import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Defenses")
 @Route("defenses")
@@ -39,9 +40,7 @@ export class DefenseRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -56,9 +55,7 @@ export class DefenseRouter extends Controller {
 
       if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.DEFENSE)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       const buildings: Buildings = await this.buildingService.getBuildings(planetID);
@@ -67,16 +64,12 @@ export class DefenseRouter extends Controller {
 
       if (!InputValidator.isSet(buildings) || !InputValidator.isSet(planet)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return {
-          error: "The player does not own the planet",
-        };
+        return new FailureResponse("The player does not own the planet");
       }
 
       if (planet.isUpgradingHangar()) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return {
-          error: "Shipyard is currently upgrading",
-        };
+        return new FailureResponse("Shipyard is currently upgrading");
       }
 
       let metal = planet.metal;
@@ -202,9 +195,7 @@ export class DefenseRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

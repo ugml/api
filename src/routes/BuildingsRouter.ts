@@ -13,12 +13,13 @@ import User from "../units/User";
 import IUnitCosts from "../interfaces/IUnitCosts";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
-import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
+import { Body, Controller, Get, Post, Request, Res, Response, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 
 import CancelBuildingRequest from "../entities/requests/CancelBuildingRequest";
 import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Buildings")
 @Route("buildings")
@@ -30,88 +31,86 @@ export class BuildingsRouter extends Controller {
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
   @inject(TYPES.IUserService) private userService: IUserService;
 
-  @Security("jwt")
   @Get("/{planetID}")
-  public async getAllBuildingsOnPlanet(@Request() request, planetID: number) {
+  @Security("jwt")
+  public async getAllBuildingsOnPlanet(
+    @Request() request,
+    planetID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Buildings>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Buildings> {
     try {
       if (!(await this.planetService.checkPlayerOwnsPlanet(request.user.userID, planetID))) {
-        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-
-        return {
-          error: "Invalid parameter",
-        };
+        badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      return await this.buildingService.getBuildings(planetID);
+      const result: Buildings = await this.buildingService.getBuildings(planetID);
+
+      successResponse(Globals.StatusCodes.SUCCESS, result);
+
+      return;
     } catch (error) {
       this.logger.error(error, error.stack);
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-      return {
-        error: "There was an error while handling the request.",
-      };
+
+      serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
     }
   }
 
-  @Security("jwt")
   @Post("/build")
-  public async startBuilding(@Request() headers, @Body() request: BuildBuildingRequest) {
+  @Security("jwt")
+  public async startBuilding(
+    @Request() headers,
+    @Body() request: BuildBuildingRequest,
+  ): Promise<Planet | FailureResponse> {
     try {
-      const userID = headers.user.userID;
-      const planetID = request.planetID;
-      const buildingID = request.buildingID;
-
-      if (!InputValidator.isValidBuildingId(buildingID)) {
+      if (!InputValidator.isValidBuildingId(request.buildingID)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-      const user: User = await this.userService.getAuthenticatedUser(userID);
+      const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
+      const buildings: Buildings = await this.buildingService.getBuildings(request.planetID);
+      const user: User = await this.userService.getAuthenticatedUser(headers.user.userID);
 
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
-        return {
-          error: "Planet already has a build-job",
-        };
+        return new FailureResponse("Planet already has a build-job");
       }
 
       // can't build shipyard / robotic / nanite while ships or defenses are built
       if (
-        (buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
-          buildingID === Globals.Buildings.NANITE_FACTORY ||
-          buildingID === Globals.Buildings.SHIPYARD) &&
+        (request.buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
+          request.buildingID === Globals.Buildings.NANITE_FACTORY ||
+          request.buildingID === Globals.Buildings.SHIPYARD) &&
         InputValidator.isSet(planet.bHangarQueue) &&
         planet.isBuildingUnits()
       ) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Can't build this building while it is in use",
-        };
+        return new FailureResponse("Can't build this building while it is in use");
       }
 
       // can't build research lab while they are researching... poor scientists :(
-      if (buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
-        return {
-          error: "Can't build this building while it is in use",
-        };
+      if (request.buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
+        return new FailureResponse("Can't build this building while it is in use");
       }
 
       // 2. check, if requirements are met
-      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === buildingID).requirements;
+      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === request.buildingID)
+        .requirements;
 
       // TODO: move to seperate file
       // building has requirements
@@ -122,18 +121,16 @@ export class BuildingsRouter extends Controller {
           if (buildings[key] < requirement.level) {
             this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-            return {
-              error: "Requirements are not met",
-            };
+            return new FailureResponse("Requirements are not met");
           }
         });
       }
 
       // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = Globals.UnitNames[buildingID];
+      const buildingKey = Globals.UnitNames[request.buildingID];
       const currentLevel = buildings[buildingKey];
 
-      const cost = Calculations.getCosts(buildingID, currentLevel);
+      const cost = Calculations.getCosts(request.buildingID, currentLevel);
 
       if (
         planet.metal < cost.metal ||
@@ -143,9 +140,7 @@ export class BuildingsRouter extends Controller {
       ) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Not enough resources",
-        };
+        return new FailureResponse("Not enough resources");
       }
 
       // 4. start the build-job
@@ -161,7 +156,7 @@ export class BuildingsRouter extends Controller {
       planet.metal = planet.metal - cost.metal;
       planet.crystal = planet.crystal - cost.crystal;
       planet.deuterium = planet.deuterium - cost.deuterium;
-      planet.bBuildingId = buildingID;
+      planet.bBuildingId = request.buildingID;
       planet.bBuildingEndTime = endTime;
 
       await this.planetService.updatePlanet(planet);
@@ -172,15 +167,18 @@ export class BuildingsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
-  @Security("jwt")
   @Post("/cancel")
-  public async cancelBuilding(@Request() headers, @Body() request: CancelBuildingRequest) {
+  @Security("jwt")
+  @Response<FailureResponse>(Globals.StatusCodes.BAD_REQUEST, "", { error: "Invalid parameter" })
+  @Response<FailureResponse>(Globals.StatusCodes.NOT_AUTHORIZED, "", { error: "Authentication failed" })
+  public async cancelBuilding(
+    @Request() headers,
+    @Body() request: CancelBuildingRequest,
+  ): Promise<Planet | FailureResponse> {
     try {
       const userID = headers.user.userID;
       const planetID = request.planetID;
@@ -191,9 +189,7 @@ export class BuildingsRouter extends Controller {
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       if (!planet.isUpgradingBuilding()) {
@@ -222,15 +218,18 @@ export class BuildingsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
-  @Security("jwt")
   @Post("/demolish")
-  public async demolishBuilding(@Request() headers, @Body() request: DemolishBuildingRequest) {
+  @Security("jwt")
+  @Response<FailureResponse>(Globals.StatusCodes.BAD_REQUEST, "", { error: "Invalid parameter" })
+  @Response<FailureResponse>(Globals.StatusCodes.NOT_AUTHORIZED, "", { error: "Authentication failed" })
+  public async demolishBuilding(
+    @Request() headers,
+    @Body() request: DemolishBuildingRequest,
+  ): Promise<Planet | FailureResponse> {
     try {
       const userID = headers.user.userID;
       const planetID = request.planetID;
@@ -239,9 +238,7 @@ export class BuildingsRouter extends Controller {
       if (!InputValidator.isValidBuildingId(buildingID)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
@@ -250,9 +247,7 @@ export class BuildingsRouter extends Controller {
       if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       if (planet.isUpgradingBuilding()) {
@@ -269,9 +264,7 @@ export class BuildingsRouter extends Controller {
       if (currentLevel === 0) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "This building can't be demolished",
-        };
+        return new FailureResponse("This building can't be demolished");
       }
 
       const cost = Calculations.getCosts(buildingID, currentLevel - 1);
@@ -297,9 +290,7 @@ export class BuildingsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

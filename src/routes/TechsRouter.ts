@@ -20,6 +20,7 @@ import TYPES from "../ioc/types";
 
 import CancelTechRequest from "../entities/requests/CancelTechRequest";
 import BuildTechRequest from "../entities/requests/BuildTechRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Technologies")
 @Route("technologies")
@@ -42,9 +43,7 @@ export class TechsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -60,9 +59,7 @@ export class TechsRouter extends Controller {
       if (!InputValidator.isSet(planet)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       // 1. check if there is already a build-job on the planet
@@ -94,9 +91,7 @@ export class TechsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 
@@ -107,9 +102,7 @@ export class TechsRouter extends Controller {
       if (request.techID < Globals.MIN_TECHNOLOGY_ID || request.techID > Globals.MAX_TECHNOLOGY_ID) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
@@ -120,9 +113,7 @@ export class TechsRouter extends Controller {
       if (!InputValidator.isSet(planet)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
 
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       if (planet.isUpgradingResearchLab()) {
@@ -181,9 +172,7 @@ export class TechsRouter extends Controller {
         if (!requirementsMet) {
           this.setStatus(Globals.StatusCodes.SUCCESS);
 
-          return {
-            error: "Requirements are not met",
-          };
+          return new FailureResponse("Requirements are not met");
         }
       }
 
@@ -202,9 +191,7 @@ export class TechsRouter extends Controller {
       ) {
         this.setStatus(Globals.StatusCodes.SUCCESS);
 
-        return {
-          error: "Not enough resources",
-        };
+        return new FailureResponse("Not enough resources");
       }
 
       // 4. start the build-job
@@ -227,9 +214,7 @@ export class TechsRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

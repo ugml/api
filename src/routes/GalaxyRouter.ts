@@ -7,6 +7,7 @@ import { Controller, Get, Route, Security, Tags } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
+import FailureResponse from "../entities/responses/FailureResponse";
 
 @Tags("Galaxy")
 @Route("galaxy")
@@ -22,9 +23,7 @@ export class GalaxyRouter extends Controller {
     try {
       if (!InputValidator.isValidPosition(posGalaxy, posSystem)) {
         this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return {
-          error: "Invalid parameter",
-        };
+        return new FailureResponse("Invalid parameter");
       }
 
       return await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
@@ -33,9 +32,7 @@ export class GalaxyRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      return {
-        error: "There was an error while handling the request.",
-      };
+      return new FailureResponse("There was an error while handling the request.");
     }
   }
 }

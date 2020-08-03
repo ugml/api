@@ -19,8 +19,8 @@ import TYPES from "../ioc/types";
 import BuildShipsRequest from "../entities/requests/BuildShipsRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Ships")
 @Route("ships")
+@Tags("Ships")
 @provide(ShipsRouter)
 export class ShipsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
@@ -29,8 +29,8 @@ export class ShipsRouter extends Controller {
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
   @inject(TYPES.IShipService) private shipService: IShipService;
 
-  @Security("jwt")
   @Get("/{planetID}")
+  @Security("jwt")
   public async getAllShipsOnPlanet(@Request() request, planetID: number) {
     try {
       return await this.shipService.getShips(request.user.userID, planetID);
@@ -43,8 +43,8 @@ export class ShipsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/build")
+  @Security("jwt")
   public async buildShips(@Request() headers, @Body() request: BuildShipsRequest) {
     try {
       if (!InputValidator.isValidBuildOrder(request.buildOrder, Globals.UnitType.SHIP)) {

@@ -21,8 +21,8 @@ import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Buildings")
 @Route("buildings")
+@Tags("Buildings")
 @provide(BuildingsRouter)
 export class BuildingsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

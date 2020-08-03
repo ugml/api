@@ -13,6 +13,7 @@ import MessageService from "../services/MessageService";
 import PlanetService from "../services/PlanetService";
 import ShipService from "../services/ShipService";
 import TechService from "../services/TechService";
+import AuthService from "../services/AuthService";
 import IBuildingService from "../interfaces/services/IBuildingService";
 import IDefenseService from "../interfaces/services/IDefenseService";
 import IEventService from "../interfaces/services/IEventService";
@@ -21,6 +22,7 @@ import IMessageService from "../interfaces/services/IMessageService";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import IShipService from "../interfaces/services/IShipService";
 import ITechService from "../interfaces/services/ITechService";
+import IAuthService from "../interfaces/services/IAuthService";
 import { AuthRouter } from "../routes/AuthRouter";
 import ILogger from "../interfaces/ILogger";
 import SimpleLogger from "../loggers/SimpleLogger";
@@ -43,6 +45,9 @@ iocContainer.bind<IMessageService>(TYPES.IMessageService).to(MessageService);
 iocContainer.bind<IPlanetService>(TYPES.IPlanetService).to(PlanetService);
 iocContainer.bind<IShipService>(TYPES.IShipService).to(ShipService);
 iocContainer.bind<ITechService>(TYPES.ITechService).to(TechService);
+iocContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
+
+// Routers
 iocContainer.bind<AuthRouter>(TYPES.AuthRouter).to(AuthRouter);
 iocContainer.bind<UserRouter>(TYPES.UsersRouter).to(UserRouter);
 

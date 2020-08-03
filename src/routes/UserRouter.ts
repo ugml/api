@@ -35,8 +35,8 @@ import { Route, Get, Tags, Controller, Security, Request, Post, Body } from "tso
 /**
  * Defines routes for user-data
  */
-@Tags("UserData")
 @Route("user")
+@Tags("UserData")
 @provide(UserRouter)
 export class UserRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
@@ -52,8 +52,8 @@ export class UserRouter extends Controller {
   /**
    * Returns sensible information about the currently authenticated user
    */
-  @Security("jwt")
   @Get("/")
+  @Security("jwt")
   public async getUserSelf(@Request() request): Promise<User> {
     return await this.userService.getAuthenticatedUser(request.user.userID);
   }
@@ -61,8 +61,8 @@ export class UserRouter extends Controller {
   /**
    * Returns basic information about a user given its userID
    */
-  @Security("jwt")
   @Get("/{userID}")
+  @Security("jwt")
   public async getUserByID(userID: number): Promise<UserInfo> {
     return await this.userService.getUserById(userID);
   }
@@ -249,8 +249,8 @@ export class UserRouter extends Controller {
   /**
    * Updates a user
    */
-  @Security("jwt")
   @Post("/update")
+  @Security("jwt")
   public async updateUser(
     @Request() request,
     @Body() requestModel: UpdateUserRequest,
@@ -301,8 +301,8 @@ export class UserRouter extends Controller {
   /**
    * Sets the current planet for a user
    */
-  @Security("jwt")
   @Post("/currentplanet/set")
+  @Security("jwt")
   public async setCurrentPlanet(
     @Request() request,
     @Body() model: SetCurrentPlanetRequest,

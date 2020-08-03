@@ -10,6 +10,7 @@ const TYPES = {
   IPlanetService: Symbol("IPlanetService"),
   IShipService: Symbol("IShipService"),
   ITechService: Symbol("ITechService"),
+  IAuthService: Symbol("IAuthService"),
   AuthRouter: Symbol("AuthRouter"),
   UsersRouter: Symbol("UsersRouter"),
 };

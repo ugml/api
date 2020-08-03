@@ -22,8 +22,8 @@ import CancelTechRequest from "../entities/requests/CancelTechRequest";
 import BuildTechRequest from "../entities/requests/BuildTechRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Technologies")
 @Route("technologies")
+@Tags("Technologies")
 @provide(TechsRouter)
 export class TechsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
@@ -33,8 +33,8 @@ export class TechsRouter extends Controller {
   @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
   @inject(TYPES.ITechService) private techService: ITechService;
 
+  @Get("/")
   @Security("jwt")
-  @Get()
   public async getTechs(@Request() headers) {
     try {
       return await this.techService.getTechs(headers.user.userID);
@@ -47,8 +47,8 @@ export class TechsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/cancel")
+  @Security("jwt")
   public async cancelTech(@Request() headers, @Body() request: CancelTechRequest) {
     try {
       const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
@@ -95,8 +95,8 @@ export class TechsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/build")
+  @Security("jwt")
   public async buildTech(@Request() headers, @Body() request: BuildTechRequest) {
     try {
       if (request.techID < Globals.MIN_TECHNOLOGY_ID || request.techID > Globals.MAX_TECHNOLOGY_ID) {

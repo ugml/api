@@ -13,8 +13,8 @@ import DeleteMessageRequest from "../entities/requests/DeleteMessageRequest";
 import { provide } from "inversify-binding-decorators";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Messages")
 @Route("messages")
+@Tags("Messages")
 @provide(MessagesRouter)
 export class MessagesRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
@@ -22,8 +22,8 @@ export class MessagesRouter extends Controller {
   @inject(TYPES.IUserService) private userService: IUserService;
   @inject(TYPES.IMessageService) private messageService: IMessageService;
 
+  @Get("/")
   @Security("jwt")
-  @Get()
   public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
     try {
       const userID = parseInt(request.userID, 10);
@@ -40,8 +40,8 @@ export class MessagesRouter extends Controller {
     }
   };
 
-  @Security("jwt")
   @Get("/{messageID}")
+  @Security("jwt")
   public async getMessageByID(@Request() headers, messageID: number) {
     try {
       const userID = headers.user.userID;
@@ -57,8 +57,8 @@ export class MessagesRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/send")
+  @Security("jwt")
   public async sendMessage(@Request() headers, @Body() request: SendMessageRequest) {
     try {
       const subject = InputValidator.sanitizeString(request.subject);
@@ -81,8 +81,8 @@ export class MessagesRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/delete")
+  @Security("jwt")
   public async deleteMessage(@Request() headers, @Body() request: DeleteMessageRequest) {
     try {
       return await this.messageService.deleteMessage(headers.user.userID, request.messageID);

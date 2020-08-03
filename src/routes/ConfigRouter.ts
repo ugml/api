@@ -7,8 +7,8 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Configuration")
 @Route("config")
+@Tags("Configuration")
 @provide(ConfigRouter)
 export class ConfigRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

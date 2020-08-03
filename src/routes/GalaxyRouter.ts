@@ -9,16 +9,15 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Galaxy")
 @Route("galaxy")
+@Tags("Galaxy")
 @provide(GalaxyRouter)
 export class GalaxyRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
-
   @inject(TYPES.IGalaxyService) private galaxyService: IGalaxyService;
 
-  @Security("jwt")
   @Get("/{posGalaxy}/{posSystem}")
+  @Security("jwt")
   public async getGalaxyInformation(posGalaxy: number, posSystem: number) {
     try {
       if (!InputValidator.isValidPosition(posGalaxy, posSystem)) {

@@ -13,16 +13,16 @@ import DestroyPlanetRequest from "../entities/requests/DestroyPlanetRequest";
 import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Planets")
 @Route("planets")
+@Tags("Planets")
 @provide(PlanetsRouter)
 export class PlanetsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
 
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
 
-  @Security("jwt")
   @Get("/planetList")
+  @Security("jwt")
   public async getAllPlanets(@Request() headers) {
     try {
       return await this.planetService.getAllPlanetsOfUser(headers.user.userID, true);
@@ -35,8 +35,8 @@ export class PlanetsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Get("/planetList/{userID}")
+  @Security("jwt")
   public async getAllPlanetsOfUser(userID: number) {
     try {
       return await this.planetService.getAllPlanetsOfUser(userID);
@@ -49,8 +49,8 @@ export class PlanetsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Get("/movement/{planetID}")
+  @Security("jwt")
   public async getMovement(@Request() headers, planetID: number) {
     try {
       return await this.planetService.getMovementOnPlanet(headers.user.userID, planetID);
@@ -62,8 +62,8 @@ export class PlanetsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/destroy")
+  @Security("jwt")
   public async destroyPlanet(@Request() headers, @Body() request: DestroyPlanetRequest) {
     try {
       const planetList = await this.planetService.getAllPlanetsOfUser(headers.user.userID);
@@ -85,8 +85,8 @@ export class PlanetsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/rename")
+  @Security("jwt")
   public async renamePlanet(@Request() headers, @Body() request: RenamePlanetRequest) {
     try {
       const newName: string = InputValidator.sanitizeString(request.newName);
@@ -119,8 +119,8 @@ export class PlanetsRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Get("/{planetID}")
+  @Security("jwt")
   public async getPlanetByID(@Request() headers, planetID: number) {
     try {
       const planet: Planet = await this.planetService.getPlanet(headers.user.userID, planetID);

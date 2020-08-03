@@ -20,8 +20,8 @@ import TYPES from "../ioc/types";
 import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-@Tags("Defenses")
 @Route("defenses")
+@Tags("Defenses")
 @provide(DefenseRouter)
 export class DefenseRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
@@ -30,8 +30,8 @@ export class DefenseRouter extends Controller {
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
   @inject(TYPES.IDefenseService) private defenseService: IDefenseService;
 
-  @Security("jwt")
   @Get("/{planetID}")
+  @Security("jwt")
   public async getAllDefensesOnPlanet(@Request() headers, planetID: number) {
     try {
       return await this.defenseService.getDefenses(headers.user.userID, planetID);
@@ -44,8 +44,8 @@ export class DefenseRouter extends Controller {
     }
   }
 
-  @Security("jwt")
   @Post("/build")
+  @Security("jwt")
   public async buildDefense(@Request() headers, @Body() request: BuildDefenseRequest) {
     try {
       const userID = headers.user.userID;

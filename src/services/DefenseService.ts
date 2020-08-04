@@ -176,13 +176,4 @@ export default class DefenseService implements IDefenseService {
 
     return planet;
   }
-
-  // /**
-  //  * Creates a new row in the database.
-  //  * @param planetID the ID of the planet
-  //  * @param connection a connection from the connection-pool, if this query should be executed within a transaction
-  //  */
-  // public async createDefenseRow(planetID: number, connection = null) {
-
-  // }
 }

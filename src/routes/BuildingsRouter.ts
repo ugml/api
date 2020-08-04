@@ -82,7 +82,10 @@ export class BuildingsRouter extends Controller {
 
       // 1. check if there is already a build-job on the planet
       if (planet.isUpgradingBuilding()) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Planet already has a build-job"));
+        return badRequestResponse(
+          Globals.StatusCodes.BAD_REQUEST,
+          new FailureResponse("Planet already has a build-job"),
+        );
       }
 
       // can't build shipyard / robotic / nanite while ships or defenses are built
@@ -246,14 +249,20 @@ export class BuildingsRouter extends Controller {
       }
 
       if (planet.isUpgradingBuilding()) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Planet already has a build-job"));
+        return badRequestResponse(
+          Globals.StatusCodes.BAD_REQUEST,
+          new FailureResponse("Planet already has a build-job"),
+        );
       }
 
       const buildingKey = Globals.UnitNames[buildingID];
       const currentLevel = buildings[buildingKey];
 
       if (currentLevel === 0) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("This building can't be demolished"));
+        return badRequestResponse(
+          Globals.StatusCodes.BAD_REQUEST,
+          new FailureResponse("This building can't be demolished"),
+        );
       }
 
       const cost = Calculations.getCosts(buildingID, currentLevel - 1);

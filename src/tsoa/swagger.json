@@ -46,6 +46,94 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Buildings": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"metalMine": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystalMine": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuteriumSynthesizer": {
+						"type": "number",
+						"format": "double"
+					},
+					"solarPlant": {
+						"type": "number",
+						"format": "double"
+					},
+					"fusionReactor": {
+						"type": "number",
+						"format": "double"
+					},
+					"roboticFactory": {
+						"type": "number",
+						"format": "double"
+					},
+					"naniteFactory": {
+						"type": "number",
+						"format": "double"
+					},
+					"shipyard": {
+						"type": "number",
+						"format": "double"
+					},
+					"metalStorage": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystalStorage": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuteriumStorage": {
+						"type": "number",
+						"format": "double"
+					},
+					"researchLab": {
+						"type": "number",
+						"format": "double"
+					},
+					"terraformer": {
+						"type": "number",
+						"format": "double"
+					},
+					"allianceDepot": {
+						"type": "number",
+						"format": "double"
+					},
+					"missileSilo": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"metalMine",
+					"crystalMine",
+					"deuteriumSynthesizer",
+					"solarPlant",
+					"fusionReactor",
+					"roboticFactory",
+					"naniteFactory",
+					"shipyard",
+					"metalStorage",
+					"crystalStorage",
+					"deuteriumStorage",
+					"researchLab",
+					"terraformer",
+					"allianceDepot",
+					"missileSilo"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Globals.PlanetType": {
 				"properties": {},
 				"type": "object",
@@ -226,94 +314,6 @@
 				"required": [
 					"planetID",
 					"buildingID"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Buildings": {
-				"properties": {
-					"planetID": {
-						"type": "number",
-						"format": "double"
-					},
-					"metalMine": {
-						"type": "number",
-						"format": "double"
-					},
-					"crystalMine": {
-						"type": "number",
-						"format": "double"
-					},
-					"deuteriumSynthesizer": {
-						"type": "number",
-						"format": "double"
-					},
-					"solarPlant": {
-						"type": "number",
-						"format": "double"
-					},
-					"fusionReactor": {
-						"type": "number",
-						"format": "double"
-					},
-					"roboticFactory": {
-						"type": "number",
-						"format": "double"
-					},
-					"naniteFactory": {
-						"type": "number",
-						"format": "double"
-					},
-					"shipyard": {
-						"type": "number",
-						"format": "double"
-					},
-					"metalStorage": {
-						"type": "number",
-						"format": "double"
-					},
-					"crystalStorage": {
-						"type": "number",
-						"format": "double"
-					},
-					"deuteriumStorage": {
-						"type": "number",
-						"format": "double"
-					},
-					"researchLab": {
-						"type": "number",
-						"format": "double"
-					},
-					"terraformer": {
-						"type": "number",
-						"format": "double"
-					},
-					"allianceDepot": {
-						"type": "number",
-						"format": "double"
-					},
-					"missileSilo": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"planetID",
-					"metalMine",
-					"crystalMine",
-					"deuteriumSynthesizer",
-					"solarPlant",
-					"fusionReactor",
-					"roboticFactory",
-					"naniteFactory",
-					"shipyard",
-					"metalStorage",
-					"crystalStorage",
-					"deuteriumStorage",
-					"researchLab",
-					"terraformer",
-					"allianceDepot",
-					"missileSilo"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1264,6 +1264,16 @@
 							}
 						}
 					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
 					"500": {
 						"description": "",
 						"content": {
@@ -1290,6 +1300,62 @@
 						}
 					}
 				}
+			}
+		},
+		"/buildings/{planetID}": {
+			"get": {
+				"operationId": "GetAllBuildingsOnPlanet",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Buildings"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Buildings"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "planetID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/buildings/build": {

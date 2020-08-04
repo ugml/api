@@ -44,9 +44,9 @@ export class AuthRouter extends Controller {
         return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse("Authentication failed"));
       }
 
-      return {
+      return successResponse(Globals.StatusCodes.SUCCESS, {
         token: token,
-      };
+      });
     } catch (error) {
       this.logger.error(error, error.stack);
 

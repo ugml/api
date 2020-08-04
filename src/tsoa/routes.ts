@@ -54,6 +54,29 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Buildings": {
+        "dataType": "refObject",
+        "properties": {
+            "planetID": { "dataType": "double", "required": true },
+            "metalMine": { "dataType": "double", "required": true },
+            "crystalMine": { "dataType": "double", "required": true },
+            "deuteriumSynthesizer": { "dataType": "double", "required": true },
+            "solarPlant": { "dataType": "double", "required": true },
+            "fusionReactor": { "dataType": "double", "required": true },
+            "roboticFactory": { "dataType": "double", "required": true },
+            "naniteFactory": { "dataType": "double", "required": true },
+            "shipyard": { "dataType": "double", "required": true },
+            "metalStorage": { "dataType": "double", "required": true },
+            "crystalStorage": { "dataType": "double", "required": true },
+            "deuteriumStorage": { "dataType": "double", "required": true },
+            "researchLab": { "dataType": "double", "required": true },
+            "terraformer": { "dataType": "double", "required": true },
+            "allianceDepot": { "dataType": "double", "required": true },
+            "missileSilo": { "dataType": "double", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Globals.PlanetType": {
         "dataType": "refObject",
         "properties": {
@@ -105,29 +128,6 @@ const models: TsoaRoute.Models = {
         "properties": {
             "planetID": { "dataType": "double", "required": true },
             "buildingID": { "dataType": "double", "required": true },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Buildings": {
-        "dataType": "refObject",
-        "properties": {
-            "planetID": { "dataType": "double", "required": true },
-            "metalMine": { "dataType": "double", "required": true },
-            "crystalMine": { "dataType": "double", "required": true },
-            "deuteriumSynthesizer": { "dataType": "double", "required": true },
-            "solarPlant": { "dataType": "double", "required": true },
-            "fusionReactor": { "dataType": "double", "required": true },
-            "roboticFactory": { "dataType": "double", "required": true },
-            "naniteFactory": { "dataType": "double", "required": true },
-            "shipyard": { "dataType": "double", "required": true },
-            "metalStorage": { "dataType": "double", "required": true },
-            "crystalStorage": { "dataType": "double", "required": true },
-            "deuteriumStorage": { "dataType": "double", "required": true },
-            "researchLab": { "dataType": "double", "required": true },
-            "terraformer": { "dataType": "double", "required": true },
-            "allianceDepot": { "dataType": "double", "required": true },
-            "missileSilo": { "dataType": "double", "required": true },
         },
         "additionalProperties": false,
     },
@@ -519,6 +519,7 @@ export function RegisterRoutes(app: express.Express) {
                 req: { "in": "body", "name": "req", "required": true, "ref": "AuthRequest" },
                 successResponse: { "in": "res", "name": "200", "required": true, "ref": "AuthResponse" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -538,6 +539,36 @@ export function RegisterRoutes(app: express.Express) {
 
 
             const promise = controller.authenticate.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/v1/buildings/:planetID',
+        authenticateMiddleware([{ "jwt": [] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+                planetID: { "in": "path", "name": "planetID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Buildings" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller: any = iocContainer.get<BuildingsRouter>(BuildingsRouter);
+            if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+            }
+
+
+            const promise = controller.getAllBuildingsOnPlanet.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

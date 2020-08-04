@@ -1,0 +1,2367 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"AuthResponse": {
+				"properties": {
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AuthRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"FailureResponse": {
+				"properties": {
+					"error": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"error"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Globals.PlanetType": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Planet": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"ownerID": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					},
+					"posGalaxy": {
+						"type": "number",
+						"format": "double"
+					},
+					"posSystem": {
+						"type": "number",
+						"format": "double"
+					},
+					"posPlanet": {
+						"type": "number",
+						"format": "double"
+					},
+					"lastUpdate": {
+						"type": "number",
+						"format": "double"
+					},
+					"planetType": {
+						"$ref": "#/components/schemas/Globals.PlanetType"
+					},
+					"image": {
+						"type": "string"
+					},
+					"diameter": {
+						"type": "number",
+						"format": "double"
+					},
+					"fieldsCurrent": {
+						"type": "number",
+						"format": "double"
+					},
+					"fieldsMax": {
+						"type": "number",
+						"format": "double"
+					},
+					"tempMin": {
+						"type": "number",
+						"format": "double"
+					},
+					"tempMax": {
+						"type": "number",
+						"format": "double"
+					},
+					"metal": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystal": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuterium": {
+						"type": "number",
+						"format": "double"
+					},
+					"energyUsed": {
+						"type": "number",
+						"format": "double"
+					},
+					"energyMax": {
+						"type": "number",
+						"format": "double"
+					},
+					"metalMinePercent": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystalMinePercent": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuteriumSynthesizerPercent": {
+						"type": "number",
+						"format": "double"
+					},
+					"solarPlantPercent": {
+						"type": "number",
+						"format": "double"
+					},
+					"fusionReactorPercent": {
+						"type": "number",
+						"format": "double"
+					},
+					"solarSatellitePercent": {
+						"type": "number",
+						"format": "double"
+					},
+					"bBuildingId": {
+						"type": "number",
+						"format": "double"
+					},
+					"bBuildingEndTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"bBuildingDemolition": {
+						"type": "boolean"
+					},
+					"bHangarQueue": {
+						"type": "string"
+					},
+					"bHangarStartTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"bHangarPlus": {
+						"type": "boolean"
+					},
+					"destroyed": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"planetID",
+					"ownerID",
+					"name",
+					"posGalaxy",
+					"posSystem",
+					"posPlanet",
+					"lastUpdate",
+					"planetType",
+					"image",
+					"diameter",
+					"fieldsCurrent",
+					"fieldsMax",
+					"tempMin",
+					"tempMax",
+					"metal",
+					"crystal",
+					"deuterium",
+					"energyUsed",
+					"energyMax",
+					"metalMinePercent",
+					"crystalMinePercent",
+					"deuteriumSynthesizerPercent",
+					"solarPlantPercent",
+					"fusionReactorPercent",
+					"solarSatellitePercent",
+					"bBuildingId",
+					"bBuildingEndTime",
+					"bBuildingDemolition",
+					"bHangarQueue",
+					"bHangarStartTime",
+					"bHangarPlus",
+					"destroyed"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BuildBuildingRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"buildingID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"buildingID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Buildings": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"metalMine": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystalMine": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuteriumSynthesizer": {
+						"type": "number",
+						"format": "double"
+					},
+					"solarPlant": {
+						"type": "number",
+						"format": "double"
+					},
+					"fusionReactor": {
+						"type": "number",
+						"format": "double"
+					},
+					"roboticFactory": {
+						"type": "number",
+						"format": "double"
+					},
+					"naniteFactory": {
+						"type": "number",
+						"format": "double"
+					},
+					"shipyard": {
+						"type": "number",
+						"format": "double"
+					},
+					"metalStorage": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystalStorage": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuteriumStorage": {
+						"type": "number",
+						"format": "double"
+					},
+					"researchLab": {
+						"type": "number",
+						"format": "double"
+					},
+					"terraformer": {
+						"type": "number",
+						"format": "double"
+					},
+					"allianceDepot": {
+						"type": "number",
+						"format": "double"
+					},
+					"missileSilo": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"metalMine",
+					"crystalMine",
+					"deuteriumSynthesizer",
+					"solarPlant",
+					"fusionReactor",
+					"roboticFactory",
+					"naniteFactory",
+					"shipyard",
+					"metalStorage",
+					"crystalStorage",
+					"deuteriumStorage",
+					"researchLab",
+					"terraformer",
+					"allianceDepot",
+					"missileSilo"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CancelBuildingRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"buildingID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"buildingID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DemolishBuildingRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"buildingID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"buildingID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IResourceCollection": {
+				"properties": {
+					"metal": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystal": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuterium": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"metal",
+					"crystal",
+					"deuterium"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IStartPlanet": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"diameter": {
+						"type": "number",
+						"format": "double"
+					},
+					"fields": {
+						"type": "number",
+						"format": "double"
+					},
+					"resources": {
+						"$ref": "#/components/schemas/IResourceCollection"
+					},
+					"minPlanetPos": {
+						"type": "number",
+						"format": "double"
+					},
+					"maxPlanetPos": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"name",
+					"diameter",
+					"fields",
+					"resources",
+					"minPlanetPos",
+					"maxPlanetPos"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ILimit": {
+				"properties": {
+					"min": {
+						"type": "number",
+						"format": "double"
+					},
+					"max": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"min",
+					"max"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ILimits": {
+				"properties": {
+					"galaxy": {
+						"$ref": "#/components/schemas/ILimit"
+					},
+					"system": {
+						"$ref": "#/components/schemas/ILimit"
+					},
+					"position": {
+						"$ref": "#/components/schemas/ILimit"
+					}
+				},
+				"required": [
+					"galaxy",
+					"system",
+					"position"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IServer": {
+				"properties": {
+					"speed": {
+						"type": "number",
+						"format": "double"
+					},
+					"language": {
+						"type": "string"
+					},
+					"startPlanet": {
+						"$ref": "#/components/schemas/IStartPlanet"
+					},
+					"limits": {
+						"$ref": "#/components/schemas/ILimits"
+					}
+				},
+				"required": [
+					"speed",
+					"language",
+					"startPlanet",
+					"limits"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ICosts": {
+				"properties": {
+					"metal": {
+						"type": "number",
+						"format": "double"
+					},
+					"crystal": {
+						"type": "number",
+						"format": "double"
+					},
+					"deuterium": {
+						"type": "number",
+						"format": "double"
+					},
+					"energy": {
+						"type": "number",
+						"format": "double"
+					},
+					"factor": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"metal",
+					"crystal",
+					"deuterium",
+					"energy",
+					"factor"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IRequirement": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"level": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"unitID",
+					"level"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IBuilding": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"costs": {
+						"$ref": "#/components/schemas/ICosts"
+					},
+					"requirements": {
+						"items": {
+							"$ref": "#/components/schemas/IRequirement"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"unitID",
+					"costs",
+					"requirements"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ITechnology": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"costs": {
+						"$ref": "#/components/schemas/ICosts"
+					},
+					"requirements": {
+						"items": {
+							"$ref": "#/components/schemas/IRequirement"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"unitID",
+					"costs",
+					"requirements"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IStats": {
+				"properties": {
+					"consumption": {
+						"type": "number",
+						"format": "double"
+					},
+					"speed": {
+						"type": "number",
+						"format": "double"
+					},
+					"capacity": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"consumption",
+					"speed",
+					"capacity"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IRapidfire": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"unitID",
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IShip": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"costs": {
+						"$ref": "#/components/schemas/ICosts"
+					},
+					"requirements": {
+						"items": {
+							"$ref": "#/components/schemas/IRequirement"
+						},
+						"type": "array"
+					},
+					"stats": {
+						"$ref": "#/components/schemas/IStats"
+					},
+					"rapidfire": {
+						"items": {
+							"$ref": "#/components/schemas/IRapidfire"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"unitID",
+					"costs",
+					"requirements",
+					"stats",
+					"rapidfire"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IDefense": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"costs": {
+						"$ref": "#/components/schemas/ICosts"
+					},
+					"requirements": {
+						"items": {
+							"$ref": "#/components/schemas/IRequirement"
+						},
+						"type": "array"
+					},
+					"stats": {
+						"$ref": "#/components/schemas/IStats"
+					},
+					"rapidfire": {
+						"items": {
+							"$ref": "#/components/schemas/IRapidfire"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"unitID",
+					"costs",
+					"requirements",
+					"stats",
+					"rapidfire"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IUnits": {
+				"properties": {
+					"buildings": {
+						"items": {
+							"$ref": "#/components/schemas/IBuilding"
+						},
+						"type": "array"
+					},
+					"technologies": {
+						"items": {
+							"$ref": "#/components/schemas/ITechnology"
+						},
+						"type": "array"
+					},
+					"ships": {
+						"items": {
+							"$ref": "#/components/schemas/IShip"
+						},
+						"type": "array"
+					},
+					"defenses": {
+						"items": {
+							"$ref": "#/components/schemas/IDefense"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"buildings",
+					"technologies",
+					"ships",
+					"defenses"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IGameConfig": {
+				"properties": {
+					"server": {
+						"$ref": "#/components/schemas/IServer"
+					},
+					"units": {
+						"$ref": "#/components/schemas/IUnits"
+					}
+				},
+				"required": [
+					"server",
+					"units"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Defenses": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"rocketLauncher": {
+						"type": "number",
+						"format": "double"
+					},
+					"lightLaser": {
+						"type": "number",
+						"format": "double"
+					},
+					"heavyLaser": {
+						"type": "number",
+						"format": "double"
+					},
+					"ionCannon": {
+						"type": "number",
+						"format": "double"
+					},
+					"gaussCannon": {
+						"type": "number",
+						"format": "double"
+					},
+					"plasmaTurret": {
+						"type": "number",
+						"format": "double"
+					},
+					"smallShieldDome": {
+						"type": "boolean"
+					},
+					"largeShieldDome": {
+						"type": "boolean"
+					},
+					"antiBallisticMissile": {
+						"type": "number",
+						"format": "double"
+					},
+					"interplanetaryMissile": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"rocketLauncher",
+					"lightLaser",
+					"heavyLaser",
+					"ionCannon",
+					"gaussCannon",
+					"plasmaTurret",
+					"smallShieldDome",
+					"largeShieldDome",
+					"antiBallisticMissile",
+					"interplanetaryMissile"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BuildOrderItem": {
+				"properties": {
+					"unitID": {
+						"type": "number",
+						"format": "double"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"unitID",
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BuildDefenseRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"buildOrder": {
+						"items": {
+							"$ref": "#/components/schemas/BuildOrderItem"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"planetID",
+					"buildOrder"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Message": {
+				"properties": {
+					"messageID": {
+						"type": "number",
+						"format": "double"
+					},
+					"senderID": {
+						"type": "number",
+						"format": "double"
+					},
+					"receiverID": {
+						"type": "number",
+						"format": "double"
+					},
+					"sendtime": {
+						"type": "number",
+						"format": "double"
+					},
+					"type": {
+						"type": "number",
+						"format": "double"
+					},
+					"subject": {
+						"type": "string"
+					},
+					"body": {
+						"type": "string"
+					},
+					"deleted": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"messageID",
+					"senderID",
+					"receiverID",
+					"sendtime",
+					"type",
+					"subject",
+					"body",
+					"deleted"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SendMessageRequest": {
+				"properties": {
+					"receiverID": {
+						"type": "number",
+						"format": "double"
+					},
+					"subject": {
+						"type": "string"
+					},
+					"body": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"receiverID",
+					"subject",
+					"body"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DeleteMessageRequest": {
+				"properties": {
+					"messageID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"messageID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DestroyPlanetRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RenamePlanetRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"newName": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"planetID",
+					"newName"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BuildShipsRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"buildOrder": {
+						"items": {
+							"$ref": "#/components/schemas/BuildOrderItem"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"planetID",
+					"buildOrder"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Techs": {
+				"properties": {
+					"userID": {
+						"type": "number",
+						"format": "double"
+					},
+					"espionageTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"computerTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"weaponTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"armourTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"shieldingTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"energyTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"hyperspaceTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"combustionDriveTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"impulseDriveTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"hyperspaceDriveTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"laserTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"ionTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"plasmaTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"intergalacticResearchTech": {
+						"type": "number",
+						"format": "double"
+					},
+					"gravitonTech": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"userID",
+					"espionageTech",
+					"computerTech",
+					"weaponTech",
+					"armourTech",
+					"shieldingTech",
+					"energyTech",
+					"hyperspaceTech",
+					"combustionDriveTech",
+					"impulseDriveTech",
+					"hyperspaceDriveTech",
+					"laserTech",
+					"ionTech",
+					"plasmaTech",
+					"intergalacticResearchTech",
+					"gravitonTech"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CancelTechRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BuildTechRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"techID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"techID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"User": {
+				"properties": {
+					"userID": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"lastTimeOnline": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPlanet": {
+						"type": "number",
+						"format": "double"
+					},
+					"bTechID": {
+						"type": "number",
+						"format": "double"
+					},
+					"bTechEndTime": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"userID",
+					"username",
+					"password",
+					"email",
+					"lastTimeOnline",
+					"currentPlanet",
+					"bTechID",
+					"bTechEndTime"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserInfo": {
+				"properties": {
+					"userID": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userID",
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateUserResponse": {
+				"properties": {
+					"userID": {
+						"type": "number",
+						"format": "double"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userID",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateUserRequest": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateUserRequest": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetCurrentPlanetRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"jwt": {
+				"type": "apiKey",
+				"name": "access-token",
+				"in": "header"
+			}
+		}
+	},
+	"info": {
+		"title": "ugamela api",
+		"version": "1.0.0",
+		"description": "bla",
+		"license": {
+			"name": "AGPL-3.0"
+		},
+		"contact": {
+			"email": "api@ugamela.org",
+			"name": "the Administrator"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/login": {
+			"post": {
+				"operationId": "Authenticate",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/buildings/build": {
+			"post": {
+				"operationId": "StartBuilding",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Buildings"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Buildings"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BuildBuildingRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/buildings/cancel": {
+			"post": {
+				"operationId": "CancelBuilding",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Buildings"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Buildings"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CancelBuildingRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/buildings/demolish": {
+			"post": {
+				"operationId": "DemolishBuilding",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Buildings"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Buildings"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DemolishBuildingRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/config/game": {
+			"get": {
+				"operationId": "GetGameConfig",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/IGameConfig"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Configuration"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/config/units": {
+			"get": {
+				"operationId": "GetUnitsConfig",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/IUnits"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Configuration"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/defenses/{planetID}": {
+			"get": {
+				"operationId": "GetAllDefensesOnPlanet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Defenses"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Defenses"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "planetID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/defenses/build": {
+			"post": {
+				"operationId": "BuildDefense",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Planet"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Defenses"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BuildDefenseRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/galaxy/{posGalaxy}/{posSystem}": {
+			"get": {
+				"operationId": "GetGalaxyInformation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Galaxy"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "posGalaxy",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "path",
+						"name": "posSystem",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/messages/{messageID}": {
+			"get": {
+				"operationId": "GetMessageByID",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Message"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Messages"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "messageID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/messages/send": {
+			"post": {
+				"operationId": "SendMessage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Messages"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SendMessageRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/messages/delete": {
+			"post": {
+				"operationId": "DeleteMessage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Messages"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DeleteMessageRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/planets/planetList": {
+			"get": {
+				"operationId": "GetAllPlanets",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Planets"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/planets/planetList/{userID}": {
+			"get": {
+				"operationId": "GetAllPlanetsOfUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Planets"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/planets/movement/{planetID}": {
+			"get": {
+				"operationId": "GetMovement",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Planets"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "planetID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/planets/destroy": {
+			"post": {
+				"operationId": "DestroyPlanet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Planets"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DestroyPlanetRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/planets/rename": {
+			"post": {
+				"operationId": "RenamePlanet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Planet"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Planets"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RenamePlanetRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/planets/{planetID}": {
+			"get": {
+				"operationId": "GetPlanetByID",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Planet"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Planets"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "planetID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/ships/{planetID}": {
+			"get": {
+				"operationId": "GetAllShipsOnPlanet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Ships"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "planetID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/ships/build": {
+			"post": {
+				"operationId": "BuildShips",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Planet"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Ships"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BuildShipsRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/technologies": {
+			"get": {
+				"operationId": "GetTechs",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Techs"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Technologies"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/technologies/cancel": {
+			"post": {
+				"operationId": "CancelTech",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Planet"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Technologies"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CancelTechRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/technologies/build": {
+			"post": {
+				"operationId": "BuildTech",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										},
+										{
+											"$ref": "#/components/schemas/Planet"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Technologies"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BuildTechRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user": {
+			"get": {
+				"operationId": "GetUserSelf",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				},
+				"description": "Returns sensible information about the currently authenticated user",
+				"tags": [
+					"UserData"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/user/{userID}": {
+			"get": {
+				"operationId": "GetUserByID",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserInfo"
+								}
+							}
+						}
+					}
+				},
+				"description": "Returns basic information about a user given its userID",
+				"tags": [
+					"UserData"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userID",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/user/create": {
+			"post": {
+				"operationId": "CreateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/CreateUserResponse"
+										},
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"description": "Creates a new user with homeplanet",
+				"tags": [
+					"UserData"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateUserRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/update": {
+			"post": {
+				"operationId": "UpdateUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										},
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"description": "Updates a user",
+				"tags": [
+					"UserData"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateUserRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/currentplanet/set": {
+			"post": {
+				"operationId": "SetCurrentPlanet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/User"
+										},
+										{
+											"$ref": "#/components/schemas/FailureResponse"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"description": "Sets the current planet for a user",
+				"tags": [
+					"UserData"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetCurrentPlanetRequest"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "http://127.0.0.1:3000/v1"
+		}
+	]
+}

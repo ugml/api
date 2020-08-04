@@ -35,7 +35,7 @@ jobs:
       script: audit-ci --low --report-type full
     - &build
       stage: "Build"
-      script: mkdir src/tsoa/ && npm run-script tsoa:gen && tsc --project . && gulp assets
+      script: npm run-script tsoa:gen && npm run-script build
       node_js: '8'
     - <<: *build
       node_js: '10'
@@ -43,7 +43,7 @@ jobs:
       node_js: '12'
     - stage: "Test"
       script:
-        - mkdir src/tsoa/ && npm run-script tsoa:gen
+        - npm run-script tsoa:gen
         - git fetch --unshallow --quiet
         - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage

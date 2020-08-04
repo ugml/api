@@ -11,14 +11,7 @@ const SOURCE_FILES = ["src/**/*.ts", "!" + TEST_FILES];
 const tsProject = ts.createProject("tsconfig.json");
 
 gulp.task("compile", () => {
-  const tsResult = gulp.src(SOURCE_FILES).pipe(
-    tsProject("./tsconfig.json", {
-      logLevel: 1,
-      compilerOptions: {
-        listFiles: true,
-      },
-    }),
-  );
+  const tsResult = gulp.src(SOURCE_FILES).pipe(tsProject());
   return tsResult.js.pipe(gulp.dest("dist"));
 });
 

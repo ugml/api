@@ -5,6 +5,8 @@ import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import * as squel from "safe-squel";
 import Event from "../units/Event";
+import SerializationHelper from "../common/SerializationHelper";
+import Buildings from "../units/Buildings";
 
 @injectable()
 export default class PlanetRepository implements IPlanetRepository {
@@ -25,7 +27,13 @@ export default class PlanetRepository implements IPlanetRepository {
       .where("planetID = ?", id)
       .toString();
 
-    return await Database.query(query);
+    const [rows] = await Database.query(query);
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new Planet(), JSON.stringify(rows[0]));
   }
 
   public async save(t: Planet): Promise<void> {

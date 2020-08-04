@@ -61,7 +61,7 @@ describe("buildingsRoute", () => {
         .get("/v1/buildings/1")
         .set("Authorization", authToken)
         .then(res => {
-          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.NOT_AUTHORIZED);
         });
     });
 
@@ -332,7 +332,7 @@ describe("buildingsRoute", () => {
         .set("Authorization", authToken)
         .send({ planetID: `${planetID}`, buildingID: "1" })
         .then(res => {
-          expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
+          expect(res.status).to.equals(Globals.StatusCodes.NOT_AUTHORIZED);
         });
     });
 
@@ -472,14 +472,14 @@ describe("buildingsRoute", () => {
   });
 
   it("should fail (player does not own planet)", async () => {
-    const planetID = 1234;
+    const planetID = 87851;
 
     return request
       .post("/v1/buildings/demolish")
       .set("Authorization", authToken)
       .send({ planetID: `${planetID}`, buildingID: Globals.Buildings.METAL_MINE })
       .then(async res => {
-        expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
+        expect(res.status).equals(Globals.StatusCodes.NOT_AUTHORIZED);
       });
   });
 

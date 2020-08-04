@@ -4,6 +4,8 @@ import * as squel from "safe-squel";
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import { injectable } from "inversify";
+import SerializationHelper from "../common/SerializationHelper";
+import Buildings from "../units/Buildings";
 
 @injectable()
 export default class DefenseRepository implements IDefenseRepository {
@@ -32,9 +34,13 @@ export default class DefenseRepository implements IDefenseRepository {
       .where("d.planetID = ?", id)
       .toString();
 
-    const [[rows]] = await Database.query(query);
+    const [rows] = await Database.query(query);
 
-    return rows;
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new Defenses(), JSON.stringify(rows[0]));
   }
 
   public async save(t: Defenses): Promise<void> {

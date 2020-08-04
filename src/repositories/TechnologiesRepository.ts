@@ -4,6 +4,8 @@ import { injectable } from "inversify";
 import * as squel from "safe-squel";
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
+import SerializationHelper from "../common/SerializationHelper";
+import Buildings from "../units/Buildings";
 
 @injectable()
 export default class TechnologiesRepository implements ITechnologiesRepository {
@@ -26,9 +28,13 @@ export default class TechnologiesRepository implements ITechnologiesRepository {
       .where("userID = ?", id)
       .toString();
 
-    const [[rows]] = await Database.query(query);
+    const [rows] = await Database.query(query);
 
-    return rows;
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new Techs(), JSON.stringify(rows[0]));
   }
 
   public async save(t: Techs): Promise<void> {

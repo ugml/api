@@ -43,6 +43,8 @@ import MessageRepository from "../repositories/MessageRepository";
 import IMessageRepository from "../interfaces/repositories/IMessageRepository";
 import IShipsRepository from "../interfaces/repositories/IShipsRepository";
 import ShipsRepository from "../repositories/ShipsRepository";
+import GalaxyRepository from "../repositories/GalaxyRepository";
+import IGalaxyRepository from "../interfaces/repositories/IGalaxyRepository";
 
 const iocContainer = new Container();
 
@@ -72,6 +74,7 @@ iocContainer.bind<ITechnologiesRepository>(TYPES.ITechnologiesRepository).to(Tec
 iocContainer.bind<IDefenseRepository>(TYPES.IDefenseRepository).to(DefenseRepository);
 iocContainer.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
 iocContainer.bind<IShipsRepository>(TYPES.IShipsRepository).to(ShipsRepository);
+iocContainer.bind<IGalaxyRepository>(TYPES.IGalaxyRepository).to(GalaxyRepository);
 
 // Routers
 iocContainer.bind<AuthRouter>(TYPES.AuthRouter).to(AuthRouter);

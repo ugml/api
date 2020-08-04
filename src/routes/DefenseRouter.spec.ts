@@ -61,9 +61,8 @@ describe("defenseRoute", () => {
       .get(`/v1/defenses/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.NOT_AUTHORIZED);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.empty;
       });
   });
 
@@ -73,7 +72,6 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-        expect(res.body.error).to.be.equals("Invalid parameter");
       });
   });
 

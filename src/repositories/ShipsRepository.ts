@@ -5,6 +5,8 @@ import InputValidator from "../common/InputValidator";
 import * as squel from "safe-squel";
 
 import { injectable } from "inversify";
+import SerializationHelper from "../common/SerializationHelper";
+import Buildings from "../units/Buildings";
 
 @injectable()
 export default class ShipsRepository implements IShipsRepository {
@@ -37,7 +39,13 @@ export default class ShipsRepository implements IShipsRepository {
       .where("planetID = ?", id)
       .toString();
 
-    return await Database.query(query);
+    const [rows] = await Database.query(query);
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new Ships(), JSON.stringify(rows[0]));
   }
 
   public async save(t: Ships): Promise<void> {

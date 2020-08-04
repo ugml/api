@@ -137,6 +137,10 @@ export default class BuildingService implements IBuildingService {
       throw new ApiException("Planet does not exist");
     }
 
+    if (!planet.isUpgradingBuilding()) {
+      throw new ApiException("Planet has no build-job");
+    }
+
     const buildingKey = Globals.UnitNames[planet.bBuildingId];
 
     const currentLevel = buildings[buildingKey];
@@ -157,11 +161,15 @@ export default class BuildingService implements IBuildingService {
   public async demolishBuilding(request: DemolishBuildingRequest, userID: number): Promise<Planet> {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
+    if (!InputValidator.isSet(planet)) {
+      throw new ApiException("The planet does not exist");
+    }
+
     if (planet.ownerID !== userID) {
       throw new UnauthorizedException("User does not own the planet");
     }
 
-    const buildings: Buildings = await this.buildingRepository.getById(request.buildingID);
+    const buildings: Buildings = await this.buildingRepository.getById(request.planetID);
 
     const buildingKey = Globals.UnitNames[request.buildingID];
     const currentLevel = buildings[buildingKey];

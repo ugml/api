@@ -4,6 +4,8 @@ import { injectable } from "inversify";
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import * as squel from "safe-squel";
+import SerializationHelper from "../common/SerializationHelper";
+import Buildings from "../units/Buildings";
 
 @injectable()
 export default class UserRepository implements IUserRepository {
@@ -14,7 +16,9 @@ export default class UserRepository implements IUserRepository {
       .where("email = ?", email)
       .toString();
 
-    return await Database.query(query);
+    const [[result]] = await Database.query(query);
+
+    return result;
   }
 
   public async exists(id: number): Promise<boolean> {
@@ -33,7 +37,14 @@ export default class UserRepository implements IUserRepository {
       .from("users")
       .where("userID = ?", id)
       .toString();
-    return await Database.query(query);
+
+    const [rows] = await Database.query(query);
+
+    if (!InputValidator.isSet(rows)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new User(), JSON.stringify(rows[0]));
   }
 
   public async save(t: User): Promise<void> {

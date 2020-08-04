@@ -9,6 +9,7 @@ import Event from "../units/Event";
 import ApiException from "../exceptions/ApiException";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
+import InputValidator from "../common/InputValidator";
 
 /**
  * This class defines a service to interact with the planets-table in the database
@@ -20,7 +21,7 @@ export default class PlanetService implements IPlanetService {
   public async checkUserOwnsPlanet(userID: number, planetID: number): Promise<boolean> {
     const planet = await this.planetRepository.getById(planetID);
 
-    return planet.ownerID === userID;
+    return InputValidator.isSet(planet) && planet.ownerID === userID;
   }
 
   public async getAllPlanetsOfUser(userID: number): Promise<Planet[]> {

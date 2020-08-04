@@ -35,7 +35,7 @@ jobs:
       script: audit-ci --low --report-type full
     - &build
       stage: "Build"
-      script: npm run-script build
+      script: tsc --project .; gulp assets
       node_js: '8'
     - <<: *build
       node_js: '10'

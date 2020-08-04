@@ -13,6 +13,7 @@ import AuthResponse from "../entities/responses/AuthResponse";
 import FailureResponse from "../entities/responses/FailureResponse";
 import AuthRequest from "../entities/requests/AuthRequest";
 import IAuthService from "../interfaces/services/IAuthService";
+import ApiException from "../exceptions/ApiException";
 
 @Route("login")
 @Tags("Authentication")
@@ -40,14 +41,14 @@ export class AuthRouter extends Controller {
 
       const token = await this.authService.authenticateUser(email, password);
 
-      if (!InputValidator.isSet(token)) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse("Authentication failed"));
-      }
-
       return successResponse(Globals.StatusCodes.SUCCESS, {
         token: token,
       });
     } catch (error) {
+      if (error instanceof ApiException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse("Authentication failed"));
+      }
+
       this.logger.error(error, error.stack);
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);

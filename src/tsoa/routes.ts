@@ -343,6 +343,26 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GalaxyPositionInfo": {
+        "dataType": "refObject",
+        "properties": {
+            "planetID": { "dataType": "double", "required": true },
+            "ownerID": { "dataType": "double", "required": true },
+            "username": { "dataType": "string", "required": true },
+            "planetName": { "dataType": "string", "required": true },
+            "posGalaxy": { "dataType": "double", "required": true },
+            "posSystem": { "dataType": "double", "required": true },
+            "posPlanet": { "dataType": "double", "required": true },
+            "lastUpdate": { "dataType": "double", "required": true },
+            "planetType": { "ref": "Globals.PlanetType", "required": true },
+            "image": { "dataType": "string", "required": true },
+            "debrisMetal": { "dataType": "double", "required": true },
+            "debrisCrystal": { "dataType": "double", "required": true },
+            "destroyed": { "dataType": "boolean", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Message": {
         "dataType": "refObject",
         "properties": {
@@ -376,6 +396,29 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Event": {
+        "dataType": "refObject",
+        "properties": {
+            "eventID": { "dataType": "double", "required": true },
+            "ownerID": { "dataType": "double", "required": true },
+            "mission": { "dataType": "double", "required": true },
+            "fleetlist": { "dataType": "string", "required": true },
+            "startID": { "dataType": "double", "required": true },
+            "startType": { "ref": "Globals.PlanetType", "required": true },
+            "startTime": { "dataType": "double", "required": true },
+            "endID": { "dataType": "double", "required": true },
+            "endType": { "ref": "Globals.PlanetType", "required": true },
+            "endTime": { "dataType": "double", "required": true },
+            "loadedMetal": { "dataType": "double", "required": true },
+            "loadedCrystal": { "dataType": "double", "required": true },
+            "loadedDeuterium": { "dataType": "double", "required": true },
+            "returning": { "dataType": "boolean", "required": true },
+            "inQueue": { "dataType": "boolean", "required": true },
+            "processed": { "dataType": "boolean", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DestroyPlanetRequest": {
         "dataType": "refObject",
         "properties": {
@@ -389,6 +432,28 @@ const models: TsoaRoute.Models = {
         "properties": {
             "planetID": { "dataType": "double", "required": true },
             "newName": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Ships": {
+        "dataType": "refObject",
+        "properties": {
+            "planetID": { "dataType": "double", "required": true },
+            "smallCargoShip": { "dataType": "double", "required": true },
+            "largeCargoShip": { "dataType": "double", "required": true },
+            "lightFighter": { "dataType": "double", "required": true },
+            "heavyFighter": { "dataType": "double", "required": true },
+            "cruiser": { "dataType": "double", "required": true },
+            "battleship": { "dataType": "double", "required": true },
+            "colonyShip": { "dataType": "double", "required": true },
+            "recycler": { "dataType": "double", "required": true },
+            "espionageProbe": { "dataType": "double", "required": true },
+            "bomber": { "dataType": "double", "required": true },
+            "solarSatellite": { "dataType": "double", "required": true },
+            "destroyer": { "dataType": "double", "required": true },
+            "battlecruiser": { "dataType": "double", "required": true },
+            "deathstar": { "dataType": "double", "required": true },
         },
         "additionalProperties": false,
     },
@@ -425,19 +490,19 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "CancelTechRequest": {
-        "dataType": "refObject",
-        "properties": {
-            "planetID": { "dataType": "double", "required": true },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "BuildTechRequest": {
         "dataType": "refObject",
         "properties": {
             "planetID": { "dataType": "double", "required": true },
             "techID": { "dataType": "double", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CancelTechRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "planetID": { "dataType": "double", "required": true },
         },
         "additionalProperties": false,
     },
@@ -453,24 +518,6 @@ const models: TsoaRoute.Models = {
             "currentPlanet": { "dataType": "double", "required": true },
             "bTechID": { "dataType": "double", "required": true },
             "bTechEndTime": { "dataType": "double", "required": true },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "UserInfo": {
-        "dataType": "refObject",
-        "properties": {
-            "userID": { "dataType": "double", "required": true },
-            "username": { "dataType": "string", "required": true },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "CreateUserResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "userID": { "dataType": "double", "required": true },
-            "token": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
     },
@@ -550,6 +597,7 @@ export function RegisterRoutes(app: express.Express) {
                 planetID: { "in": "path", "name": "planetID", "required": true, "dataType": "double" },
                 successResponse: { "in": "res", "name": "200", "required": true, "ref": "Buildings" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -578,8 +626,9 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "BuildBuildingRequest" },
-                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Buildings" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -608,8 +657,9 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "CancelBuildingRequest" },
-                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Buildings" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -638,8 +688,9 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "DemolishBuildingRequest" },
-                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Buildings" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -665,6 +716,8 @@ export function RegisterRoutes(app: express.Express) {
     app.get('/v1/config/game',
         function(request: any, response: any, next: any) {
             const args = {
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "IGameConfig" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -689,6 +742,8 @@ export function RegisterRoutes(app: express.Express) {
     app.get('/v1/config/units',
         function(request: any, response: any, next: any) {
             const args = {
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "IUnits" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -716,6 +771,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 planetID: { "in": "path", "name": "planetID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Defenses" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -743,6 +802,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "BuildDefenseRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -770,6 +833,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 posGalaxy: { "in": "path", "name": "posGalaxy", "required": true, "dataType": "double" },
                 posSystem: { "in": "path", "name": "posSystem", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "array", "array": { "ref": "GalaxyPositionInfo" } },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -791,12 +858,46 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/v1/messages',
+        authenticateMiddleware([{ "jwt": [] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "array", "array": { "ref": "Message" } },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller: any = iocContainer.get<MessagesRouter>(MessagesRouter);
+            if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+            }
+
+
+            const promise = controller.getAllMessages.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/v1/messages/:messageID',
         authenticateMiddleware([{ "jwt": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 messageID: { "in": "path", "name": "messageID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Message" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -824,6 +925,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "SendMessageRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "void" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -851,6 +956,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "DeleteMessageRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "void" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -877,6 +986,10 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "array", "array": { "ref": "Planet" } },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -903,6 +1016,10 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 userID: { "in": "path", "name": "userID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "array", "array": { "ref": "Planet" } },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -930,6 +1047,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 planetID: { "in": "path", "name": "planetID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "array", "array": { "ref": "Event" } },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -957,6 +1078,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "DestroyPlanetRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "dataType": "void" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -984,6 +1109,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "RenamePlanetRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1011,6 +1140,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 planetID: { "in": "path", "name": "planetID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1038,6 +1171,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
                 planetID: { "in": "path", "name": "planetID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Ships" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1065,6 +1202,10 @@ export function RegisterRoutes(app: express.Express) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "BuildShipsRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1091,6 +1232,10 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Techs" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1112,39 +1257,16 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.post('/v1/technologies/cancel',
-        authenticateMiddleware([{ "jwt": [] }]),
-        function(request: any, response: any, next: any) {
-            const args = {
-                headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
-                request: { "in": "body", "name": "request", "required": true, "ref": "CancelTechRequest" },
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-            } catch (err) {
-                return next(err);
-            }
-
-            const controller: any = iocContainer.get<TechsRouter>(TechsRouter);
-            if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-            }
-
-
-            const promise = controller.cancelTech.apply(controller, validatedArgs as any);
-            promiseHandler(controller, promise, response, next);
-        });
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.post('/v1/technologies/build',
         authenticateMiddleware([{ "jwt": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "body", "name": "request", "required": true, "ref": "BuildTechRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1166,11 +1288,46 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/v1/technologies/cancel',
+        authenticateMiddleware([{ "jwt": [] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
+                request: { "in": "body", "name": "request", "required": true, "ref": "CancelTechRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "Planet" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller: any = iocContainer.get<TechsRouter>(TechsRouter);
+            if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+            }
+
+
+            const promise = controller.cancelTech.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/v1/user',
         authenticateMiddleware([{ "jwt": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
                 request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "User" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1197,6 +1354,10 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 userID: { "in": "path", "name": "userID", "required": true, "dataType": "double" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "User" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1222,6 +1383,10 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 request: { "in": "body", "name": "request", "required": true, "ref": "CreateUserRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "AuthResponse" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1247,8 +1412,13 @@ export function RegisterRoutes(app: express.Express) {
         authenticateMiddleware([{ "jwt": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
+                headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
                 requestModel: { "in": "body", "name": "requestModel", "required": true, "ref": "UpdateUserRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "User" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -1274,8 +1444,13 @@ export function RegisterRoutes(app: express.Express) {
         authenticateMiddleware([{ "jwt": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
+                headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
                 request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
                 model: { "in": "body", "name": "model", "required": true, "ref": "SetCurrentPlanetRequest" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "User" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
+                serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

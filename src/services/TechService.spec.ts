@@ -2,16 +2,19 @@ import * as chai from "chai";
 import { iocContainer } from "../ioc/inversify.config";
 
 import TYPES from "../ioc/types";
-import ITechService from "../interfaces/services/ITechService";
+import ITechnologiesRepository from "../interfaces/repositories/ITechnologiesRepository";
+import Techs from "../units/Techs";
 
-const techService = iocContainer.get<ITechService>(TYPES.ITechService);
+const technologiesRepository = iocContainer.get<ITechnologiesRepository>(TYPES.ITechnologiesRepository);
 
 const expect = chai.expect;
 
 describe("TechService", () => {
   it("should return a planet", async () => {
     try {
-      await techService.createTechRow(1);
+      await technologiesRepository.create({
+        userID: 1,
+      } as Techs);
     } catch (error) {
       expect(error.message).contains("Duplicate entry");
     }

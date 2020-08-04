@@ -2,15 +2,15 @@ import * as chai from "chai";
 import { iocContainer } from "../ioc/inversify.config";
 
 import TYPES from "../ioc/types";
-import IUserService from "../interfaces/services/IUserService";
+import IUserRepository from "../interfaces/repositories/IUserRepository";
 
 const expect = chai.expect;
 
-const userService = iocContainer.get<IUserService>(TYPES.IUserService);
+const userRepository = iocContainer.get<IUserRepository>(TYPES.IUserRepository);
 
 describe("UserService", () => {
   it("should return a valid userID", async () => {
-    const result = await userService.getNewId();
+    const result = await userRepository.getNewId();
 
     expect(result).to.be.above(0);
   });
@@ -18,7 +18,7 @@ describe("UserService", () => {
   it("should return information about an authenticated user", async () => {
     const userID = 1;
 
-    const result = await userService.getAuthenticatedUser(userID);
+    const result = await userRepository.getById(userID);
 
     expect(result.userID).to.be.equals(userID);
     expect(result.username).to.be.equals("admin");
@@ -30,7 +30,7 @@ describe("UserService", () => {
   it("should return information about an user", async () => {
     const userID = 1;
 
-    const result = await userService.getUserById(userID);
+    const result = await userRepository.getById(userID);
 
     expect(result.userID).to.be.equals(userID);
     expect(result.username).to.be.equals("admin");
@@ -39,7 +39,7 @@ describe("UserService", () => {
   it("should return nothing because the user does not exist", async () => {
     const userID = -1;
 
-    const result = await userService.getUserById(userID);
+    const result = await userRepository.getById(userID);
 
     expect(result).to.be.equals(null);
   });
@@ -48,7 +48,7 @@ describe("UserService", () => {
     const email = "user_1501005189510@test.com";
     const userID = 1;
 
-    const result = await userService.getUserForAuthentication(email);
+    const result = await userRepository.getById(userID);
 
     expect(result.userID).to.be.equals(userID);
     expect(result.email).to.be.equals(email);
@@ -56,9 +56,9 @@ describe("UserService", () => {
   });
 
   it("should return nothing because the user does not exist", async () => {
-    const email = "idontexist@test.com";
+    const userID = -1;
 
-    const result = await userService.getUserForAuthentication(email);
+    const result = await userRepository.getById(userID);
 
     expect(result).to.be.equals(null);
   });
@@ -66,28 +66,24 @@ describe("UserService", () => {
   it("should return nothing because the user does not exist", async () => {
     const userID = -1;
 
-    const result = await userService.getUserById(userID);
+    const result = await userRepository.getById(userID);
 
     expect(result).to.be.equals(null);
   });
 
   it("should return username taken and email taken", async () => {
-    const username = "admin";
     const email = "user_1501005189510@test.com";
 
-    const result = await userService.checkIfNameOrMailIsTaken(username, email);
+    const result = await userRepository.checkEmailTaken(email);
 
-    expect(result.username_taken).to.be.equals(1);
-    expect(result.email_taken).to.be.equals(1);
+    expect(result).to.be.equals(1);
   });
 
   it("should return username free and email free", async () => {
     const username = "WhatEver";
-    const email = "whatever@test.com";
 
-    const result = await userService.checkIfNameOrMailIsTaken(username, email);
+    const result = await userRepository.checkUsernameTaken(username);
 
-    expect(result.username_taken).to.be.equals(0);
-    expect(result.email_taken).to.be.equals(0);
+    expect(result).to.be.equals(0);
   });
 });

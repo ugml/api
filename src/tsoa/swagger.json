@@ -837,6 +837,74 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"GalaxyPositionInfo": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"ownerID": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
+						"type": "string"
+					},
+					"planetName": {
+						"type": "string"
+					},
+					"posGalaxy": {
+						"type": "number",
+						"format": "double"
+					},
+					"posSystem": {
+						"type": "number",
+						"format": "double"
+					},
+					"posPlanet": {
+						"type": "number",
+						"format": "double"
+					},
+					"lastUpdate": {
+						"type": "number",
+						"format": "double"
+					},
+					"planetType": {
+						"$ref": "#/components/schemas/Globals.PlanetType"
+					},
+					"image": {
+						"type": "string"
+					},
+					"debrisMetal": {
+						"type": "number",
+						"format": "double"
+					},
+					"debrisCrystal": {
+						"type": "number",
+						"format": "double"
+					},
+					"destroyed": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"planetID",
+					"ownerID",
+					"username",
+					"planetName",
+					"posGalaxy",
+					"posSystem",
+					"posPlanet",
+					"lastUpdate",
+					"planetType",
+					"image",
+					"debrisMetal",
+					"debrisCrystal",
+					"destroyed"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Message": {
 				"properties": {
 					"messageID": {
@@ -916,6 +984,88 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Event": {
+				"properties": {
+					"eventID": {
+						"type": "number",
+						"format": "double"
+					},
+					"ownerID": {
+						"type": "number",
+						"format": "double"
+					},
+					"mission": {
+						"type": "number",
+						"format": "double"
+					},
+					"fleetlist": {
+						"type": "string"
+					},
+					"startID": {
+						"type": "number",
+						"format": "double"
+					},
+					"startType": {
+						"$ref": "#/components/schemas/Globals.PlanetType"
+					},
+					"startTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"endID": {
+						"type": "number",
+						"format": "double"
+					},
+					"endType": {
+						"$ref": "#/components/schemas/Globals.PlanetType"
+					},
+					"endTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"loadedMetal": {
+						"type": "number",
+						"format": "double"
+					},
+					"loadedCrystal": {
+						"type": "number",
+						"format": "double"
+					},
+					"loadedDeuterium": {
+						"type": "number",
+						"format": "double"
+					},
+					"returning": {
+						"type": "boolean"
+					},
+					"inQueue": {
+						"type": "boolean"
+					},
+					"processed": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"eventID",
+					"ownerID",
+					"mission",
+					"fleetlist",
+					"startID",
+					"startType",
+					"startTime",
+					"endID",
+					"endType",
+					"endTime",
+					"loadedMetal",
+					"loadedCrystal",
+					"loadedDeuterium",
+					"returning",
+					"inQueue",
+					"processed"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"DestroyPlanetRequest": {
 				"properties": {
 					"planetID": {
@@ -942,6 +1092,89 @@
 				"required": [
 					"planetID",
 					"newName"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Ships": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					},
+					"smallCargoShip": {
+						"type": "number",
+						"format": "double"
+					},
+					"largeCargoShip": {
+						"type": "number",
+						"format": "double"
+					},
+					"lightFighter": {
+						"type": "number",
+						"format": "double"
+					},
+					"heavyFighter": {
+						"type": "number",
+						"format": "double"
+					},
+					"cruiser": {
+						"type": "number",
+						"format": "double"
+					},
+					"battleship": {
+						"type": "number",
+						"format": "double"
+					},
+					"colonyShip": {
+						"type": "number",
+						"format": "double"
+					},
+					"recycler": {
+						"type": "number",
+						"format": "double"
+					},
+					"espionageProbe": {
+						"type": "number",
+						"format": "double"
+					},
+					"bomber": {
+						"type": "number",
+						"format": "double"
+					},
+					"solarSatellite": {
+						"type": "number",
+						"format": "double"
+					},
+					"destroyer": {
+						"type": "number",
+						"format": "double"
+					},
+					"battlecruiser": {
+						"type": "number",
+						"format": "double"
+					},
+					"deathstar": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID",
+					"smallCargoShip",
+					"largeCargoShip",
+					"lightFighter",
+					"heavyFighter",
+					"cruiser",
+					"battleship",
+					"colonyShip",
+					"recycler",
+					"espionageProbe",
+					"bomber",
+					"solarSatellite",
+					"destroyer",
+					"battlecruiser",
+					"deathstar"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1054,19 +1287,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"CancelTechRequest": {
-				"properties": {
-					"planetID": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"planetID"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"BuildTechRequest": {
 				"properties": {
 					"planetID": {
@@ -1081,6 +1301,19 @@
 				"required": [
 					"planetID",
 					"techID"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CancelTechRequest": {
+				"properties": {
+					"planetID": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"planetID"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1126,40 +1359,6 @@
 					"currentPlanet",
 					"bTechID",
 					"bTechEndTime"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UserInfo": {
-				"properties": {
-					"userID": {
-						"type": "number",
-						"format": "double"
-					},
-					"username": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"userID",
-					"username"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"CreateUserResponse": {
-				"properties": {
-					"userID": {
-						"type": "number",
-						"format": "double"
-					},
-					"token": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"userID",
-					"token"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -1326,6 +1525,16 @@
 							}
 						}
 					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
 					"500": {
 						"description": "",
 						"content": {
@@ -1367,12 +1576,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Buildings"
+									"$ref": "#/components/schemas/Planet"
 								}
 							}
 						}
 					},
 					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
 						"description": "",
 						"content": {
 							"application/json": {
@@ -1423,12 +1642,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Buildings"
+									"$ref": "#/components/schemas/Planet"
 								}
 							}
 						}
 					},
 					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
 						"description": "",
 						"content": {
 							"application/json": {
@@ -1479,12 +1708,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Buildings"
+									"$ref": "#/components/schemas/Planet"
 								}
 							}
 						}
 					},
 					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
 						"description": "",
 						"content": {
 							"application/json": {
@@ -1531,18 +1770,21 @@
 				"operationId": "GetGameConfig",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/IGameConfig"
-										}
-									]
+									"$ref": "#/components/schemas/IGameConfig"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -1560,18 +1802,21 @@
 				"operationId": "GetUnitsConfig",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/IUnits"
-										}
-									]
+									"$ref": "#/components/schemas/IUnits"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -1589,18 +1834,41 @@
 				"operationId": "GetAllDefensesOnPlanet",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Defenses"
-										}
-									]
+									"$ref": "#/components/schemas/Defenses"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -1632,18 +1900,41 @@
 				"operationId": "BuildDefense",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Planet"
-										}
-									]
+									"$ref": "#/components/schemas/Planet"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -1675,10 +1966,45 @@
 				"operationId": "GetGalaxyInformation",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/GalaxyPositionInfo"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1713,23 +2039,105 @@
 				]
 			}
 		},
+		"/messages": {
+			"get": {
+				"operationId": "GetAllMessages",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Message"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Messages"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/messages/{messageID}": {
 			"get": {
 				"operationId": "GetMessageByID",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Message"
-										}
-									]
+									"$ref": "#/components/schemas/Message"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -1761,10 +2169,38 @@
 				"operationId": "SendMessage",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": ""
+					},
+					"204": {
+						"description": "No content"
+					},
+					"400": {
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1795,10 +2231,38 @@
 				"operationId": "DeleteMessage",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": ""
+					},
+					"204": {
+						"description": "No content"
+					},
+					"400": {
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1829,10 +2293,45 @@
 				"operationId": "GetAllPlanets",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Planet"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1853,10 +2352,45 @@
 				"operationId": "GetAllPlanetsOfUser",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Planet"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1887,10 +2421,45 @@
 				"operationId": "GetMovement",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Event"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1921,10 +2490,38 @@
 				"operationId": "DestroyPlanet",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": ""
+					},
+					"204": {
+						"description": "No content"
+					},
+					"400": {
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -1955,18 +2552,41 @@
 				"operationId": "RenamePlanet",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Planet"
-										}
-									]
+									"$ref": "#/components/schemas/Planet"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -1998,18 +2618,41 @@
 				"operationId": "GetPlanetByID",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Planet"
-										}
-									]
+									"$ref": "#/components/schemas/Planet"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -2041,10 +2684,42 @@
 				"operationId": "GetAllShipsOnPlanet",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
-								"schema": {}
+								"schema": {
+									"$ref": "#/components/schemas/Ships"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
 							}
 						}
 					}
@@ -2075,18 +2750,41 @@
 				"operationId": "BuildShips",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Planet"
-										}
-									]
+									"$ref": "#/components/schemas/Planet"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -2118,18 +2816,41 @@
 				"operationId": "GetTechs",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Techs"
-										}
-									]
+									"$ref": "#/components/schemas/Techs"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -2146,66 +2867,46 @@
 				"parameters": []
 			}
 		},
-		"/technologies/cancel": {
-			"post": {
-				"operationId": "CancelTech",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Planet"
-										}
-									]
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Technologies"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/CancelTechRequest"
-							}
-						}
-					}
-				}
-			}
-		},
 		"/technologies/build": {
 			"post": {
 				"operationId": "BuildTech",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										},
-										{
-											"$ref": "#/components/schemas/Planet"
-										}
-									]
+									"$ref": "#/components/schemas/Planet"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -2232,12 +2933,78 @@
 				}
 			}
 		},
+		"/technologies/cancel": {
+			"post": {
+				"operationId": "CancelTech",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Planet"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Technologies"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CancelTechRequest"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/user": {
 			"get": {
 				"operationId": "GetUserSelf",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -2245,9 +3012,38 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
 					}
 				},
-				"description": "Returns sensible information about the currently authenticated user",
 				"tags": [
 					"UserData"
 				],
@@ -2264,17 +3060,46 @@
 				"operationId": "GetUserByID",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/UserInfo"
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
 					}
 				},
-				"description": "Returns basic information about a user given its userID",
 				"tags": [
 					"UserData"
 				],
@@ -2301,24 +3126,46 @@
 				"operationId": "CreateUser",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/CreateUserResponse"
-										},
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										}
-									]
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
 					}
 				},
-				"description": "Creates a new user with homeplanet",
 				"tags": [
 					"UserData"
 				],
@@ -2341,18 +3188,41 @@
 				"operationId": "UpdateUser",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/User"
-										},
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										}
-									]
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -2385,18 +3255,41 @@
 				"operationId": "SetCurrentPlanet",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "",
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/User"
-										},
-										{
-											"$ref": "#/components/schemas/FailureResponse"
-										}
-									]
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}

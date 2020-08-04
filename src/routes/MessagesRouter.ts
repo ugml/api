@@ -1,17 +1,20 @@
-import { Response } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
+
 import IMessageService from "../interfaces/services/IMessageService";
 import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
-import { Body, Controller, Get, Post, Request, Route, Security, Tags } from "tsoa";
+import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import SendMessageRequest from "../entities/requests/SendMessageRequest";
 import DeleteMessageRequest from "../entities/requests/DeleteMessageRequest";
 import { provide } from "inversify-binding-decorators";
 import FailureResponse from "../entities/responses/FailureResponse";
+import ApiException from "../exceptions/ApiException";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
+
+import Message from "../units/Message";
 
 @Route("messages")
 @Tags("Messages")
@@ -24,74 +27,123 @@ export class MessagesRouter extends Controller {
 
   @Get("/")
   @Security("jwt")
-  public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
+  public async getAllMessages(
+    @Request() headers,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Message[]>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Message[]> {
     try {
-      const userID = parseInt(request.userID, 10);
-
-      const messages = await this.messageService.getAllMessages(userID);
-
-      return response.status(Globals.StatusCodes.SUCCESS).json(messages ?? {});
+      return await this.messageService.getAllMessages(headers.user.userID);
     } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
+
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
       this.logger.error(error, error.stack);
 
-      return response.status(Globals.StatusCodes.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
     }
-  };
+  }
 
   @Get("/{messageID}")
   @Security("jwt")
-  public async getMessageByID(@Request() headers, messageID: number) {
+  public async getMessageByID(
+    @Request() headers,
+    messageID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Message>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Message> {
     try {
-      const userID = headers.user.userID;
-      const message = await this.messageService.getMessageById(userID, messageID);
-
-      return message;
+      return await this.messageService.getMessageById(messageID, headers.user.userID);
     } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
+
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
       this.logger.error(error, error.stack);
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-
-      return new FailureResponse("There was an error while handling the request.");
+      return serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
     }
   }
 
   @Post("/send")
   @Security("jwt")
-  public async sendMessage(@Request() headers, @Body() request: SendMessageRequest) {
+  public async sendMessage(
+    @Request() headers,
+    @Body() request: SendMessageRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, void>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<void> {
     try {
-      const subject = InputValidator.sanitizeString(request.subject);
-      const messageText = InputValidator.sanitizeString(request.body);
+      request.subject = InputValidator.sanitizeString(request.subject);
+      request.body = InputValidator.sanitizeString(request.body);
 
-      const receiver = await this.userService.getUserById(request.receiverID);
-
-      if (!InputValidator.isSet(receiver)) {
-        this.setStatus(Globals.StatusCodes.BAD_REQUEST);
-        return new FailureResponse("The receiver does not exist");
+      return await this.messageService.sendMessage(request, headers.user.userID);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
       }
 
-      return await this.messageService.sendMessage(headers.user.userID, request.receiverID, subject, messageText);
-    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
       this.logger.error(error, error.stack);
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-
-      return new FailureResponse("There was an error while handling the request.");
+      return serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
     }
   }
 
   @Post("/delete")
   @Security("jwt")
-  public async deleteMessage(@Request() headers, @Body() request: DeleteMessageRequest) {
+  public async deleteMessage(
+    @Request() headers,
+    @Body() request: DeleteMessageRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, void>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<void> {
     try {
       return await this.messageService.deleteMessage(headers.user.userID, request.messageID);
     } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
+
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
       this.logger.error(error, error.stack);
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-
-      return new FailureResponse("There was an error while handling the request.");
+      return serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
     }
   }
 }

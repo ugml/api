@@ -1,5 +1,3 @@
-import Calculations from "../common/Calculations";
-import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 import ILogger from "../interfaces/ILogger";
@@ -9,8 +7,7 @@ import IUserService from "../interfaces/services/IUserService";
 
 import Planet from "../units/Planet";
 import Buildings from "../units/Buildings";
-import User from "../units/User";
-import IUnitCosts from "../interfaces/IUnitCosts";
+
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
@@ -20,6 +17,8 @@ import CancelBuildingRequest from "../entities/requests/CancelBuildingRequest";
 import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
+import ApiException from "../exceptions/ApiException";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 @Route("buildings")
 @Tags("Buildings")
@@ -38,18 +37,24 @@ export class BuildingsRouter extends Controller {
     planetID: number,
     @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Buildings>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Buildings> {
     try {
-      if (!(await this.planetService.checkPlayerOwnsPlanet(request.user.userID, planetID))) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
+      return successResponse(
+        Globals.StatusCodes.SUCCESS,
+        await this.buildingService.getBuildings(planetID, request.user.userID),
+      );
+    } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
       }
 
-      return successResponse(Globals.StatusCodes.SUCCESS, await this.buildingService.getBuildings(planetID));
-    } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      this.logger.error(error, error.stack);
 
       return serverErrorResponse(
         Globals.StatusCodes.SERVER_ERROR,
@@ -63,8 +68,9 @@ export class BuildingsRouter extends Controller {
   public async startBuilding(
     @Request() headers,
     @Body() request: BuildBuildingRequest,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Buildings>,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Planet> {
     try {
@@ -72,98 +78,17 @@ export class BuildingsRouter extends Controller {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      const planet: Planet = await this.planetService.getPlanet(headers.user.userID, request.planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(request.planetID);
-      const user: User = await this.userService.getAuthenticatedUser(headers.user.userID);
-
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
-      }
-
-      // 1. check if there is already a build-job on the planet
-      if (planet.isUpgradingBuilding()) {
-        return badRequestResponse(
-          Globals.StatusCodes.BAD_REQUEST,
-          new FailureResponse("Planet already has a build-job"),
-        );
-      }
-
-      // can't build shipyard / robotic / nanite while ships or defenses are built
-      if (
-        (request.buildingID === Globals.Buildings.ROBOTIC_FACTORY ||
-          request.buildingID === Globals.Buildings.NANITE_FACTORY ||
-          request.buildingID === Globals.Buildings.SHIPYARD) &&
-        InputValidator.isSet(planet.bHangarQueue) &&
-        planet.isBuildingUnits()
-      ) {
-        return badRequestResponse(
-          Globals.StatusCodes.BAD_REQUEST,
-          new FailureResponse("Can't build this building while it is in use"),
-        );
-      }
-
-      // can't build research lab while they are researching... poor scientists :(
-      if (request.buildingID === Globals.Buildings.RESEARCH_LAB && user.isResearching()) {
-        return badRequestResponse(
-          Globals.StatusCodes.BAD_REQUEST,
-          new FailureResponse("Can't build this building while it is in use"),
-        );
-      }
-
-      // 2. check, if requirements are met
-      const requirements = Config.getGameConfig().units.buildings.find(r => r.unitID === request.buildingID)
-        .requirements;
-
-      // TODO: move to seperate file
-      // building has requirements
-      if (requirements !== undefined) {
-        requirements.forEach(function(requirement) {
-          const key = Globals.UnitNames[requirement.unitID];
-
-          if (buildings[key] < requirement.level) {
-            return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Requirements are not met"));
-          }
-        });
-      }
-
-      // 3. check if there are enough resources on the planet for the building to be built
-      const buildingKey = Globals.UnitNames[request.buildingID];
-      const currentLevel = buildings[buildingKey];
-
-      const cost = Calculations.getCosts(request.buildingID, currentLevel);
-
-      if (
-        planet.metal < cost.metal ||
-        planet.crystal < cost.crystal ||
-        planet.deuterium < cost.deuterium ||
-        planet.energyUsed < cost.energy
-      ) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Not enough resources"));
-      }
-
-      // 4. start the build-job
-      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
-        cost.metal,
-        cost.crystal,
-        buildings.roboticFactory,
-        buildings.naniteFactory,
-      );
-
-      const endTime: number = Math.round(+new Date() / 1000) + buildTime;
-
-      planet.metal = planet.metal - cost.metal;
-      planet.crystal = planet.crystal - cost.crystal;
-      planet.deuterium = planet.deuterium - cost.deuterium;
-      planet.bBuildingId = request.buildingID;
-      planet.bBuildingEndTime = endTime;
-
-      await this.planetService.updatePlanet(planet);
-
-      return planet;
+      return await this.buildingService.startBuilding(request, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
+      this.logger.error(error, error.stack);
 
       return serverErrorResponse(
         Globals.StatusCodes.SERVER_ERROR,
@@ -177,44 +102,23 @@ export class BuildingsRouter extends Controller {
   public async cancelBuilding(
     @Request() headers,
     @Body() request: CancelBuildingRequest,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Buildings>,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Planet> {
     try {
-      const userID = headers.user.userID;
-      const planetID = request.planetID;
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
-      }
-
-      if (!planet.isUpgradingBuilding()) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Planet has no build-job"));
-      }
-
-      const buildingKey = Globals.UnitNames[planet.bBuildingId];
-
-      const currentLevel = buildings[buildingKey];
-
-      const cost: IUnitCosts = Calculations.getCosts(planet.bBuildingId, currentLevel);
-
-      planet.bBuildingId = 0;
-      planet.bBuildingEndTime = 0;
-      planet.metal = planet.metal + cost.metal;
-      planet.crystal = planet.crystal + cost.crystal;
-      planet.deuterium = planet.deuterium + cost.deuterium;
-
-      await this.planetService.updatePlanet(planet);
-
-      return planet;
+      return await this.buildingService.cancelBuilding(request.planetID, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
+      this.logger.error(error, error.stack);
 
       return serverErrorResponse(
         Globals.StatusCodes.SERVER_ERROR,
@@ -228,65 +132,27 @@ export class BuildingsRouter extends Controller {
   public async demolishBuilding(
     @Request() headers,
     @Body() request: DemolishBuildingRequest,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Buildings>,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Planet> {
     try {
-      const userID = headers.user.userID;
-      const planetID = request.planetID;
-      const buildingID = request.buildingID;
-
-      if (!InputValidator.isValidBuildingId(buildingID)) {
+      if (!InputValidator.isValidBuildingId(request.buildingID)) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-
-      if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
-      }
-
-      if (planet.isUpgradingBuilding()) {
-        return badRequestResponse(
-          Globals.StatusCodes.BAD_REQUEST,
-          new FailureResponse("Planet already has a build-job"),
-        );
-      }
-
-      const buildingKey = Globals.UnitNames[buildingID];
-      const currentLevel = buildings[buildingKey];
-
-      if (currentLevel === 0) {
-        return badRequestResponse(
-          Globals.StatusCodes.BAD_REQUEST,
-          new FailureResponse("This building can't be demolished"),
-        );
-      }
-
-      const cost = Calculations.getCosts(buildingID, currentLevel - 1);
-
-      const buildTime: number = Calculations.calculateBuildTimeInSeconds(
-        cost.metal,
-        cost.crystal,
-        buildings.roboticFactory,
-        buildings.naniteFactory,
-      );
-
-      const endTime: number = Math.round(+new Date() / 1000) + buildTime;
-
-      planet.bBuildingId = buildingID;
-      planet.bBuildingEndTime = endTime;
-      planet.bBuildingDemolition = true;
-
-      await this.planetService.updatePlanet(planet);
-
-      return planet;
+      return await this.buildingService.demolishBuilding(request, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
 
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
+      this.logger.error(error, error.stack);
 
       return serverErrorResponse(
         Globals.StatusCodes.SERVER_ERROR,

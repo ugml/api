@@ -1,52 +1,149 @@
-import Database from "../common/Database";
-import InputValidator from "../common/InputValidator";
 import IShipService from "../interfaces/services/IShipService";
 
-import squel = require("safe-squel");
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import TYPES from "../ioc/types";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
+import IShipsRepository from "../interfaces/repositories/IShipsRepository";
+import ApiException from "../exceptions/ApiException";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import BuildShipsRequest from "../entities/requests/BuildShipsRequest";
+import Queue from "../common/Queue";
+import Planet from "../units/Planet";
+import Buildings from "../units/Buildings";
+import IUnitCosts from "../interfaces/IUnitCosts";
+import Calculations from "../common/Calculations";
+import QueueItem from "../common/QueueItem";
+import InputValidator from "../common/InputValidator";
 
-/**
- * This class defines a service to interact with the ships-table in the database
- */
+import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
+
 @injectable()
 export default class ShipService implements IShipService {
-  /**
-   * Returns a list of ships on a given planet, owned by the given user
-   * @param userID the ID of the user
-   * @param planetID the ID of the planet
-   */
+  @inject(TYPES.IShipsRepository) private shipsRepository: IShipsRepository;
+  @inject(TYPES.IPlanetRepository) private planetRepository: IPlanetRepository;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+  @inject(TYPES.IBuildingRepository) private buildingRepository: IBuildingRepository;
+
   public async getShips(userID: number, planetID: number) {
-    const query: string = squel
-      .select()
-      .field("p.ownerID")
-      .field("s.*")
-      .from("ships", "s")
-      .left_join("planets", "p", "s.planetID = p.planetID")
-      .where("s.planetID = ?", planetID)
-      .where("p.ownerID = ?", userID)
-      .toString();
-
-    const [[rows]] = await Database.query(query.toString());
-
-    if (!InputValidator.isSet(rows)) {
-      return null;
+    if (!(await this.planetRepository.exists(planetID))) {
+      throw new ApiException("Planet does not exist");
     }
 
-    return rows;
+    if (!(await this.planetService.checkUserOwnsPlanet(userID, planetID))) {
+      throw new UnauthorizedException("User does not own the planet");
+    }
+
+    return await this.shipsRepository.getById(planetID);
   }
 
-  /**
-   * Creates a new row in the database.
-   * @param planetID the ID of the planet
-   * @param connection a connection from the connection-pool, if this query should be executed within a transaction
-   */
-  public async createShipsRow(planetID: number, connection = null) {
-    const query = `INSERT INTO ships (\`planetID\`) VALUES (${planetID});`;
+  public async processBuildOrder(request: BuildShipsRequest, userID: number): Promise<Planet> {
+    const queue: Queue = new Queue();
 
-    if (connection === null) {
-      return await Database.query(query);
+    const planet: Planet = await this.planetRepository.getById(request.planetID);
+    const buildings: Buildings = await this.buildingRepository.getById(request.planetID);
+
+    if (planet.ownerID !== userID) {
+      throw new UnauthorizedException("The player does not own the planet");
     }
 
-    return await connection.query(query);
+    if (planet.isUpgradingHangar()) {
+      throw new ApiException("Shipyard is currently upgrading");
+    }
+
+    let metal = planet.metal;
+    let crystal = planet.crystal;
+    let deuterium = planet.deuterium;
+
+    let stopProcessing = false;
+    let buildTime = 0;
+
+    // TODO: put into separate function (also reference this in defense-router)
+    for (const buildOrder of request.buildOrder) {
+      const cost: IUnitCosts = Calculations.getCosts(buildOrder.unitID, 1);
+
+      // if the user has not enough ressources to fullfill the complete build-order
+      if (
+        metal < cost.metal * buildOrder.amount ||
+        crystal < cost.crystal * buildOrder.amount ||
+        deuterium < cost.deuterium * buildOrder.amount
+      ) {
+        let tempCount: number;
+
+        if (cost.metal > 0) {
+          tempCount = metal / cost.metal;
+
+          if (tempCount < buildOrder.amount) {
+            buildOrder.amount = tempCount;
+          }
+        }
+
+        if (cost.crystal > 0) {
+          tempCount = crystal / cost.crystal;
+
+          if (tempCount < buildOrder.amount) {
+            buildOrder.amount = tempCount;
+          }
+        }
+
+        if (cost.deuterium > 0) {
+          tempCount = deuterium / cost.deuterium;
+
+          if (tempCount < buildOrder.amount) {
+            buildOrder.amount = tempCount;
+          }
+        }
+
+        // no need to further process the queue
+        stopProcessing = true;
+      }
+
+      // build time in seconds
+      buildTime +=
+        Calculations.calculateBuildTimeInSeconds(
+          cost.metal,
+          cost.crystal,
+          buildings.shipyard,
+          buildings.naniteFactory,
+        ) * Math.floor(buildOrder.amount);
+
+      queue.getQueue().push(new QueueItem(buildOrder.unitID, Math.floor(buildOrder.amount)));
+
+      metal -= cost.metal * buildOrder.amount;
+      crystal -= cost.crystal * buildOrder.amount;
+      deuterium -= cost.deuterium * buildOrder.amount;
+
+      if (stopProcessing) {
+        break;
+      }
+    }
+
+    queue.setTimeRemaining(buildTime);
+    queue.setLastUpdateTime(Math.floor(Date.now() / 1000));
+
+    let oldBuildOrder;
+
+    if (!InputValidator.isSet(planet.bHangarQueue)) {
+      planet.bHangarQueue = JSON.parse("[]");
+      oldBuildOrder = planet.bHangarQueue;
+    } else {
+      oldBuildOrder = JSON.parse(planet.bHangarQueue);
+    }
+
+    oldBuildOrder.push(queue);
+
+    planet.bHangarQueue = JSON.stringify(oldBuildOrder);
+
+    if (planet.bHangarStartTime === 0) {
+      planet.bHangarStartTime = Math.floor(Date.now() / 1000);
+    }
+
+    planet.metal = metal;
+    planet.crystal = crystal;
+    planet.deuterium = deuterium;
+
+    await this.planetRepository.save(planet);
+
+    return planet;
   }
 }

@@ -5,6 +5,7 @@ import JwtHelper from "../common/JwtHelper";
 import { inject, injectable } from "inversify";
 import TYPES from "../ioc/types";
 import IUserService from "../interfaces/services/IUserService";
+import ApiException from "../exceptions/ApiException";
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -14,13 +15,13 @@ export default class AuthService implements IAuthService {
     const data = await this.userService.getUserForAuthentication(email);
 
     if (!InputValidator.isSet(data)) {
-      return null;
+      throw new ApiException("Invalid parameters");
     }
 
     const isValidPassword = await Encryption.compare(password, data.password);
 
     if (!isValidPassword) {
-      return null;
+      throw new ApiException("Invalid parameters");
     }
 
     return JwtHelper.generateToken(data.userID);

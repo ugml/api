@@ -6,12 +6,12 @@ import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import User from "../units/User";
 import { iocContainer } from "../ioc/inversify.config";
-import IPlanetService from "../interfaces/services/IPlanetService";
 import TYPES from "../ioc/types";
-import IUserService from "../interfaces/services/IUserService";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
+import IUserRepository from "../interfaces/repositories/IUserRepository";
 
-const planetService = iocContainer.get<IPlanetService>(TYPES.IPlanetService);
-const userService = iocContainer.get<IUserService>(TYPES.IUserService);
+const planetRepository = iocContainer.get<IPlanetRepository>(TYPES.IPlanetRepository);
+const userRepository = iocContainer.get<IUserRepository>(TYPES.IUserRepository);
 
 const app = new App().express;
 
@@ -26,8 +26,8 @@ describe("planetsRouter", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    authUserBeforeTests = await userService.getAuthenticatedUser(1);
-    planetBeforeTests = await planetService.getPlanet(1, 167546850, true);
+    authUserBeforeTests = await userRepository.getById(1);
+    planetBeforeTests = await planetRepository.getById(167546850);
     return request
       .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -37,8 +37,8 @@ describe("planetsRouter", () => {
   });
 
   after(async () => {
-    await userService.updateUserData(authUserBeforeTests);
-    await planetService.updatePlanet(planetBeforeTests);
+    await userRepository.save(authUserBeforeTests);
+    await planetRepository.save(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -190,7 +190,7 @@ describe("planetsRouter", () => {
   it("should rename a planet", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetRepository.getById(planetID);
 
     return request
       .post("/v1/planets/rename")
@@ -202,7 +202,7 @@ describe("planetsRouter", () => {
         expect(res.body.name).to.be.equals("FancyNewName");
 
         // reset
-        await planetService.updatePlanet(planet);
+        await planetRepository.save(planet);
       });
   });
 
@@ -302,7 +302,7 @@ describe("planetsRouter", () => {
   it("should delete the planet", async () => {
     const planetID = 167546999;
 
-    secondPlanetBackup = await planetService.getPlanet(1, planetID, true);
+    secondPlanetBackup = await planetRepository.getById(planetID);
 
     return request
       .post("/v1/planets/destroy/")
@@ -325,7 +325,7 @@ describe("planetsRouter", () => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("The last planet cannot be destroyed");
-        await planetService.createNewPlanet(secondPlanetBackup);
+        await planetRepository.create(secondPlanetBackup);
       });
   });
 });

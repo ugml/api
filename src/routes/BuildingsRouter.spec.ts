@@ -6,12 +6,12 @@ import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import User from "../units/User";
 import { iocContainer } from "../ioc/inversify.config";
-import IPlanetService from "../interfaces/services/IPlanetService";
 import TYPES from "../ioc/types";
-import IUserService from "../interfaces/services/IUserService";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
+import IUserRepository from "../interfaces/repositories/IUserRepository";
 
-const planetService = iocContainer.get<IPlanetService>(TYPES.IPlanetService);
-const userService = iocContainer.get<IUserService>(TYPES.IUserService);
+const planetRepository = iocContainer.get<IPlanetRepository>(TYPES.IPlanetRepository);
+const userRepository = iocContainer.get<IUserRepository>(TYPES.IUserRepository);
 
 const app = new App().express;
 
@@ -25,7 +25,7 @@ describe("buildingsRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await planetRepository.getById(167546850);
     return request
       .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -35,7 +35,7 @@ describe("buildingsRoute", () => {
   });
 
   after(async () => {
-    await planetService.updatePlanet(planetBeforeTests);
+    await planetRepository.save(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -339,14 +339,14 @@ describe("buildingsRoute", () => {
     it("should fail (can't build shipyard/robotic/nanite while it is being used)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await planetRepository.getById(planetID);
 
       const valueBefore = planet.bHangarStartTime;
 
       planet.bHangarQueue = "[ { test: 1234 } ]";
       planet.bHangarStartTime = 1;
 
-      await planetService.updatePlanet(planet);
+      await planetRepository.save(planet);
 
       return request
         .post("/v1/buildings/build")
@@ -358,15 +358,15 @@ describe("buildingsRoute", () => {
 
           // reset planet
           planet.bHangarStartTime = valueBefore;
-          await planetService.updatePlanet(planet);
+          await planetRepository.save(planet);
         });
     });
 
     it("should fail (can't build research-lab while it is being used)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await planetService.getPlanet(1, planetID, true);
-      const user: User = await userService.getAuthenticatedUser(planet.ownerID);
+      const planet: Planet = await planetRepository.getById(planetID);
+      const user: User = await userRepository.getById(planet.ownerID);
 
       const techIDold = user.bTechID;
       const endtime = user.bTechEndTime;
@@ -374,7 +374,7 @@ describe("buildingsRoute", () => {
       user.bTechEndTime = 1;
       user.bTechID = 109;
 
-      await userService.updateUserData(user);
+      await userRepository.save(user);
 
       return request
         .post("/v1/buildings/build")
@@ -387,7 +387,7 @@ describe("buildingsRoute", () => {
           user.bTechEndTime = techIDold;
           user.bTechID = endtime;
 
-          await userService.updateUserData(user);
+          await userRepository.save(user);
         });
     });
 
@@ -406,13 +406,13 @@ describe("buildingsRoute", () => {
     it("should fail (planet has not enough resources)", async () => {
       const planetID = 167546850;
 
-      const planet: Planet = await planetService.getPlanet(1, planetID, true);
+      const planet: Planet = await planetRepository.getById(planetID);
 
       const metalBefore = planet.metal;
 
       planet.metal = 0;
 
-      await planetService.updatePlanet(planet);
+      await planetRepository.save(planet);
 
       return request
         .post("/v1/buildings/build")
@@ -423,7 +423,7 @@ describe("buildingsRoute", () => {
 
           // reset planet
           planet.metal = metalBefore;
-          await planetService.updatePlanet(planet);
+          await planetRepository.save(planet);
         });
     });
   });
@@ -499,7 +499,7 @@ describe("buildingsRoute", () => {
   it("should start demolition of a building", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetRepository.getById(planetID);
 
     return request
       .post("/v1/buildings/demolish")
@@ -513,20 +513,20 @@ describe("buildingsRoute", () => {
         expect(res.status).equals(Globals.StatusCodes.SUCCESS);
 
         // reset
-        await planetService.updatePlanet(planet);
+        await planetRepository.save(planet);
       });
   });
 
   it("should fail (planet has already a build job)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetRepository.getById(planetID);
 
     planet.bBuildingId = 1;
     planet.bBuildingEndTime = 1234;
     planet.bBuildingDemolition = true;
 
-    await planetService.updatePlanet(planet);
+    await planetRepository.save(planet);
 
     return request
       .post("/v1/buildings/demolish")
@@ -540,7 +540,7 @@ describe("buildingsRoute", () => {
         planet.bBuildingId = 0;
         planet.bBuildingEndTime = 0;
         planet.bBuildingDemolition = false;
-        await planetService.updatePlanet(planet);
+        await planetRepository.save(planet);
       });
   });
 });

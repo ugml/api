@@ -27,6 +27,22 @@ import { AuthRouter } from "../routes/AuthRouter";
 import ILogger from "../interfaces/ILogger";
 import SimpleLogger from "../loggers/SimpleLogger";
 import { UserRouter } from "../routes/UserRouter";
+import BuildingRepository from "../repositories/BuildingRepository";
+import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
+import PlanetRepository from "../repositories/PlanetRepository";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
+import UserRepository from "../repositories/UserRepository";
+import IUserRepository from "../interfaces/repositories/IUserRepository";
+import TechnologiesRepository from "../repositories/TechnologiesRepository";
+import ITechnologiesRepository from "../interfaces/repositories/ITechnologiesRepository";
+import RequirementsService from "../services/RequirementsService";
+import IRequirementsService from "../interfaces/services/IRequirementsService";
+import DefenseRepository from "../repositories/DefenseRepository";
+import IDefenseRepository from "../interfaces/repositories/IDefenseRepository";
+import MessageRepository from "../repositories/MessageRepository";
+import IMessageRepository from "../interfaces/repositories/IMessageRepository";
+import IShipsRepository from "../interfaces/repositories/IShipsRepository";
+import ShipsRepository from "../repositories/ShipsRepository";
 
 const iocContainer = new Container();
 
@@ -46,6 +62,16 @@ iocContainer.bind<IPlanetService>(TYPES.IPlanetService).to(PlanetService);
 iocContainer.bind<IShipService>(TYPES.IShipService).to(ShipService);
 iocContainer.bind<ITechService>(TYPES.ITechService).to(TechService);
 iocContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
+iocContainer.bind<IRequirementsService>(TYPES.IRequirementsService).to(RequirementsService);
+
+// Repositories
+iocContainer.bind<IBuildingRepository>(TYPES.IBuildingRepository).to(BuildingRepository);
+iocContainer.bind<IPlanetRepository>(TYPES.IPlanetRepository).to(PlanetRepository);
+iocContainer.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
+iocContainer.bind<ITechnologiesRepository>(TYPES.ITechnologiesRepository).to(TechnologiesRepository);
+iocContainer.bind<IDefenseRepository>(TYPES.IDefenseRepository).to(DefenseRepository);
+iocContainer.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
+iocContainer.bind<IShipsRepository>(TYPES.IShipsRepository).to(ShipsRepository);
 
 // Routers
 iocContainer.bind<AuthRouter>(TYPES.AuthRouter).to(AuthRouter);

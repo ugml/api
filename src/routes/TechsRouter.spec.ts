@@ -7,7 +7,7 @@ import Planet from "../units/Planet";
 
 import { iocContainer } from "../ioc/inversify.config";
 import TYPES from "../ioc/types";
-import IPlanetService from "../interfaces/services/IPlanetService";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
 
 const app = new App().express;
 
@@ -17,7 +17,7 @@ const expect = chai.expect;
 let authToken = "";
 let request = chai.request(app);
 
-const planetService = iocContainer.get<IPlanetService>(TYPES.IPlanetService);
+const planetRepository = iocContainer.get<IPlanetRepository>(TYPES.IPlanetRepository);
 
 describe("techsRouter", () => {
   before(() => {
@@ -136,13 +136,13 @@ describe("techsRouter", () => {
   it("try to start a tech-build-order while research-lab is upgrading", async () => {
     const planetID = 167546850;
 
-    const planetBackup: Planet = await planetService.getPlanet(1, planetID, true);
-    const planet: Planet = await planetService.getPlanet(1, planetID, true);
+    const planetBackup: Planet = await planetRepository.getById(planetID);
+    const planet: Planet = await planetRepository.getById(planetID);
 
     planet.bBuildingId = Globals.Buildings.RESEARCH_LAB;
     planet.bBuildingEndTime = 1;
 
-    await planetService.updatePlanet(planet);
+    await planetRepository.save(planet);
 
     return request
       .post("/v1/techs/build")
@@ -153,7 +153,7 @@ describe("techsRouter", () => {
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
 
         // reset
-        await planetService.updatePlanet(planetBackup);
+        await planetRepository.save(planetBackup);
       });
   });
 

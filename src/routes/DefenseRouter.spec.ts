@@ -5,10 +5,11 @@ import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
 import { iocContainer } from "../ioc/inversify.config";
-import IPlanetService from "../interfaces/services/IPlanetService";
-import TYPES from "../ioc/types";
 
-const planetService = iocContainer.get<IPlanetService>(TYPES.IPlanetService);
+import TYPES from "../ioc/types";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
+
+const planetRepository = iocContainer.get<IPlanetRepository>(TYPES.IPlanetRepository);
 
 const app = new App().express;
 
@@ -22,7 +23,7 @@ describe("defenseRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await planetRepository.getById(167546850);
     return request
       .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
@@ -32,7 +33,7 @@ describe("defenseRoute", () => {
   });
 
   after(async () => {
-    await planetService.updatePlanet(planetBeforeTests);
+    await planetRepository.save(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -176,13 +177,13 @@ describe("defenseRoute", () => {
   it("should fail (shipyard is currently upgrading)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetRepository.getById(planetID);
 
     const valueBefore = planet.bHangarPlus;
 
     planet.bHangarPlus = true;
 
-    await planetService.updatePlanet(planet);
+    await planetRepository.save(planet);
 
     return (
       request
@@ -195,7 +196,7 @@ describe("defenseRoute", () => {
           expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
           planet.bHangarPlus = valueBefore;
-          await planetService.updatePlanet(planet);
+          await planetRepository.save(planet);
         })
     );
   });

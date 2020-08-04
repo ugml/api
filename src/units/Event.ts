@@ -9,10 +9,10 @@ export default class Event implements IUnit {
   public mission: number;
   public fleetlist: string;
   public startID: number;
-  public startType: PlanetType;
+  public startType: Globals.PlanetType;
   public startTime: number;
   public endID: number;
-  public endType: PlanetType;
+  public endType: Globals.PlanetType;
   public endTime: number;
   public loadedMetal: number;
   public loadedCrystal: number;

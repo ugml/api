@@ -31,7 +31,7 @@ export class AuthRouter extends Controller {
   ): Promise<AuthResponse> {
     try {
       if (!InputValidator.isSet(req.email) || !InputValidator.isSet(req.password)) {
-        badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
       const email: string = InputValidator.sanitizeString(req.email);
@@ -40,7 +40,7 @@ export class AuthRouter extends Controller {
       const token = await this.authService.authenticateUser(email, password);
 
       if (!InputValidator.isSet(token)) {
-        badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Authentication failed"));
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Authentication failed"));
       }
 
       return {
@@ -51,7 +51,7 @@ export class AuthRouter extends Controller {
 
       this.setStatus(Globals.StatusCodes.SERVER_ERROR);
 
-      serverErrorResponse(
+      return serverErrorResponse(
         Globals.StatusCodes.SERVER_ERROR,
         new FailureResponse("There was an error while handling the request."),
       );

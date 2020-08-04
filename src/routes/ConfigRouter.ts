@@ -11,6 +11,7 @@ import IGameConfig, { IUnits } from "../interfaces/IGameConfig";
 
 @Route("config")
 @Tags("Configuration")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(ConfigRouter)
 export class ConfigRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

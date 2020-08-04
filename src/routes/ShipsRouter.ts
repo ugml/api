@@ -19,6 +19,7 @@ import Ships from "../units/Ships";
 
 @Route("ships")
 @Tags("Ships")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(ShipsRouter)
 export class ShipsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

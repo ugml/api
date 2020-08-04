@@ -14,6 +14,7 @@ import GalaxyPositionInfo from "../units/GalaxyPositionInfo";
 
 @Route("galaxy")
 @Tags("Galaxy")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(GalaxyRouter)
 export class GalaxyRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

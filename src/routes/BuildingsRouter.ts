@@ -22,6 +22,7 @@ import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 @Route("buildings")
 @Tags("Buildings")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(BuildingsRouter)
 export class BuildingsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

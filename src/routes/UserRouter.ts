@@ -31,6 +31,7 @@ import AuthResponse from "../entities/responses/AuthResponse";
  */
 @Route("user")
 @Tags("UserData")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(UserRouter)
 export class UserRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

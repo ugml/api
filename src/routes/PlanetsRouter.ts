@@ -19,6 +19,7 @@ import Event from "../units/Event";
 
 @Route("planets")
 @Tags("Planets")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(PlanetsRouter)
 export class PlanetsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

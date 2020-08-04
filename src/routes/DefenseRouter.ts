@@ -22,6 +22,7 @@ import Planet from "../units/Planet";
 
 @Route("defenses")
 @Tags("Defenses")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(DefenseRouter)
 export class DefenseRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

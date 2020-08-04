@@ -17,6 +17,7 @@ import ApiException from "../exceptions/ApiException";
 
 @Route("login")
 @Tags("Authentication")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(AuthRouter)
 export class AuthRouter extends Controller {
   @inject(TYPES.IUserService) private userService: IUserService;

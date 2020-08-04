@@ -21,6 +21,7 @@ import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 @Route("technologies")
 @Tags("Technologies")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(TechsRouter)
 export class TechsRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

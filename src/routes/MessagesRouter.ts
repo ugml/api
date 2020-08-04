@@ -18,6 +18,7 @@ import Message from "../units/Message";
 
 @Route("messages")
 @Tags("Messages")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(MessagesRouter)
 export class MessagesRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;

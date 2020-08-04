@@ -27,6 +27,7 @@ export class AuthRouter extends Controller {
     @Body() req: AuthRequest,
     @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthResponse>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<AuthResponse> {
     try {
@@ -40,7 +41,7 @@ export class AuthRouter extends Controller {
       const token = await this.authService.authenticateUser(email, password);
 
       if (!InputValidator.isSet(token)) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Authentication failed"));
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse("Authentication failed"));
       }
 
       return {

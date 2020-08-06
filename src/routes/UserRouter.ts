@@ -25,6 +25,7 @@ import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaR
 import ApiException from "../exceptions/ApiException";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import AuthResponse from "../entities/responses/AuthResponse";
+import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 
 /**
  * Defines routes for user-data
@@ -190,8 +191,7 @@ export class UserRouter extends Controller {
   @Security("jwt")
   public async setCurrentPlanet(
     @Request() headers,
-    @Request() request,
-    @Body() model: SetCurrentPlanetRequest,
+    @Body() request: SetCurrentPlanetRequest,
     @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, User>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
     @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,

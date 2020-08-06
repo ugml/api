@@ -1445,8 +1445,7 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 headers: { "in": "request", "name": "headers", "required": true, "dataType": "object" },
-                request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
-                model: { "in": "body", "name": "model", "required": true, "ref": "SetCurrentPlanetRequest" },
+                request: { "in": "body", "name": "request", "required": true, "ref": "SetCurrentPlanetRequest" },
                 successResponse: { "in": "res", "name": "200", "required": true, "ref": "User" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
                 unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },

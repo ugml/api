@@ -99,7 +99,9 @@ export class MessagesRouter extends Controller {
       request.subject = InputValidator.sanitizeString(request.subject);
       request.body = InputValidator.sanitizeString(request.body);
 
-      return await this.messageService.sendMessage(request, headers.user.userID);
+      await this.messageService.sendMessage(request, headers.user.userID);
+
+      return successResponse(Globals.StatusCodes.SUCCESS);
     } catch (error) {
       if (error instanceof ApiException) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
@@ -129,7 +131,9 @@ export class MessagesRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<void> {
     try {
-      return await this.messageService.deleteMessage(headers.user.userID, request.messageID);
+      await this.messageService.deleteMessage(headers.user.userID, request.messageID);
+
+      return successResponse(Globals.StatusCodes.SUCCESS);
     } catch (error) {
       if (error instanceof ApiException) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));

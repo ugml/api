@@ -5,7 +5,6 @@ import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import * as squel from "safe-squel";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "../units/Buildings";
 
 @injectable()
 export default class UserRepository implements IUserRepository {
@@ -44,7 +43,11 @@ export default class UserRepository implements IUserRepository {
       return null;
     }
 
-    return SerializationHelper.toInstance(new User(), JSON.stringify(rows[0]));
+    const user = SerializationHelper.toInstance(new User(), JSON.stringify(rows[0]));
+
+    delete user.password;
+
+    return user;
   }
 
   public async save(t: User): Promise<void> {

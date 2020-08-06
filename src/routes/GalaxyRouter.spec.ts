@@ -62,7 +62,7 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.eql("Invalid parameter");
+        expect(res.body.error).to.be.eql("Validation failed");
       });
   });
 
@@ -73,7 +73,7 @@ describe("galaxyRouter", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.eql("Invalid parameter");
+        expect(res.body.error).to.be.eql("Validation failed");
       });
   });
 

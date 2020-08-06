@@ -47,14 +47,16 @@ describe("planetsRouter", () => {
   });
 
   it("should set the current planet", () => {
+    const planetID = 167546850;
     return request
       .post("/v1/user/currentplanet/set")
-      .send({ planetID: 167546850 })
+      .send({ planetID: planetID })
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.empty;
+        expect(res.body.currentPlanet).to.be.eql(planetID);
+        expect(res.body.password).to.be.undefined;
       });
   });
 

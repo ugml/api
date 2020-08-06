@@ -6,7 +6,6 @@ import InputValidator from "../common/InputValidator";
 import * as squel from "safe-squel";
 import Event from "../units/Event";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "../units/Buildings";
 
 @injectable()
 export default class PlanetRepository implements IPlanetRepository {
@@ -17,7 +16,9 @@ export default class PlanetRepository implements IPlanetRepository {
       .where("planetID = ?", id)
       .toString();
 
-    return InputValidator.isSet(await Database.query(query));
+    const [result] = await Database.query(query);
+
+    return InputValidator.isSet(result);
   }
 
   public async getById(id: number): Promise<Planet> {

@@ -23,6 +23,10 @@ export default class MessageService implements IMessageService {
   public async getMessageById(messageID: number, userID: number): Promise<Message> {
     const message = await this.messageRepository.getById(messageID);
 
+    if (!InputValidator.isSet(message)) {
+      throw new ApiException("Message does not exist");
+    }
+
     if (message.receiverID !== userID) {
       throw new UnauthorizedException("User was not the receiver");
     }

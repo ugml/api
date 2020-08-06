@@ -54,14 +54,14 @@ describe("defenseRoute", () => {
       });
   });
 
-  it("should return an empty list", () => {
+  it("should fail, planet does not exist", () => {
     const planetID = 60881;
 
     return request
       .get(`/v1/defenses/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.StatusCodes.NOT_AUTHORIZED);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
       });
   });
@@ -81,7 +81,15 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: JSON.stringify({ 301: 1, 302: 1, 309: 1, 310: 1 }) })
+      .send({
+        planetID: planetID,
+        buildOrder: [
+          { unitID: 301, amount: 1 },
+          { unitID: 302, amount: 1 },
+          { unitID: 309, amount: 1 },
+          { unitID: 310, amount: 1 },
+        ],
+      })
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
@@ -95,7 +103,7 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: JSON.stringify({ 310: 10000 }) })
+      .send({ planetID, buildOrder: [{ unitID: 310, amount: 10000 }] })
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
@@ -107,11 +115,10 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ buildOrder: JSON.stringify({ 301: 1 }) })
+      .send({ buildOrder: [{ unitID: 301, amount: 1 }] })
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-        expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -125,7 +132,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -136,7 +143,7 @@ describe("defenseRoute", () => {
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -151,7 +158,8 @@ describe("defenseRoute", () => {
       .send({ planetID, buildOrder: "{ \"xyz\": 1 }" })
         .then(res => {
           expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-          expect(res.body.error).to.be.equals("Invalid parameter");
+          expect(res.type).to.eql("application/json");
+          expect(res.body.error).to.be.equals("Validation failed");
         })
     );
   });
@@ -164,10 +172,10 @@ describe("defenseRoute", () => {
         .post("/v1/defenses/build")
         .set("Authorization", authToken)
         // eslint-disable-next-line prettier/prettier
-        .send({ planetID, buildOrder: "{ \"301\": 1 }" })
+        .send({ planetID, buildOrder: [{ unitID: 301, amount: 1 }] })
         .then(res => {
           expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-          expect(res.body.error).to.be.equals("The player does not own the planet");
+          expect(res.body.error).to.be.equals("Planet does not exist");
         })
     );
   });
@@ -188,7 +196,7 @@ describe("defenseRoute", () => {
         .post("/v1/defenses/build")
         .set("Authorization", authToken)
         // eslint-disable-next-line prettier/prettier
-        .send({ planetID, buildOrder: "{ \"301\": 1 }" })
+        .send({ planetID, buildOrder:  [{ unitID: 301, amount: 1 }] })
         .then(async res => {
           expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
           expect(res.body.error).to.be.equals("Shipyard is currently upgrading");

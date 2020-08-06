@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import * as bodyParser from "body-parser";
 import * as express from "express";
+import { Response as ExResponse, Request as ExRequest, NextFunction } from "express";
 
 import ILogger from "./interfaces/ILogger";
 import * as dotenv from "dotenv";
@@ -10,6 +11,8 @@ import { inject } from "inversify";
 import TYPES from "./ioc/types";
 
 import { expressCspHeader, INLINE, SELF } from "express-csp-header";
+import { ValidateError } from "tsoa";
+import {Globals} from "./common/Globals";
 
 dotenv.config();
 
@@ -25,6 +28,30 @@ export default class App {
     this.startSwagger();
 
     RegisterRoutes(this.express);
+
+
+
+    this.express.use(function ErrorHandler(
+      err: unknown,
+      req: ExRequest,
+      res: ExResponse,
+      next: NextFunction,
+    ): ExResponse | void {
+      if (err instanceof ValidateError) {
+        console.warn(`Caught Validation Error for ${req.path}:`, err.fields);
+        return res.status(Globals.StatusCodes.BAD_REQUEST).json({
+          error: "Validation failed",
+          details: err?.fields,
+        });
+      }
+      if (err instanceof Error) {
+        return res.status(Globals.StatusCodes.SERVER_ERROR).json({
+          error: "Internal Server Error",
+        });
+      }
+
+      next();
+    });
   }
 
   private startSwagger(): void {
@@ -69,6 +96,7 @@ export default class App {
         extended: true,
       }),
     );
+
     this.express.use(bodyParser.json());
     this.express.use(helmet.hidePoweredBy());
     this.express.use(noCache());

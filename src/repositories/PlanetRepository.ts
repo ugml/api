@@ -112,10 +112,13 @@ export default class PlanetRepository implements IPlanetRepository {
       .set("bHangarQueue", t.bHangarQueue)
       .set("bHangarStartTime", t.bHangarStartTime)
       .set("bHangarPlus", t.bHangarPlus)
-      .set("destroyed", t.destroyed)
-      .toString();
+      .set("destroyed", t.destroyed);
 
-    await Database.query(query);
+    if (InputValidator.isSet(t.planetID)) {
+      query.set("planetID", t.planetID);
+    }
+
+    await Database.query(query.toString());
 
     return t;
   }

@@ -41,6 +41,11 @@ export default class ShipService implements IShipService {
     const queue: Queue = new Queue();
 
     const planet: Planet = await this.planetRepository.getById(request.planetID);
+
+    if (!InputValidator.isSet(planet)) {
+      throw new ApiException("Planet does not exist");
+    }
+
     const buildings: Buildings = await this.buildingRepository.getById(request.planetID);
 
     if (planet.ownerID !== userID) {

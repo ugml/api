@@ -25,7 +25,7 @@ import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaR
 import ApiException from "../exceptions/ApiException";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import AuthResponse from "../entities/responses/AuthResponse";
-import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
+import Planet from "../units/Planet";
 
 /**
  * Defines routes for user-data
@@ -166,6 +166,64 @@ export class UserRouter extends Controller {
       }
 
       return await this.userService.updateUser(request, headers.user.userID);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
+
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
+      this.logger.error(error, error.stack);
+
+      return serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
+    }
+  }
+
+  @Get("/planetlist")
+  @Security("jwt")
+  public async getAllPlanetsOfUser(
+    @Request() request,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet[]>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Planet[]> {
+    try {
+      return await this.planetService.getAllPlanetsOfUser(request.user.userID);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
+      }
+
+      if (error instanceof UnauthorizedException) {
+        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
+      }
+
+      this.logger.error(error, error.stack);
+
+      return serverErrorResponse(
+        Globals.StatusCodes.SERVER_ERROR,
+        new FailureResponse("There was an error while handling the request."),
+      );
+    }
+  }
+
+  @Get("/planetList/{userID}")
+  @Security("jwt")
+  public async getAllPlanetsOfOtherUser(
+    userID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet[]>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Planet[]> {
+    try {
+      return await this.planetService.getAllPlanetsOfOtherUser(userID);
     } catch (error) {
       if (error instanceof ApiException) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));

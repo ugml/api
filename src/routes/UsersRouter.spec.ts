@@ -31,10 +31,10 @@ describe("User Routes", () => {
     const user = {
       username: "IDoNotExistYet",
       password: "test",
-      email: "iamnotareal@email.com",
+      email: "iamnotarealaddress@email.com",
     };
 
-    const { type, status, body } = await request.post("/v1/users/create/").send(user);
+    const { type, status, body } = await request.post("/v1/user/create/").send(user);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
@@ -231,5 +231,52 @@ describe("User Routes", () => {
     expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body.userID).to.be.equals(1);
     expect(body.username).to.be.equals("admin");
+  });
+
+  it("should return a list of planets", () => {
+    return request
+      .get("/v1/user/planetlist")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body[0].planetID).to.be.equals(167546850);
+        expect(res.body[0].ownerID).to.be.equals(1);
+        expect(res.body[0].posGalaxy).to.be.equals(9);
+        expect(res.body[0].posSystem).to.be.equals(54);
+        expect(res.body[0].posPlanet).to.be.equals(1);
+        expect(res.body[0].metal).to.be.greaterThan(0);
+        expect(res.body[0].crystal).to.be.greaterThan(0);
+        expect(res.body[0].deuterium).to.be.greaterThan(0);
+      });
+  });
+
+  it("should return a list of planets of an other user", () => {
+    return request
+      .get("/v1/user/planetlist/35")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body[0].planetID).to.be.equals(93133);
+        expect(res.body[0].ownerID).to.be.equals(35);
+        expect(res.body[0].posGalaxy).to.be.equals(4);
+        expect(res.body[0].posSystem).to.be.equals(71);
+        expect(res.body[0].posPlanet).to.be.equals(2);
+        expect(res.body[0].metal).to.be.equals(undefined);
+        expect(res.body[0].crystal).to.be.equals(undefined);
+        expect(res.body[0].deuterium).to.be.equals(undefined);
+      });
+  });
+
+  it("should return nothing", () => {
+    return request
+      .get("/v1/user/planet/1234")
+      .set("Authorization", authToken)
+      .then(res => {
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
+        expect(res.type).to.eql("application/json");
+        expect(res.body).to.be.empty;
+      });
   });
 });

@@ -17,7 +17,11 @@ export default class UserRepository implements IUserRepository {
 
     const [[result]] = await Database.query(query);
 
-    return result;
+    if (!InputValidator.isSet(result)) {
+      return null;
+    }
+
+    return SerializationHelper.toInstance(new User(), JSON.stringify(result));
   }
 
   public async exists(id: number): Promise<boolean> {
@@ -51,20 +55,33 @@ export default class UserRepository implements IUserRepository {
   }
 
   public async save(t: User): Promise<void> {
-    const query = squel
-      .update()
-      .table("users")
-      .set("username", t.username)
-      .set("password", t.password)
-      .set("email", t.email)
-      .set("lastTimeOnline", t.lastTimeOnline)
-      .set("currentPlanet", t.currentPlanet)
-      .set("bTechID", t.bTechID)
-      .set("bTechEndTime", t.bTechEndTime)
-      .where("userID = ?", t.userID)
-      .toString();
+    const query = squel.update().table("users");
 
-    await Database.query(query);
+    if (InputValidator.isSet(t.username)) {
+      query.set("username", t.username);
+    }
+    if (InputValidator.isSet(t.password)) {
+      query.set("password", t.password);
+    }
+    if (InputValidator.isSet(t.email)) {
+      query.set("email", t.email);
+    }
+    if (InputValidator.isSet(t.lastTimeOnline)) {
+      query.set("lastTimeOnline", t.lastTimeOnline);
+    }
+    if (InputValidator.isSet(t.currentPlanet)) {
+      query.set("currentPlanet", t.currentPlanet);
+    }
+    if (InputValidator.isSet(t.bTechID)) {
+      query.set("bTechID", t.bTechID);
+    }
+    if (InputValidator.isSet(t.bTechEndTime)) {
+      query.set("bTechEndTime", t.bTechEndTime);
+    }
+
+    query.where("userID = ?", t.userID);
+
+    await Database.query(query.toString());
   }
 
   public async create(t: User): Promise<User> {
@@ -78,7 +95,10 @@ export default class UserRepository implements IUserRepository {
       .set("lastTimeOnline", t.lastTimeOnline)
       .set("currentPlanet", t.currentPlanet)
       .toString();
-    return await Database.query(query);
+
+    await Database.query(query);
+
+    return t;
   }
 
   public async createTransactional(t: User, connection): Promise<User> {
@@ -96,19 +116,19 @@ export default class UserRepository implements IUserRepository {
   }
 
   public async checkUsernameTaken(username: string): Promise<boolean> {
-    const query = `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}')`;
+    const query = `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') as result`;
 
     const [[data]] = await Database.query(query);
 
-    return InputValidator.isSet(data);
+    return data.result === 1;
   }
 
   public async checkEmailTaken(email: string): Promise<boolean> {
-    const query = `SELECT EXISTS (SELECT 1 FROM users WHERE email LIKE '${email}')`;
+    const query = `SELECT EXISTS (SELECT 1 FROM users WHERE email LIKE '${email}') as result`;
 
     const [[data]] = await Database.query(query);
 
-    return InputValidator.isSet(data);
+    return data.result === 1;
   }
 
   public async getNewId(): Promise<number> {

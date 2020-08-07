@@ -86,7 +86,7 @@ export default class UserService implements IUserService {
       await connection.beginTransaction();
 
       if (await this.userRepository.checkEmailTaken(request.email)) {
-        throw new ApiException("Username is already taken");
+        throw new ApiException("Email is already taken");
       }
 
       if (await this.userRepository.checkUsernameTaken(request.username)) {

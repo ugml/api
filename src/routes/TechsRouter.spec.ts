@@ -36,7 +36,7 @@ describe("techsRouter", () => {
 
   it("should return a list of technologies", () => {
     return request
-      .get("/v1/techs/")
+      .get("/v1/technologies/")
       .set("Authorization", authToken)
       .then(res => {
         expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
@@ -50,22 +50,22 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
       .send({ planetID })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
+        expect(res.body.error).equals("Validation failed");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
   it("should fail (missing planetID-parameter)", () => {
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
       .send({ techID: 1 })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
+        expect(res.body.error).equals("Validation failed");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -74,7 +74,7 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
       .send({ planetID, techID: -1 })
       .then(res => {
@@ -87,7 +87,7 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
       .send({ planetID, techID: 500 })
       .then(res => {
@@ -98,11 +98,11 @@ describe("techsRouter", () => {
 
   it("should fail (player does not own planet)", () => {
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
       .send({ planetID: 1234, techID: 101 })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
+        expect(res.body.error).equals("Planet does not exist");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -111,7 +111,7 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
       .send({ planetID, techID: 101 })
       .then(res => {
@@ -124,9 +124,9 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, techID: "101" })
+      .send({ planetID: `${planetID}`, techID: 101 })
       .then(res => {
         expect(res.body.error).equals("Planet already has a build-job");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
@@ -145,9 +145,9 @@ describe("techsRouter", () => {
     await planetRepository.save(planet);
 
     return request
-      .post("/v1/techs/build")
+      .post("/v1/technologies/build")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, techID: "101" })
+      .send({ planetID: `${planetID}`, techID: 101 })
       .then(async res => {
         expect(res.body.error).equals("Planet is upgrading the research-lab");
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
@@ -161,11 +161,11 @@ describe("techsRouter", () => {
     const planetID = "test";
 
     return request
-      .post("/v1/techs/cancel")
+      .post("/v1/technologies/cancel")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, techID: "101" })
+      .send({ planetID: `${planetID}` })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
+        expect(res.body.error).equals("Validation failed");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -174,9 +174,9 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/cancel")
+      .post("/v1/technologies/cancel")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, techID: "101" })
+      .send({ planetID: `${planetID}` })
       .then(res => {
         expect(res.status).to.equals(Globals.StatusCodes.SUCCESS);
         expect(res.body.planetID).to.equals(planetID);
@@ -187,11 +187,11 @@ describe("techsRouter", () => {
     const planetID = 1234;
 
     return request
-      .post("/v1/techs/cancel")
+      .post("/v1/technologies/cancel")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, techID: "1101" })
+      .send({ planetID: `${planetID}` })
       .then(res => {
-        expect(res.body.error).equals("Invalid parameter");
+        expect(res.body.error).equals("Planet does not exist");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
@@ -200,11 +200,11 @@ describe("techsRouter", () => {
     const planetID = 167546850;
 
     return request
-      .post("/v1/techs/cancel")
+      .post("/v1/technologies/cancel")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, techID: "1" })
+      .send({ planetID: `${planetID}` })
       .then(res => {
-        expect(res.body.error).equals("Planet has no build-job");
+        expect(res.body.error).equals("User is not currently researching");
         expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });

@@ -55,35 +55,6 @@ export class PlanetsRouter extends Controller {
     }
   }
 
-  @Get("/planetList/{userID}")
-  @Security("jwt")
-  public async getAllPlanetsOfUser(
-    userID: number,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet[]>,
-    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
-    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
-    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
-  ): Promise<Planet[]> {
-    try {
-      return await this.planetService.getAllPlanetsOfOtherUser(userID);
-    } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
-    }
-  }
-
   @Get("/movement/{planetID}")
   @Security("jwt")
   public async getMovement(
@@ -95,7 +66,10 @@ export class PlanetsRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Event[]> {
     try {
-      return await this.planetService.getMovementOnPlanet(headers.user.userID, planetID);
+      return successResponse(
+        Globals.StatusCodes.SUCCESS,
+        await this.planetService.getMovementOnPlanet(headers.user.userID, planetID),
+      );
     } catch (error) {
       if (error instanceof ApiException) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
@@ -159,7 +133,7 @@ export class PlanetsRouter extends Controller {
 
       // TODO: put into config
       const minLength = 4;
-      const maxLength = 10;
+      const maxLength = 32;
 
       if (request.newName.length < minLength || request.newName.length > maxLength) {
         return badRequestResponse(

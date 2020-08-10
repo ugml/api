@@ -66,6 +66,10 @@ export default class UserService implements IUserService {
   public async getOtherUser(userID: number): Promise<User> {
     const user: User = await this.userRepository.getById(userID);
 
+    if (!InputValidator.isSet(user)) {
+      throw new ApiException("User does not exist");
+    }
+
     return {
       userID: user.userID,
       username: user.username,
@@ -208,6 +212,10 @@ export default class UserService implements IUserService {
       await connection.rollback();
       this.logger.error(error, error);
 
+      if (error instanceof ApiException) {
+        throw error;
+      }
+
       if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
         throw new Error(`There was an error while handling the request: ${error.message}`);
       }
@@ -241,14 +249,10 @@ export default class UserService implements IUserService {
 
     if (InputValidator.isSet(request.email)) {
       if (await this.userRepository.checkEmailTaken(request.email)) {
-        throw new ApiException("Username already taken");
+        throw new ApiException("Email already taken");
       }
 
       user.email = InputValidator.sanitizeString(request.email);
-    }
-
-    if (!user.isValid()) {
-      throw new ApiException("User-data invalid");
     }
 
     await this.userRepository.save(user);

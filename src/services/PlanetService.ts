@@ -28,10 +28,6 @@ export default class PlanetService implements IPlanetService {
     return await this.planetRepository.getAllOfUser(userID);
   }
 
-  public async getAllPlanetsOfOtherUser(userID: number): Promise<Planet[]> {
-    return this.planetRepository.getAllOfOtherUser(userID);
-  }
-
   public async getMovementOnPlanet(planetID: number, userID: number): Promise<Event[]> {
     return await this.planetRepository.getMovement(userID, planetID);
   }

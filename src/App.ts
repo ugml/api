@@ -12,7 +12,7 @@ import TYPES from "./ioc/types";
 
 import { expressCspHeader, INLINE, SELF } from "express-csp-header";
 import { ValidateError } from "tsoa";
-import {Globals} from "./common/Globals";
+import { Globals } from "./common/Globals";
 
 dotenv.config();
 
@@ -23,14 +23,23 @@ export default class App {
   public constructor() {
     this.express = express();
 
+    this.express.use(function(req, res, next) {
+      res.header("Content-Type", "application/json");
+      next();
+    });
+
     this.allowCors();
     this.middleware();
     this.startSwagger();
 
     RegisterRoutes(this.express);
 
+    this.registerErrorHandler();
 
+    this.registerNotFoundHandler();
+  }
 
+  private registerErrorHandler() {
     this.express.use(function ErrorHandler(
       err: unknown,
       req: ExRequest,
@@ -51,6 +60,14 @@ export default class App {
       }
 
       next();
+    });
+  }
+
+  private registerNotFoundHandler() {
+    this.express.use(function(req, res) {
+      res.status(404);
+
+      res.send({ error: "Not found" });
     });
   }
 

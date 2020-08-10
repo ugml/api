@@ -163,29 +163,6 @@ export default class PlanetRepository implements IPlanetRepository {
     return rows;
   }
 
-  public async getAllOfOtherUser(userID): Promise<Planet[]> {
-    const query = squel
-      .select()
-      .field("planetID")
-      .field("ownerID")
-      .field("name")
-      .field("posGalaxy")
-      .field("posSystem")
-      .field("posPlanet")
-      .field("planetType")
-      .field("image")
-      .from("planets")
-      .where("ownerID = ?", userID);
-
-    const [rows] = await Database.query(query.toString());
-
-    if (!InputValidator.isSet(rows)) {
-      return null;
-    }
-
-    return rows;
-  }
-
   public async getMovement(userID: number, planetID: number): Promise<Event[]> {
     const query: string = squel
       .select()

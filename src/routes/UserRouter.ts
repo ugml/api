@@ -21,7 +21,7 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 
-import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaResponse } from "tsoa";
+import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaResponse, OperationId } from "tsoa";
 import ApiException from "../exceptions/ApiException";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import AuthResponse from "../entities/responses/AuthResponse";
@@ -150,7 +150,6 @@ export class UserRouter extends Controller {
   @Security("jwt")
   public async updateUser(
     @Request() headers,
-    @Request() request,
     @Body() requestModel: UpdateUserRequest,
     @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, User>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
@@ -158,14 +157,7 @@ export class UserRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<User> {
     try {
-      if (!requestModel.isValid()) {
-        return badRequestResponse(
-          Globals.StatusCodes.BAD_REQUEST,
-          new FailureResponse("Invalid parameters were passed"),
-        );
-      }
-
-      return await this.userService.updateUser(request, headers.user.userID);
+      return await this.userService.updateUser(requestModel, headers.user.userID);
     } catch (error) {
       if (error instanceof ApiException) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
@@ -195,35 +187,6 @@ export class UserRouter extends Controller {
   ): Promise<Planet[]> {
     try {
       return await this.planetService.getAllPlanetsOfUser(request.user.userID);
-    } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
-    }
-  }
-
-  @Get("/planetList/{userID}")
-  @Security("jwt")
-  public async getAllPlanetsOfOtherUser(
-    userID: number,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet[]>,
-    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
-    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
-    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
-  ): Promise<Planet[]> {
-    try {
-      return await this.planetService.getAllPlanetsOfOtherUser(userID);
     } catch (error) {
       if (error instanceof ApiException) {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));

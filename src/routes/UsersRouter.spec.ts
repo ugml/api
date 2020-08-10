@@ -3,6 +3,7 @@ import * as chai from "chai";
 import App from "../App";
 import { Globals } from "../common/Globals";
 import chaiHttp = require("chai-http");
+import UpdateUserRequest from "../entities/requests/UpdateUserRequest";
 
 const app = new App().express;
 
@@ -38,7 +39,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
-    expect(body).to.have.keys("userID", "token");
+    expect(body).to.have.keys("token");
     expect(body.token.length).to.be.above(120);
   });
 
@@ -49,11 +50,10 @@ describe("User Routes", () => {
       email: "test@test.com",
     };
 
-    const { type, status, body } = await request.post("/v1/users/create/").send(user);
+    const { status, body } = await request.post("/v1/user/create/").send(user);
 
-    expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("There was an error while handling the request: Username is already taken");
+    expect(body.error).to.be.equals("Username is already taken");
   });
 
   it("should fail (email already taken)", async () => {
@@ -63,11 +63,11 @@ describe("User Routes", () => {
       email: "L17@WEC.test",
     };
 
-    const { type, status, body } = await request.post("/v1/users/create/").send(user);
+    const { type, status, body } = await request.post("/v1/user/create/").send(user);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("There was an error while handling the request: Email is already taken");
+    expect(body.error).to.be.equals("Email is already taken");
   });
 
   it("user-creation should fail (invalid parameters)", async () => {
@@ -76,11 +76,11 @@ describe("User Routes", () => {
       password: "test",
     };
 
-    const { type, status, body } = await request.post("/v1/users/create/").send(user);
+    const { type, status, body } = await request.post("/v1/user/create/").send(user);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("Invalid parameter");
+    expect(body.error).to.be.equals("Validation failed");
   });
 
   it("user-creation should fail (invalid parameters)", async () => {
@@ -89,11 +89,11 @@ describe("User Routes", () => {
       email: "iamnotareal@email.com",
     };
 
-    const { type, status, body } = await request.post("/v1/users/create/").send(user);
+    const { type, status, body } = await request.post("/v1/user/create/").send(user);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("Invalid parameter");
+    expect(body.error).to.be.equals("Validation failed");
   });
 
   it("user-creation should fail (invalid parameters)", async () => {
@@ -102,19 +102,19 @@ describe("User Routes", () => {
       email: "iamnotareal@email.com",
     };
 
-    const { type, status, body } = await request.post("/v1/users/create/").send(user);
+    const { type, status, body } = await request.post("/v1/user/create/").send(user);
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("Invalid parameter");
+    expect(body.error).to.be.equals("Validation failed");
   });
 
   it("user-creation should fail (no data sent)", async () => {
-    const { type, status, body } = await request.post("/v1/users/create/");
+    const { type, status, body } = await request.post("/v1/user/create/");
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("Invalid parameter");
+    expect(body.error).to.be.equals("Validation failed");
   });
 
   it("should return the user", async () => {
@@ -130,9 +130,8 @@ describe("User Routes", () => {
   });
 
   it("should return a user", async () => {
-    const { type, status, body } = await request.get("/v1/users/41").set("Authorization", authToken);
+    const { status, body } = await request.get("/v1/user/41").set("Authorization", authToken);
 
-    expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
     expect(body.userID).to.be.equals(41);
     expect(body.username).to.not.be.equals(null);
@@ -142,24 +141,24 @@ describe("User Routes", () => {
   });
 
   it("should fail (invalid userID)", async () => {
-    const { type, status, body } = await request.get("/v1/users/asdf").set("Authorization", authToken);
+    const { type, status, body } = await request.get("/v1/user/asdf").set("Authorization", authToken);
 
-    expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("Invalid parameter");
+    expect(body.error).to.be.equals("Validation failed");
+    expect(type).to.be.equals("application/json");
   });
 
   it("should return nothing (user does not exist)", async () => {
-    const { type, status } = await request.get("/v1/users/2").set("Authorization", authToken);
+    const { type, status } = await request.get("/v1/user/2").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
+    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
   });
 
   it("should update the user", async () => {
     const user = {
       username: "testuser1234",
-    };
+    } as UpdateUserRequest;
 
     const { type, status, body } = await request
       .post("/v1/user/update")
@@ -180,11 +179,10 @@ describe("User Routes", () => {
   });
 
   it("update should fail (no data sent)", async () => {
-    const { type, status, body } = await request.post("/v1/user/update").set("Authorization", authToken);
+    const { type, status } = await request.post("/v1/user/update").set("Authorization", authToken);
 
     expect(type).to.be.equals("application/json");
-    expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).to.be.equals("No parameters were passed");
+    expect(status).to.be.equals(Globals.StatusCodes.SUCCESS);
   });
 
   it("update should fail (username already taken)", async () => {
@@ -199,7 +197,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).contain("There was an error while handling the request: ");
+    expect(body.error).equals("Username already taken");
   });
 
   it("update should fail (email already taken)", async () => {
@@ -214,7 +212,7 @@ describe("User Routes", () => {
 
     expect(type).to.be.equals("application/json");
     expect(status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
-    expect(body.error).contain("There was an error while handling the request: ");
+    expect(body.error).contains("Email already taken");
   });
 
   it("update password", async () => {
@@ -248,35 +246,6 @@ describe("User Routes", () => {
         expect(res.body[0].metal).to.be.greaterThan(0);
         expect(res.body[0].crystal).to.be.greaterThan(0);
         expect(res.body[0].deuterium).to.be.greaterThan(0);
-      });
-  });
-
-  it("should return a list of planets of an other user", () => {
-    return request
-      .get("/v1/user/planetlist/35")
-      .set("Authorization", authToken)
-      .then(res => {
-        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
-        expect(res.type).to.eql("application/json");
-        expect(res.body[0].planetID).to.be.equals(93133);
-        expect(res.body[0].ownerID).to.be.equals(35);
-        expect(res.body[0].posGalaxy).to.be.equals(4);
-        expect(res.body[0].posSystem).to.be.equals(71);
-        expect(res.body[0].posPlanet).to.be.equals(2);
-        expect(res.body[0].metal).to.be.equals(undefined);
-        expect(res.body[0].crystal).to.be.equals(undefined);
-        expect(res.body[0].deuterium).to.be.equals(undefined);
-      });
-  });
-
-  it("should return nothing", () => {
-    return request
-      .get("/v1/user/planet/1234")
-      .set("Authorization", authToken)
-      .then(res => {
-        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
-        expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.empty;
       });
   });
 });

@@ -21,7 +21,7 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 
-import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaResponse, OperationId } from "tsoa";
+import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaResponse } from "tsoa";
 import ApiException from "../exceptions/ApiException";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import AuthResponse from "../entities/responses/AuthResponse";

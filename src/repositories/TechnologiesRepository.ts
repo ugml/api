@@ -5,7 +5,6 @@ import * as squel from "safe-squel";
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import Buildings from "../units/Buildings";
 
 @injectable()
 export default class TechnologiesRepository implements ITechnologiesRepository {

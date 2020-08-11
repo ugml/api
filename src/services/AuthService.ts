@@ -9,7 +9,11 @@ import ApiException from "../exceptions/ApiException";
 
 @injectable()
 export default class AuthService implements IAuthService {
-  @inject(TYPES.IUserService) private userService: IUserService;
+  private userService: IUserService;
+
+  constructor(@inject(TYPES.IUserService) userService: IUserService) {
+    this.userService = userService;
+  }
 
   public async authenticateUser(email: string, password: string): Promise<string> {
     const data = await this.userService.getUserForAuthentication(email);

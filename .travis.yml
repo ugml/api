@@ -21,7 +21,7 @@ env:
   - NODE_ENV=development
 
 stages:
-  - "Audit"
+  #- "Audit"
   - "Build"
   - "Test"
   - "Lint"
@@ -30,9 +30,9 @@ stages:
 
 jobs:
   include:
-    - stage: "Audit"
-      if: type = pull_request
-      script: audit-ci --low --report-type full
+    #- stage: "Audit"
+    #  if: type = pull_request
+    #  script: audit-ci --low --report-type full
     - &build
       stage: "Build"
       script: npm run-script tsoa:gen && npm run-script build

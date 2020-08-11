@@ -70,4 +70,10 @@ describe("authRoute", () => {
         expect(res.status).to.equals(Globals.StatusCodes.NOT_AUTHORIZED);
       });
   });
+
+  it("authentication should fail (no data sent)", async () => {
+    return request.post("/v1/login").then(res => {
+      expect(res.status).to.equals(Globals.StatusCodes.BAD_REQUEST);
+    });
+  });
 });

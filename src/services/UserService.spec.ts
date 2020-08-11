@@ -76,7 +76,7 @@ describe("UserService", () => {
 
     const result = await userRepository.checkEmailTaken(email);
 
-    expect(result).to.be.equals(1);
+    expect(result).to.be.equals(true);
   });
 
   it("should return username free and email free", async () => {
@@ -84,6 +84,6 @@ describe("UserService", () => {
 
     const result = await userRepository.checkUsernameTaken(username);
 
-    expect(result).to.be.equals(0);
+    expect(result).to.be.equals(false);
   });
 });

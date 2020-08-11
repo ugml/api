@@ -23,14 +23,14 @@ export default class App {
   public constructor() {
     this.express = express();
 
-    this.express.use(function(req, res, next) {
-      res.header("Content-Type", "application/json");
-      next();
-    });
-
     this.allowCors();
     this.middleware();
     this.startSwagger();
+
+    // this.express.use(function(req, res, next) {
+    //   res.header("Content-Type", "application/json");
+    //   next();
+    // });
 
     RegisterRoutes(this.express);
 

@@ -20,12 +20,16 @@ describe("PlanetService", () => {
   });
 
   it("should update a planet", async () => {
+    const newName = "SomethingElse";
+
     const planet: Planet = await planetRepository.getById(167546850);
 
-    planet.name = "SomethingElse";
+    planet.name = newName;
 
-    const result = await planetRepository.save(planet);
+    await planetRepository.save(planet);
 
-    expect(result).to.be.equals(planet);
+    const result = await planetRepository.getById(planet.planetID);
+
+    expect(result.name).to.be.equals(newName);
   });
 });

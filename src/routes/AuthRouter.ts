@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 import IUserService from "../interfaces/services/IUserService";
 import ILogger from "../interfaces/ILogger";
 
-import { Route, Post, Body, Tags, Controller, Res, TsoaResponse } from "tsoa";
+import { Route, Post, Body, Tags, Controller, Res, TsoaResponse, OperationId } from "tsoa";
 
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
@@ -25,7 +25,7 @@ export class AuthRouter extends Controller {
   @inject(TYPES.ILogger) private logger: ILogger;
 
   @Post("/")
-  public async authenticate(
+  public async login(
     @Body() req: AuthRequest,
     @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthResponse>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,

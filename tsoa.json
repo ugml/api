@@ -26,8 +26,7 @@
                 "in": "header"
             }
         },
-        "description":"bla",
-        "host": "127.0.0.1:3000",
+        "description":"Definition for the official ugamela-API which can be used to interact with an instance of an ugamela-server.",
         "license":"AGPL-3.0",
         "name":"ugamela api",
         "outputDirectory":"./src/tsoa/",

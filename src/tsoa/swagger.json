@@ -1423,7 +1423,7 @@
 	"info": {
 		"title": "ugamela api",
 		"version": "1.0.0",
-		"description": "bla",
+		"description": "Definition for the official ugamela-API which can be used to interact with an instance of an ugamela-server.",
 		"license": {
 			"name": "AGPL-3.0"
 		},
@@ -1436,7 +1436,7 @@
 	"paths": {
 		"/login": {
 			"post": {
-				"operationId": "Authenticate",
+				"operationId": "Login",
 				"responses": {
 					"200": {
 						"description": "",
@@ -3246,7 +3246,7 @@
 	},
 	"servers": [
 		{
-			"url": "http://127.0.0.1:3000/v1"
+			"url": "/v1"
 		}
 	]
 }

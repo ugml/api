@@ -33,10 +33,6 @@ export class AuthRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<AuthResponse> {
     try {
-      if (!InputValidator.isSet(req.email) || !InputValidator.isSet(req.password)) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
-      }
-
       const email: string = InputValidator.sanitizeString(req.email);
       const password: string = InputValidator.sanitizeString(req.password);
 

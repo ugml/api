@@ -34,14 +34,29 @@ import DemolishBuildingRequest from "../entities/requests/DemolishBuildingReques
 export default class BuildingService implements IBuildingService {
   @inject(TYPES.ILogger) private logger: ILogger;
 
-  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+  private planetService: IPlanetService;
+  private requirementsService: IRequirementsService;
 
-  @inject(TYPES.IBuildingRepository) private buildingRepository: IBuildingRepository;
-  @inject(TYPES.IPlanetRepository) private planetRepository: IPlanetRepository;
-  @inject(TYPES.ITechnologiesRepository) private technologiesRepository: ITechnologiesRepository;
-  @inject(TYPES.IUserRepository) private userRepository: IUserRepository;
+  private buildingRepository: IBuildingRepository;
+  private planetRepository: IPlanetRepository;
+  private technologiesRepository: ITechnologiesRepository;
+  private userRepository: IUserRepository;
 
-  @inject(TYPES.IRequirementsService) private requirementsService: IRequirementsService;
+  constructor(
+    @inject(TYPES.IPlanetService) planetService: IPlanetService,
+    @inject(TYPES.IRequirementsService) requirementsService: IRequirementsService,
+    @inject(TYPES.IBuildingRepository) buildingRepository: IBuildingRepository,
+    @inject(TYPES.IPlanetRepository) planetRepository: IPlanetRepository,
+    @inject(TYPES.ITechnologiesRepository) technologiesRepository: ITechnologiesRepository,
+    @inject(TYPES.IUserRepository) userRepository: IUserRepository,
+  ) {
+    this.planetService = planetService;
+    this.buildingRepository = buildingRepository;
+    this.planetRepository = planetRepository;
+    this.technologiesRepository = technologiesRepository;
+    this.userRepository = userRepository;
+    this.requirementsService = requirementsService;
+  }
 
   public async startBuilding(request: BuildBuildingRequest, userID: number): Promise<Planet> {
     if (!(await this.buildingRepository.exists(request.planetID))) {

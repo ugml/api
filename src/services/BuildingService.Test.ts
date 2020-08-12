@@ -423,9 +423,6 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(
-      ApiException,
-      "Planet does not exist",
-    );
+    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(ApiException, "Planet does not exist");
   });
 });

@@ -45,14 +45,14 @@ import IShipsRepository from "../interfaces/repositories/IShipsRepository";
 import ShipsRepository from "../repositories/ShipsRepository";
 import GalaxyRepository from "../repositories/GalaxyRepository";
 import IGalaxyRepository from "../interfaces/repositories/IGalaxyRepository";
-import {BuildingsRouter} from "../routes/BuildingsRouter";
-import {ConfigRouter} from "../routes/ConfigRouter";
-import {DefenseRouter} from "../routes/DefenseRouter";
-import {GalaxyRouter} from "../routes/GalaxyRouter";
-import {MessagesRouter} from "../routes/MessagesRouter";
-import {PlanetsRouter} from "../routes/PlanetsRouter";
-import {ShipsRouter} from "../routes/ShipsRouter";
-import {TechsRouter} from "../routes/TechsRouter";
+import { BuildingsRouter } from "../routes/BuildingsRouter";
+import { ConfigRouter } from "../routes/ConfigRouter";
+import { DefenseRouter } from "../routes/DefenseRouter";
+import { GalaxyRouter } from "../routes/GalaxyRouter";
+import { MessagesRouter } from "../routes/MessagesRouter";
+import { PlanetsRouter } from "../routes/PlanetsRouter";
+import { ShipsRouter } from "../routes/ShipsRouter";
+import { TechsRouter } from "../routes/TechsRouter";
 
 const iocContainer = new Container();
 

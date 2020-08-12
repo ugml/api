@@ -1,3 +1,4 @@
+import "reflect-metadata";
 /* eslint-disable @typescript-eslint/naming-convention */
 
 const TYPES = {
@@ -25,6 +26,15 @@ const TYPES = {
   IShipsRepository: Symbol("IShipsRepository"),
 
   AuthRouter: Symbol("AuthRouter"),
+  BuildingsRouter: Symbol("BuildingsRouter"),
+  ConfigRouter: Symbol("ConfigRouter"),
+  DefenseRouter: Symbol("DefenseRouter"),
+  EventRouter: Symbol("EventRouter"),
+  GalaxyRouter: Symbol("GalaxyRouter"),
+  MessagesRouter: Symbol("MessagesRouter"),
+  PlanetsRouter: Symbol("PlanetsRouter"),
+  ShipsRouter: Symbol("ShipsRouter"),
+  TechsRouter: Symbol("TechsRouter"),
   UsersRouter: Symbol("UsersRouter"),
 };
 

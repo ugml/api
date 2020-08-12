@@ -15,6 +15,7 @@ export function expressAuthentication(request: express.Request, securityName: st
       if (!token) {
         return reject(new Error("No token provided"));
       }
+
       jwt.verify(token, process.env.JWT_SECRET, function(err: any, decoded: any) {
         if (err) {
           return reject(err);
@@ -26,6 +27,7 @@ export function expressAuthentication(request: express.Request, securityName: st
             return reject(new Error("JWT does not contain required scope."));
           }
         }
+
         return resolve(decoded);
       });
     });

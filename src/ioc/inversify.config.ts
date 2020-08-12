@@ -45,6 +45,14 @@ import IShipsRepository from "../interfaces/repositories/IShipsRepository";
 import ShipsRepository from "../repositories/ShipsRepository";
 import GalaxyRepository from "../repositories/GalaxyRepository";
 import IGalaxyRepository from "../interfaces/repositories/IGalaxyRepository";
+import {BuildingsRouter} from "../routes/BuildingsRouter";
+import {ConfigRouter} from "../routes/ConfigRouter";
+import {DefenseRouter} from "../routes/DefenseRouter";
+import {GalaxyRouter} from "../routes/GalaxyRouter";
+import {MessagesRouter} from "../routes/MessagesRouter";
+import {PlanetsRouter} from "../routes/PlanetsRouter";
+import {ShipsRouter} from "../routes/ShipsRouter";
+import {TechsRouter} from "../routes/TechsRouter";
 
 const iocContainer = new Container();
 
@@ -78,6 +86,15 @@ iocContainer.bind<IGalaxyRepository>(TYPES.IGalaxyRepository).to(GalaxyRepositor
 
 // Routers
 iocContainer.bind<AuthRouter>(TYPES.AuthRouter).to(AuthRouter);
+iocContainer.bind<BuildingsRouter>(TYPES.BuildingsRouter).to(BuildingsRouter);
+iocContainer.bind<ConfigRouter>(TYPES.ConfigRouter).to(ConfigRouter);
+iocContainer.bind<DefenseRouter>(TYPES.DefenseRouter).to(DefenseRouter);
+// iocContainer.bind<EventRouter>(TYPES.EventRouter).to(EventRouter);
+iocContainer.bind<GalaxyRouter>(TYPES.GalaxyRouter).to(GalaxyRouter);
+iocContainer.bind<MessagesRouter>(TYPES.MessagesRouter).to(MessagesRouter);
+iocContainer.bind<PlanetsRouter>(TYPES.PlanetsRouter).to(PlanetsRouter);
+iocContainer.bind<ShipsRouter>(TYPES.ShipsRouter).to(ShipsRouter);
+iocContainer.bind<TechsRouter>(TYPES.TechsRouter).to(TechsRouter);
 iocContainer.bind<UserRouter>(TYPES.UsersRouter).to(UserRouter);
 
 export { iocContainer, autoProvide, inject, decorate, injectable };

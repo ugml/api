@@ -465,7 +465,7 @@ describe("buildingsRoute", () => {
     return request
       .post("/v1/buildings/demolish")
       .set("Authorization", authToken)
-      .send({ planetID: `${planetID}`, buildingID: 503 })
+      .send({ planetID: planetID, buildingID: 503 })
       .then(async res => {
         expect(res.status).equals(Globals.StatusCodes.BAD_REQUEST);
       });

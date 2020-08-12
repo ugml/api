@@ -13,20 +13,20 @@ export function expressAuthentication(request: express.Request, securityName: st
 
     return new Promise((resolve, reject) => {
       if (!token) {
-        reject(new Error("No token provided"));
+        return reject(new Error("No token provided"));
       }
       jwt.verify(token, process.env.JWT_SECRET, function(err: any, decoded: any) {
         if (err) {
-          reject(err);
-        } else {
-          // Check if JWT contains all required scopes
-          for (const scope of scopes) {
-            if (!decoded.scopes.includes(scope)) {
-              reject(new Error("JWT does not contain required scope."));
-            }
-          }
-          resolve(decoded);
+          return reject(err);
         }
+
+        // Check if JWT contains all required scopes
+        for (const scope of scopes) {
+          if (!decoded.scopes.includes(scope)) {
+            return reject(new Error("JWT does not contain required scope."));
+          }
+        }
+        return resolve(decoded);
       });
     });
   }

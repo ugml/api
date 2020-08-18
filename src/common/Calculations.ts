@@ -19,8 +19,14 @@ export default class Calculations {
     );
   }
 
-  public static calculateResearchTimeInSeconds(metalCosts: number, crystalCosts: number, researchLabLevel: number): number {
-    return Math.round(((metalCosts + crystalCosts) / ((1 + researchLabLevel) * Config.getGameConfig().server.speed)) * 3600);
+  public static calculateResearchTimeInSeconds(
+    metalCosts: number,
+    crystalCosts: number,
+    researchLabLevel: number,
+  ): number {
+    return Math.round(
+      ((metalCosts + crystalCosts) / ((1 + researchLabLevel) * Config.getGameConfig().server.speed)) * 3600,
+    );
   }
 
   public static calculateFreeMissileSlots(

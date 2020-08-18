@@ -3,7 +3,6 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class SimpleLogger implements ILogger {
-
   public error(message: string) {
     // tslint:disable-next-line:no-console
     console.error(message);

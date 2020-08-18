@@ -4,7 +4,6 @@ import dotenv = require("dotenv");
 dotenv.config();
 
 export default class Database {
-
   public static getConnectionPool() {
     return this.connectionPool;
   }

@@ -6,10 +6,8 @@ import Event from "../units/Event";
 import squel = require("safe-squel");
 import { injectable } from "inversify";
 
-
 @injectable()
 export default class EventService implements IEventService {
-
   public async create(event: Event) {
     const query: string = squel
       .insert()

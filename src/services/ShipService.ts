@@ -17,6 +17,7 @@ import QueueItem from "../common/QueueItem";
 import InputValidator from "../common/InputValidator";
 
 import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 @injectable()
 export default class ShipService implements IShipService {
@@ -27,7 +28,7 @@ export default class ShipService implements IShipService {
 
   public async getAll(userID: number, planetID: number) {
     if (!(await this.planetRepository.exists(planetID))) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     if (!(await this.planetService.checkOwnership(userID, planetID))) {
@@ -43,7 +44,7 @@ export default class ShipService implements IShipService {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     const buildings: Buildings = await this.buildingRepository.getById(request.planetID);

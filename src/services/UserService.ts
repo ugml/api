@@ -35,6 +35,7 @@ import SetCurrentPlanetRequest from "../entities/requests/SetCurrentPlanetReques
 
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ILogger from "../interfaces/ILogger";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 @injectable()
 export default class UserService implements IUserService {
@@ -65,7 +66,7 @@ export default class UserService implements IUserService {
     const user: User = await this.userRepository.getById(userID);
 
     if (!InputValidator.isSet(user)) {
-      throw new ApiException("User does not exist");
+      throw new NonExistingEntityException("User does not exist");
     }
 
     return {
@@ -264,7 +265,7 @@ export default class UserService implements IUserService {
     const planet: Planet = await this.planetRepository.getById(planetID);
 
     if (!InputValidator.isSet(planet)) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     if (planet.ownerID !== userID) {

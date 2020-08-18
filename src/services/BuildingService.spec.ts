@@ -23,6 +23,7 @@ import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import ApiException from "../exceptions/ApiException";
 import { Globals } from "../common/Globals";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
@@ -420,6 +421,9 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.start(request, userID)).to.be.rejectedWith(ApiException, "Planet does not exist");
+    await expect(service.start(request, userID)).to.be.rejectedWith(
+      NonExistingEntityException,
+      "Planet does not exist",
+    );
   });
 });

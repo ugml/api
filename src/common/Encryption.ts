@@ -9,7 +9,6 @@ try {
 }
 
 export default class Encryption {
-
   public static async hash(password: string): Promise<string> {
     return bcrypt.hash(password, SALT_WORK_FACTOR);
   }

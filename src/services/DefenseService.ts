@@ -16,6 +16,7 @@ import IUnitCosts from "../interfaces/IUnitCosts";
 import QueueItem from "../common/QueueItem";
 import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 @injectable()
 export default class DefenseService implements IDefenseService {
@@ -26,7 +27,7 @@ export default class DefenseService implements IDefenseService {
 
   public async getAll(userID: number, planetID: number): Promise<Defenses> {
     if (!(await this.planetRepository.exists(planetID))) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     if (!(await this.planetService.checkOwnership(userID, planetID))) {
@@ -38,7 +39,7 @@ export default class DefenseService implements IDefenseService {
 
   public async processBuildOrder(request: BuildDefenseRequest, userID: number): Promise<Planet> {
     if (!(await this.planetRepository.exists(request.planetID))) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     const planet: Planet = await this.planetRepository.getById(request.planetID);

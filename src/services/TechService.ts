@@ -21,6 +21,7 @@ import UnauthorizedException from "../exceptions/UnauthorizedException";
 import IRequirementsService from "../interfaces/services/IRequirementsService";
 import CancelTechRequest from "../entities/requests/CancelTechRequest";
 import IUnitCosts from "../interfaces/IUnitCosts";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 @injectable()
 export default class TechService implements ITechService {
@@ -38,7 +39,7 @@ export default class TechService implements ITechService {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     if (planet.ownerID !== userID) {
@@ -102,7 +103,7 @@ export default class TechService implements ITechService {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     if (planet.ownerID !== userID) {

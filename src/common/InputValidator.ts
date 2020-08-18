@@ -3,7 +3,6 @@ import { Globals } from "./Globals";
 import BuildOrderItem from "../entities/common/BuildOrderItem";
 
 export default class InputValidator {
-
   public static isValidInt(input: string): boolean {
     if (!this.isSet(input)) {
       return false;

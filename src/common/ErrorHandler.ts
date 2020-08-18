@@ -7,6 +7,8 @@ import { inject, injectable } from "inversify";
 import TYPES from "../ioc/types";
 import ILogger from "../interfaces/ILogger";
 import IErrorHandler from "../interfaces/IErrorHandler";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 @injectable()
 export default class ErrorHandler implements IErrorHandler {
@@ -22,7 +24,11 @@ export default class ErrorHandler implements IErrorHandler {
     unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ) {
-    if (error instanceof ApiException) {
+    if (
+      error instanceof ApiException ||
+      error instanceof InvalidParameterException ||
+      error instanceof NonExistingEntityException
+    ) {
       return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
     }
 

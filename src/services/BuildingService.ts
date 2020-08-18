@@ -25,6 +25,8 @@ import InputValidator from "../common/InputValidator";
 import IUnitCosts from "../interfaces/IUnitCosts";
 
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
+import InvalidParameterException from "../exceptions/InvalidParameterException";
 
 @injectable()
 export default class BuildingService implements IBuildingService {
@@ -54,7 +56,7 @@ export default class BuildingService implements IBuildingService {
 
   public async start(request: BuildBuildingRequest, userID: number): Promise<Planet> {
     if (!(await this.buildingRepository.exists(request.planetID))) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     const planet: Planet = await this.planetRepository.getById(request.planetID);
@@ -145,7 +147,7 @@ export default class BuildingService implements IBuildingService {
     const buildings: Buildings = await this.buildingRepository.getById(planetID);
 
     if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-      throw new ApiException("Planet does not exist");
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
     if (!planet.isUpgradingBuilding()) {
@@ -173,7 +175,7 @@ export default class BuildingService implements IBuildingService {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {
-      throw new ApiException("The planet does not exist");
+      throw new NonExistingEntityException("The planet does not exist");
     }
 
     if (planet.ownerID !== userID) {
@@ -190,7 +192,7 @@ export default class BuildingService implements IBuildingService {
     }
 
     if (!InputValidator.isSet(planet) || !InputValidator.isSet(buildings)) {
-      throw new ApiException("Invalid parameter");
+      throw new InvalidParameterException("Invalid parameter");
     }
 
     if (planet.isUpgradingBuilding()) {

@@ -1,7 +1,6 @@
 import IGameConfig, { IBuilding, IDefense, IShip, ITechnology } from "../interfaces/IGameConfig";
 
 export default class Config {
-
   public static getGameConfig(): IGameConfig {
     return require("../config/game.json");
   }

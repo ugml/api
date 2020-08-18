@@ -10,6 +10,7 @@ import InputValidator from "../common/InputValidator";
 import SendMessageRequest from "../entities/requests/SendMessageRequest";
 import IUserRepository from "../interfaces/repositories/IUserRepository";
 import ApiException from "../exceptions/ApiException";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
 @injectable()
 export default class MessageService implements IMessageService {
@@ -24,7 +25,7 @@ export default class MessageService implements IMessageService {
     const message = await this.messageRepository.getById(messageID);
 
     if (!InputValidator.isSet(message)) {
-      throw new ApiException("Message does not exist");
+      throw new NonExistingEntityException("Message does not exist");
     }
 
     if (message.receiverID !== userID) {
@@ -38,7 +39,7 @@ export default class MessageService implements IMessageService {
     const receiver = await this.userRepository.getById(request.receiverID);
 
     if (!InputValidator.isSet(receiver)) {
-      throw new ApiException("The receiver does not exist");
+      throw new NonExistingEntityException("The receiver does not exist");
     }
 
     const message: Message = {
@@ -56,7 +57,7 @@ export default class MessageService implements IMessageService {
     const message: Message = await this.messageRepository.getById(messageID);
 
     if (!InputValidator.isSet(message)) {
-      throw new ApiException("Message does not exist");
+      throw new NonExistingEntityException("Message does not exist");
     }
 
     if (message.receiverID !== userID) {

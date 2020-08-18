@@ -25,12 +25,12 @@ export default class ShipService implements IShipService {
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
   @inject(TYPES.IBuildingRepository) private buildingRepository: IBuildingRepository;
 
-  public async getShips(userID: number, planetID: number) {
+  public async getAll(userID: number, planetID: number) {
     if (!(await this.planetRepository.exists(planetID))) {
       throw new ApiException("Planet does not exist");
     }
 
-    if (!(await this.planetService.checkUserOwnsPlanet(userID, planetID))) {
+    if (!(await this.planetService.checkOwnership(userID, planetID))) {
       throw new UnauthorizedException("User does not own the planet");
     }
 
@@ -61,7 +61,7 @@ export default class ShipService implements IShipService {
     let deuterium = planet.deuterium;
 
     let stopProcessing = false;
-    let buildTime = 0;
+    let buildTimeInSeconds = 0;
 
     // TODO: put into separate function (also reference this in defense-router)
     for (const buildOrder of request.buildOrder) {
@@ -103,8 +103,7 @@ export default class ShipService implements IShipService {
         stopProcessing = true;
       }
 
-      // build time in seconds
-      buildTime +=
+      buildTimeInSeconds +=
         Calculations.calculateBuildTimeInSeconds(
           cost.metal,
           cost.crystal,
@@ -123,7 +122,7 @@ export default class ShipService implements IShipService {
       }
     }
 
-    queue.setTimeRemaining(buildTime);
+    queue.setTimeRemaining(buildTimeInSeconds);
     queue.setLastUpdateTime(Math.floor(Date.now() / 1000));
 
     let oldBuildOrder;

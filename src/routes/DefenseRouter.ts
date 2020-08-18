@@ -16,9 +16,9 @@ import TYPES from "../ioc/types";
 
 import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
-import ApiException from "../exceptions/ApiException";
-import UnauthorizedException from "../exceptions/UnauthorizedException";
+
 import Planet from "../units/Planet";
+import ErrorHandler from "../common/ErrorHandler";
 
 @Route("defenses")
 @Tags("Defenses")
@@ -42,22 +42,9 @@ export class DefenseRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Defenses> {
     try {
-      return await this.defenseService.getDefenses(headers.user.userID, planetID);
+      return await this.defenseService.getAll(headers.user.userID, planetID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -79,20 +66,7 @@ export class DefenseRouter extends Controller {
 
       return await this.defenseService.processBuildOrder(request, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

@@ -16,8 +16,7 @@ import TYPES from "../ioc/types";
 import CancelTechRequest from "../entities/requests/CancelTechRequest";
 import BuildTechRequest from "../entities/requests/BuildTechRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
-import ApiException from "../exceptions/ApiException";
-import UnauthorizedException from "../exceptions/UnauthorizedException";
+import ErrorHandler from "../common/ErrorHandler";
 
 @Route("technologies")
 @Tags("Technologies")
@@ -41,22 +40,9 @@ export class TechsRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Techs> {
     try {
-      return await this.techService.getTechs(headers.user.userID);
+      return await this.techService.getAll(headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -75,22 +61,9 @@ export class TechsRouter extends Controller {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      return await this.techService.buildTech(request, headers.user.userID);
+      return await this.techService.build(request, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -105,22 +78,9 @@ export class TechsRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Planet> {
     try {
-      return await this.techService.cancelTech(request, headers.user.userID);
+      return await this.techService.cancel(request, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

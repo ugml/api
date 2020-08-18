@@ -29,7 +29,7 @@ import * as express from 'express';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "AuthResponse": {
+    "AuthSuccessResponse": {
         "dataType": "refObject",
         "properties": {
             "token": { "dataType": "string", "required": true },
@@ -564,7 +564,7 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 req: { "in": "body", "name": "req", "required": true, "ref": "AuthRequest" },
-                successResponse: { "in": "res", "name": "200", "required": true, "ref": "AuthResponse" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "AuthSuccessResponse" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
                 unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
@@ -717,6 +717,8 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 successResponse: { "in": "res", "name": "200", "required": true, "ref": "IGameConfig" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -743,6 +745,8 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 successResponse: { "in": "res", "name": "200", "required": true, "ref": "IUnits" },
+                badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
+                unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },
             };
 
@@ -1293,7 +1297,7 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 request: { "in": "body", "name": "request", "required": true, "ref": "CreateUserRequest" },
-                successResponse: { "in": "res", "name": "200", "required": true, "ref": "AuthResponse" },
+                successResponse: { "in": "res", "name": "200", "required": true, "ref": "AuthSuccessResponse" },
                 badRequestResponse: { "in": "res", "name": "400", "required": true, "ref": "FailureResponse" },
                 unauthorizedResponse: { "in": "res", "name": "401", "required": true, "ref": "FailureResponse" },
                 serverErrorResponse: { "in": "res", "name": "500", "required": true, "ref": "FailureResponse" },

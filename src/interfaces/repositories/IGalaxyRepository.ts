@@ -3,7 +3,7 @@ import ICoordinates from "../ICoordinates";
 import GalaxyRow from "../../units/GalaxyRow";
 
 export default interface IGalaxyRepository {
-  getGalaxyInfo(posGalaxy: number, posSystem: number): Promise<GalaxyPositionInfo[]>;
+  getPositionInfo(posGalaxy: number, posSystem: number): Promise<GalaxyPositionInfo[]>;
   getFreePosition(
     maxGalaxy: number,
     maxSystem: number,

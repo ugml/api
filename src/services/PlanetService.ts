@@ -18,21 +18,21 @@ import InputValidator from "../common/InputValidator";
 export default class PlanetService implements IPlanetService {
   @inject(TYPES.IPlanetRepository) private planetRepository: IPlanetRepository;
 
-  public async checkUserOwnsPlanet(userID: number, planetID: number): Promise<boolean> {
+  public async checkOwnership(userID: number, planetID: number): Promise<boolean> {
     const planet = await this.planetRepository.getById(planetID);
 
     return InputValidator.isSet(planet) && planet.ownerID === userID;
   }
 
-  public async getAllPlanetsOfUser(userID: number): Promise<Planet[]> {
+  public async getAll(userID: number): Promise<Planet[]> {
     return await this.planetRepository.getAllOfUser(userID);
   }
 
-  public async getMovementOnPlanet(planetID: number, userID: number): Promise<Event[]> {
+  public async getMovement(planetID: number, userID: number): Promise<Event[]> {
     return await this.planetRepository.getMovement(userID, planetID);
   }
 
-  public async destroyPlanet(planetID: number, userID: number): Promise<void> {
+  public async destroy(planetID: number, userID: number): Promise<void> {
     const planet: Planet = await this.planetRepository.getById(planetID);
 
     if (planet.ownerID !== userID) {
@@ -49,7 +49,7 @@ export default class PlanetService implements IPlanetService {
     // TODO: if the deleted planet was the current planet -> set another one as current planet
   }
 
-  public async renamePlanet(request: RenamePlanetRequest, userID: number): Promise<Planet> {
+  public async rename(request: RenamePlanetRequest, userID: number): Promise<Planet> {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (planet.ownerID !== userID) {
@@ -63,7 +63,7 @@ export default class PlanetService implements IPlanetService {
     return planet;
   }
 
-  public async getPlanet(planetID: number, userID: number): Promise<Planet> {
+  public async getById(planetID: number, userID: number): Promise<Planet> {
     const planet: Planet = await this.planetRepository.getById(planetID);
 
     if (planet.ownerID !== userID) {

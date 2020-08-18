@@ -7,7 +7,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class RequirementsService implements IRequirementsService {
-  public requirementsFulfilled(requirements: IRequirement[], buildings: Buildings, technologies: Techs): boolean {
+  public fulfilled(requirements: IRequirement[], buildings: Buildings, technologies: Techs): boolean {
     if (requirements !== undefined) {
       requirements.forEach(function(requirement) {
         const key = Globals.UnitNames[requirement.unitID];

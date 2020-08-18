@@ -67,7 +67,7 @@ describe("BuildingService", () => {
       naniteFactory: 5,
     } as Buildings);
 
-    when(requirementsServiceMock.requirementsFulfilled(anything(), anything(), anything())).thenReturn(true);
+    when(requirementsServiceMock.fulfilled(anything(), anything(), anything())).thenReturn(true);
 
     const service = new BuildingService(
       instance(planetServiceMock),
@@ -85,7 +85,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    const result: Planet = await service.startBuilding(request, userID);
+    const result: Planet = await service.start(request, userID);
 
     expect(result.bBuildingId).equals(request.buildingID);
     expect(result.bBuildingEndTime).greaterThan(Math.floor(Date.now() / 1000));
@@ -128,7 +128,7 @@ describe("BuildingService", () => {
       naniteFactory: 5,
     } as Buildings);
 
-    when(requirementsServiceMock.requirementsFulfilled(anything(), anything(), anything())).thenReturn(true);
+    when(requirementsServiceMock.fulfilled(anything(), anything(), anything())).thenReturn(true);
 
     const service = new BuildingService(
       instance(planetServiceMock),
@@ -146,7 +146,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(ApiException, "Not enough resources");
+    await expect(service.start(request, userID)).to.be.rejectedWith(ApiException, "Not enough resources");
   });
 
   it("should fail (requirements not met)", async () => {
@@ -186,7 +186,7 @@ describe("BuildingService", () => {
       naniteFactory: 5,
     } as Buildings);
 
-    when(requirementsServiceMock.requirementsFulfilled(anything(), anything(), anything())).thenReturn(false);
+    when(requirementsServiceMock.fulfilled(anything(), anything(), anything())).thenReturn(false);
 
     const service = new BuildingService(
       instance(planetServiceMock),
@@ -204,7 +204,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(ApiException, "Requirements are not met");
+    await expect(service.start(request, userID)).to.be.rejectedWith(ApiException, "Requirements are not met");
   });
 
   it("should fail (user is researching)", async () => {
@@ -252,7 +252,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(
+    await expect(service.start(request, userID)).to.be.rejectedWith(
       ApiException,
       "Can't build this building while it is in use",
     );
@@ -303,7 +303,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(
+    await expect(service.start(request, userID)).to.be.rejectedWith(
       ApiException,
       "Can't build this building while it is in use",
     );
@@ -347,10 +347,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(
-      ApiException,
-      "Planet already has a build-job",
-    );
+    await expect(service.start(request, userID)).to.be.rejectedWith(ApiException, "Planet already has a build-job");
   });
 
   it("should fail (user does not own the planet)", async () => {
@@ -391,7 +388,7 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(
+    await expect(service.start(request, userID)).to.be.rejectedWith(
       UnauthorizedException,
       "User does not own the planet",
     );
@@ -423,6 +420,6 @@ describe("BuildingService", () => {
 
     const userID = 1;
 
-    await expect(service.startBuilding(request, userID)).to.be.rejectedWith(ApiException, "Planet does not exist");
+    await expect(service.start(request, userID)).to.be.rejectedWith(ApiException, "Planet does not exist");
   });
 });

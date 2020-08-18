@@ -20,8 +20,8 @@ export default class GalaxyService implements IGalaxyService {
    * @param posGalaxy the galaxy
    * @param posSystem the system
    */
-  public async getGalaxyInfo(posGalaxy: number, posSystem: number): Promise<GalaxyPositionInfo[]> {
-    return await this.galaxyRepository.getGalaxyInfo(posGalaxy, posSystem);
+  public async getPositionInfo(posGalaxy: number, posSystem: number): Promise<GalaxyPositionInfo[]> {
+    return await this.galaxyRepository.getPositionInfo(posGalaxy, posSystem);
   }
 
   public async getFreePosition(): Promise<ICoordinates> {

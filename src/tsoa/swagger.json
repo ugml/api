@@ -6,7 +6,7 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"AuthResponse": {
+			"AuthSuccessResponse": {
 				"properties": {
 					"token": {
 						"type": "string"
@@ -1443,7 +1443,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AuthResponse"
+									"$ref": "#/components/schemas/AuthSuccessResponse"
 								}
 							}
 						}
@@ -1774,6 +1774,26 @@
 							}
 						}
 					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
 					"500": {
 						"description": "",
 						"content": {
@@ -1802,6 +1822,26 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/IUnits"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FailureResponse"
 								}
 							}
 						}
@@ -2931,7 +2971,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AuthResponse"
+									"$ref": "#/components/schemas/AuthSuccessResponse"
 								}
 							}
 						}
@@ -3029,7 +3069,6 @@
 						}
 					}
 				},
-				"description": "Updates a user",
 				"tags": [
 					"UserData"
 				],
@@ -3155,7 +3194,6 @@
 						}
 					}
 				},
-				"description": "Sets the current planet for a user",
 				"tags": [
 					"UserData"
 				],

@@ -16,11 +16,11 @@ export default class MessageService implements IMessageService {
   @inject(TYPES.IMessageRepository) private messageRepository: IMessageRepository;
   @inject(TYPES.IUserRepository) private userRepository: IUserRepository;
 
-  public async getAllMessages(userID: number): Promise<Message[]> {
+  public async getAll(userID: number): Promise<Message[]> {
     return await this.messageRepository.getAll(userID);
   }
 
-  public async getMessageById(messageID: number, userID: number): Promise<Message> {
+  public async getById(messageID: number, userID: number): Promise<Message> {
     const message = await this.messageRepository.getById(messageID);
 
     if (!InputValidator.isSet(message)) {
@@ -34,7 +34,7 @@ export default class MessageService implements IMessageService {
     return message;
   }
 
-  public async sendMessage(request: SendMessageRequest, userID: number): Promise<void> {
+  public async send(request: SendMessageRequest, userID: number): Promise<void> {
     const receiver = await this.userRepository.getById(request.receiverID);
 
     if (!InputValidator.isSet(receiver)) {
@@ -52,7 +52,7 @@ export default class MessageService implements IMessageService {
     await this.messageRepository.create(message);
   }
 
-  public async deleteMessage(messageID: number, userID: number): Promise<void> {
+  public async delete(messageID: number, userID: number): Promise<void> {
     const message: Message = await this.messageRepository.getById(messageID);
 
     if (!InputValidator.isSet(message)) {

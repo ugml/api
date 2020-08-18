@@ -17,8 +17,8 @@ import CancelBuildingRequest from "../entities/requests/CancelBuildingRequest";
 import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
-import ApiException from "../exceptions/ApiException";
-import UnauthorizedException from "../exceptions/UnauthorizedException";
+
+import ErrorHandler from "../common/ErrorHandler";
 
 @Route("buildings")
 @Tags("Buildings")
@@ -44,23 +44,10 @@ export class BuildingsRouter extends Controller {
     try {
       return successResponse(
         Globals.StatusCodes.SUCCESS,
-        await this.buildingService.getBuildings(planetID, request.user.userID),
+        await this.buildingService.getAll(planetID, request.user.userID),
       );
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -79,22 +66,9 @@ export class BuildingsRouter extends Controller {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      return await this.buildingService.startBuilding(request, headers.user.userID);
+      return await this.buildingService.start(request, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -109,22 +83,9 @@ export class BuildingsRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Planet> {
     try {
-      return await this.buildingService.cancelBuilding(request.planetID, headers.user.userID);
+      return await this.buildingService.cancel(request.planetID, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -143,22 +104,9 @@ export class BuildingsRouter extends Controller {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      return await this.buildingService.demolishBuilding(request, headers.user.userID);
+      return await this.buildingService.demolish(request, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

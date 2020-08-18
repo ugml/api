@@ -9,11 +9,12 @@ import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 import { Globals } from "../common/Globals";
-import AuthResponse from "../entities/responses/AuthResponse";
+import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
 import FailureResponse from "../entities/responses/FailureResponse";
 import AuthRequest from "../entities/requests/AuthRequest";
 import IAuthService from "../interfaces/services/IAuthService";
 import ApiException from "../exceptions/ApiException";
+import ErrorHandler from "../common/ErrorHandler";
 
 @Route("login")
 @Tags("Authentication")
@@ -27,11 +28,11 @@ export class AuthRouter extends Controller {
   @Post("/")
   public async login(
     @Body() req: AuthRequest,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthResponse>,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthSuccessResponse>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
     @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
-  ): Promise<AuthResponse> {
+  ): Promise<AuthSuccessResponse> {
     try {
       const email: string = InputValidator.sanitizeString(req.email);
       const password: string = InputValidator.sanitizeString(req.password);
@@ -42,18 +43,7 @@ export class AuthRouter extends Controller {
         token: token,
       });
     } catch (error) {
-      if (error instanceof ApiException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse("Authentication failed"));
-      }
-
-      this.logger.error(error, error.stack);
-
-      this.setStatus(Globals.StatusCodes.SERVER_ERROR);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

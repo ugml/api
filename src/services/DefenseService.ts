@@ -27,12 +27,12 @@ export default class DefenseService implements IDefenseService {
   @inject(TYPES.IBuildingRepository) private buildingRepository: IBuildingRepository;
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
 
-  public async getDefenses(userID: number, planetID: number): Promise<Defenses> {
+  public async getAll(userID: number, planetID: number): Promise<Defenses> {
     if (!(await this.planetRepository.exists(planetID))) {
       throw new ApiException("Planet does not exist");
     }
 
-    if (!(await this.planetService.checkUserOwnsPlanet(userID, planetID))) {
+    if (!(await this.planetService.checkOwnership(userID, planetID))) {
       throw new UnauthorizedException("User does not own the planet");
     }
 

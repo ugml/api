@@ -1,7 +1,7 @@
 import Event from "../../units/Event";
 
 export default interface IEventService {
-  createNewEvent(event: Event);
-  getEventOfPlayer(userID: number, eventID: number): Promise<Event>;
-  cancelEvent(event: Event);
+  create(event: Event);
+  getEvent(userID: number, eventID: number): Promise<Event>;
+  cancel(event: Event);
 }

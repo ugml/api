@@ -5,6 +5,7 @@ import { anyString, instance, mock, when } from "ts-mockito";
 import User from "../units/User";
 import UserService from "./UserService";
 import ApiException from "../exceptions/ApiException";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
@@ -35,7 +36,7 @@ describe("AuthService", () => {
 
     const service = new AuthService(instance(userServiceMock));
 
-    await expect(service.authenticateUser("foo@bar.at", "secret")).to.be.rejectedWith(ApiException);
+    await expect(service.authenticateUser("foo@bar.at", "secret")).to.be.rejectedWith(UnauthorizedException);
   });
 
   it("should fail (wrong password)", async () => {
@@ -49,6 +50,6 @@ describe("AuthService", () => {
 
     const service = new AuthService(instance(userServiceMock));
 
-    await expect(service.authenticateUser("foo@bar.at", "somethingElse")).to.be.rejectedWith(ApiException);
+    await expect(service.authenticateUser("foo@bar.at", "somethingElse")).to.be.rejectedWith(UnauthorizedException);
   });
 });

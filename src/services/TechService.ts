@@ -33,11 +33,11 @@ export default class TechService implements ITechService {
   @inject(TYPES.IUserRepository) private userRepository: IUserRepository;
   @inject(TYPES.IRequirementsService) private requirementsService: IRequirementsService;
 
-  public async getTechs(userID: number): Promise<Techs> {
+  public async getAll(userID: number): Promise<Techs> {
     return await this.technologiesRepository.getById(userID);
   }
 
-  public async buildTech(request: BuildTechRequest, userID: number): Promise<Planet> {
+  public async build(request: BuildTechRequest, userID: number): Promise<Planet> {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {
@@ -64,7 +64,7 @@ export default class TechService implements ITechService {
     // 2. check, if requirements are met
     const requirements = Config.getGameConfig().units.technologies.find(r => r.unitID === request.techID).requirements;
 
-    if (!(await this.requirementsService.requirementsFulfilled(requirements, buildings, techs))) {
+    if (!(await this.requirementsService.fulfilled(requirements, buildings, techs))) {
       throw new ApiException("Requirements are not met");
     }
 
@@ -101,7 +101,7 @@ export default class TechService implements ITechService {
     return planet;
   }
 
-  public async cancelTech(request: CancelTechRequest, userID: number): Promise<Planet> {
+  public async cancel(request: CancelTechRequest, userID: number): Promise<Planet> {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {

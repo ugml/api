@@ -5,7 +5,7 @@ import TYPES from "../ioc/types";
 
 import IUserRepository from "../interfaces/repositories/IUserRepository";
 import CreateUserRequest from "../entities/requests/CreateUserRequest";
-import AuthResponse from "../entities/responses/AuthResponse";
+import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
 import IGameConfig from "../interfaces/IGameConfig";
 import Config from "../common/Config";
 
@@ -76,7 +76,7 @@ export default class UserService implements IUserService {
     } as User;
   }
 
-  public async createUser(request: CreateUserRequest): Promise<AuthResponse> {
+  public async create(request: CreateUserRequest): Promise<AuthSuccessResponse> {
     const gameConfig: IGameConfig = Config.getGameConfig();
 
     const hashedPassword = await Encryption.hash(request.password);
@@ -230,7 +230,7 @@ export default class UserService implements IUserService {
     };
   }
 
-  public async updateUser(request: UpdateUserRequest, userID: number): Promise<User> {
+  public async update(request: UpdateUserRequest, userID: number): Promise<User> {
     const user: User = await this.userRepository.getById(userID);
 
     if (InputValidator.isSet(request.username)) {

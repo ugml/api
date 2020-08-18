@@ -2,9 +2,6 @@ import Config from "./Config";
 import { Globals } from "./Globals";
 import BuildOrderItem from "../entities/common/BuildOrderItem";
 
-/**
- * This class contains methods for input- and data-validation
- */
 export default class InputValidator {
   /**
    * Checks, if a given string is a valid integer

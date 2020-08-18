@@ -4,8 +4,8 @@ import Buildings from "../../units/Buildings";
 import DemolishBuildingRequest from "../../entities/requests/DemolishBuildingRequest";
 
 export default interface IBuildingService {
-  startBuilding(request: BuildBuildingRequest, userID: number): Promise<Planet>;
-  getBuildings(planetID: number, userID: number): Promise<Buildings>;
-  cancelBuilding(planetID: number, userID: number): Promise<Planet>;
-  demolishBuilding(request: DemolishBuildingRequest, userID: number): Promise<Planet>;
+  start(request: BuildBuildingRequest, userID: number): Promise<Planet>;
+  getAll(planetID: number, userID: number): Promise<Buildings>;
+  cancel(planetID: number, userID: number): Promise<Planet>;
+  demolish(request: DemolishBuildingRequest, userID: number): Promise<Planet>;
 }

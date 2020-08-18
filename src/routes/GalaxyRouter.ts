@@ -8,9 +8,9 @@ import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
 import FailureResponse from "../entities/responses/FailureResponse";
-import ApiException from "../exceptions/ApiException";
-import UnauthorizedException from "../exceptions/UnauthorizedException";
+
 import GalaxyPositionInfo from "../units/GalaxyPositionInfo";
+import ErrorHandler from "../common/ErrorHandler";
 
 @Route("galaxy")
 @Tags("Galaxy")
@@ -35,22 +35,9 @@ export class GalaxyRouter extends Controller {
         return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      return await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
+      return await this.galaxyService.getPositionInfo(posGalaxy, posSystem);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

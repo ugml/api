@@ -6,6 +6,7 @@ import { inject, injectable } from "inversify";
 import TYPES from "../ioc/types";
 import IUserService from "../interfaces/services/IUserService";
 import ApiException from "../exceptions/ApiException";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -19,13 +20,13 @@ export default class AuthService implements IAuthService {
     const data = await this.userService.getUserForAuthentication(email);
 
     if (!InputValidator.isSet(data)) {
-      throw new ApiException("Invalid parameters");
+      throw new UnauthorizedException("Authentication failed");
     }
 
     const isValidPassword = await Encryption.compare(password, data.password);
 
     if (!isValidPassword) {
-      throw new ApiException("Invalid parameters");
+      throw new UnauthorizedException("Authentication failed");
     }
 
     return JwtHelper.generateToken(data.userID);

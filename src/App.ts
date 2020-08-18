@@ -26,10 +26,10 @@ export default class App {
     this.middleware();
     this.startSwagger();
 
-    // this.express.use(function(req, res, next) {
-    //   res.header("Content-Type", "application/json");
-    //   next();
-    // });
+    this.express.use(function(req, res, next) {
+      res.header("Content-Type", "application/json");
+      next();
+    });
 
     RegisterRoutes(this.express);
 

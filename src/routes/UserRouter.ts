@@ -22,14 +22,11 @@ import TYPES from "../ioc/types";
 import { provide } from "inversify-binding-decorators";
 
 import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaResponse } from "tsoa";
-import ApiException from "../exceptions/ApiException";
-import UnauthorizedException from "../exceptions/UnauthorizedException";
-import AuthResponse from "../entities/responses/AuthResponse";
-import Planet from "../units/Planet";
 
-/**
- * Defines routes for user-data
- */
+import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
+import Planet from "../units/Planet";
+import ErrorHandler from "../common/ErrorHandler";
+
 @Route("user")
 @Tags("UserData")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -57,31 +54,18 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.getAuthenticatedUser(request.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
   @Post("/create")
   public async createUser(
     @Body() request: CreateUserRequest,
-    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthResponse>,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthSuccessResponse>,
     @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
     @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
-  ): Promise<AuthResponse> {
+  ): Promise<AuthSuccessResponse> {
     try {
       if (
         !InputValidator.isSet(request.username) ||
@@ -95,28 +79,12 @@ export class UserRouter extends Controller {
       request.password = InputValidator.sanitizeString(request.password);
       request.email = InputValidator.sanitizeString(request.email);
 
-      return await this.userService.createUser(request);
+      return await this.userService.create(request);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
-  /**
-   * Updates a user
-   */
   @Post("/update")
   @Security("jwt")
   public async updateUser(
@@ -128,22 +96,9 @@ export class UserRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<User> {
     try {
-      return await this.userService.updateUser(requestModel, headers.user.userID);
+      return await this.userService.update(requestModel, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -157,28 +112,12 @@ export class UserRouter extends Controller {
     @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
   ): Promise<Planet[]> {
     try {
-      return await this.planetService.getAllPlanetsOfUser(request.user.userID);
+      return await this.planetService.getAll(request.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
-  /**
-   * Sets the current planet for a user
-   */
   @Post("/currentplanet/set")
   @Security("jwt")
   public async setCurrentPlanet(
@@ -192,20 +131,7 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.setCurrentPlanet(request, headers.user.userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -221,20 +147,7 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.getOtherUser(userID);
     } catch (error) {
-      if (error instanceof ApiException) {
-        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse(error.message));
-      }
-
-      if (error instanceof UnauthorizedException) {
-        return unauthorizedResponse(Globals.StatusCodes.NOT_AUTHORIZED, new FailureResponse(error.message));
-      }
-
-      this.logger.error(error, error.stack);
-
-      return serverErrorResponse(
-        Globals.StatusCodes.SERVER_ERROR,
-        new FailureResponse("There was an error while handling the request."),
-      );
+      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

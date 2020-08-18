@@ -8,7 +8,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class MessageRepository implements IMessageRepository {
-  public async exists(id: number): Promise<boolean> {
+  public async exists(messageID: number): Promise<boolean> {
     const query: string = squel
       .select()
       .from("messages")
@@ -19,7 +19,7 @@ export default class MessageRepository implements IMessageRepository {
       .field("type")
       .field("subject")
       .field("body")
-      .where("messageID = ?", id)
+      .where("messageID = ?", messageID)
       .where("deleted = ?", 0)
       .toString();
 
@@ -28,11 +28,11 @@ export default class MessageRepository implements IMessageRepository {
     return InputValidator.isSet(rows);
   }
 
-  public async getById(id: number): Promise<Message> {
+  public async getById(messageID: number): Promise<Message> {
     const query: string = squel
       .select()
       .from("messages")
-      .where("messageID = ?", id)
+      .where("messageID = ?", messageID)
       .where("deleted = ?", 0)
       .toString();
 
@@ -85,7 +85,7 @@ export default class MessageRepository implements IMessageRepository {
     return t;
   }
 
-  public async delete(userID: number, messageID: number): Promise<void> {
+  public async remove(userID: number, messageID: number): Promise<void> {
     const query: string = squel
       .update()
       .table("messages")

@@ -10,7 +10,7 @@ import GalaxyRow from "../units/GalaxyRow";
 
 @injectable()
 export default class GalaxyRepository implements IGalaxyRepository {
-  public async getGalaxyInfo(posGalaxy: number, posSystem: number): Promise<GalaxyPositionInfo[]> {
+  public async getPositionInfo(posGalaxy: number, posSystem: number): Promise<GalaxyPositionInfo[]> {
     const query: string = squel
       .select()
       .field("p.planetID")

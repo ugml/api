@@ -58,7 +58,7 @@ export default class BuildingService implements IBuildingService {
     this.requirementsService = requirementsService;
   }
 
-  public async startBuilding(request: BuildBuildingRequest, userID: number): Promise<Planet> {
+  public async start(request: BuildBuildingRequest, userID: number): Promise<Planet> {
     if (!(await this.buildingRepository.exists(request.planetID))) {
       throw new ApiException("Planet does not exist");
     }
@@ -92,7 +92,7 @@ export default class BuildingService implements IBuildingService {
     const technolgies: Techs = await this.technologiesRepository.getById(userID);
     const buildings: Buildings = await this.buildingRepository.getById(request.planetID);
 
-    if (!this.requirementsService.requirementsFulfilled(requirements, buildings, technolgies)) {
+    if (!this.requirementsService.fulfilled(requirements, buildings, technolgies)) {
       throw new ApiException("Requirements are not met");
     }
 
@@ -101,6 +101,8 @@ export default class BuildingService implements IBuildingService {
     const currentLevel = buildings[buildingKey];
 
     const cost = Calculations.getCosts(request.buildingID, currentLevel);
+
+    // TODO: update planet resources to the current tick before checking them
 
     if (
       planet.metal < cost.metal ||
@@ -132,16 +134,16 @@ export default class BuildingService implements IBuildingService {
     return planet;
   }
 
-  public async getBuildings(planetID: number, userID: number): Promise<Buildings> {
-    if (!(await this.planetService.checkUserOwnsPlanet(userID, planetID))) {
+  public async getAll(planetID: number, userID: number): Promise<Buildings> {
+    if (!(await this.planetService.checkOwnership(userID, planetID))) {
       throw new UnauthorizedException("Player does not own the planet");
     }
 
     return await this.buildingRepository.getById(planetID);
   }
 
-  public async cancelBuilding(planetID: number, userID: number): Promise<Planet> {
-    if (!(await this.planetService.checkUserOwnsPlanet(userID, planetID))) {
+  public async cancel(planetID: number, userID: number): Promise<Planet> {
+    if (!(await this.planetService.checkOwnership(userID, planetID))) {
       throw new UnauthorizedException("Player does not own the planet");
     }
 
@@ -173,7 +175,7 @@ export default class BuildingService implements IBuildingService {
     return planet;
   }
 
-  public async demolishBuilding(request: DemolishBuildingRequest, userID: number): Promise<Planet> {
+  public async demolish(request: DemolishBuildingRequest, userID: number): Promise<Planet> {
     const planet: Planet = await this.planetRepository.getById(request.planetID);
 
     if (!InputValidator.isSet(planet)) {

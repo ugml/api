@@ -11,9 +11,6 @@ import UnauthorizedException from "../exceptions/UnauthorizedException";
 import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
 import InputValidator from "../common/InputValidator";
 
-/**
- * This class defines a service to interact with the planets-table in the database
- */
 @injectable()
 export default class PlanetService implements IPlanetService {
   @inject(TYPES.IPlanetRepository) private planetRepository: IPlanetRepository;

@@ -26,9 +26,6 @@ import IUnitCosts from "../interfaces/IUnitCosts";
 
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 
-/**
- * This class defines a service to interact with the buildings-table in the database
- */
 @injectable()
 export default class BuildingService implements IBuildingService {
   private planetService: IPlanetService;

@@ -3,14 +3,7 @@ import IJwt from "../interfaces/IJwt";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const jwt = require("jsonwebtoken");
 
-/**
- * This class contains functionality to generate and validate JWT-token
- */
 export default class JwtHelper {
-  /**
-   * Generates a new JWT-token containing the passed userID
-   * @param userID the userID of the authenticated user
-   */
   public static generateToken(userID: number): string {
     return jwt.sign(
       {

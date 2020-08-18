@@ -36,9 +36,6 @@ import SetCurrentPlanetRequest from "../entities/requests/SetCurrentPlanetReques
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 import ILogger from "../interfaces/ILogger";
 
-/**
- * This class defines a service to interact with the users-table in the database
- */
 @injectable()
 export default class UserService implements IUserService {
   @inject(TYPES.ILogger) private logger: ILogger;

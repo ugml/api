@@ -17,9 +17,6 @@ import QueueItem from "../common/QueueItem";
 import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
 
-/**
- * This class defines a service to interact with the defenses-table in the database
- */
 @injectable()
 export default class DefenseService implements IDefenseService {
   @inject(TYPES.IDefenseRepository) private defenseRepository: IDefenseRepository;

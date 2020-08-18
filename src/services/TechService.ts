@@ -22,9 +22,6 @@ import IRequirementsService from "../interfaces/services/IRequirementsService";
 import CancelTechRequest from "../entities/requests/CancelTechRequest";
 import IUnitCosts from "../interfaces/IUnitCosts";
 
-/**
- * This class defines a service to interact with the techs-table in the database
- */
 @injectable()
 export default class TechService implements ITechService {
   @inject(TYPES.ITechnologiesRepository) private technologiesRepository: ITechnologiesRepository;

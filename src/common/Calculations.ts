@@ -5,47 +5,24 @@ import IShipUnits from "../interfaces/IShipUnits";
 import Config from "./Config";
 import InputValidator from "./InputValidator";
 
-/**
- * This class provides functionality for different common calculations
- */
 export default class Calculations {
-  /**
-   * Calculates the buildtime for a building, ship or defense in SECONDS and PER UNIT.
-   * @param metalCosts the metal-costs for the level/unit
-   * @param crystalCosts the crystal-costs for the level/unit
-   * @param robotFactory the current level of the robotic-factory
-   * @param naniteFactory the current level of the nanite-factory
-   * @returns number builtime in seconds
-   */
   public static calculateBuildTimeInSeconds(
     metalCosts: number,
     crystalCosts: number,
-    robotFactory: number,
-    naniteFactory: number,
+    robotFactoryLevel: number,
+    naniteFactoryLevel: number,
   ): number {
     return Math.round(
       ((metalCosts + crystalCosts) /
-        (2500 * (1 + robotFactory) * 2 ** naniteFactory * Config.getGameConfig().server.speed)) *
+        (2500 * (1 + robotFactoryLevel) * 2 ** naniteFactoryLevel * Config.getGameConfig().server.speed)) *
         3600,
     );
   }
 
-  /**
-   * Calculates the research-time for a technology
-   * @param metalCosts the metal-costs for the level
-   * @param crystalCosts the crystal-costs for the level
-   * @param researchLab the current level of the reserach-lab
-   */
-  public static calculateResearchTimeInSeconds(metalCosts: number, crystalCosts: number, researchLab: number): number {
-    return Math.round(((metalCosts + crystalCosts) / ((1 + researchLab) * Config.getGameConfig().server.speed)) * 3600);
+  public static calculateResearchTimeInSeconds(metalCosts: number, crystalCosts: number, researchLabLevel: number): number {
+    return Math.round(((metalCosts + crystalCosts) / ((1 + researchLabLevel) * Config.getGameConfig().server.speed)) * 3600);
   }
 
-  /**
-   * Calculates the free missile slots
-   * @param siloLevel the level of the missile silo
-   * @param numAntiBallisticMissiles the amount of anti-ballistic missiles currently on the planet
-   * @param numInterplanetaryMissiles the amount of interplanetary missiles currently on the planet
-   */
   public static calculateFreeMissileSlots(
     siloLevel: number,
     numAntiBallisticMissiles: number,
@@ -54,13 +31,6 @@ export default class Calculations {
     return siloLevel * 10 - numAntiBallisticMissiles - numInterplanetaryMissiles * 2;
   }
 
-  /**
-   * Returns the costs of a unit. For building or technology,
-   * the costs for the next level is returned.
-   * For ships or defenses, the costs for one unit is returned.
-   * @param unitID
-   * @param currentLevel
-   */
   public static getCosts(unitID: number, currentLevel: number): IUnitCosts {
     let costs: IPricelist;
 
@@ -86,12 +56,6 @@ export default class Calculations {
     };
   }
 
-  /**
-   * Calculates the distances between two planets
-   * Source: http://www.owiki.de/index.php?title=Entfernung
-   * @param origin The first planet
-   * @param destination The second planet
-   */
   public static calculateDistance(origin: ICoordinates, destination: ICoordinates): number {
     const distances = [
       Math.abs(origin.posGalaxy - destination.posGalaxy),
@@ -133,10 +97,6 @@ export default class Calculations {
     );
   }
 
-  /**
-   * Returns the speed of the slowest ship in the fleet
-   * @param units The sent ship in this event
-   */
   public static getSlowestShipSpeed(units: IShipUnits): number {
     const unitData = Config.getGameConfig();
 

@@ -157,7 +157,6 @@ describe("shipsRouter", () => {
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
-        // reset
         planet.bHangarPlus = valueBefore;
         await planetRepository.save(planet);
       });

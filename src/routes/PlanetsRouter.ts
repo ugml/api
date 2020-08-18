@@ -1,256 +1,112 @@
-import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IPlanetService from "../interfaces/IPlanetService";
+
+import IPlanetService from "../interfaces/services/IPlanetService";
 import Planet from "../units/Planet";
-import ILogger from "../interfaces/ILogger";
 
-/**
- * Defines routes for planet-data
- */
-export default class PlanetsRouter {
-  public router: Router = Router();
+import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
 
-  private logger: ILogger;
+import DestroyPlanetRequest from "../entities/requests/DestroyPlanetRequest";
+import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
-  private planetService: IPlanetService;
+import Event from "../units/Event";
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.planetService = container.planetService;
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-    this.router.get("/movement/:planetID", this.getMovement);
-    this.router.post("/destroy/", this.destroyPlanet);
-    this.router.post("/rename/", this.renamePlanet);
-    this.router.get("/:planetID", this.getPlanetByID);
+@Route("planets")
+@Tags("Planets")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+@provide(PlanetsRouter)
+export class PlanetsRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
-    this.logger = logger;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+
+  @Get("/movement/{planetID}")
+  @Security("jwt")
+  public async getMovement(
+    @Request() headers,
+    planetID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Event[]>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Event[]> {
+    try {
+      return successResponse(
+        Globals.StatusCodes.SUCCESS,
+        await this.planetService.getMovement(headers.user.userID, planetID),
+      );
+    } catch (error) {
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+    }
   }
 
-  /**
-   * Returns a list of all planets of a given authenticated user.
-   * This route returns sensible planet-data.
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllPlanets = async (request: IAuthorizedRequest, response: Response) => {
+  @Post("/destroy")
+  @Security("jwt")
+  public async destroyPlanet(
+    @Request() headers,
+    @Body() request: DestroyPlanetRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, void>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<void> {
     try {
-      const userID = parseInt(request.userID, 10);
-
-      const planetList = await this.planetService.getAllPlanetsOfUser(userID, true);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(planetList ?? {});
+      return await this.planetService.destroy(request.planetID, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
+  }
 
-  /**
-   * Returns a list of all planets of a given user.
-   * This route returns only the basic planet-data.
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllPlanetsOfUser = async (request: IAuthorizedRequest, response: Response) => {
+  @Post("/rename")
+  @Security("jwt")
+  public async renamePlanet(
+    @Request() headers,
+    @Body() request: RenamePlanetRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Planet> {
     try {
-      const userID = parseInt(request.params.userID, 10);
+      request.newName = InputValidator.sanitizeString(request.newName);
 
-      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
+      // TODO: put into config
+      const minLength = 4;
+      const maxLength = 32;
 
-      return response.status(Globals.Statuscode.SUCCESS).json(planetList ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Returns a planet owned by the authenticated user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getOwnPlanet = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+      if (request.newName.length < minLength || request.newName.length > maxLength) {
+        return badRequestResponse(
+          Globals.StatusCodes.BAD_REQUEST,
+          new FailureResponse(`Length of new name must be between ${minLength} and ${maxLength}`),
+        );
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const planet = await this.planetService.getPlanet(userID, planetID, true);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
+      return await this.planetService.rename(request, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
+  }
 
-  /**
-   * Returns a list of flights to and from the given planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getMovement = async (request: IAuthorizedRequest, response: Response) => {
+  @Get("/{planetID}")
+  @Security("jwt")
+  public async getPlanetByID(
+    @Request() headers,
+    planetID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Planet> {
     try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const movement = await this.planetService.getMovementOnPlanet(userID, planetID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(movement ?? {});
+      return await this.planetService.getById(planetID, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
-
-  /**
-   * Destroys a given planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public destroyPlanet = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      // validate parameters
-      if (!InputValidator.isSet(request.body.planetID) || !InputValidator.isValidInt(request.body.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const planetList = await this.planetService.getAllPlanetsOfUser(userID);
-
-      if (planetList.length === 1) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "The last planet cannot be destroyed",
-        });
-      }
-
-      // TODO: if the deleted planet was the current planet -> set another one as current planet
-      await this.planetService.deletePlanet(userID, planetID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json({});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Renames a planet
-   * @param request
-   * @param response
-   * @param next
-   */
-  public renamePlanet = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      // validate parameters
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.name)
-      ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const newName: string = InputValidator.sanitizeString(request.body.name);
-
-      // TODO: check max-length
-      if (newName.length <= 4) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "New name is too short",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-
-      planet.name = newName;
-
-      await this.planetService.updatePlanet(planet);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
-
-  /**
-   * Returns basic informations about a planet owned by the given user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getPlanetByID = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      // validate parameters
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
+  }
 }

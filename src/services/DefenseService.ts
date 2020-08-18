@@ -1,44 +1,177 @@
-import Database from "../common/Database";
-import IDefenseService from "../interfaces/IDefenseService";
-import squel = require("safe-squel");
+import IDefenseService from "../interfaces/services/IDefenseService";
+import { inject, injectable } from "inversify";
+import Defenses from "../units/Defenses";
+import TYPES from "../ioc/types";
+import IDefenseRepository from "../interfaces/repositories/IDefenseRepository";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
 
-/**
- * This class defines a service to interact with the defenses-table in the database
- */
+import ApiException from "../exceptions/ApiException";
+import Buildings from "../units/Buildings";
+import Planet from "../units/Planet";
+import Calculations from "../common/Calculations";
+import Queue from "../common/Queue";
+import IUnitCosts from "../interfaces/IUnitCosts";
+import QueueItem from "../common/QueueItem";
+import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
+import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
+
+@injectable()
 export default class DefenseService implements IDefenseService {
-  /**
-   * Returns a list of defenses on a given planet owner by a given user
-   * @param userID the ID of the user
-   * @param planetID the ID of the planet
-   */
-  public async getDefenses(userID: number, planetID: number) {
-    const query: string = squel
-      .select()
-      .field("p.ownerID", "ownerID")
-      .field("d.*")
-      .from("defenses", "d")
-      .left_join("planets", "p", "d.planetID = p.planetID")
-      .where("d.planetID = ?", planetID)
-      .where("p.ownerID = ?", userID)
-      .toString();
+  @inject(TYPES.IDefenseRepository) private defenseRepository: IDefenseRepository;
+  @inject(TYPES.IPlanetRepository) private planetRepository: IPlanetRepository;
+  @inject(TYPES.IBuildingRepository) private buildingRepository: IBuildingRepository;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
 
-    const [[rows]] = await Database.query(query);
-
-    return rows;
-  }
-
-  /**
-   * Creates a new row in the database.
-   * @param planetID the ID of the planet
-   * @param connection a connection from the connection-pool, if this query should be executed within a transaction
-   */
-  public async createDefenseRow(planetID: number, connection = null) {
-    const query = `INSERT INTO defenses (\`planetID\`) VALUES (${planetID});`;
-
-    if (connection === null) {
-      return await Database.query(query);
+  public async getAll(userID: number, planetID: number): Promise<Defenses> {
+    if (!(await this.planetRepository.exists(planetID))) {
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
-    return await connection.query(query);
+    if (!(await this.planetService.checkOwnership(userID, planetID))) {
+      throw new UnauthorizedException("User does not own the planet");
+    }
+
+    return await this.defenseRepository.getById(planetID);
+  }
+
+  public async processBuildOrder(request: BuildDefenseRequest, userID: number): Promise<Planet> {
+    if (!(await this.planetRepository.exists(request.planetID))) {
+      throw new NonExistingEntityException("Planet does not exist");
+    }
+
+    const planet: Planet = await this.planetRepository.getById(request.planetID);
+
+    if (planet.ownerID !== userID) {
+      throw new UnauthorizedException("User does not own the planet");
+    }
+
+    const buildings: Buildings = await this.buildingRepository.getById(request.planetID);
+    const defenses: Defenses = await this.defenseRepository.getById(request.planetID);
+
+    if (planet.isUpgradingHangar()) {
+      throw new ApiException("Shipyard is currently upgrading");
+    }
+
+    let metal = planet.metal;
+    let crystal = planet.crystal;
+    let deuterium = planet.deuterium;
+
+    let stopProcessing = false;
+    let buildTime = 0;
+
+    let freeSiloSlots: number = Calculations.calculateFreeMissileSlots(
+      buildings.missileSilo,
+      defenses.antiBallisticMissile,
+      defenses.interplanetaryMissile,
+    );
+
+    const queue: Queue = new Queue();
+
+    // TODO: put this into a separate function
+    for (const buildOrder of request.buildOrder) {
+      let count = buildOrder.amount;
+
+      const cost: IUnitCosts = Calculations.getCosts(buildOrder.unitID, 1);
+
+      // if the user has not enough ressources to fullfill the complete build-order
+      if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
+        let tempCount: number;
+
+        if (cost.metal > 0) {
+          tempCount = metal / cost.metal;
+
+          if (tempCount < count) {
+            count = tempCount;
+          }
+        }
+
+        if (cost.crystal > 0) {
+          tempCount = crystal / cost.crystal;
+
+          if (tempCount < count) {
+            count = tempCount;
+          }
+        }
+
+        if (cost.deuterium > 0) {
+          tempCount = deuterium / cost.deuterium;
+
+          if (tempCount < count) {
+            count = tempCount;
+          }
+        }
+
+        // no need to further process the queue
+        stopProcessing = true;
+      }
+
+      // check free slots in silo
+      if (buildOrder.unitID === 309) {
+        // can't build any more rockets
+        if (freeSiloSlots === 0) {
+          buildOrder.amount = 0;
+        } else {
+          buildOrder.amount = Math.min(freeSiloSlots, buildOrder.amount);
+          freeSiloSlots -= buildOrder.amount;
+        }
+      }
+
+      if (buildOrder.unitID === 310) {
+        // can't build any more rockets
+        if (freeSiloSlots === 0) {
+          buildOrder.amount = 0;
+        } else {
+          buildOrder.amount = Math.floor(freeSiloSlots / 2) * buildOrder.amount;
+          freeSiloSlots -= buildOrder.amount;
+        }
+      }
+
+      // build time in seconds
+      buildTime +=
+        Calculations.calculateBuildTimeInSeconds(
+          cost.metal,
+          cost.crystal,
+          buildings.shipyard,
+          buildings.naniteFactory,
+        ) * Math.floor(count);
+
+      queue.getQueue().push(new QueueItem(buildOrder.unitID, Math.floor(count)));
+
+      metal -= cost.metal * count;
+      crystal -= cost.crystal * count;
+      deuterium -= cost.deuterium * count;
+
+      if (stopProcessing) {
+        break;
+      }
+    }
+
+    queue.setTimeRemaining(buildTime);
+    queue.setLastUpdateTime(Math.floor(Date.now() / 1000));
+
+    let oldBuildOrder;
+
+    if (!planet.isBuildingUnits()) {
+      planet.bHangarQueue = JSON.parse("[]");
+      oldBuildOrder = planet.bHangarQueue;
+      planet.bHangarStartTime = Math.floor(Date.now() / 1000);
+    } else {
+      oldBuildOrder = JSON.parse(planet.bHangarQueue);
+    }
+
+    oldBuildOrder.push(queue);
+
+    planet.bHangarQueue = JSON.stringify(oldBuildOrder);
+
+    planet.metal = metal;
+    planet.crystal = crystal;
+    planet.deuterium = deuterium;
+
+    await this.planetRepository.save(planet);
+
+    return planet;
   }
 }

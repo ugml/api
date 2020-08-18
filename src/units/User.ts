@@ -2,61 +2,27 @@ import { Globals } from "../common/Globals";
 import IUnit from "../interfaces/IUnit";
 import InputValidator from "../common/InputValidator";
 
-/**
- * Represents a user-row in the database
- */
 export default class User implements IUnit {
-  /**
-   * The ID of the user
-   */
   public userID: number;
 
-  /**
-   * The name of the user
-   */
   public username: string;
 
-  /**
-   * The encrypted password of the user
-   */
   public password: string;
 
-  /**
-   * The e-mail address of the user
-   */
   public email: string;
 
-  /**
-   * The unix-timestamp of the last time the user was online
-   */
   public lastTimeOnline: number;
 
-  /**
-   * The current planet of the user
-   */
   public currentPlanet: number;
 
-  /**
-   * The ID of the technology which is currently being researched.
-   * This value is 0 if no technology is currently being researched.
-   */
   public bTechID: number;
 
-  /**
-   * The time, at which the research will be completed
-   */
   public bTechEndTime: number;
 
-  /**
-   *  Checks, if the planet is currently researching
-   */
   public isResearching(): boolean {
     return this.bTechID > 0 && this.bTechEndTime > 0;
   }
 
-  /**
-   * Returns, if the contains valid data or not
-   */
   public isValid(): boolean {
     if (!InputValidator.isSet(this.userID) || this.userID <= 0) {
       return false;

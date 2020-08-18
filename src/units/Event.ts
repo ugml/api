@@ -3,19 +3,16 @@ import InputValidator from "../common/InputValidator";
 import IUnit from "../interfaces/IUnit";
 import PlanetType = Globals.PlanetType;
 
-/**
- * Represents a user-row in the database
- */
 export default class Event implements IUnit {
   public eventID: number;
   public ownerID: number;
   public mission: number;
   public fleetlist: string;
   public startID: number;
-  public startType: PlanetType;
+  public startType: Globals.PlanetType;
   public startTime: number;
   public endID: number;
-  public endType: PlanetType;
+  public endType: Globals.PlanetType;
   public endTime: number;
   public loadedMetal: number;
   public loadedCrystal: number;
@@ -24,9 +21,6 @@ export default class Event implements IUnit {
   public inQueue: boolean;
   public processed: boolean;
 
-  /**
-   * Returns, if the contains valid data or not
-   */
   public isValid(): boolean {
     if (!InputValidator.isSet(this.eventID) || this.eventID <= 0) {
       return false;

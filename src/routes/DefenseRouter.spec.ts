@@ -4,14 +4,14 @@ import chaiHttp = require("chai-http");
 import App from "../App";
 import { Globals } from "../common/Globals";
 import Planet from "../units/Planet";
-import SimpleLogger from "../loggers/SimpleLogger";
+import { iocContainer } from "../ioc/inversify.config";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
+import TYPES from "../ioc/types";
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
 
-const container = createContainer();
+const planetRepository = iocContainer.get<IPlanetRepository>(TYPES.IPlanetRepository);
 
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -23,9 +23,9 @@ describe("defenseRoute", () => {
   let planetBeforeTests: Planet;
 
   before(async () => {
-    planetBeforeTests = await container.planetService.getPlanet(1, 167546850, true);
+    planetBeforeTests = await planetRepository.getById(167546850);
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -33,7 +33,7 @@ describe("defenseRoute", () => {
   });
 
   after(async () => {
-    await container.planetService.updatePlanet(planetBeforeTests);
+    await planetRepository.save(planetBeforeTests);
   });
 
   beforeEach(function() {
@@ -48,22 +48,21 @@ describe("defenseRoute", () => {
       .get(`/v1/defenses/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).equals(planetID);
       });
   });
 
-  it("should return an empty list", () => {
+  it("should fail, planet does not exist", () => {
     const planetID = 60881;
 
     return request
       .get(`/v1/defenses/${planetID}`)
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.empty;
       });
   });
 
@@ -72,8 +71,7 @@ describe("defenseRoute", () => {
       .get("/v1/defenses/asdf")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
       });
   });
 
@@ -83,9 +81,17 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: JSON.stringify({ 301: 1, 302: 1, 309: 1, 310: 1 }) })
+      .send({
+        planetID: planetID,
+        buildOrder: [
+          { unitID: 301, amount: 1 },
+          { unitID: 302, amount: 1 },
+          { unitID: 309, amount: 1 },
+          { unitID: 310, amount: 1 },
+        ],
+      })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).equals(planetID);
       });
@@ -97,9 +103,9 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ planetID, buildOrder: JSON.stringify({ 310: 10000 }) })
+      .send({ planetID, buildOrder: [{ unitID: 310, amount: 10000 }] })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.planetID).equals(planetID);
       });
@@ -109,11 +115,10 @@ describe("defenseRoute", () => {
     return request
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
-      .send({ buildOrder: JSON.stringify({ 301: 1 }) })
+      .send({ buildOrder: [{ unitID: 301, amount: 1 }] })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-        expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -125,9 +130,9 @@ describe("defenseRoute", () => {
       .set("Authorization", authToken)
       .send({ planetID })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -136,9 +141,9 @@ describe("defenseRoute", () => {
       .post("/v1/defenses/build")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -152,8 +157,9 @@ describe("defenseRoute", () => {
         // eslint-disable-next-line prettier/prettier
       .send({ planetID, buildOrder: "{ \"xyz\": 1 }" })
         .then(res => {
-          expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.error).to.be.equals("Invalid parameter");
+          expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
+          expect(res.type).to.eql("application/json");
+          expect(res.body.error).to.be.equals("Validation failed");
         })
     );
   });
@@ -166,10 +172,10 @@ describe("defenseRoute", () => {
         .post("/v1/defenses/build")
         .set("Authorization", authToken)
         // eslint-disable-next-line prettier/prettier
-        .send({ planetID, buildOrder: "{ \"301\": 1 }" })
+        .send({ planetID, buildOrder: [{ unitID: 301, amount: 1 }] })
         .then(res => {
-          expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
-          expect(res.body.error).to.be.equals("The player does not own the planet");
+          expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
+          expect(res.body.error).to.be.equals("Planet does not exist");
         })
     );
   });
@@ -177,26 +183,26 @@ describe("defenseRoute", () => {
   it("should fail (shipyard is currently upgrading)", async () => {
     const planetID = 167546850;
 
-    const planet: Planet = await container.planetService.getPlanet(1, planetID, true);
+    const planet: Planet = await planetRepository.getById(planetID);
 
     const valueBefore = planet.bHangarPlus;
 
     planet.bHangarPlus = true;
 
-    await container.planetService.updatePlanet(planet);
+    await planetRepository.save(planet);
 
     return (
       request
         .post("/v1/defenses/build")
         .set("Authorization", authToken)
         // eslint-disable-next-line prettier/prettier
-        .send({ planetID, buildOrder: "{ \"301\": 1 }" })
+        .send({ planetID, buildOrder:  [{ unitID: 301, amount: 1 }] })
         .then(async res => {
-          expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+          expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
           expect(res.body.error).to.be.equals("Shipyard is currently upgrading");
 
           planet.bHangarPlus = valueBefore;
-          await container.planetService.updatePlanet(planet);
+          await planetRepository.save(planet);
         })
     );
   });

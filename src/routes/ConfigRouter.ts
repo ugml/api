@@ -1,64 +1,47 @@
-import { Request, Response, Router } from "express";
 import { Globals } from "../common/Globals";
-import ILogger from "../interfaces/ILogger";
+
 import Config from "../common/Config";
+import { Controller, Get, Res, Route, Tags, TsoaResponse } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
+import FailureResponse from "../entities/responses/FailureResponse";
 
-/**
- * Defines routes to get the config-files
- */
-export default class ConfigRouter {
-  public router: Router = Router();
+import IGameConfig, { IUnits } from "../interfaces/IGameConfig";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-  private logger: ILogger;
+@Route("config")
+@Tags("Configuration")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+@provide(ConfigRouter)
+export class ConfigRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
-  /**
-   * Initialize the Router
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(logger: ILogger) {
-    this.router.get("/game", this.getGameConfig);
-    this.router.get("/units", this.getUnitsConfig);
-
-    this.logger = logger;
-  }
-
-  /**
-   * Returns the current game-configuration
-   * @param req
-   * @param response
-   * @param next
-   */
-  public getGameConfig(req: Request, response: Response) {
+  @Get("/game")
+  public getGameConfig(
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, IGameConfig>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<IGameConfig> {
     try {
-      const data = Config.getGameConfig();
-
-      return response.status(Globals.Statuscode.SUCCESS).json(data ?? {});
+      return successResponse(Globals.StatusCodes.SUCCESS, Config.getGameConfig());
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
-  /**
-   * Returns the current unit-configuration
-   * @param req
-   * @param response
-   * @param next
-   */
-  public getUnitsConfig(req: Request, response: Response) {
+  @Get("/units")
+  public getUnitsConfig(
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, IUnits>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<IUnits> {
     try {
-      const data = Config.getGameConfig();
-
-      return response.status(Globals.Statuscode.SUCCESS).json(data.units ?? {});
+      return successResponse(Globals.StatusCodes.SUCCESS, Config.getGameConfig().units);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

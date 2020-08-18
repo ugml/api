@@ -1,224 +1,69 @@
-import { Response, Router } from "express";
-import Calculations from "../common/Calculations";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import Queue from "../common/Queue";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IBuildingService from "../interfaces/IBuildingService";
-import ICosts from "../interfaces/ICosts";
-import IPlanetService from "../interfaces/IPlanetService";
-import IShipService from "../interfaces/IShipService";
-import Buildings from "../units/Buildings";
+
+import IBuildingService from "../interfaces/services/IBuildingService";
+import IPlanetService from "../interfaces/services/IPlanetService";
+import IShipService from "../interfaces/services/IShipService";
 import Planet from "../units/Planet";
-import QueueItem from "../common/QueueItem";
-import ILogger from "../interfaces/ILogger";
 
-/**
- * Defines routes for ships-data
- */
-export default class ShipsRouter {
-  public router: Router = Router();
+import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
 
-  private logger: ILogger;
+import BuildShipsRequest from "../entities/requests/BuildShipsRequest";
+import FailureResponse from "../entities/responses/FailureResponse";
 
-  private planetService: IPlanetService;
-  private buildingService: IBuildingService;
-  private shipService: IShipService;
+import Ships from "../units/Ships";
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.planetService = container.planetService;
-    this.buildingService = container.buildingService;
-    this.shipService = container.shipService;
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-    this.router.get("/:planetID", this.getAllShipsOnPlanet);
-    this.router.post("/build/", this.buildShips);
+@Route("ships")
+@Tags("Ships")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+@provide(ShipsRouter)
+export class ShipsRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
-    this.logger = logger;
+  @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
+  @inject(TYPES.IPlanetService) private planetService: IPlanetService;
+  @inject(TYPES.IShipService) private shipService: IShipService;
+
+  @Get("/{planetID}")
+  @Security("jwt")
+  public async getAllShipsOnPlanet(
+    @Request() request,
+    planetID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Ships>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Ships> {
+    try {
+      return await this.shipService.getAll(request.user.userID, planetID);
+    } catch (error) {
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+    }
   }
 
-  /**
-   * Returns a list of all ships on a given planet owned by the authenticated user
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllShipsOnPlanet = async (request: IAuthorizedRequest, response: Response) => {
+  @Post("/build")
+  @Security("jwt")
+  public async buildShips(
+    @Request() headers,
+    @Body() request: BuildShipsRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Planet>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Planet> {
     try {
-      if (!InputValidator.isSet(request.params.planetID) || !InputValidator.isValidInt(request.params.planetID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+      if (!InputValidator.isValidBuildOrder(request.buildOrder, Globals.UnitType.SHIP)) {
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.params.planetID, 10);
-
-      const ships = await this.shipService.getShips(userID, planetID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(ships ?? {});
+      return await this.shipService.processBuildOrder(request, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
-
-  /**
-   * Starts a new build-order on the planet and appends it to the build-queue
-   * @param request
-   * @param response
-   * @param next
-   */
-  public buildShips = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      if (
-        !InputValidator.isSet(request.body.planetID) ||
-        !InputValidator.isValidInt(request.body.planetID) ||
-        !InputValidator.isSet(request.body.buildOrder) ||
-        !InputValidator.isValidJson(request.body.buildOrder)
-      ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const buildOrders = JSON.parse(request.body.buildOrder);
-
-      // validate build-order
-      if (!InputValidator.isValidBuildOrder(buildOrders, Globals.UnitType.SHIP)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const planetID = parseInt(request.body.planetID, 10);
-
-      const queue: Queue = new Queue();
-
-      const planet: Planet = await this.planetService.getPlanet(userID, planetID, true);
-      const buildings: Buildings = await this.buildingService.getBuildings(planetID);
-
-      if (planet === null) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "The player does not own the planet",
-        });
-      }
-
-      if (planet.bHangarPlus) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Shipyard is currently upgrading",
-        });
-      }
-
-      let metal = planet.metal;
-      let crystal = planet.crystal;
-      let deuterium = planet.deuterium;
-
-      let stopProcessing = false;
-      let buildTime = 0;
-
-      // TODO: put into seperate funciton (also reference this in defense-router)
-      for (const item in buildOrders) {
-        if (!buildOrders.hasOwnProperty(item)) {
-          continue;
-        }
-
-        let count: number = buildOrders[item];
-        const cost: ICosts = Calculations.getCosts(parseInt(item, 10), 1);
-
-        // if the user has not enough ressources to fullfill the complete build-order
-        if (metal < cost.metal * count || crystal < cost.crystal * count || deuterium < cost.deuterium * count) {
-          let tempCount: number;
-
-          if (cost.metal > 0) {
-            tempCount = metal / cost.metal;
-
-            if (tempCount < count) {
-              count = tempCount;
-            }
-          }
-
-          if (cost.crystal > 0) {
-            tempCount = crystal / cost.crystal;
-
-            if (tempCount < count) {
-              count = tempCount;
-            }
-          }
-
-          if (cost.deuterium > 0) {
-            tempCount = deuterium / cost.deuterium;
-
-            if (tempCount < count) {
-              count = tempCount;
-            }
-          }
-
-          // no need to further process the queue
-          stopProcessing = true;
-        }
-
-        // build time in seconds
-        buildTime +=
-          Calculations.calculateBuildTimeInSeconds(
-            cost.metal,
-            cost.crystal,
-            buildings.shipyard,
-            buildings.naniteFactory,
-          ) * Math.floor(count);
-
-        queue.getQueue().push(new QueueItem(parseInt(item, 10), Math.floor(count)));
-
-        metal -= cost.metal * count;
-        crystal -= cost.crystal * count;
-        deuterium -= cost.deuterium * count;
-
-        if (stopProcessing) {
-          break;
-        }
-      }
-
-      queue.setTimeRemaining(buildTime);
-      queue.setLastUpdateTime(Math.floor(Date.now() / 1000));
-
-      let oldBuildOrder;
-
-      if (!InputValidator.isSet(planet.bHangarQueue)) {
-        planet.bHangarQueue = JSON.parse("[]");
-        oldBuildOrder = planet.bHangarQueue;
-      } else {
-        oldBuildOrder = JSON.parse(planet.bHangarQueue);
-      }
-
-      oldBuildOrder.push(queue);
-
-      planet.bHangarQueue = JSON.stringify(oldBuildOrder);
-
-      if (planet.bHangarStartTime === 0) {
-        planet.bHangarStartTime = Math.floor(Date.now() / 1000);
-      }
-
-      planet.metal = metal;
-      planet.crystal = crystal;
-      planet.deuterium = deuterium;
-
-      await this.planetService.updatePlanet(planet);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(planet ?? {});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
+  }
 }

@@ -1,0 +1,40 @@
+{
+    "entryFile":"./src/App.ts",
+    "noImplicitAdditionalProperties":"throw-on-extras",
+    "controllerPathGlobs":[
+        "./src/routes/*Router.ts"
+    ],
+    "ignore": [
+        "**/node_modules/**"
+    ],
+    "routes":{
+        "basePath":"/v1",
+        "routesDir":"./src/tsoa/",
+        "iocModule":"./src/ioc/inversify.config.ts",
+        "authenticationModule": "./src/middlewares/authentication.ts"
+    },
+    "spec":{
+        "basePath":"/v1",
+        "contact":{
+            "email":"api@ugamela.org",
+            "name":"the Administrator"
+        },
+        "securityDefinitions": {
+            "jwt": {
+                "type": "apiKey",
+                "name": "access-token",
+                "in": "header"
+            }
+        },
+        "description":"Definition for the official ugamela-API which can be used to interact with an instance of an ugamela-server.",
+        "license":"AGPL-3.0",
+        "name":"ugamela api",
+        "outputDirectory":"./src/tsoa/",
+        "schemes":[
+            "http",
+            "https"
+        ],
+        "specVersion":3,
+        "version":"1.0.0"
+    }
+}

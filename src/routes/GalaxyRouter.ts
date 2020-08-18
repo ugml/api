@@ -1,70 +1,44 @@
-import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IGalaxyService from "../interfaces/IGalaxyService";
-import ILogger from "../interfaces/ILogger";
 
-/**
- * Defines routes for galaxy-data
- */
-export default class GalaxyRouter {
-  public router: Router = Router();
+import IGalaxyService from "../interfaces/services/IGalaxyService";
 
-  private logger: ILogger;
+import { Controller, Get, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
+import { provide } from "inversify-binding-decorators";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
+import FailureResponse from "../entities/responses/FailureResponse";
 
-  private galaxyService: IGalaxyService;
+import GalaxyPositionInfo from "../units/GalaxyPositionInfo";
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.galaxyService = container.galaxyService;
-    this.router.get("/:posGalaxy/:posSystem", this.getGalaxyInformation);
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-    this.logger = logger;
-  }
+@Route("galaxy")
+@Tags("Galaxy")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+@provide(GalaxyRouter)
+export class GalaxyRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
+  @inject(TYPES.IGalaxyService) private galaxyService: IGalaxyService;
 
-  /**
-   * Returns a list of all galaxy-entries at the given position
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getGalaxyInformation = async (request: IAuthorizedRequest, response: Response) => {
+  @Get("/{posGalaxy}/{posSystem}")
+  @Security("jwt")
+  public async getGalaxyInformation(
+    posGalaxy: number,
+    posSystem: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, GalaxyPositionInfo[]>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<GalaxyPositionInfo[]> {
     try {
-      // validate parameters
-      if (
-        !InputValidator.isSet(request.params.posGalaxy) ||
-        !InputValidator.isValidInt(request.params.posGalaxy) ||
-        !InputValidator.isSet(request.params.posSystem) ||
-        !InputValidator.isValidInt(request.params.posSystem)
-      ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const posGalaxy = parseInt(request.params.posGalaxy, 10);
-      const posSystem = parseInt(request.params.posSystem, 10);
-
       if (!InputValidator.isValidPosition(posGalaxy, posSystem)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
+        return badRequestResponse(Globals.StatusCodes.BAD_REQUEST, new FailureResponse("Invalid parameter"));
       }
 
-      const galaxyData = await this.galaxyService.getGalaxyInfo(posGalaxy, posSystem);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(galaxyData ?? {});
+      return await this.galaxyService.getPositionInfo(posGalaxy, posSystem);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
+  }
 }

@@ -3,14 +3,8 @@ import chaiHttp = require("chai-http");
 
 import App from "../App";
 import { Globals } from "../common/Globals";
-import SimpleLogger from "../loggers/SimpleLogger";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
-
-const container = createContainer();
-
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -21,7 +15,7 @@ let request = chai.request(app);
 describe("messagesRouter", () => {
   before(() => {
     return request
-      .post("/v1/auth/login")
+      .post("/v1/login")
       .send({ email: "user_1501005189510@test.com", password: "admin" })
       .then(res => {
         authToken = res.body.token;
@@ -35,10 +29,10 @@ describe("messagesRouter", () => {
 
   it("should return a list of messages", () => {
     return request
-      .get("/v1/messages/get")
+      .get("/v1/messages")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body[0].messageID).to.be.equals(5);
         expect(res.body[0].senderID).to.be.equals(1);
@@ -51,10 +45,10 @@ describe("messagesRouter", () => {
 
   it("should return a specific message", () => {
     return request
-      .get("/v1/messages/get/5")
+      .get("/v1/messages/5")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.type).to.eql("application/json");
         expect(res.body.messageID).to.be.equals(5);
         expect(res.body.senderID).to.be.equals(1);
@@ -67,23 +61,23 @@ describe("messagesRouter", () => {
 
   it("should fail (invalid message-id)", () => {
     return request
-      .get("/v1/messages/get/asdf")
+      .get("/v1/messages/asdf")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
   it("should return nothing (message does not exist)", () => {
     return request
-      .get("/v1/messages/get/-1")
+      .get("/v1/messages/-1")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body).to.be.empty;
+        expect(res.body.error).to.be.equals("Message does not exist");
       });
   });
 
@@ -93,9 +87,8 @@ describe("messagesRouter", () => {
       .send({ receiverID: 48, subject: "Test", body: "Test" })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
-        expect(res.type).to.eql("application/json");
         expect(res.body).to.be.empty;
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
       });
   });
 
@@ -105,9 +98,9 @@ describe("messagesRouter", () => {
       .send({ subject: "Test", body: "Test" })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -117,9 +110,9 @@ describe("messagesRouter", () => {
       .send({ receiverID: 1, body: "Test" })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -129,9 +122,9 @@ describe("messagesRouter", () => {
       .send({ receiverID: 1, subject: "Test" })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -141,7 +134,7 @@ describe("messagesRouter", () => {
       .send({ receiverID: 91283917239, subject: "Test", body: "Test" })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
         expect(res.body.error).to.be.equals("The receiver does not exist");
       });
@@ -150,11 +143,10 @@ describe("messagesRouter", () => {
   it("should delete a message", () => {
     return request
       .post("/v1/messages/delete")
-      .send({ messageID: 5 })
+      .send({ messageID: 1 })
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.SUCCESS);
-        expect(res.type).to.eql("application/json");
+        expect(res.status).to.be.equals(Globals.StatusCodes.SUCCESS);
         expect(res.body).to.be.empty;
       });
   });
@@ -164,9 +156,9 @@ describe("messagesRouter", () => {
       .post("/v1/messages/delete")
       .set("Authorization", authToken)
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 
@@ -176,9 +168,9 @@ describe("messagesRouter", () => {
       .set("Authorization", authToken)
       .send({ messageID: "asdf" })
       .then(res => {
-        expect(res.status).to.be.equals(Globals.Statuscode.BAD_REQUEST);
+        expect(res.status).to.be.equals(Globals.StatusCodes.BAD_REQUEST);
         expect(res.type).to.eql("application/json");
-        expect(res.body.error).to.be.equals("Invalid parameter");
+        expect(res.body.error).to.be.equals("Validation failed");
       });
   });
 });

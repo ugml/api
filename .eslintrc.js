@@ -1,3 +1,9 @@
+const SEVERITY = {
+  OFF: 0,
+  WARNING: 1,
+  ERROR: 2
+};
+
 module.exports =  {
   parser: '@typescript-eslint/parser',  // Specifies the ESLint parser
   extends:  [
@@ -12,39 +18,31 @@ module.exports =  {
     project: './tsconfig.json'
   },
   rules:  {
-    "comma-dangle": [2, "always-multiline"],
-    "quotes": [2, "double"],
-    "eqeqeq": [2, "always"],
-    "arrow-parens": [2, "as-needed"],
-    "space-before-function-paren": [2, {
+    "comma-dangle": [SEVERITY.ERROR, "always-multiline"],
+    "quotes": [SEVERITY.ERROR, "double"],
+    "eqeqeq": [SEVERITY.ERROR, "always"],
+    "arrow-parens": [SEVERITY.ERROR, "as-needed"],
+    "space-before-function-paren": [SEVERITY.ERROR, {
       "anonymous": "never",
       "named": "never",
       "asyncArrow": "always"
     }],
-    "object-curly-spacing": [2, "always"],
-    "max-len": ["warn", { "code": 120, "tabWidth": 2 }],
-    "@typescript-eslint/no-use-before-define": 2,
-    "@typescript-eslint/no-namespace": 0,
-    "@typescript-eslint/no-empty-interface": 0,
-    "no-unused-vars": 2,
-    "@typescript-eslint/no-unused-vars": 2,
-    "@typescript-eslint/no-explicit-any": 2,
-    "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/no-var-requires": 2,
-    "require-jsdoc": [2, {
-      "require": {
-        "FunctionDeclaration": true,
-        "MethodDefinition": true,
-        "ClassDeclaration": true,
-        "ArrowFunctionExpression": true,
-        "FunctionExpression": true
-      }
-    }],
-    "unused-imports/no-unused-imports-ts": 2,
-    "unused-imports/no-unused-vars-ts": 1,
-    "@typescript-eslint/interface-name-prefix": 0,
+    "object-curly-spacing": [SEVERITY.ERROR, "always"],
+    "max-len": [SEVERITY.WARNING, { "code": 120, "tabWidth": 2 }],
+    "@typescript-eslint/no-use-before-define": SEVERITY.WARNING,
+    "@typescript-eslint/no-namespace": SEVERITY.OFF,
+    "@typescript-eslint/no-empty-interface": SEVERITY.OFF,
+    "no-unused-vars": SEVERITY.ERROR,
+    "@typescript-eslint/no-unused-vars": SEVERITY.ERROR,
+    "@typescript-eslint/no-explicit-any": SEVERITY.ERROR,
+    "@typescript-eslint/explicit-function-return-type": SEVERITY.OFF,
+    "@typescript-eslint/no-var-requires": SEVERITY.ERROR,
+    "require-jsdoc": SEVERITY.OFF,
+    "unused-imports/no-unused-imports-ts": SEVERITY.ERROR,
+    "unused-imports/no-unused-vars-ts": SEVERITY.WARNING,
+    "@typescript-eslint/interface-name-prefix": SEVERITY.OFF,
     "@typescript-eslint/naming-convention": [
-      2,
+      SEVERITY.ERROR,
       {
         "selector": "default",
         "format": ["PascalCase", "UPPER_CASE"]

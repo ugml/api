@@ -1,186 +1,283 @@
-import Database from "../common/Database";
-import InputValidator from "../common/InputValidator";
-import SerializationHelper from "../common/SerializationHelper";
-import IUserService from "../interfaces/IUserService";
+import IUserService from "../interfaces/services/IUserService";
 import User from "../units/User";
-import squel = require("safe-squel");
+import { inject, injectable } from "inversify";
+import TYPES from "../ioc/types";
 
-/**
- * This class defines a service to interact with the users-table in the database
- */
+import IUserRepository from "../interfaces/repositories/IUserRepository";
+import CreateUserRequest from "../entities/requests/CreateUserRequest";
+import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
+import IGameConfig from "../interfaces/IGameConfig";
+import Config from "../common/Config";
+
+import Encryption from "../common/Encryption";
+import Database from "../common/Database";
+import Planet from "../units/Planet";
+import DuplicateRecordException from "../exceptions/DuplicateRecordException";
+import { Globals } from "../common/Globals";
+
+import JwtHelper from "../common/JwtHelper";
+
+import ApiException from "../exceptions/ApiException";
+import PlanetType = Globals.PlanetType;
+import IPlanetRepository from "../interfaces/repositories/IPlanetRepository";
+import IGalaxyService from "../interfaces/services/IGalaxyService";
+import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
+import IDefenseRepository from "../interfaces/repositories/IDefenseRepository";
+import IShipsRepository from "../interfaces/repositories/IShipsRepository";
+import IGalaxyRepository from "../interfaces/repositories/IGalaxyRepository";
+
+import GalaxyRow from "../units/GalaxyRow";
+import ITechnologiesRepository from "../interfaces/repositories/ITechnologiesRepository";
+
+import UpdateUserRequest from "../entities/requests/UpdateUserRequest";
+import InputValidator from "../common/InputValidator";
+import SetCurrentPlanetRequest from "../entities/requests/SetCurrentPlanetRequest";
+
+import UnauthorizedException from "../exceptions/UnauthorizedException";
+import ILogger from "../interfaces/ILogger";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
+
+@injectable()
 export default class UserService implements IUserService {
-  /**
-   * Returns all information about an authenticated user.
-   * @param userID The ID of the currently authenticated user
-   */
-  public async getAuthenticatedUser(userID: number): Promise<User> {
-    const query: string = squel
-      .select()
-      .field("*")
-      .from("users")
-      .where("userID = ?", userID)
-      .toString();
+  @inject(TYPES.ILogger) private logger: ILogger;
 
-    const [result] = await Database.query(query);
+  @inject(TYPES.IUserRepository) private userRepository: IUserRepository;
+  @inject(TYPES.IBuildingRepository) private buildingRepository: IBuildingRepository;
+  @inject(TYPES.IPlanetRepository) private planetRepository: IPlanetRepository;
+  @inject(TYPES.IDefenseRepository) private defenseRepository: IDefenseRepository;
+  @inject(TYPES.IGalaxyRepository) private galaxyRepository: IGalaxyRepository;
+  @inject(TYPES.ITechnologiesRepository) private technologiesRepository: ITechnologiesRepository;
+  @inject(TYPES.IShipsRepository) private shipsRepository: IShipsRepository;
+  @inject(TYPES.IGalaxyService) private galaxyService: IGalaxyService;
 
-    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
-  }
-
-  /**
-   * Returns information about a user.
-   * This information does not contain sensible data (like email or passwords).
-   * @param userID The ID of the user
-   * @returns A user-object
-   */
-  public async getUserById(userID: number): Promise<User> {
-    const query: string = squel
-      .select()
-      .distinct()
-      .field("userID")
-      .field("username")
-      .from("users")
-      .where("userID = ?", userID)
-      .toString();
-
-    const [result] = await Database.query(query);
-
-    if (!InputValidator.isSet(result)) {
-      return null;
-    }
-
-    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
-  }
-
-  /**
-   * Returns informations about a user.
-   * This information does contain sensible data which is needed for authentication (like email or passwords).
-   * @param email The email of the user
-   * @returns A user-object
-   */
   public async getUserForAuthentication(email: string): Promise<User> {
-    const query: string = squel
-      .select({ autoQuoteFieldNames: true })
-      .field("userID")
-      .field("email")
-      .field("password")
-      .from("users")
-      .where("email = ?", email)
-      .toString();
-
-    const [result] = await Database.query(query);
-
-    if (!InputValidator.isSet(result)) {
-      return null;
-    }
-
-    return SerializationHelper.toInstance(new User(), JSON.stringify(result[0]));
+    return await this.userRepository.getUserForAuthentication(email);
   }
 
-  /**
-   * Checks, if a username of a email-address is already taken.
-   * Returns an object containing the following informations:
-   * ```
-   * {
-   *   username_taken: 0 (if not taken),
-   *   email_taken: 1 (if taken)
-   * }
-   * ```
-   * @param username the username
-   * @param email the email-address
-   */
-  public async checkIfNameOrMailIsTaken(username: string, email: string) {
-    const query =
-      `SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE '${username}') AS \`username_taken\`, ` +
-      `EXISTS (SELECT 1  FROM users WHERE email LIKE '${email}') AS \`email_taken\``;
+  public async getAuthenticatedUser(userID: number): Promise<User> {
+    const user = await this.userRepository.getById(userID);
 
-    const [[data]] = await Database.query(query);
+    delete user.password;
 
-    return data;
+    return user;
   }
 
-  /**
-   * Returns a new, not yet taken userID
-   * @returns The new ID
-   */
-  public async getNewId(): Promise<number> {
-    const queryUser = "CALL getNewUserId();";
+  public async getOtherUser(userID: number): Promise<User> {
+    const user: User = await this.userRepository.getById(userID);
 
-    const [[[result]]] = await Database.query(queryUser);
+    if (!InputValidator.isSet(user)) {
+      throw new NonExistingEntityException("User does not exist");
+    }
 
-    return result.userID;
+    return {
+      userID: user.userID,
+      username: user.username,
+    } as User;
   }
 
-  /**
-   * Stores the current object in the database
-   * @param user A user-object
-   * @param connection An open database-connection, if the query should be run within a transaction
-   */
-  public async createNewUser(user: User, connection) {
-    const query: string = squel
-      .insert({ autoQuoteFieldNames: true })
-      .into("users")
-      .set("userID", user.userID)
-      .set("username", user.username)
-      .set("password", user.password)
-      .set("email", user.email)
-      .set("lastTimeOnline", user.lastTimeOnline)
-      .set("currentPlanet", user.currentPlanet)
-      .toString();
+  public async create(request: CreateUserRequest): Promise<AuthSuccessResponse> {
+    const gameConfig: IGameConfig = Config.getGameConfig();
 
-    if (connection === null) {
-      return await Database.query(query);
-    } else {
-      return await connection.query(query);
+    const hashedPassword = await Encryption.hash(request.password);
+
+    const connection = await Database.getConnectionPool().getConnection();
+
+    const newUser: User = new User();
+    const newPlanet: Planet = new Planet();
+
+    try {
+      await connection.beginTransaction();
+
+      if (await this.userRepository.checkEmailTaken(request.email)) {
+        throw new ApiException("Email is already taken");
+      }
+
+      if (await this.userRepository.checkUsernameTaken(request.username)) {
+        throw new ApiException("Username is already taken");
+      }
+
+      this.logger.info("Getting a new userID");
+
+      newUser.username = request.username;
+      newUser.email = request.email;
+
+      const userID = await this.userRepository.getNewId();
+
+      newUser.userID = userID;
+      newPlanet.ownerID = userID;
+      newUser.password = hashedPassword;
+      newPlanet.planetType = PlanetType.PLANET;
+
+      this.logger.info("Getting a new planetID");
+
+      const planetID = await this.planetRepository.getNewId();
+
+      newUser.currentPlanet = planetID;
+      newPlanet.planetID = planetID;
+
+      this.logger.info("Finding free position for new planet");
+
+      const galaxyData = await this.galaxyService.getFreePosition();
+
+      newPlanet.posGalaxy = galaxyData.posGalaxy;
+      newPlanet.posSystem = galaxyData.posSystem;
+      newPlanet.posPlanet = galaxyData.posPlanet;
+
+      this.logger.info("Creating a new user");
+
+      await this.userRepository.createTransactional(newUser, connection);
+
+      this.logger.info("Creating a new planet");
+
+      newPlanet.name = gameConfig.server.startPlanet.name;
+      newPlanet.lastUpdate = Math.floor(Date.now() / 1000);
+      newPlanet.diameter = gameConfig.server.startPlanet.diameter;
+      newPlanet.fieldsMax = gameConfig.server.startPlanet.fields;
+      newPlanet.metal = gameConfig.server.startPlanet.resources.metal;
+      newPlanet.crystal = gameConfig.server.startPlanet.resources.crystal;
+      newPlanet.deuterium = gameConfig.server.startPlanet.resources.deuterium;
+
+      switch (true) {
+        case newPlanet.posPlanet <= 5: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["desert", "dry"];
+
+          newPlanet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+          break;
+        }
+        case newPlanet.posPlanet <= 10: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["normal", "jungle", "gas"];
+
+          newPlanet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+
+          break;
+        }
+        case newPlanet.posPlanet <= 15: {
+          newPlanet.tempMin = Math.random() * (130 - 40) + 40;
+          newPlanet.tempMax = Math.random() * (150 - 240) + 240;
+
+          const images: string[] = ["ice", "water"];
+
+          newPlanet.image =
+            images[Math.floor(Math.random() * images.length)] + Math.round(Math.random() * (10 - 1) + 1) + ".png";
+        }
+      }
+
+      await this.planetRepository.createTransactional(newPlanet, connection);
+
+      this.logger.info("Creating entry in buildings-table");
+
+      await this.buildingRepository.createTransactional(newPlanet.planetID, connection);
+
+      this.logger.info("Creating entry in defenses-table");
+
+      await this.defenseRepository.createTransactional(newPlanet.planetID, connection);
+
+      this.logger.info("Creating entry in ships-table");
+
+      await this.shipsRepository.createTransactional(newPlanet.planetID, connection);
+
+      this.logger.info("Creating entry in galaxy-table");
+
+      const galaxyRow: GalaxyRow = {
+        planetID: newPlanet.planetID,
+        posGalaxy: newPlanet.posGalaxy,
+        posSystem: newPlanet.posSystem,
+        posPlanet: newPlanet.posPlanet,
+        debrisMetal: 0,
+        debrisCrystal: 0,
+      } as GalaxyRow;
+
+      await this.galaxyRepository.createTransactional(galaxyRow, connection);
+
+      this.logger.info("Creating entry in techs-table");
+
+      await this.technologiesRepository.createTransactional(newUser.userID, connection);
+
+      connection.commit();
+
+      this.logger.info("Transaction complete");
+
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      this.logger.error(error, error);
+
+      if (error instanceof ApiException) {
+        throw error;
+      }
+
+      if (error instanceof DuplicateRecordException || error.message.includes("Duplicate entry")) {
+        throw new Error(`There was an error while handling the request: ${error.message}`);
+      }
+
+      throw new Error("There was an error while handling the request.");
+    } finally {
+      await connection.release();
     }
+
+    return {
+      token: JwtHelper.generateToken(newUser.userID),
+    };
   }
 
-  /**
-   * Updates the userdata in the database
-   * @param user A user-object
-   * @param connection An open database-connection, if the query should be run within a transaction
-   */
-  public async updateUserData(user: User, connection = null) {
-    let query = squel.update().table("users");
+  public async update(request: UpdateUserRequest, userID: number): Promise<User> {
+    const user: User = await this.userRepository.getById(userID);
 
-    if (!user.isValid()) {
-      // TODO: throw exception
-      return null;
+    if (InputValidator.isSet(request.username)) {
+      if (await this.userRepository.checkUsernameTaken(request.username)) {
+        throw new ApiException("Username already taken");
+      }
+
+      user.username = InputValidator.sanitizeString(request.username);
     }
 
-    if (typeof user.username !== "undefined") {
-      query = query.set("username", user.username);
+    if (InputValidator.isSet(request.password)) {
+      const password = InputValidator.sanitizeString(request.password);
+
+      user.password = await Encryption.hash(password);
     }
 
-    if (typeof user.password !== "undefined") {
-      query = query.set("password", user.password);
+    if (InputValidator.isSet(request.email)) {
+      if (await this.userRepository.checkEmailTaken(request.email)) {
+        throw new ApiException("Email already taken");
+      }
+
+      user.email = InputValidator.sanitizeString(request.email);
     }
 
-    if (typeof user.email !== "undefined") {
-      query = query.set("email", user.email);
+    await this.userRepository.save(user);
+
+    return user;
+  }
+
+  public async setCurrentPlanet(request: SetCurrentPlanetRequest, userID: number): Promise<User> {
+    const planetID = request.planetID;
+
+    const planet: Planet = await this.planetRepository.getById(planetID);
+
+    if (!InputValidator.isSet(planet)) {
+      throw new NonExistingEntityException("Planet does not exist");
     }
 
-    if (typeof user.lastTimeOnline !== "undefined") {
-      query = query.set("lastTimeOnline", user.lastTimeOnline);
+    if (planet.ownerID !== userID) {
+      throw new UnauthorizedException("User does not own the planet");
     }
 
-    if (typeof user.currentPlanet !== "undefined") {
-      query = query.set("currentPlanet", user.currentPlanet);
-    }
+    const user: User = await this.userRepository.getById(userID);
 
-    if (typeof user.bTechID !== "undefined") {
-      query = query.set("bTechID", user.bTechID);
-    }
+    user.currentPlanet = planetID;
 
-    if (typeof user.bTechEndTime !== "undefined") {
-      query = query.set("bTechEndTime", user.bTechEndTime);
-    }
+    await this.userRepository.save(user);
 
-    query = query.where("userID = ?", user.userID);
-
-    if (connection === null) {
-      return await Database.query(query.toString());
-    } else {
-      return await connection.query(query.toString());
-    }
+    return user;
   }
 }

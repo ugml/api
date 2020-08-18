@@ -1,76 +1,48 @@
-import { Response, Router } from "express";
-import { Globals } from "../common/Globals";
-import Encryption from "../common/Encryption";
 import InputValidator from "../common/InputValidator";
-import JwtHelper from "../common/JwtHelper";
-import IRequest from "../interfaces/IRequest";
-import IUserService from "../interfaces/IUserService";
-import ILogger from "../interfaces/ILogger";
 
-/**
- * Defines routes for authentication
- */
-export default class AuthRouter {
-  public router: Router = Router();
+import IUserService from "../interfaces/services/IUserService";
 
-  private userService: IUserService;
-  private logger: ILogger;
+import { Route, Post, Body, Tags, Controller, Res, TsoaResponse } from "tsoa";
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger
-   */
-  public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.router.post("/login", this.authenticate);
-    this.logger = logger;
-  }
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
+import { provide } from "inversify-binding-decorators";
+import { Globals } from "../common/Globals";
+import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
+import FailureResponse from "../entities/responses/FailureResponse";
+import AuthRequest from "../entities/requests/AuthRequest";
+import IAuthService from "../interfaces/services/IAuthService";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-  /**
-   * Validates the passed login-data. If the data is valid,
-   * a new JWT-token is returned.
-   * @param req
-   * @param response
-   * @param next
-   */
-  public authenticate = async (req: IRequest, response: Response) => {
+@Route("login")
+@Tags("Authentication")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+@provide(AuthRouter)
+export class AuthRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
+
+  @inject(TYPES.IUserService) private userService: IUserService;
+  @inject(TYPES.IAuthService) private authService: IAuthService;
+
+  @Post("/")
+  public async login(
+    @Body() req: AuthRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, AuthSuccessResponse>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<AuthSuccessResponse> {
     try {
-      if (!InputValidator.isSet(req.body.email) || !InputValidator.isSet(req.body.password)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      const email: string = InputValidator.sanitizeString(req.email);
+      const password: string = InputValidator.sanitizeString(req.password);
 
-      const email: string = InputValidator.sanitizeString(req.body.email);
+      const token = await this.authService.authenticateUser(email, password);
 
-      const password: string = InputValidator.sanitizeString(req.body.password);
-
-      const data = await this.userService.getUserForAuthentication(email);
-
-      if (!InputValidator.isSet(data)) {
-        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          error: "Authentication failed",
-        });
-      }
-
-      const isValidPassword = await Encryption.compare(password, data.password);
-
-      if (!isValidPassword) {
-        return response.status(Globals.Statuscode.NOT_AUTHORIZED).json({
-          error: "Authentication failed",
-        });
-      }
-
-      return response.status(Globals.Statuscode.SUCCESS).json({
-        token: JwtHelper.generateToken(data.userID),
+      return successResponse(Globals.StatusCodes.SUCCESS, {
+        token: token,
       });
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
+  }
 }

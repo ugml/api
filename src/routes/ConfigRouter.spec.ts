@@ -2,15 +2,9 @@ import * as chai from "chai";
 import chaiHttp = require("chai-http");
 
 import App from "../App";
-import SimpleLogger from "../loggers/SimpleLogger";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const createContainer = require("../ioc/createContainer");
 import Config from "../common/Config";
 
-const container = createContainer();
-
-const app = new App(container, new SimpleLogger()).express;
+const app = new App().express;
 
 chai.use(chaiHttp);
 const expect = chai.expect;

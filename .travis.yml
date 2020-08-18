@@ -21,7 +21,7 @@ env:
   - NODE_ENV=development
 
 stages:
-  - "Audit"
+  #- "Audit"
   - "Build"
   - "Test"
   - "Lint"
@@ -30,12 +30,12 @@ stages:
 
 jobs:
   include:
-    - stage: "Audit"
-      if: type = pull_request
-      script: audit-ci --low --report-type full
+    #- stage: "Audit"
+    #  if: type = pull_request
+    #  script: audit-ci --low --report-type full
     - &build
       stage: "Build"
-      script: npm run-script build
+      script: npm run-script tsoa:gen && npm run-script build
       node_js: '8'
     - <<: *build
       node_js: '10'
@@ -43,6 +43,7 @@ jobs:
       node_js: '12'
     - stage: "Test"
       script:
+        - npm run-script tsoa:gen
         - git fetch --unshallow --quiet
         - sudo mysql -u root < test/ci.sql
         - npm run-script test-coverage

@@ -1,6 +1,3 @@
-/**
- * This class holds all global variables
- */
 class Globals {
   public static MIN_BUILDING_ID = 1;
   public static MAX_BUILDING_ID = 15;
@@ -34,10 +31,7 @@ namespace Globals {
     MISSILE_SILO = 15,
   }
 
-  // 4xx - authentication failure
-  // 5xx - server errors
-
-  export enum Statuscode {
+  export enum StatusCodes {
     SUCCESS = 200,
     CREATED = 201,
     BAD_REQUEST = 400,

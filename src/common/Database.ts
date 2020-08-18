@@ -3,22 +3,11 @@ import dotenv = require("dotenv");
 
 dotenv.config();
 
-/**
- * Manages the connection to the (mysql/mariaDB)-database
- */
 export default class Database {
-  /**
-   * Returns the connection-pool to the mysql-database
-   */
   public static getConnectionPool() {
     return this.connectionPool;
   }
 
-  /**
-   * Returns a promise for a query
-   * @param sql the sql-query
-   * @param args optional arguments
-   */
   public static query(sql: string) {
     // TODO: Log the mysql-errors
     return this.connectionPool.query(sql);

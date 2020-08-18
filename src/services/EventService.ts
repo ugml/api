@@ -1,19 +1,14 @@
 import Database from "../common/Database";
 import InputValidator from "../common/InputValidator";
 import SerializationHelper from "../common/SerializationHelper";
-import IEventService from "../interfaces/IEventService";
+import IEventService from "../interfaces/services/IEventService";
 import Event from "../units/Event";
 import squel = require("safe-squel");
+import { injectable } from "inversify";
 
-/**
- * This class defines a service to interact manage events
- */
+@injectable()
 export default class EventService implements IEventService {
-  /**
-   *
-   * @param event
-   */
-  public async createNewEvent(event: Event) {
+  public async create(event: Event) {
     const query: string = squel
       .insert()
       .into("events")
@@ -34,12 +29,7 @@ export default class EventService implements IEventService {
     return await Database.query(query);
   }
 
-  /**
-   * Returns an event of a user
-   * @param userID the ID of the user
-   * @param eventID the ID of the event
-   */
-  public async getEventOfPlayer(userID: number, eventID: number): Promise<Event> {
+  public async getEvent(userID: number, eventID: number): Promise<Event> {
     const query: string = squel
       .select()
       .from("events")
@@ -56,11 +46,7 @@ export default class EventService implements IEventService {
     return SerializationHelper.toInstance(new Event(), JSON.stringify(result));
   }
 
-  /**
-   * Cancels an event
-   * @param event the event to be canceled
-   */
-  public async cancelEvent(event: Event) {
+  public async cancel(event: Event) {
     const query: string = squel
       .update()
       .table("events")

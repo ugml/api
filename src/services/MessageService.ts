@@ -1,123 +1,71 @@
-import Database from "../common/Database";
-import InputValidator from "../common/InputValidator";
-import SerializationHelper from "../common/SerializationHelper";
-import IMessageService from "../interfaces/IMessageService";
+import IMessageService from "../interfaces/services/IMessageService";
+
+import { inject, injectable } from "inversify";
 import Message from "../units/Message";
+import TYPES from "../ioc/types";
+import IMessageRepository from "../interfaces/repositories/IMessageRepository";
+import UnauthorizedException from "../exceptions/UnauthorizedException";
+import InputValidator from "../common/InputValidator";
 
-import squel = require("safe-squel");
+import SendMessageRequest from "../entities/requests/SendMessageRequest";
+import IUserRepository from "../interfaces/repositories/IUserRepository";
+import ApiException from "../exceptions/ApiException";
+import NonExistingEntityException from "../exceptions/NonExistingEntityException";
 
-/**
- * This class defines a service to interact with the messages-table in the database
- */
+@injectable()
 export default class MessageService implements IMessageService {
-  /**
-   * Returns a list of all messages a user has sent or received
-   * @param userID the ID of the user
-   */
-  public async getAllMessages(userID: number) {
-    const query: string = squel
-      .select()
-      .from("messages")
-      .field("messageID")
-      .field("senderID")
-      .field("receiverID")
-      .field("sendtime")
-      .field("type")
-      .field("subject")
-      .field("body")
-      .where("receiverID = ?", userID)
-      .where("deleted = ?", 0)
-      .order("sendtime", false)
-      .toString();
+  @inject(TYPES.IMessageRepository) private messageRepository: IMessageRepository;
+  @inject(TYPES.IUserRepository) private userRepository: IUserRepository;
 
-    const [rows] = await Database.query(query);
-
-    if (!InputValidator.isSet(rows)) {
-      return null;
-    }
-
-    return rows;
+  public async getAll(userID: number): Promise<Message[]> {
+    return await this.messageRepository.getAll(userID);
   }
 
-  /**
-   * Returns a specific message given the messageID and the sender- or receiverID
-   * @param userID the sender- or receiverID
-   * @param messageID the ID of the message
-   */
-  public async getMessageById(userID: number, messageID: number): Promise<Message> {
-    const query: string = squel
-      .select()
-      .from("messages")
-      .field("messageID")
-      .field("senderID")
-      .field("receiverID")
-      .field("sendtime")
-      .field("type")
-      .field("subject")
-      .field("body")
-      .where("receiverID = ?", userID)
-      .where("messageID = ?", messageID)
-      .where("deleted = ?", 0)
-      .toString();
+  public async getById(messageID: number, userID: number): Promise<Message> {
+    const message = await this.messageRepository.getById(messageID);
 
-    const [rows] = await Database.query(query.toString());
-
-    if (!InputValidator.isSet(rows)) {
-      return null;
+    if (!InputValidator.isSet(message)) {
+      throw new NonExistingEntityException("Message does not exist");
     }
 
-    return SerializationHelper.toInstance(new Message(), JSON.stringify(rows[0]));
-  }
-
-  /**
-   * Marks a message as deleted in the database
-   * @param userID the ID of the user
-   * @param messageID the ID of the message
-   */
-  public async deleteMessage(userID: number, messageID: number) {
-    const query: string = squel
-      .update()
-      .table("messages")
-      .set("deleted", 1)
-      .where("messageID = ?", messageID)
-      .where("receiverID = ?", userID)
-      .toString();
-
-    const [rows] = await Database.query(query);
-
-    if (!InputValidator.isSet(rows)) {
-      return null;
+    if (message.receiverID !== userID) {
+      throw new UnauthorizedException("User was not the receiver");
     }
 
-    return rows;
+    return message;
   }
 
-  /**
-   * Sends a new message
-   * @param senderID the ID of the sender
-   * @param receiverID the ID of the receiver
-   * @param subject the subject of the message
-   * @param messageText the message-text
-   */
-  public async sendMessage(senderID: number, receiverID: number, subject: string, messageText: string) {
-    // TODO: set unread-message-count + 1 at receiver?
-    const query: string = squel
-      .insert()
-      .into("messages")
-      .set("senderID", senderID)
-      .set("receiverID", receiverID)
-      .set(
-        "sendtime",
-        new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " "),
-      )
-      .set("type", 1)
-      .set("subject", subject)
-      .set("body", messageText)
-      .toString();
+  public async send(request: SendMessageRequest, userID: number): Promise<void> {
+    const receiver = await this.userRepository.getById(request.receiverID);
 
-    await Database.query(query);
+    if (!InputValidator.isSet(receiver)) {
+      throw new NonExistingEntityException("The receiver does not exist");
+    }
+
+    const message: Message = {
+      senderID: userID,
+      receiverID: request.receiverID,
+      type: 1, // TODO
+      subject: request.subject,
+      body: request.body,
+    } as Message;
+
+    await this.messageRepository.create(message);
+  }
+
+  public async delete(messageID: number, userID: number): Promise<void> {
+    const message: Message = await this.messageRepository.getById(messageID);
+
+    if (!InputValidator.isSet(message)) {
+      throw new NonExistingEntityException("Message does not exist");
+    }
+
+    if (message.receiverID !== userID) {
+      throw new UnauthorizedException("Message was not sent to user");
+    }
+
+    message.deleted = true;
+
+    await this.messageRepository.save(message);
   }
 }

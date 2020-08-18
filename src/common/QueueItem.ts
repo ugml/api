@@ -1,7 +1,3 @@
-/**
- * This class represents a QueueItem.
- * A QueueItem is part of a build-queue.
- */
 export default class QueueItem {
   public unitID: number;
   public amount: number;

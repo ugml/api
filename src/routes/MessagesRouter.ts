@@ -1,158 +1,102 @@
-import { Response, Router } from "express";
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import IAuthorizedRequest from "../interfaces/IAuthorizedRequest";
-import IMessageService from "../interfaces/IMessageService";
-import IUserService from "../interfaces/IUserService";
-import ILogger from "../interfaces/ILogger";
 
-/**
- * Defines routes for message-sending and receiving
- */
-export default class MessagesRouter {
-  public router: Router = Router();
+import IMessageService from "../interfaces/services/IMessageService";
+import IUserService from "../interfaces/services/IUserService";
 
-  private logger: ILogger;
+import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
+import { inject } from "inversify";
+import TYPES from "../ioc/types";
+import SendMessageRequest from "../entities/requests/SendMessageRequest";
+import DeleteMessageRequest from "../entities/requests/DeleteMessageRequest";
+import { provide } from "inversify-binding-decorators";
+import FailureResponse from "../entities/responses/FailureResponse";
 
-  private userService: IUserService;
-  private messageService: IMessageService;
+import Message from "../units/Message";
 
-  /**
-   * Registers the routes and needed services
-   * @param container the IoC-container with registered services
-   * @param logger Instance of an ILogger-object
-   */
-  public constructor(container, logger: ILogger) {
-    this.userService = container.userService;
-    this.messageService = container.messageService;
-    this.router.get("/get", this.getAllMessages);
-    this.router.get("/get/:messageID", this.getMessageByID);
-    this.router.post("/delete", this.deleteMessage);
-    this.router.post("/send", this.sendMessage);
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-    this.logger = logger;
+@Route("messages")
+@Tags("Messages")
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+@provide(MessagesRouter)
+export class MessagesRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
+
+  @inject(TYPES.IUserService) private userService: IUserService;
+  @inject(TYPES.IMessageService) private messageService: IMessageService;
+
+  @Get("/")
+  @Security("jwt")
+  public async getAllMessages(
+    @Request() headers,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Message[]>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Message[]> {
+    try {
+      return await this.messageService.getAll(headers.user.userID);
+    } catch (error) {
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+    }
   }
 
-  /**
-   * Returns a list of all messages
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getAllMessages = async (request: IAuthorizedRequest, response: Response) => {
+  @Get("/{messageID}")
+  @Security("jwt")
+  public async getMessageByID(
+    @Request() headers,
+    messageID: number,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, Message>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<Message> {
     try {
-      const userID = parseInt(request.userID, 10);
-
-      const messages = await this.messageService.getAllMessages(userID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json(messages ?? {});
+      return await this.messageService.getById(messageID, headers.user.userID);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
+  }
 
-  /**
-   * Returns a specific message by its messageID
-   * @param request
-   * @param response
-   * @param next
-   */
-  public getMessageByID = async (request: IAuthorizedRequest, response: Response) => {
+  @Post("/send")
+  @Security("jwt")
+  public async sendMessage(
+    @Request() headers,
+    @Body() request: SendMessageRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, void>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<void> {
     try {
-      if (!InputValidator.isSet(request.params.messageID) || !InputValidator.isValidInt(request.params.messageID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      request.subject = InputValidator.sanitizeString(request.subject);
+      request.body = InputValidator.sanitizeString(request.body);
 
-      const userID = parseInt(request.userID, 10);
-      const messageID = parseInt(request.params.messageID, 10);
-      const message = await this.messageService.getMessageById(userID, messageID);
+      await this.messageService.send(request, headers.user.userID);
 
-      return response.status(Globals.Statuscode.SUCCESS).json(message ?? {});
+      return successResponse(Globals.StatusCodes.SUCCESS);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
+  }
 
-  /**
-   * Deletes a message by its messageID
-   * @param request
-   * @param response
-   * @param next
-   */
-  public deleteMessage = async (request: IAuthorizedRequest, response: Response) => {
+  @Post("/delete")
+  @Security("jwt")
+  public async deleteMessage(
+    @Request() headers,
+    @Body() request: DeleteMessageRequest,
+    @Res() successResponse: TsoaResponse<Globals.StatusCodes.SUCCESS, void>,
+    @Res() badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
+    @Res() unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,
+    @Res() serverErrorResponse: TsoaResponse<Globals.StatusCodes.SERVER_ERROR, FailureResponse>,
+  ): Promise<void> {
     try {
-      if (!InputValidator.isSet(request.body.messageID) || !InputValidator.isValidInt(request.body.messageID)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
+      await this.messageService.delete(headers.user.userID, request.messageID);
 
-      const userID = parseInt(request.userID, 10);
-      const messageID = parseInt(request.body.messageID, 10);
-
-      await this.messageService.deleteMessage(userID, messageID);
-
-      return response.status(Globals.Statuscode.SUCCESS).json({});
+      return successResponse(Globals.StatusCodes.SUCCESS);
     } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
-  };
-
-  /**
-   * Sends a new message
-   * @param request
-   * @param response
-   * @param next
-   */
-  public sendMessage = async (request: IAuthorizedRequest, response: Response) => {
-    try {
-      if (
-        !InputValidator.isSet(request.body.receiverID) ||
-        !InputValidator.isValidInt(request.body.receiverID) ||
-        !InputValidator.isSet(request.body.subject) ||
-        !InputValidator.isSet(request.body.body)
-      ) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "Invalid parameter",
-        });
-      }
-
-      const userID = parseInt(request.userID, 10);
-      const receiverID = parseInt(request.body.receiverID, 10);
-      const subject = InputValidator.sanitizeString(request.body.subject);
-      const messageText = InputValidator.sanitizeString(request.body.body);
-
-      const receiver = await this.userService.getUserById(receiverID);
-
-      if (!InputValidator.isSet(receiver)) {
-        return response.status(Globals.Statuscode.BAD_REQUEST).json({
-          error: "The receiver does not exist",
-        });
-      }
-
-      await this.messageService.sendMessage(userID, receiverID, subject, messageText);
-
-      return response.status(Globals.Statuscode.SUCCESS).json({});
-    } catch (error) {
-      this.logger.error(error, error.stack);
-
-      return response.status(Globals.Statuscode.SERVER_ERROR).json({
-        error: "There was an error while handling the request.",
-      });
-    }
-  };
+  }
 }

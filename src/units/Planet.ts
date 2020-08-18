@@ -1,196 +1,86 @@
 import Config from "../common/Config";
 import { Globals } from "../common/Globals";
 import IUnit from "../interfaces/IUnit";
-/**
- * Represents a planet-row in the database
- */
+
 export default class Planet implements IUnit {
-  /**
-   * The ID of the planet
-   */
   public planetID: number;
 
-  /**
-   * The ID of the owner
-   */
   public ownerID: number;
 
-  /**
-   * The name of the planet
-   */
   public name: string;
 
-  /**
-   * The galaxy-position in the universe
-   */
   public posGalaxy: number;
 
-  /**
-   * The system-position in the universe
-   */
   public posSystem: number;
 
-  /**
-   * the planet-position in the universe
-   */
   public posPlanet: number;
 
-  /**
-   * The unix-timestamp the planet was last updated
-   */
   public lastUpdate: number;
 
-  /**
-   * The type of the planet
-   */
   public planetType: Globals.PlanetType;
 
-  /**
-   * The image of the planet
-   */
   public image: string;
 
-  /**
-   * The diameter of the planet
-   */
   public diameter: number;
 
-  /**
-   * The currently populated fields on the planet
-   */
   public fieldsCurrent: number;
 
-  /**
-   * The maximum fields on the planet
-   */
   public fieldsMax: number;
 
-  /**
-   * The minimum temperature on the planet
-   */
   public tempMin: number;
 
-  /**
-   * The maximum temperature on the planet
-   */
   public tempMax: number;
 
-  /**
-   * The current amount of metal on the planet
-   */
   public metal: number;
 
-  /**
-   * The current amount of crystal on the planet
-   */
   public crystal: number;
 
-  /**
-   * The current amount of deuterium on the planet
-   */
   public deuterium: number;
 
-  /**
-   * The current amount of energy used on the planet
-   */
   public energyUsed: number;
 
-  /**
-   * The maximum amount of energy on the planet
-   */
   public energyMax: number;
 
-  /**
-   * The percentage of production metal-mine
-   */
   public metalMinePercent: number;
 
-  /**
-   * The percentage of production of the crystal-mine
-   */
   public crystalMinePercent: number;
 
-  /**
-   * The percentage of production deuterium-synthesizer
-   */
   public deuteriumSynthesizerPercent: number;
 
-  /**
-   * The percentage of production solar-planet
-   */
   public solarPlantPercent: number;
 
-  /**
-   * The percentage of production fusion-reactor
-   */
   public fusionReactorPercent: number;
 
-  /**
-   * The percentage of production solar-sattelite
-   */
   public solarSatellitePercent: number;
 
-  /**
-   * The ID of the building currently upgrading.
-   * This value is 0 if no building is currently upgrading.
-   */
   public bBuildingId: number;
 
-  /**
-   * The time, at which the upgrade will be completed
-   */
   public bBuildingEndTime: number;
 
-  /**
-   * True, if the current build-order is a demolition job
-   */
   public bBuildingDemolition: boolean;
 
-  /**
-   * The curreny queue of the hangar
-   */
   public bHangarQueue: string;
 
-  /**
-   * The time, the queue was started
-   */
   public bHangarStartTime: number;
 
   // TODO: obsolete?
-  /**
-   * True, if the hangar is currently upgraded
-   */
+
   public bHangarPlus: boolean;
 
-  /**
-   * Indicates, if the planet is destroyed
-   */
   public destroyed: boolean;
 
-  /**
-   * Checks, if the planet is currently upgrading a building
-   */
   public isUpgradingBuilding(): boolean {
     return this.bBuildingId > 0 && this.bBuildingEndTime > 0;
   }
 
-  /**
-   * Checks, if the planet is currently upgrading its hangar
-   */
   public isUpgradingHangar(): boolean {
     return this.bHangarPlus;
   }
 
-  /**
-   *  Checks, if the planet is currently upgrading the research-lab
-   */
   public isUpgradingResearchLab(): boolean {
     return this.bBuildingId === Globals.Buildings.RESEARCH_LAB && this.bBuildingEndTime > 0;
   }
 
-  /**
-   *  Checks, if the planet is currently building units
-   */
   public isBuildingUnits(): boolean {
     return (
       this.bHangarQueue !== undefined &&
@@ -200,9 +90,6 @@ export default class Planet implements IUnit {
     );
   }
 
-  /**
-   * Returns, if the contains valid data or not
-   */
   public isValid(): boolean {
     return (
       0 < this.planetID &&

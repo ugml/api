@@ -5,7 +5,7 @@ import IBuildingService from "../interfaces/services/IBuildingService";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import IShipService from "../interfaces/services/IShipService";
 import Planet from "../units/Planet";
-import ILogger from "../interfaces/ILogger";
+
 import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
@@ -15,14 +15,15 @@ import BuildShipsRequest from "../entities/requests/BuildShipsRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
 import Ships from "../units/Ships";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("ships")
 @Tags("Ships")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(ShipsRouter)
 export class ShipsRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
@@ -41,7 +42,7 @@ export class ShipsRouter extends Controller {
     try {
       return await this.shipService.getAll(request.user.userID, planetID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -62,7 +63,7 @@ export class ShipsRouter extends Controller {
 
       return await this.shipService.processBuildOrder(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

@@ -8,7 +8,6 @@ import IPlanetService from "../interfaces/services/IPlanetService";
 
 import Defenses from "../units/Defenses";
 
-import ILogger from "../interfaces/ILogger";
 import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
@@ -18,14 +17,15 @@ import BuildDefenseRequest from "../entities/requests/BuildDefenseRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
 import Planet from "../units/Planet";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("defenses")
 @Tags("Defenses")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(DefenseRouter)
 export class DefenseRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
@@ -44,7 +44,7 @@ export class DefenseRouter extends Controller {
     try {
       return await this.defenseService.getAll(headers.user.userID, planetID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -66,7 +66,7 @@ export class DefenseRouter extends Controller {
 
       return await this.defenseService.processBuildOrder(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

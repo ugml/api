@@ -2,7 +2,7 @@ import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
 
 import IGalaxyService from "../interfaces/services/IGalaxyService";
-import ILogger from "../interfaces/ILogger";
+
 import { Controller, Get, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
@@ -10,14 +10,15 @@ import TYPES from "../ioc/types";
 import FailureResponse from "../entities/responses/FailureResponse";
 
 import GalaxyPositionInfo from "../units/GalaxyPositionInfo";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("galaxy")
 @Tags("Galaxy")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(GalaxyRouter)
 export class GalaxyRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
   @inject(TYPES.IGalaxyService) private galaxyService: IGalaxyService;
 
   @Get("/{posGalaxy}/{posSystem}")
@@ -37,7 +38,7 @@ export class GalaxyRouter extends Controller {
 
       return await this.galaxyService.getPositionInfo(posGalaxy, posSystem);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

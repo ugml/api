@@ -1,7 +1,6 @@
 import InputValidator from "../common/InputValidator";
 
 import IUserService from "../interfaces/services/IUserService";
-import ILogger from "../interfaces/ILogger";
 
 import { Route, Post, Body, Tags, Controller, Res, TsoaResponse } from "tsoa";
 
@@ -13,17 +12,17 @@ import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
 import FailureResponse from "../entities/responses/FailureResponse";
 import AuthRequest from "../entities/requests/AuthRequest";
 import IAuthService from "../interfaces/services/IAuthService";
-import ApiException from "../exceptions/ApiException";
-import ErrorHandler from "../common/ErrorHandler";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("login")
 @Tags("Authentication")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(AuthRouter)
 export class AuthRouter extends Controller {
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
+
   @inject(TYPES.IUserService) private userService: IUserService;
   @inject(TYPES.IAuthService) private authService: IAuthService;
-  @inject(TYPES.ILogger) private logger: ILogger;
 
   @Post("/")
   public async login(
@@ -43,7 +42,7 @@ export class AuthRouter extends Controller {
         token: token,
       });
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

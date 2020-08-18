@@ -3,14 +3,20 @@ import { Globals } from "./Globals";
 import FailureResponse from "../entities/responses/FailureResponse";
 import ApiException from "../exceptions/ApiException";
 import UnauthorizedException from "../exceptions/UnauthorizedException";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import TYPES from "../ioc/types";
 import ILogger from "../interfaces/ILogger";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
-export default class ErrorHandler {
-  @inject(TYPES.ILogger) private static logger: ILogger;
+@injectable()
+export default class ErrorHandler implements IErrorHandler {
+  private logger: ILogger;
 
-  public static handle(
+  constructor(@inject(TYPES.ILogger) logger: ILogger) {
+    this.logger = logger;
+  }
+
+  public handle(
     error: Error,
     badRequestResponse: TsoaResponse<Globals.StatusCodes.BAD_REQUEST, FailureResponse>,
     unauthorizedResponse: TsoaResponse<Globals.StatusCodes.NOT_AUTHORIZED, FailureResponse>,

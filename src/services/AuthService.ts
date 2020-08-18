@@ -5,7 +5,7 @@ import JwtHelper from "../common/JwtHelper";
 import { inject, injectable } from "inversify";
 import TYPES from "../ioc/types";
 import IUserService from "../interfaces/services/IUserService";
-import ApiException from "../exceptions/ApiException";
+
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 @injectable()

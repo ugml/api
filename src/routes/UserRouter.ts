@@ -4,7 +4,6 @@ import InputValidator from "../common/InputValidator";
 
 import FailureResponse from "../entities/responses/FailureResponse";
 
-import ILogger from "../interfaces/ILogger";
 import IBuildingService from "../interfaces/services/IBuildingService";
 import IDefenseService from "../interfaces/services/IDefenseService";
 import IGalaxyService from "../interfaces/services/IGalaxyService";
@@ -25,14 +24,15 @@ import { Route, Get, Tags, Controller, Security, Request, Post, Body, Res, TsoaR
 
 import AuthSuccessResponse from "../entities/responses/AuthSuccessResponse";
 import Planet from "../units/Planet";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("user")
 @Tags("UserData")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(UserRouter)
 export class UserRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IUserService) private userService: IUserService;
   @inject(TYPES.IGalaxyService) private galaxyService: IGalaxyService;
@@ -54,7 +54,7 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.getAuthenticatedUser(request.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -81,7 +81,7 @@ export class UserRouter extends Controller {
 
       return await this.userService.create(request);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -98,7 +98,7 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.update(requestModel, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -114,7 +114,7 @@ export class UserRouter extends Controller {
     try {
       return await this.planetService.getAll(request.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -131,7 +131,7 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.setCurrentPlanet(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -147,7 +147,7 @@ export class UserRouter extends Controller {
     try {
       return await this.userService.getOtherUser(userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

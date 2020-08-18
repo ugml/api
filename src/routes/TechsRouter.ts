@@ -7,7 +7,7 @@ import Planet from "../units/Planet";
 import Techs from "../units/Techs";
 
 import IUserService from "../interfaces/services/IUserService";
-import ILogger from "../interfaces/ILogger";
+
 import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
@@ -16,14 +16,15 @@ import TYPES from "../ioc/types";
 import CancelTechRequest from "../entities/requests/CancelTechRequest";
 import BuildTechRequest from "../entities/requests/BuildTechRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("technologies")
 @Tags("Technologies")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(TechsRouter)
 export class TechsRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IUserService) private userService: IUserService;
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
@@ -42,7 +43,7 @@ export class TechsRouter extends Controller {
     try {
       return await this.techService.getAll(headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -63,7 +64,7 @@ export class TechsRouter extends Controller {
 
       return await this.techService.build(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -80,7 +81,7 @@ export class TechsRouter extends Controller {
     try {
       return await this.techService.cancel(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

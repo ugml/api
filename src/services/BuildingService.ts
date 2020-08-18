@@ -10,7 +10,6 @@ import { Globals } from "../common/Globals";
 import Config from "../common/Config";
 import Calculations from "../common/Calculations";
 import TYPES from "../ioc/types";
-import ILogger from "../interfaces/ILogger";
 import IBuildingRepository from "../interfaces/repositories/IBuildingRepository";
 import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import ApiException from "../exceptions/ApiException";
@@ -32,8 +31,6 @@ import DemolishBuildingRequest from "../entities/requests/DemolishBuildingReques
  */
 @injectable()
 export default class BuildingService implements IBuildingService {
-  @inject(TYPES.ILogger) private logger: ILogger;
-
   private planetService: IPlanetService;
   private requirementsService: IRequirementsService;
 

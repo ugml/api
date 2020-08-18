@@ -1,6 +1,5 @@
 import { Globals } from "../common/Globals";
 import InputValidator from "../common/InputValidator";
-import ILogger from "../interfaces/ILogger";
 import IBuildingService from "../interfaces/services/IBuildingService";
 import IPlanetService from "../interfaces/services/IPlanetService";
 import IUserService from "../interfaces/services/IUserService";
@@ -18,14 +17,14 @@ import BuildBuildingRequest from "../entities/requests/BuildBuildingRequest";
 import DemolishBuildingRequest from "../entities/requests/DemolishBuildingRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
-import ErrorHandler from "../common/ErrorHandler";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("buildings")
 @Tags("Buildings")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(BuildingsRouter)
 export class BuildingsRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IBuildingService) private buildingService: IBuildingService;
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
@@ -47,7 +46,7 @@ export class BuildingsRouter extends Controller {
         await this.buildingService.getAll(planetID, request.user.userID),
       );
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -68,7 +67,7 @@ export class BuildingsRouter extends Controller {
 
       return await this.buildingService.start(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -85,7 +84,7 @@ export class BuildingsRouter extends Controller {
     try {
       return await this.buildingService.cancel(request.planetID, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -106,7 +105,7 @@ export class BuildingsRouter extends Controller {
 
       return await this.buildingService.demolish(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

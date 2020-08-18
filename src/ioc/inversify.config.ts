@@ -53,6 +53,8 @@ import { MessagesRouter } from "../routes/MessagesRouter";
 import { PlanetsRouter } from "../routes/PlanetsRouter";
 import { ShipsRouter } from "../routes/ShipsRouter";
 import { TechsRouter } from "../routes/TechsRouter";
+import ErrorHandler from "../common/ErrorHandler";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 const iocContainer = new Container();
 
@@ -96,5 +98,7 @@ iocContainer.bind<PlanetsRouter>(TYPES.PlanetsRouter).to(PlanetsRouter);
 iocContainer.bind<ShipsRouter>(TYPES.ShipsRouter).to(ShipsRouter);
 iocContainer.bind<TechsRouter>(TYPES.TechsRouter).to(TechsRouter);
 iocContainer.bind<UserRouter>(TYPES.UsersRouter).to(UserRouter);
+
+iocContainer.bind<IErrorHandler>(TYPES.IErrorHandler).to(ErrorHandler);
 
 export { iocContainer, autoProvide, inject, decorate, injectable };

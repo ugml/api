@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 
 import IPlanetService from "../interfaces/services/IPlanetService";
 import Planet from "../units/Planet";
-import ILogger from "../interfaces/ILogger";
+
 import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
 import { inject } from "inversify";
@@ -14,14 +14,15 @@ import RenamePlanetRequest from "../entities/requests/RenamePlanetRequest";
 import FailureResponse from "../entities/responses/FailureResponse";
 
 import Event from "../units/Event";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("planets")
 @Tags("Planets")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(PlanetsRouter)
 export class PlanetsRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IPlanetService) private planetService: IPlanetService;
 
@@ -41,7 +42,7 @@ export class PlanetsRouter extends Controller {
         await this.planetService.getMovement(headers.user.userID, planetID),
       );
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -58,7 +59,7 @@ export class PlanetsRouter extends Controller {
     try {
       return await this.planetService.destroy(request.planetID, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -88,7 +89,7 @@ export class PlanetsRouter extends Controller {
 
       return await this.planetService.rename(request, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -105,7 +106,7 @@ export class PlanetsRouter extends Controller {
     try {
       return await this.planetService.getById(planetID, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

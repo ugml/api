@@ -4,7 +4,7 @@ import IUserService from "../interfaces/services/IUserService";
 import { anyString, instance, mock, when } from "ts-mockito";
 import User from "../units/User";
 import UserService from "./UserService";
-import ApiException from "../exceptions/ApiException";
+
 import UnauthorizedException from "../exceptions/UnauthorizedException";
 
 const chai = require("chai");

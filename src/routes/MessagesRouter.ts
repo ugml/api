@@ -3,7 +3,7 @@ import InputValidator from "../common/InputValidator";
 
 import IMessageService from "../interfaces/services/IMessageService";
 import IUserService from "../interfaces/services/IUserService";
-import ILogger from "../interfaces/ILogger";
+
 import { Body, Controller, Get, Post, Request, Res, Route, Security, Tags, TsoaResponse } from "tsoa";
 import { inject } from "inversify";
 import TYPES from "../ioc/types";
@@ -13,14 +13,15 @@ import { provide } from "inversify-binding-decorators";
 import FailureResponse from "../entities/responses/FailureResponse";
 
 import Message from "../units/Message";
-import ErrorHandler from "../common/ErrorHandler";
+
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("messages")
 @Tags("Messages")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(MessagesRouter)
 export class MessagesRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @inject(TYPES.IUserService) private userService: IUserService;
   @inject(TYPES.IMessageService) private messageService: IMessageService;
@@ -37,7 +38,7 @@ export class MessagesRouter extends Controller {
     try {
       return await this.messageService.getAll(headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -54,7 +55,7 @@ export class MessagesRouter extends Controller {
     try {
       return await this.messageService.getById(messageID, headers.user.userID);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -76,7 +77,7 @@ export class MessagesRouter extends Controller {
 
       return successResponse(Globals.StatusCodes.SUCCESS);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -95,7 +96,7 @@ export class MessagesRouter extends Controller {
 
       return successResponse(Globals.StatusCodes.SUCCESS);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

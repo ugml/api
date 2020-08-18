@@ -1,5 +1,5 @@
 import { Globals } from "../common/Globals";
-import ILogger from "../interfaces/ILogger";
+
 import Config from "../common/Config";
 import { Controller, Get, Res, Route, Tags, TsoaResponse } from "tsoa";
 import { provide } from "inversify-binding-decorators";
@@ -8,14 +8,14 @@ import TYPES from "../ioc/types";
 import FailureResponse from "../entities/responses/FailureResponse";
 
 import IGameConfig, { IUnits } from "../interfaces/IGameConfig";
-import ErrorHandler from "../common/ErrorHandler";
+import IErrorHandler from "../interfaces/IErrorHandler";
 
 @Route("config")
 @Tags("Configuration")
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 @provide(ConfigRouter)
 export class ConfigRouter extends Controller {
-  @inject(TYPES.ILogger) private logger: ILogger;
+  @inject(TYPES.IErrorHandler) private errorHandler: IErrorHandler;
 
   @Get("/game")
   public getGameConfig(
@@ -27,7 +27,7 @@ export class ConfigRouter extends Controller {
     try {
       return successResponse(Globals.StatusCodes.SUCCESS, Config.getGameConfig());
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 
@@ -41,7 +41,7 @@ export class ConfigRouter extends Controller {
     try {
       return successResponse(Globals.StatusCodes.SUCCESS, Config.getGameConfig().units);
     } catch (error) {
-      return ErrorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
+      return this.errorHandler.handle(error, badRequestResponse, unauthorizedResponse, serverErrorResponse);
     }
   }
 }

@@ -1,4 +1,5 @@
 import "reflect-metadata";
+
 /* eslint-disable @typescript-eslint/naming-convention */
 
 const TYPES = {
@@ -36,6 +37,8 @@ const TYPES = {
   ShipsRouter: Symbol("ShipsRouter"),
   TechsRouter: Symbol("TechsRouter"),
   UsersRouter: Symbol("UsersRouter"),
+
+  IErrorHandler: Symbol("IErrorHandler"),
 };
 
 export default TYPES;

@@ -10,7 +10,7 @@ const technologiesRepository = iocContainer.get<ITechnologiesRepository>(TYPES.I
 const expect = chai.expect;
 
 describe("TechService", () => {
-  it("should return a planet", async () => {
+  it("should fail (duplicate entry)", async () => {
     try {
       await technologiesRepository.create({
         userID: 1,

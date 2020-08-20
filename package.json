@@ -104,7 +104,7 @@
     "typescript": "^3.7.3"
   },
   "optionalDependencies": {
-    "bcrypt": "^3.0.7"
+    "bcrypt": "^5.0.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

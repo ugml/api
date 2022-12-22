@@ -121,7 +121,7 @@
     "gulp-typescript": "^5.0.1",
     "helmet": "^3.16.0",
     "jsonschema": "^1.2.4",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
     "node-pre-gyp": "^0.14.0",
